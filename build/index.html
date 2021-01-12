@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FeaturesTs</title>
+    <style>
+
+        #interface {
+            left: 0;
+            right: 0;
+            /* position: absolute; */
+        }
+
+        #camera {
+            /* position: absolute; */
+            /* width: 1366px; */
+            /* height: 768px; */
+            /* z-index: 10; */
+
+            text-align: center;
+            /* opacity: 0.5; */
+
+            left: 0;
+            right: 0;
+        }
+
+        #canvas {
+            /* position: absolute; */
+            /* background-color: grey; */
+            
+            /* width: 1366px; */
+            /* height: 768px; */
+            /* z-index: 9; */
+
+            /* text-align: center; */
+            /* opacity: 1.0; */
+            /* background-color: gray; */
+            left: 0;
+            right: 0;
+        }
+
+        body {
+            background-color: black;
+            border: 0;
+            margin: 0;
+        }
+    </style>
+    
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    <video id="camera" muted hidden></video>
+  
+    <div id="interface">
+    <button id="camera-on">On</button>
+    <button id="camera-off">Off</button>
+    <button id="predict">Predict</button>
+    </div>
+</body>
+<script src="./index.js"></script>
+</html>
