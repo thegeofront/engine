@@ -53,9 +53,10 @@
     <video id="camera" muted hidden></video>
   
     <div id="interface">
-    <button id="camera-on">On</button>
-    <button id="camera-off">Off</button>
-    <button id="predict">Predict</button>
+        <input type="file" onchange="showFile(this)">
+        <button id="camera-on">On</button>
+        <button id="camera-off">Off</button>
+        <button id="predict">Predict</button>
     </div>
 </body>
 <script src="./index.js"></script>
