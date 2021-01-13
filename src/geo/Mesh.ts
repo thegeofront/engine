@@ -5,7 +5,27 @@
 
 import { Renderer } from "../draw/Renderer";
 
+export class Mesh {
 
+    verts: number[][] = []; // 3 long float
+    norms: number[][] = []; // 3 long float
+    uvs:   number[][] = []; // 2 long float 
+    faces: number[][] = []; // 3 long int
+
+    lastTouched: number = 0; // int , needed for triangle walk
+
+    constructor() {}
+
+    export_to_file(path: string) {
+        
+    }
+
+    set_all_neighbours() {
+
+    }
+};
+
+// simple wrapper
 class Face {
 
     a: number;
@@ -20,35 +40,12 @@ class Face {
     }
 };
 
-export class Mesh {
-
-    verts: number[][] = []; // 3 long float
-    norms: number[][] = []; // 3 long float
-    uvs:   number[][] = []; // 2 long float 
-    faces: number[][] = []; // 3 long int
-
-    lastTouched: number = 0; // int , needed for triangle walk
-
-    constructor() {}
-
-    static create_from_obj(file: File) : Mesh {
-
-        let mesh = new Mesh();
-        
-        // let reader = new FileReader()
-
-        return mesh;
-    }  
+export async function loadMeshFromObjFile(file: File) : Promise<Mesh> {
     
-    to_renderer(r: Renderer) {
+    let mesh = new Mesh();
 
-    }
+    // let reader = new FileReader
 
-    export_to_file(path: string) {
 
-    }
-
-    set_all_neighbours() {
-
-    }
-};
+    return mesh;
+}

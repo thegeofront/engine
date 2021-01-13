@@ -1,10 +1,4 @@
 {
-	"input": {
-		"remark": "paths to various files within a face folder",
-		"points_json": "faceLandmarks.json",
-		"obj": "head3d.obj",
-		"jpeg": "head3d.jpg"
-	},
 	"process": {
 		"n_bellus_points": 77,
 		"point_ranges": {
