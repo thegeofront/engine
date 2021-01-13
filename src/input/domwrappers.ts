@@ -1,7 +1,6 @@
 // domwrappers.ts
 // author : Jos Feenstra
 // purpuse : wrap certain DOM functionalities 
-// for easy readablility & reusability
 
 // set any to document to add drop functionality to the entire document, or use any other div.
 type FuncGenericReturn = <T>() => T;

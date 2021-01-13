@@ -13,8 +13,21 @@ export class Mesh {
     faces: number[][] = []; // 3 long int
 
     lastTouched: number = 0; // int , needed for triangle walk
+    texture?: ImageData;
 
     constructor() {}
+
+    static async loadFromObj(file: File) : Promise<Mesh> {
+    
+        let mesh = new Mesh();
+    
+        let r = new FileReader();
+        
+    
+    
+        return mesh;
+    }
+
 
     export_to_file(path: string) {
         
@@ -40,12 +53,4 @@ class Face {
     }
 };
 
-export async function loadMeshFromObjFile(file: File) : Promise<Mesh> {
-    
-    let mesh = new Mesh();
 
-    // let reader = new FileReader
-
-
-    return mesh;
-}

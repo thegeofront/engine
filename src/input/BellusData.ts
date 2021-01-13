@@ -5,7 +5,7 @@
 // - wrapper around all data gathered from Bellus3D.
 // - do all file -> object convertions here.         
 
-import { Mesh, loadMeshFromObjFile } from "../geo/Mesh";
+import { Mesh } from "../geo/Mesh";
 import { loadImageFromFile, loadJSONFromFile } from "./domwrappers";
 
 export class BellusScanData {
@@ -66,7 +66,7 @@ export class BellusScanData {
                 
                 let json = await loadJSONFromFile(jsonFile); 
                 let texture = await loadImageFromFile(textureFile);
-                let mesh = await loadMeshFromObjFile(objFile);
+                let mesh = await Mesh.loadFromObj(objFile);
                 let front = await loadImageFromFile(frontFile);
 
                 return new BellusScanData(json, texture, mesh, front);
