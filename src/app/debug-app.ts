@@ -78,6 +78,6 @@ class DebugApp {
         let image = GeonImage.fromImageData(bsd.texture);
         
         let trim = image.resizeNN(500,500);
-        this.r.drawImage(trim);
+        this.r.drawImage(10, 10, trim);
     }
 }
