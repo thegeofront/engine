@@ -6,7 +6,7 @@
 // - do all file -> object convertions here.         
 
 import { Mesh } from "../geo/Mesh";
-import { loadImageFromFile, loadJSONFromFile } from "./domwrappers";
+import { loadImageFromFile, loadJSONFromFile, loadTextFromFile } from "./domwrappers";
 
 export class BellusScanData {
 
@@ -66,7 +66,8 @@ export class BellusScanData {
                 
                 let json = await loadJSONFromFile(jsonFile); 
                 let texture = await loadImageFromFile(textureFile);
-                let mesh = await Mesh.loadFromObj(objFile);
+                let objtext = await loadTextFromFile(objFile);
+                let mesh = await Mesh.loadFromObj(objtext);
                 let front = await loadImageFromFile(frontFile);
 
                 return new BellusScanData(json, texture, mesh, front);

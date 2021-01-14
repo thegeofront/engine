@@ -1,0 +1,24 @@
+{
+	"folders": [
+		{
+			"name": "eyefinder-poc",
+			"path": "..\\eyefinder-poc"
+		},
+		{
+			"name": "GeonTs",
+			"path": "..\\..\\Dev\\Web\\GeonTs"
+		},
+		{
+			"name": "eyefinder-ts",
+			"path": "."
+		},
+		{
+			"name": "src",
+			"path": "src"
+		}
+	],
+	"settings": {
+		"liveServer.settings.port": 5501,
+		"liveServer.settings.multiRootWorkspaceName": "eyefinder-ts"
+	}
+}

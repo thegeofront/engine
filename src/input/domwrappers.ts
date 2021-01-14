@@ -64,6 +64,19 @@ async function loadImageTest(files: FileList) {
 
 }
 
+export function loadTextFromFile(file: File) : Promise<string> {
+
+    return new Promise((resolve, reject) => {
+        let reader = new FileReader();
+        reader.readAsText(file);
+        reader.onload = () => {
+            console.log(reader.result);
+            resolve(reader.result as string);
+        }
+        reader.onerror = (error) => reject(error);
+    });
+}
+
 export function loadJSONFromFile(file: File) : Promise<JSON> {
     
     return new Promise((resolve, reject) => {
