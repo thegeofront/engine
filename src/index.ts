@@ -1,8 +1,8 @@
 // Author: Jos Feenstra
 // Purpose: Entry point
 
-import {RunWithDefaultModel} from "./webcam-app";
-import {RunEyeFinderDemo} from "./debug-app";
+import {RunWithDefaultModel} from "./app/webcam-app";
+import {RunEyeFinderDemo} from "./app/debug-app";
 
 const REALTIME_DEMO = false;
 

@@ -4,7 +4,6 @@
 // Author: Jos Feenstra
 
 import { browserLocalStorage } from "@tensorflow/tfjs-core/dist/io/local_storage";
-import { Renderer } from "../draw/Renderer";
 
 export class Mesh {
 

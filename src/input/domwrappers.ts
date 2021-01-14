@@ -12,7 +12,7 @@ export function addDropFileEventListeners(env: any, filesCallback: CallbackOnePa
         //add hover class when drag over
         ev.stopPropagation();
         ev.preventDefault();
-        console.log("entering drag....")
+        // console.log("entering drag....")
         return false;
     });
         
@@ -21,7 +21,7 @@ export function addDropFileEventListeners(env: any, filesCallback: CallbackOnePa
         //remove hover class when drag out
         ev.stopPropagation();
         ev.preventDefault();
-        console.log("leaving drag....")
+        // console.log("leaving drag....")
         return false;
     });
 
@@ -42,26 +42,12 @@ export function addDropFileEventListeners(env: any, filesCallback: CallbackOnePa
 
 interface CallbackOneParam<T1, T2 = void> {
     (param1: T1): T2;
-  }
-
-function drop(ev: DragEvent)
-{
-    //prevent browser from open the file when drop off
-    ev.stopPropagation();
-    ev.preventDefault();
-
-    //retrieve uploaded files data
-    var files = ev.dataTransfer!.files;
-    console.log("i am recieving files! using the first one...");
-    
-    return false;
 }
+
 
 async function loadImageTest(files: FileList) {
 
     let image = await loadImageFromFile(files.item(0)!);
-
-
 }
 
 export function loadTextFromFile(file: File) : Promise<string> {
@@ -70,7 +56,7 @@ export function loadTextFromFile(file: File) : Promise<string> {
         let reader = new FileReader();
         reader.readAsText(file);
         reader.onload = () => {
-            console.log(reader.result);
+            // console.log(reader.result);
             resolve(reader.result as string);
         }
         reader.onerror = (error) => reject(error);
@@ -83,7 +69,7 @@ export function loadJSONFromFile(file: File) : Promise<JSON> {
         let reader = new FileReader();
         reader.readAsText(file);
         reader.onload = () => {
-            console.log(reader.result);
+            // console.log(reader.result);
             resolve(JSON.parse(reader.result as string));
         }
         reader.onerror = (error) => reject(error);
