@@ -18,7 +18,7 @@ export function RunEyeFinderDemo(canvas: HTMLCanvasElement, context: HTMLDivElem
     app.start();
 
     // start the file listening
-    addDropFileEventListeners(document, app.processFiles);
+    addDropFileEventListeners(document, processFiles.bind(app));
 
     // start infinite loop
     loop(app);
@@ -33,13 +33,20 @@ function loop(app: DebugApp) {
     requestAnimationFrame(() => loop(app));
 }
 
+async function processFiles(this: DebugApp, files: FileList) {
+    
+    BellusScanData.fromFileList(files, settings).then(
+        (bsd) => this.addBellusData(bsd)
+    );
+}
+
 class DebugApp {
 
     canvas: HTMLCanvasElement;
     context: HTMLDivElement;
     r: CtxRenderer;
     points: Vector2[] = [];
-    bellusdata?: BellusScanData;
+    bsd?: BellusScanData;
 
     constructor(canvas: HTMLCanvasElement, context: HTMLDivElement) {
         
@@ -61,20 +68,10 @@ class DebugApp {
 
     draw() {
         // this.r.clear();
-        
-  
-
         this.points.forEach((p) => this.r.drawPoint(p));
     }
 
-    async processFiles(files: FileList) {
-    
-        this.bellusdata = await BellusScanData.fromFileList(files, settings);
-        if (this.bellusdata) {
-            const d = this.bellusdata!;
-            this.r.drawImage(d.texture);
-        }
-    
-        
+    addBellusData(bsd: BellusScanData) {
+        this.bsd = bsd;
     }
 }

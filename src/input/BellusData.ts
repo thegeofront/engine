@@ -13,14 +13,14 @@ export class BellusScanData {
     landmarks: any; // json
     texture: ImageData; 
     mesh: Mesh;
-    // front: ImageData; 
+    front: ImageData; 
     settings: any; // local settings file. We want this to extract the right regions.
 
-    constructor(landmarks: any, texture: ImageData, mesh: Mesh, settings: any) {
+    constructor(landmarks: any, texture: ImageData, mesh: Mesh, front: ImageData, settings: any) {
         this.landmarks = landmarks;
         this.texture = texture;
         this.mesh = mesh;
-        // this.front = front;
+        this.front = front;
         this.settings = settings;
     }
 
@@ -47,17 +47,18 @@ export class BellusScanData {
                 case 'head3d.obj': 
                     objFile = file;
                     break; 
-                // case 'image.jpg': 
-                //     frontFile = file;
-                //     break;
+                case 'image.jpg': 
+                    frontFile = file;
+                    break;
             } 
         }
     
-        return new Promise(async function(resolve, reject) {
+        return await new Promise(async function(resolve, reject) {
 
             if (jsonFile == undefined    || 
                 textureFile == undefined || 
-                objFile == undefined) {
+                objFile == undefined || 
+                frontFile == undefined) {
                 alert("give me exactly one .json, one .ojb, and one .jpg file please!");
                 reject();
             }
@@ -68,11 +69,13 @@ export class BellusScanData {
                 let json = await loadJSONFromFile(jsonFile); 
                 let texture = await loadImageFromFile(textureFile);
                 let objtext = await loadTextFromFile(objFile);
-                let mesh = new Mesh();
-                // let mesh = await Mesh.loadFromObj(objtext);
-                // let front = await loadImageFromFile(frontFile);
+                // let mesh = new Mesh();
+                let mesh = await Mesh.loadFromObj(objtext);
+                let front = await loadImageFromFile(frontFile);
 
-                return new BellusScanData(json, texture, mesh, settings);
+                console.log("done! bellus scan loaded.");
+
+                resolve(new BellusScanData(json, texture, mesh, front, settings));
             }
         });
     }
