@@ -1,4 +1,5 @@
 // purpose: wrap 
+import { GeonImage } from "../img/Image";
 import { Vector2 } from "../math/Vector2";
 
 export class CtxRenderer {
@@ -40,10 +41,10 @@ export class CtxRenderer {
         ctx.fill();
     } 
 
-    drawImage(image: ImageData) {
+    drawImage(x: number, y: number, image: GeonImage) {
 
         // draw an image
         const ctx = this.ctx;
-        ctx.putImageData(image, 10, 10);
+        ctx.putImageData(image.getImageData(), x, y);
     }
 }

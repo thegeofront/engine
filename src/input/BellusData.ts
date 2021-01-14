@@ -78,5 +78,7 @@ export class BellusScanData {
                 resolve(new BellusScanData(json, texture, mesh, front, settings));
             }
         });
+
+        
     }
 }

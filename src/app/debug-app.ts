@@ -7,6 +7,7 @@ import { EyeFinder } from "../process/EyeFinder";
 import { BellusScanData } from "../input/BellusData";
 import { CtxRenderer } from "../draw/CtxRenderer"; 
 import { Vector2 } from "../math/Vector2";
+import { GeonImage } from "../img/Image";
 
 const settings = require('../process/settings.json'); // note DIFFERENCE BETWEEN "" AND ''. '' WORKS, "" NOT. 
 const STOP = false;
@@ -73,5 +74,10 @@ class DebugApp {
 
     addBellusData(bsd: BellusScanData) {
         this.bsd = bsd;
+
+        let image = GeonImage.fromImageData(bsd.texture);
+        
+        let trim = image.resizeNN(500,500);
+        this.r.drawImage(trim);
     }
 }
