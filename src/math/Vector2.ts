@@ -120,7 +120,7 @@ export class Vector2
 
     toString() : string
     {
-        return `Vector3(${this.x}, ${this.y})`;
+        return `Vector2(${this.x}, ${this.y})`;
     }
 
     clone() : Vector2

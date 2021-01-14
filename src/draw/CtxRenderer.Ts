@@ -9,6 +9,11 @@ export class CtxRenderer {
     width: number;
     height: number;
 
+    // 'camera'
+    scale: number = 0;
+    xOffset: number = 0;
+    yOffset: number = 0;
+
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
         this.ctx = canvas.getContext("2d")!;
@@ -28,23 +33,33 @@ export class CtxRenderer {
 
     }
 
+    private transform(p: Vector2) : Vector2 {
+        
+        return p.clone().addn(this.xOffset, this.yOffset).scale(this.scale);
+    }
+
     // ------- draw wrappers -------
     
     drawPoint(p: Vector2) {
 
-        // draw a small white dot
+        // draw a small white dot at x, y
+        let v = this.transform(p);
+
         const ctx = this.ctx;
         ctx.strokeStyle = "white";
         ctx.fillStyle = "white";
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 3, 0, 7, false);
+        ctx.arc(v.x, v.y, 3, 0, 7, false);
         ctx.fill();
     } 
 
-    drawImage(x: number, y: number, image: GeonImage) {
+    drawImage(p: Vector2, image: GeonImage) {
 
         // draw an image
+        let v = this.transform(p);
         const ctx = this.ctx;
-        ctx.putImageData(image.getImageData(), x, y);
+
+        let data = image.scale(this.scale, this.scale).getImageData();
+        ctx.putImageData(data, v.x, v.y);
     }
 }

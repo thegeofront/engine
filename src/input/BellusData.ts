@@ -6,6 +6,8 @@
 // - do all file -> object convertions here.         
 
 import { Mesh } from "../geo/Mesh";
+import { FloatArray } from "../math/Array";
+import { Vector2 } from "../math/Vector2";
 import { loadImageFromFile, loadJSONFromFile, loadTextFromFile } from "./domwrappers";
 
 export class BellusScanData {
@@ -79,6 +81,40 @@ export class BellusScanData {
             }
         });
 
+
+    }
+
+    getLandmarksImageSize() : Vector2 {
+        // image sizes as registered in the 'facelandmarks' json.
         
+        let data = this.landmarks.ImageSize;
+        return new Vector2(data[0], data[1]);
+    }
+
+    getLandmarks2f() : FloatArray {
+
+        // 2d landmarks as registered in the 'facelandmarks' json
+        let data = this.landmarks.Point2f;
+        let size = data.cols;
+        let dim = 2;
+
+        let raw = new Float32Array(data.data);
+        let arr = new FloatArray(raw, size, dim);
+
+        return arr;
+    }
+
+    
+    getLandmarks3f() : FloatArray {
+
+        // 2d landmarks as registered in the 'facelandmarks' json
+        let data = this.landmarks.Point3f;
+        let size = data.cols;
+        let dim = 3;
+
+        let raw = new Float32Array(data.data);
+        let arr = new FloatArray(raw, size, dim);
+
+        return arr;
     }
 }
