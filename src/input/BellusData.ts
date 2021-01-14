@@ -104,7 +104,6 @@ export class BellusScanData {
         return arr;
     }
 
-    
     getLandmarks3f() : FloatArray {
 
         // 2d landmarks as registered in the 'facelandmarks' json
@@ -117,4 +116,6 @@ export class BellusScanData {
 
         return arr;
     }
+
+    
 }

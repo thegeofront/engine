@@ -1,6 +1,7 @@
 // purpose: wrap 
 import { GeonImage } from "../img/Image";
 import { Vector2 } from "../math/Vector2";
+import { InputHandler } from "../system/InputHandler";
 
 export class CtxRenderer {
     
@@ -17,7 +18,7 @@ export class CtxRenderer {
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
         this.ctx = canvas.getContext("2d")!;
-
+ 
         canvas.width = canvas.clientWidth;
         canvas.height = canvas.clientHeight;
 
@@ -61,5 +62,29 @@ export class CtxRenderer {
 
         let data = image.scale(this.scale, this.scale).getImageData();
         ctx.putImageData(data, v.x, v.y);
+    }
+
+
+    public setScale(scale: number)
+    {
+        this.scale = scale;
+        this.setWindow();
+    }
+
+    private setWindow()
+    {
+        console.log("setting window...");
+
+        this.canvas.width = document.body.clientWidth / this.scale;
+        this.canvas.height = document.body.clientHeight / this.scale;
+        this.canvas.style.width  = document.body.clientWidth + "px";
+        this.canvas.style.height = document.body.clientHeight + "px";
+
+        if (this.scale != 1)
+        {
+            this.canvas.style.imageRendering = "crisp-edges";
+        }
+        this.width = this.canvas.width;
+        this.height = this.canvas.height;
     }
 }

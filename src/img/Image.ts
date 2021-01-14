@@ -27,7 +27,7 @@ export class GeonImage {
     }
 
     public applyKernel(kernel: Matrix) : GeonImage {
-        
+
         // determine kernel size
         let size = kernel.width;
         let radius = (size / 2) - 0.5;
@@ -60,6 +60,16 @@ export class GeonImage {
             }
         }
         return sum;
+    }
+
+    setAplha(a: number) {
+        for (let y = 0; y < this.height; y++) {
+            for (let x = 0; x < this.width; x++) {
+                let pixel = this.get(x, y);
+                this.set(x, y, [pixel[0], pixel[1], pixel[2], a]);
+            }
+        }
+        return this;
     }
 
     scale(scaleX: number, scaleY: number) : GeonImage {

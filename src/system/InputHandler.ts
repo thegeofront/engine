@@ -1,0 +1,178 @@
+// CanvasInputHandler.ts
+// author : Jos Feenstra
+// purpose : handle all input events.
+
+import { Vector2 } from "../math/Vector2";
+
+export interface IKeys 
+{
+    [key: string] : boolean
+}
+
+export class InputHandler {
+
+    tick: number;
+    oldTime: number;
+    newTime: number;
+    startTime: number;
+    minimumTick: number;
+
+    clientMousePos: Vector2 = Vector2.zero();
+    mouseLeftDown = false;
+    mouseLeftPressed = false;
+    private mouseLeftPrev = false;
+
+    mouseRightDown = false;
+    mouseRightPressed = false;
+    private mouseRightPrev = false;
+
+    mouseMiddleDown = false;
+    mouseMiddlePressed = false;
+    private mouseMiddlePrev = false;
+
+    private keysDown: IKeys = {};
+    private keysPressed: string[] = [];
+
+    scrollValue = 0;
+
+    // delegate functions
+    onMouseWheelScroll?: Function
+
+    constructor(canvas: HTMLCanvasElement) {
+
+        // time
+        this.tick = 0;
+        this.oldTime = Date.now();
+        this.newTime = this.oldTime;
+        this.startTime = Date.now();
+        this.minimumTick = 1000 / 144;
+
+        // mouse
+        canvas.addEventListener("mousemove", this.setMousePos.bind(this));
+        canvas.addEventListener("mousedown", this.setMouseDown.bind(this));
+        canvas.addEventListener("mouseup", this.setMouseUp.bind(this));
+        canvas.addEventListener("contextmenu", (e) => { e.preventDefault(); e.stopPropagation(); });
+        canvas.addEventListener("mousemove", this.setMousePos.bind(this));
+        canvas.addEventListener("wheel", this.setMouseScroll.bind(this));
+
+        for(let i = 0; i < 223 ;i++)
+            this.keysDown[i] = false;
+        
+        // keyboard
+        canvas.addEventListener("keydown", this.onKeyDown.bind(this));
+        // canvas.addEventListener("keypressed", this.onKeyPressed.bind(this));
+        canvas.addEventListener("keyup", this.onKeyUp.bind(this));
+
+        // final   
+        canvas.focus();
+    }
+
+    public preUpdate() {
+        // this must be called every tick within whatever context this is used
+
+        // update time
+        this.newTime = Date.now();
+        this.tick = (this.newTime - this.oldTime);
+        this.oldTime = this.newTime;
+
+        // update mouse
+        this.mouseLeftPressed =  (this.mouseLeftPrev != this.mouseLeftDown) && this.mouseLeftDown;
+        this.mouseRightPressed =  (this.mouseRightPrev != this.mouseRightDown) && this.mouseRightDown;
+        this.mouseMiddlePressed =  (this.mouseMiddlePrev != this.mouseMiddleDown) && this.mouseMiddleDown;
+
+        this.mouseLeftPrev = this.mouseLeftDown
+        this.mouseRightPrev = this.mouseRightDown
+        this.mouseMiddlePrev = this.mouseMiddleDown
+    }
+
+    public postUpdate() {
+
+        // this also must be called for keyIsPressed to work
+
+        // refresh keypresses
+        this.keysPressed = [];
+    }
+
+    public IsKeyDown(key: string) : boolean
+    {
+        return this.keysDown[key];  
+    }
+
+    public IsKeyPressed(key: string) : boolean
+    {
+        return this.keysPressed.includes(key);
+    }
+
+    public onKeyDown(e: KeyboardEvent)
+    { 
+        if (this.keysDown[e.key] == true) return;
+        console.log(e.key);
+        this.keysDown[e.key.toLowerCase()] = true;
+        this.keysPressed.push(e.key);
+    }
+
+    public onKeyUp(e: KeyboardEvent)
+    {
+        this.keysDown[e.key.toLowerCase()] = false;
+    }
+
+    public onKeyPressed(e: KeyboardEvent)
+    {
+        // NOTE: i made a different system to handle this, see onKeyDown
+    }
+
+    private setMouseScroll(e: WheelEvent) {
+        // console.log("we be scrollin' now...")
+        this.scrollValue = e.deltaY;
+    }
+
+    private setMousePos(e: MouseEvent)
+    {
+        // this is a bit messy, BUT, multiply by camera parameters
+        this.clientMousePos = new Vector2(e.clientX, e.clientY)
+    }
+
+    private setMouseUp(e: MouseEvent)
+    {
+        let code = e.buttons;
+        if (code < 4) 
+        {
+            this.mouseMiddleDown = false;
+        }
+        if (code < 2) 
+        {
+            this.mouseRightDown = false;
+        }
+        if (code < 1) 
+        {
+            this.mouseLeftDown = false;
+        } 
+    }
+
+    private setMouseDown(e: MouseEvent)
+    {
+        e.preventDefault();
+        e.stopPropagation();
+        let code = e.buttons;
+        if (code >= 4) 
+        {
+            code -= 4;
+            this.mouseMiddleDown = true;
+        }
+        if (code >= 2) 
+        {
+            code -= 2;
+            this.mouseRightDown = true;
+        }
+        if (code >= 1) 
+        {
+            code -= 1;
+            this.mouseLeftDown = true;
+        }  
+        return false;     
+    }
+
+
+
+
+}
