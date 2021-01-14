@@ -112,9 +112,14 @@ class DebugApp {
     addBellusData(bsd: BellusScanData) {
 
         this.bsd = bsd;
-        this.landmarks = bsd.getLandmarks2f().toVector2();
+        let landmarks = bsd.getLandmarks2f().toVector2();
         let image = GeonImage.fromImageData(bsd.texture);
+        
+        // visualize this data
+        this.landmarks = landmarks; 
         this.images.push(image);
         this.imagelocs.push(new Vector2(0, 0));
+
+        // extract eyes, ears, and brows from the image
     }
 }
