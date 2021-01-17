@@ -1,8 +1,11 @@
 // Author: Jos Feenstra
 // Purpose: Entry point
 
-import {RunWithDefaultModel} from "./app/webcam-app";
-import {RunEyeFinderDemo} from "./app/debug-app";
+import {addWebcamAppWhenReady, WebcamApp} from "./app/webcam-app";
+import {DebugApp} from "./app/debug-app";
+import { InputHandler } from "./system/InputHandler";
+import { App } from "./app/app";
+import { WebglHelpers } from "./render/webglHelpers";
 
 const REALTIME_DEMO = false;
 
@@ -12,17 +15,72 @@ function main() {
     let canvas = document.getElementById("canvas")! as HTMLCanvasElement;
     let video = document.getElementById("camera")! as HTMLVideoElement;
     let context = document.getElementById("interface")  as HTMLDivElement;
-    // let cameraOn = document.getElementById("camera-on")! as HTMLButtonElement;
-    // let cameraStop = document.getElementById("camera-off")! as HTMLButtonElement;
-    // let buttonPredict = document.getElementById("predict")! as HTMLButtonElement;
+    let cameraOn = document.getElementById("camera-on")! as HTMLButtonElement;
+    let cameraStop = document.getElementById("camera-off")! as HTMLButtonElement;
+    let buttonPredict = document.getElementById("predict")! as HTMLButtonElement;
     
-    if (REALTIME_DEMO)
-        RunWithDefaultModel(canvas, video);
-    else 
-        RunEyeFinderDemo(canvas, context);
+    const core = new Core(canvas);
+
+    core.addApp(new DebugApp(canvas, context)); 
+    //addWebcamAppWhenReady(core, canvas, video);
+
+    // infinite loop
+    function loop() {
+
+        if (core.STOP) return;
+
+        core.update();
+        core.draw();
+        requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+
+    // we broke out of the loop
+    console.log("app has stopped.");
 }
 
 
 window.addEventListener("load", function() {
     main();
 }, false);
+
+
+export class Core {
+
+    canvas: HTMLCanvasElement;
+    gl: WebGLRenderingContext;
+
+    state: InputHandler;
+
+    private apps: App[];
+    STOP = false;
+
+    constructor(canvas: HTMLCanvasElement) {
+        this.canvas = canvas;
+        this.gl = WebglHelpers.initWebglContext(canvas);
+        this.state = new InputHandler(canvas);
+        this.apps = [];
+    }
+
+    addApp(app: App) {
+        this.apps.push(app);
+        app.start();
+    }
+
+    update() {
+        this.state.preUpdate();
+        this.apps.forEach((app) => {
+            app.update(this.state);
+        });
+        this.state.postUpdate();
+    }
+
+    draw() {
+        const canvas = this.canvas;
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
+        this.apps.forEach((app) => {
+            app.draw(this.gl);
+        })
+    }
+}

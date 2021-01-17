@@ -12,10 +12,13 @@ require("@tensorflow/tfjs-backend-webgl");
 import { Vector2 } from "../math/Vector2";
 import { Triangle2 } from "../math/Triangle2";
 import * as draw from "../draw/tensorflow-drawing";
+import { App } from "./app";
+import { Core } from "..";
+import { InputHandler } from "../system/InputHandler";
 
 // PUBLIC
 
-export function RunWithDefaultModel(canvas: HTMLCanvasElement, video: HTMLVideoElement) {
+export function addWebcamAppWhenReady(core: Core, canvas: HTMLCanvasElement, video: HTMLVideoElement) {
         
     let app: App;
     var constraints = {audio:false, video:true};
@@ -34,17 +37,15 @@ export function RunWithDefaultModel(canvas: HTMLCanvasElement, video: HTMLVideoE
     });
 
     tffl.load(tffl.SupportedPackages.mediapipeFacemesh).then((model) => {
-        app = new App(canvas, video, model);
-        app.update();
+        app = new WebcamApp(canvas, video, model);
+        // 
     });
 }
 
 // PRIVATE
 
-class App {
+export class WebcamApp extends App {
 
-    ctx: CanvasRenderingContext2D;
-    canvas: HTMLCanvasElement;
     video: HTMLVideoElement;
     
     points: Array<Vector2>;
@@ -55,28 +56,20 @@ class App {
     // ------- basics -------
 
     constructor(canvas: HTMLCanvasElement, video: HTMLVideoElement, model: MediaPipeFaceMesh) {
-        
-        this.canvas = canvas;
+        super();
         this.video = video;
-        this.ctx = canvas.getContext("2d", { alpha: false })!;
         this.points = [];
         this.triangles = [];
         this.model = model;
-        this.start();
     }
 
     start() {
-        let canvas = this.canvas;
-        let ctx = this.ctx;
         let video = this.video;
-
-        canvas.width = canvas.clientWidth;
-        canvas.height = canvas.clientHeight;
 
         // load the tensorflow face mesh predictor
         
 
-        canvas.addEventListener("click", this.clickEvent.bind(this));
+        // canvas.addEventListener("click", this.clickEvent.bind(this));
         video.addEventListener("loadeddata", (ev: Event) => {
 
             this.drawVideo = true;
@@ -84,26 +77,28 @@ class App {
         });
     }
 
-    update() {
+    update(state: InputHandler) {
         
-        this.canvas.width = 1000;
-        this.canvas.height = 800;
+    }
+
+    drawCtx(ctx: CanvasRenderingContext2D) {
+        ctx.canvas.width = 1000;
+        ctx.canvas.height = 800;
         
-        this.canvas.style.width = "1000";
-        this.canvas.style.height = "800";
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        ctx.canvas.style.width = "1000";
+        ctx.canvas.style.height = "800";
+
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         
         if (this.drawVideo)
         {
-            this.ctx.drawImage(this.video, 0, 0, this.canvas.width, this.canvas.height);
+            ctx.drawImage(this.video, 0, 0, ctx.canvas.width, ctx.canvas.height);
             this.startPredictions();
         }
 
         this.points.forEach((p) => {
-            drawPoint(this.ctx, p);
+            drawPoint(ctx, p);
         })
-
-        requestAnimationFrame(this.update.bind(this));
     }
 
     // ------- interface -------

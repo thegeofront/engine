@@ -13,46 +13,12 @@ import { input } from "@tensorflow/tfjs";
 import { getMaxTexturesInShader } from "@tensorflow/tfjs-backend-webgl/dist/webgl_util";
 
 const settings = require('../process/settings.json'); // note DIFFERENCE BETWEEN "" AND ''. '' WORKS, "" NOT. 
-const STOP = false;
 
-export function RunEyeFinderDemo(canvas: HTMLCanvasElement, context: HTMLDivElement) {
-
-    // setup the app
-    const app = new DebugApp(canvas, context);
-    app.start();
-
-    // start the file listening
-    addDropFileEventListeners(document, processFiles.bind(app));
-
-    
-
-    // start infinite loop
-    loop(app);
-}
-
-function loop(app: DebugApp) {
-
-    app.update();
-    app.draw();
-
-    if (STOP) return;
-
-    requestAnimationFrame(() => loop(app));
-}
-
-async function processFiles(this: DebugApp, files: FileList) {
-    
-    BellusScanData.fromFileList(files, settings).then(
-        (bsd) => this.addBellusData(bsd)
-    );
-}
-
-class DebugApp {
+export class DebugApp {
 
     canvas: HTMLCanvasElement;
     context: HTMLDivElement;
     r: CtxRenderer;
-    in: InputHandler;
 
     // main input data 
     bsd?: BellusScanData;
@@ -69,30 +35,23 @@ class DebugApp {
 
         this.r = new CtxRenderer(canvas);
         this.r.scale = 0.1;
-        this.in = new InputHandler(canvas);
     }
 
     start() {
-        
-        // this.points.push(new Vector2(0, 0));
+        addDropFileEventListeners(document, processFiles.bind(this));
     }
 
-    update() {
+    update(state: InputHandler) {
 
-        // basic camera controls
-        this.in.preUpdate();
-
-        if (this.in.IsKeyPressed("-"))  this.r.scale += 0.01;
-        if (this.in.IsKeyPressed("="))  this.r.scale +=  -0.01;
-        if (this.in.IsKeyDown("a")) this.r.xOffset += 10;
-        if (this.in.IsKeyDown("d")) this.r.xOffset -= 10;
-        if (this.in.IsKeyDown("w")) this.r.yOffset += 10;        
-        if (this.in.IsKeyDown("s")) this.r.yOffset -= 10;
-        
-        this.in.postUpdate();
+        if (state.IsKeyPressed("-"))  this.r.scale += 0.01;
+        if (state.IsKeyPressed("="))  this.r.scale +=  -0.01;
+        if (state.IsKeyDown("a")) this.r.xOffset += 10;
+        if (state.IsKeyDown("d")) this.r.xOffset -= 10;
+        if (state.IsKeyDown("w")) this.r.yOffset += 10;        
+        if (state.IsKeyDown("s")) this.r.yOffset -= 10;
     }
 
-    draw() {
+    draw(gl: WebGLRenderingContext) {
         
         this.r.clear();
 
@@ -122,4 +81,11 @@ class DebugApp {
 
         // extract eyes, ears, and brows from the image
     }
+}
+
+async function processFiles(this: DebugApp, files: FileList) {
+    
+    BellusScanData.fromFileList(files, settings).then(
+        (bsd) => this.addBellusData(bsd)
+    );
 }

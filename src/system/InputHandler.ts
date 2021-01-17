@@ -36,8 +36,7 @@ export class InputHandler {
     scrollValue = 0;
 
     // delegate functions
-    onMouseWheelScroll?: Function
-
+    onMouseWheelScroll?: Function;
     constructor(canvas: HTMLCanvasElement) {
 
         // time
