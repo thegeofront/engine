@@ -1,35 +1,35 @@
-import { GeneralMatrix } from "../math/Matrix"
+import { Matrix } from "../math/matrix"
 
 // kernels
 export class Kernels
 {
-    static readonly SmoothKernel = new GeneralMatrix(3,3, [
+    static readonly SmoothKernel = new Matrix(3,3, [
         1,1,1,
         1,1,1,
         1,1,1
-    ]).scale(1/9);
+    ]).scaleEntries(1/9);
      
-    static readonly SmoothKernel5 = new GeneralMatrix(5,5, [
+    static readonly SmoothKernel5 = new Matrix(5,5, [
         1,1,1,1,1,
         1,1,1,1,1,
         1,1,1,1,1,
         1,1,1,1,1,
         1,1,1,1,1
-    ]).scale(1/25);
+    ]).scaleEntries(1/25);
 
-    static readonly TestKernel = new GeneralMatrix(3,3, [
+    static readonly TestKernel = new Matrix(3,3, [
           1, 0,-1,
           0, 0, 0,
          -1, 0, 1,
     ]);
 
-    static readonly HorEdgeKernel = new GeneralMatrix(3,3, [
+    static readonly HorEdgeKernel = new Matrix(3,3, [
         -1,-2,-1,
          0, 0, 0,
          1, 2, 1,
     ]);
     
-    static readonly VerEdgeKernel = new GeneralMatrix(3,3, [
+    static readonly VerEdgeKernel = new Matrix(3,3, [
         -1, 0, 1,
         -2, 0, 2,
         -1, 0, 1,

@@ -2,14 +2,14 @@
 // author : Jos Feenstra
 // purpose : handle all input events.
 
-import { Vector2 } from "../math/Vector2";
+import { Vector2 } from "../math/Vector";
 
 export interface IKeys 
 {
     [key: string] : boolean
 }
 
-export class InputHandler {
+export class InputState {
 
     tick: number;
     oldTime: number;

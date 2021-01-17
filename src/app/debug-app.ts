@@ -8,7 +8,7 @@ import { BellusScanData } from "../input/BellusData";
 import { CtxRenderer } from "../draw/CtxRenderer"; 
 import { Vector2 } from "../math/Vector";
 import { GeonImage } from "../img/Image";
-import { InputHandler } from "../system/InputHandler";
+import { InputState } from "../system/InputHandler";
 import { input } from "@tensorflow/tfjs";
 import { getMaxTexturesInShader } from "@tensorflow/tfjs-backend-webgl/dist/webgl_util";
 
@@ -41,7 +41,7 @@ export class DebugApp {
         addDropFileEventListeners(document, processFiles.bind(this));
     }
 
-    update(state: InputHandler) {
+    update(state: InputState) {
 
         if (state.IsKeyPressed("-"))  this.r.scale += 0.01;
         if (state.IsKeyPressed("="))  this.r.scale +=  -0.01;

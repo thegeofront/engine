@@ -19,7 +19,7 @@ export class Vector3
 
 	static fromLerp( v1:Vector3, v2:Vector3, alpha:number ) : Vector3 
 	{
-		return this.constructor(
+		return new Vector3(
 			v1.x + ( v2.x - v1.x ) * alpha,
             v1.y + ( v2.y - v1.y ) * alpha,
             v1.z + ( v2.z - v1.z ) * alpha
@@ -32,7 +32,7 @@ export class Vector3
 
     static fromRandom() : Vector3 
     {
-        return this.constructor(
+        return new Vector3(
 		    Math.random(),
 		    Math.random(),
 		    Math.random()
@@ -327,13 +327,8 @@ export class Vector3
     // TODO : matrix interactions
 }
 
-// this is an optimization trick used by three.js, dont know why 
+// vector object used within heavy calculations, to make sure we dont create Vectors all over the place.
 const _vector = new Vector3(0,0,0);
-
-// author: Jos Feenstra
-// inspiration from Three.js
-// note: recycle the class as much as possble, building a new class is expensive,
-// especially in javascript
 
 export class Vector2
 {
@@ -654,4 +649,12 @@ export class Vector2
 		this.y += ( other.y - this.y ) * alpha;
 		return this;
 	}
+}
+
+export function radToDeg(r: number) {
+	return r * 180 / Math.PI;
+}
+
+export function degToRad(d: number) {
+	return d * Math.PI / 180;
 }

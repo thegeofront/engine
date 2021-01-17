@@ -5,7 +5,7 @@
 // 
 // note: named GeonImage to not collide with Image classes.
 
-import { GeneralMatrix } from "../math/Matrix";
+import { Matrix } from "../math/matrix";
 
 const acceptedKernels : number[] = [3,5,7,9];
 export class GeonImage {
@@ -26,7 +26,7 @@ export class GeonImage {
         return gi
     }
 
-    public applyKernel(kernel: GeneralMatrix) : GeonImage {
+    public applyKernel(kernel: Matrix) : GeonImage {
 
         // determine kernel size
         let size = kernel.width;
@@ -44,7 +44,7 @@ export class GeonImage {
         return image; // succes 
     }
 
-    private getWithKernel(x: number, y: number, kernel: GeneralMatrix, radius: number) : number[] {
+    private getWithKernel(x: number, y: number, kernel: Matrix, radius: number) : number[] {
         
         // kernel space
         let sum = [0, 0, 0, 255];

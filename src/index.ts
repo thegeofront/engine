@@ -3,9 +3,11 @@
 
 import {addWebcamAppWhenReady, WebcamApp} from "./app/webcam-app";
 import {DebugApp} from "./app/debug-app";
-import { InputHandler } from "./system/InputHandler";
+import { InputState } from "./system/InputHandler";
 import { App } from "./app/app";
-import { WebglHelpers } from "./render/webglHelpers";
+import { WebglHelpers } from "./render/webgl-helpers";
+import { VectorApp } from "./app/vector-app";
+import { initWebglContext } from "./render/renderer";
 
 const REALTIME_DEMO = false;
 
@@ -21,19 +23,26 @@ function main() {
     
     const core = new Core(canvas);
 
-    core.addApp(new DebugApp(canvas, context)); 
+    //core.addApp(new DebugApp(canvas, context));
+    core.addApp(new VectorApp()); 
     //addWebcamAppWhenReady(core, canvas, video);
 
     // infinite loop
     function loop() {
 
-        if (core.STOP) return;
+        console.log(core.STOP);
+        if (core.STOP) 
+            return;
 
         core.update();
         core.draw();
-        requestAnimationFrame(loop);
+        
+        setTimeout(() => {
+            requestAnimationFrame(loop);
+        }, 10);
     }
-    requestAnimationFrame(loop);
+    loop();
+    // requestAnimationFrame(loop);
 
     // we broke out of the loop
     console.log("app has stopped.");
@@ -50,15 +59,15 @@ export class Core {
     canvas: HTMLCanvasElement;
     gl: WebGLRenderingContext;
 
-    state: InputHandler;
+    state: InputState;
 
     private apps: App[];
     STOP = false;
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
-        this.gl = WebglHelpers.initWebglContext(canvas);
-        this.state = new InputHandler(canvas);
+        this.gl = initWebglContext(canvas);
+        this.state = new InputState(canvas);
         this.apps = [];
     }
 
@@ -69,6 +78,8 @@ export class Core {
 
     update() {
         this.state.preUpdate();
+        if (this.state.IsKeyPressed("Esc"))
+            this.STOP = true;
         this.apps.forEach((app) => {
             app.update(this.state);
         });

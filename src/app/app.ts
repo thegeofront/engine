@@ -1,4 +1,4 @@
-import { InputHandler } from "../system/InputHandler"
+import { InputState } from "../system/InputHandler"
 
 export class App {
 
@@ -10,7 +10,7 @@ export class App {
         // additional setup of state
     }
 
-    update(state: InputHandler) {
+    update(state: InputState) {
         // updating state
     }
 
