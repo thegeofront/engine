@@ -1,6 +1,6 @@
 // purpose: wrap 
 import { GeonImage } from "../img/Image";
-import { Vector2 } from "../math/Vector2";
+import { Vector2 } from "../math/Vector";
 import { InputHandler } from "../system/InputHandler";
 
 export class CtxRenderer {

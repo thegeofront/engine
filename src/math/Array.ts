@@ -5,8 +5,7 @@
 // NOTE: all these small wrappers might not be good pratice, but i 
 // like to extract simple logic like this to not clutter the code too much
 
-import { Vector2 } from "./Vector2";
-import { Vector3 } from "./Vector3";
+import { Vector3, Vector2 } from "./Vector";
 
 export class FloatArray {
     data: Float32Array;
@@ -19,7 +18,7 @@ export class FloatArray {
         this.dim = dim;
     }
 
-    toVector3() : Vector3[] {
+    toVector() : Vector3[] {
         
         if (this.dim != 3) throw "dimention of floatarray is not 3";
 

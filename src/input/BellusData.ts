@@ -7,7 +7,7 @@
 
 import { Mesh } from "../geo/Mesh";
 import { FloatArray } from "../math/Array";
-import { Vector2 } from "../math/Vector2";
+import { Vector2 } from "../math/Vector";
 import { loadImageFromFile, loadJSONFromFile, loadTextFromFile } from "./domwrappers";
 
 export class BellusScanData {

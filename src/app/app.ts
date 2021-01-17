@@ -2,9 +2,8 @@ import { InputHandler } from "../system/InputHandler"
 
 export class App {
 
-    // unique constructors
     constructor() {
-        
+        // unique constructor    
     }
 
     start() {

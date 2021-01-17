@@ -6,7 +6,7 @@ import { addDropFileEventListeners } from "../input/domwrappers";
 import { EyeFinder } from "../process/EyeFinder";
 import { BellusScanData } from "../input/BellusData";
 import { CtxRenderer } from "../draw/CtxRenderer"; 
-import { Vector2 } from "../math/Vector2";
+import { Vector2 } from "../math/Vector";
 import { GeonImage } from "../img/Image";
 import { InputHandler } from "../system/InputHandler";
 import { input } from "@tensorflow/tfjs";
