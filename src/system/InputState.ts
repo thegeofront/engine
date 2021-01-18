@@ -72,7 +72,8 @@ export class InputState {
         canvas.addEventListener("contextmenu", (e) => { e.preventDefault(); e.stopPropagation(); });
         canvas.addEventListener("mousemove", this.setMousePos.bind(this));
         canvas.addEventListener("wheel", this.setMouseScroll.bind(this));
-
+        canvas.addEventListener("touchmove", this.setTouch.bind(this));
+        canvas.addEventListener("touchstart", this.setTouch.bind(this));
         for(let i = 0; i < 223 ;i++)
             this.keysDown[i] = false;
         
@@ -137,6 +138,13 @@ export class InputState {
     public onKeyPressed(e: KeyboardEvent)
     {
         // NOTE: i made a different system to handle this, see onKeyDown
+    }
+
+    private setTouch(e: TouchEvent) {
+        e.preventDefault();
+
+        this.mousePos = new Vector2(e.touches[0].clientX, e.touches[0].clientY);
+        this.mouseLeftDown = true;
     }
 
     private setMouseScroll(e: WheelEvent) {
