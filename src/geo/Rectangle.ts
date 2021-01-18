@@ -16,7 +16,7 @@ export class Rectangle2 {
     }
 
     center() : Vector2 {
-        return this.pose.transform(new Vector2(0, 0));
+        return this.pose.transformVector(new Vector2(0, 0));
     }
 
     getVertices() : Vector2[] {
@@ -28,7 +28,7 @@ export class Rectangle2 {
             new Vector2(this.domain.x.t1, this.domain.y.t1),
         ];
 
-        verts.forEach((v) => this.pose.transform(v));
+        verts.forEach((v) => this.pose.transformVector(v));
         return verts;
     }
 

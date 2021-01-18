@@ -4,6 +4,24 @@
 
 import { Vector2 } from "../math/Vector";
 
+enum Key {
+    A, B, C, D, E, F,  G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
+    Up, Down, Left, Right, Space, Control, Alt, Shift, Enter, Esc,
+    N1, N2, N3, N4,  N5,  N6, N7, N8,  N9, N0, Plus, Minus, Backspace
+}
+
+function toMapping(key: Key) : number {
+    switch(key) {
+        case(Key.A): return 1;
+        case(Key.B): return 2;
+        case(Key.C): return 3;
+        case(Key.D): return 4;
+        case(Key.E): return 5;
+        case(Key.F): return 6;
+        default: return 0;
+    }
+}
+
 export interface IKeys 
 {
     [key: string] : boolean

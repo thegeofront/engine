@@ -148,6 +148,15 @@ export class GeonImage {
         return this;
     }
 
+    fillEvery(filler: Function) {
+        for (let y = 0; y < this.height; y++) {
+            for (let x = 0; x < this.width; x++) {
+                this.set(x, y, filler());
+            }
+        }
+        return this;
+    }
+    
     public set(x: number, y: number, pixel: number[]) {
 
         if (x > this.width || x < 0) throw "out of bounds";

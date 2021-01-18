@@ -79,6 +79,10 @@ export class Vector3
         return `Vector3(${this.x}, ${this.y}, ${this.z})`;
     }
 
+	toVector2() : Vector2 {
+		return new Vector2(this.x, this.y);
+	}
+
     clone() : Vector3
     {
         return this.constructor(this.x, this.y, this.z);

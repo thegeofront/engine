@@ -66,7 +66,7 @@ function compileShader(gl: WebGLRenderingContext, shaderSource: string, shaderTy
     gl.compileShader(shader); 
     var success = gl.getShaderParameter(shader, gl.COMPILE_STATUS); 
     if (!success) {
-        throw "could not compile shader:" + gl.getShaderInfoLog(shader);
+        throw "could not compile shader:" + shaderSource + gl.getShaderInfoLog(shader);
     }
     return shader;
 }

@@ -2,44 +2,50 @@
 // purpose : test with Renderers, Domains & Vectors
 
 import { Rectangle2 } from "../geo/Rectangle";
+import { GeonImage } from "../img/Image";
 import { Domain, Domain2, Domain3 } from "../math/domain";
 import { Matrix3 } from "../math/matrix";
 import { Vector3 } from "../math/Vector";
+import { ImageRenderer } from "../render/image-renderer";
 import { RectangleRenderer } from "../render/rectangle-renderer";
 import { InputState } from "../system/InputHandler"
-import { App } from "./app"
+import { App } from "../app/app"
 
-export class VectorApp extends App {
+export class RectangleApp extends App {
 
     recs: Rectangle2[] = [];
     dirs: Vector3[] = [];
 
     bounds: Domain3;
-    renderer: RectangleRenderer;
-    
+    renderer: ImageRenderer;
+    tex: GeonImage;
 
     // unique constructors
     constructor(gl: WebGLRenderingContext) {
         super();
-        this.bounds = Domain3.new(-500, 500, -500, 500, -500, 500);
-        this.renderer = new RectangleRenderer(gl)
+        this.bounds = Domain3.new(0, 300, 0, 300, 0, 500);
+        this.renderer = new ImageRenderer(gl)
+        this.tex = new GeonImage(20, 20).fillEvery(randomPixelColor);
     }
 
     start() {
         // additional setup of state
-        const normSpace = Domain3.new(-1, 1, -1, 1, -1, 1);
-        for (let i = 0 ; i < 1; i++) {
+        let normrange = 5;
+        let count = 10;
+        const normSpace = Domain3.new(-normrange, normrange, -normrange, normrange, -normrange, normrange);
+        
+        for (let i = 0 ; i < count; i++) {
 
-            this.recs.push(new Rectangle2(
-                Matrix3.newIdentity(),
-                Domain2.new(-1, 1, -1, 1),
-            ));
+            let loc = this.bounds.elevate(Vector3.fromRandom());
+            let mat = Matrix3.newIdentity().translate(loc.toVector2());
+            let domain = Domain2.new(-100, 100, -100, 100);
+
+            this.recs.push(new Rectangle2(mat, domain));
             this.dirs.push(normSpace.elevate(Vector3.fromRandom()));
         }
     }
 
     update(state: InputState) {
-        // updating state
         for (let i = 0 ; i < this.recs.length; i++) {
 
             // these 'should' be pointers, but check this
@@ -56,24 +62,29 @@ export class VectorApp extends App {
             //     dir.z = -dir.z
 
             // move & rotate
-            rec.pose.translateN(dir.x, dir.y);
-            rec.pose.rotate(0.01);
-
+            rec.pose = rec.pose.rotate(0.01);
+            rec.pose = Matrix3.newTranslation(dir.x, dir.y).multiply(rec.pose);
             
             if (state.IsKeyPressed("q"))
             {
                 console.log(rec.center().toString());
             }
-                
-                //console.log(rec.center().toString());
         }  
-
     }
 
     draw(gl: WebGLRenderingContext) {
-        // drawing state
+        for (const rec of this.recs) {
 
-        // render the points like boxes which are flying around
-        this.renderer.render(gl, this.recs);
+            this.renderer.render(gl, rec, this.tex.getImageData());
+        }
     }
+}
+
+function randomPixelColor(alpha: number = 255) : number[] {
+    let pixel: number[] = [];
+    pixel.push(Math.round(Math.random() * 255));
+    pixel.push(Math.round(Math.random() * 255));
+    pixel.push(Math.round(Math.random() * 255));
+    pixel.push(alpha)
+    return pixel;
 }

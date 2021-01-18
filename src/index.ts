@@ -5,8 +5,9 @@ import {addWebcamAppWhenReady, WebcamApp} from "./app/webcam-app";
 import {DebugApp} from "./app/debug-app";
 import { InputState } from "./system/InputHandler";
 import { App } from "./app/app";
-import { VectorApp } from "./app/vector-app";
-import { initWebglContext } from "./render/renderer";
+import { initWebglContext, Renderer } from "./render/renderer";
+import { DotApp } from "./app-demos/dot-app";
+import { RectangleApp } from "./app-demos/rectangle-app";
 
 const REALTIME_DEMO = false;
 
@@ -25,7 +26,7 @@ function main() {
     const core = new Core(canvas, gl);
 
     //core.addApp(new DebugApp(canvas, context));
-    core.addApp(new VectorApp(gl)); 
+    core.addApp(new RectangleApp(gl)); 
     //addWebcamAppWhenReady(core, canvas, video);
 
     // infinite loop
@@ -37,9 +38,7 @@ function main() {
         core.update();
         core.draw();
         
-        setTimeout(() => {
-            requestAnimationFrame(loop);
-        }, 10);
+        requestAnimationFrame(loop);
     }
     // loop();
     requestAnimationFrame(loop);
@@ -88,8 +87,15 @@ export class Core {
 
     draw() {
         const canvas = this.canvas;
-        canvas.width = canvas.clientWidth;
-        canvas.height = canvas.clientHeight;
+        const gl = this.gl
+
+        // pre-gl business
+        Renderer.resizeCanvas(this.gl);
+        this.gl.clearColor(0, 0, 0, 0);
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+
+        // render all apps
+        // TODO : reverse order
         this.apps.forEach((app) => {
             app.draw(this.gl);
         })

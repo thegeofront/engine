@@ -1,5 +1,9 @@
+//
+// [JF]
+// 
 // author: Jos Feenstra
 // TODO: FIX MATRIX4 !!!
+// NOTE: Matrix3 & Matr
 
 import { Quaternion } from "./quaternion";
 import { Vector2, Vector3 } from "./Vector";
@@ -187,7 +191,7 @@ export class Matrix3 extends Matrix {
     }
 
     // transform a vector. RECYCLE IT
-    transform(v: Vector2) : Vector2 {
+    transformVector(v: Vector2) : Vector2 {
         let m = this.data;
         let v0 = v.x;
         let v1 = v.y;
@@ -198,7 +202,7 @@ export class Matrix3 extends Matrix {
     }
     
     // return the inverse of this matrix
-    inverse() {
+    inverse() : Matrix3 {
 
         // ive got no idea what is happening here, 
         // but apparantly, this is how you inverse a 3x3 matrix.
@@ -209,7 +213,7 @@ export class Matrix3 extends Matrix {
 
         // discriminant
         var d = 1.0 / (m[0 * 3 + 0] * t00 - m[1 * 3 + 0] * t10 + m[2 * 3 + 0] * t20);
-        return new Matrix3([
+        this.setData([
          d * t00, -d * t10, d * t20,
         -d * (m[1 * 3 + 0] * m[2 * 3 + 2] - m[1 * 3 + 2] * m[2 * 3 + 0]),
          d * (m[0 * 3 + 0] * m[2 * 3 + 2] - m[0 * 3 + 2] * m[2 * 3 + 0]),
@@ -218,8 +222,8 @@ export class Matrix3 extends Matrix {
         -d * (m[0 * 3 + 0] * m[2 * 3 + 1] - m[0 * 3 + 1] * m[2 * 3 + 0]),
          d * (m[0 * 3 + 0] * m[1 * 3 + 1] - m[0 * 3 + 1] * m[1 * 3 + 0]),
         ]);
+        return this;
     }
-
 }
 
 // 4x4 matrix of floats used for 3d math

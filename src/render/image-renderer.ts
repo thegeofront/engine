@@ -3,7 +3,7 @@
 import { Rectangle2 } from "../geo/Rectangle";
 import { Renderer } from "./renderer";
 
-export class RectangleRenderer extends Renderer {
+export class ImageRenderer extends Renderer {
 
     // attribute & uniform locations
     a_position: number;
@@ -19,29 +19,31 @@ export class RectangleRenderer extends Renderer {
         // they are coupled 1 to 1.
         let vertexSource: string = `
         attribute vec2 a_position;
+        attribute vec2 a_texCoord;
 
         uniform vec2 u_resolution;
+
+        varying vec2 v_texCoord;
 
         void main() {
             // convert the rectangle from pixels to 0.0 to 1.0
             vec2 zeroToOne = ((a_position / u_resolution) * 2.0) - 1.0;
 
-            // convert from 0->1 to 0->2
-            // vec2 zeroToTwo = zeroToOne * 2.0;
-
-            // convert from 0->2 to -1->+1 (clipspace)
-            // vec2 clipSpace = zeroToTwo - 1.0;
-
             gl_Position = vec4(zeroToOne * vec2(1, -1), 0, 1);
+
+            v_texCoord = a_texCoord;
         }
         `;
         let fragmentSource: string = `
         precision mediump float;
+ 
+        uniform sampler2D u_image;
 
-        uniform vec4 u_color;
+        varying vec2 v_texCoord;
         
         void main() {
-           gl_FragColor = u_color;
+            // Look up a color from the texture.
+            gl_FragColor = texture2D(u_image, v_texCoord);
         }
         `;
 
@@ -53,24 +55,45 @@ export class RectangleRenderer extends Renderer {
         this.a_position_buffer = gl.createBuffer()!;
         this.u_resolution = gl.getUniformLocation(this.program, "u_resolution")!;
         this.u_color = gl.getUniformLocation(this.program, "u_color")!;
-   
-        // Create a buffer to put three 2d clip space points in
-        
 
         // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);        
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);     
+        
+        // look up where the texture coordinates need to go.
+        var a_texCoord = gl.getAttribLocation(this.program, "a_texCoord");
+        
+        // provide texture coordinates for the rectangle.
+        var a_texCoord_buffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, a_texCoord_buffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+            0.0,  0.0,
+            1.0,  0.0,
+            0.0,  1.0,
+            0.0,  1.0,
+            1.0,  0.0,
+            1.0,  1.0]), gl.STATIC_DRAW);
+        gl.enableVertexAttribArray(a_texCoord);
+        gl.vertexAttribPointer(a_texCoord, 2, gl.FLOAT, false, 0, 0);
+        
+        // Create a texture.
+        var texture = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+        
+        // Set the parameters so we can render any size image.
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
     }
 
-    render(gl: WebGLRenderingContext, rs: Rectangle2[]) {
-        
-        
-
-        // Clear the canvas
-        gl.clearColor(0, 0, 0, 0);
-        gl.clear(gl.COLOR_BUFFER_BIT);
+    // render 1 image to the screen
+    render(gl: WebGLRenderingContext, r: Rectangle2, image: ImageData) {
 
         // Tell it to use our program (pair of shaders)
         gl.useProgram(this.program);
+
+        // Upload the image into the texture.
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
 
         // Turn on the attribute
         gl.enableVertexAttribArray(this.a_position);
@@ -88,24 +111,16 @@ export class RectangleRenderer extends Renderer {
         var offset = 0;        // start at the beginning of the buffer
         gl.vertexAttribPointer(this.a_position, size, type, normalize, stride, offset);
 
+        this.setRectangle(gl, r);
 
-        // draw 50 random rectangles in random colors
-        for (let r of rs) {
-            // Setup a random rectangle
-            // This will write to positionBuffer because
-            // its the last thing we bound on the ARRAY_BUFFER
-            // bind point
-            this.setRectangle(gl, r);
+        // Set a random color.
+        gl.uniform4f(this.u_color, Math.random(), Math.random(), Math.random(), 1);
 
-            // Set a random color.
-            gl.uniform4f(this.u_color, Math.random(), Math.random(), Math.random(), 1);
-
-            // Draw the rectangle.
-            var primitiveType = gl.TRIANGLES;
-            var offset = 0;
-            var count = 6;
-            gl.drawArrays(primitiveType, offset, count);
-        }
+        // Draw the rectangle.
+        var primitiveType = gl.TRIANGLES;
+        var offset = 0;
+        var count = 6;
+        gl.drawArrays(primitiveType, offset, count);
     }
 
     // Fill the buffer with the values that define a rectangle.
