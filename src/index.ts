@@ -6,8 +6,9 @@ import {DebugApp} from "./app/debug-app";
 import { InputState } from "./system/InputState";
 import { App } from "./app/app";
 import { initWebglContext, Renderer } from "./render/renderer";
-import { DotApp } from "./app-demos/dot-app";
+import { DotApp2 } from "./app-demos/dot-app2";
 import { RectangleApp } from "./app-demos/rectangle-app";
+import { DotApp3 } from "./app-demos/dot-app3";
 
 const REALTIME_DEMO = false;
 
@@ -27,7 +28,7 @@ function main() {
 
     //core.addApp(new DebugApp(canvas, context));
     // core.addApp(new RectangleApp(gl)); 
-    core.addApp(new DotApp(gl)); 
+    core.addApp(new DotApp3(gl, canvas)); 
     //addWebcamAppWhenReady(core, canvas, video);
 
     // infinite loop
@@ -89,7 +90,21 @@ export class Core {
         const gl = this.gl
 
         // pre-gl business
-        Renderer.resizeCanvas(this.gl);
+        if (window.innerHeight != canvas.height || 
+            window.innerWidth  != canvas.width) 
+        {
+            canvas.height = window.innerHeight;
+            // canvas.clientHeight = window.innerHeight;
+            canvas.style.height = window.innerHeight.toString();
+
+            canvas.width  = window.innerWidth;
+            // canvas.clientWidth = window.innerWidth;
+            canvas.style.width = window.innerWidth.toString();
+
+            gl.viewport(0, 0, window.innerWidth, window.innerHeight);
+        }
+
+        // Renderer.resizeCanvas(this.gl);
         this.gl.clearColor(0, 0, 0, 0);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 

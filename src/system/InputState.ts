@@ -35,7 +35,8 @@ export class InputState {
     startTime: number;
     minimumTick: number;
 
-    clientMousePos: Vector2 = Vector2.zero();
+    mousePos: Vector2 = Vector2.zero();
+    mouseDelta: Vector2 = Vector2.zero();
     mouseLeftDown = false;
     mouseLeftPressed = false;
     private mouseLeftPrev = false;
@@ -146,7 +147,7 @@ export class InputState {
     private setMousePos(e: MouseEvent)
     {
         // this is a bit messy, BUT, multiply by camera parameters
-        this.clientMousePos = new Vector2(e.clientX, e.clientY)
+        this.mousePos = new Vector2(e.clientX, e.clientY);;
     }
 
     private setMouseUp(e: MouseEvent)

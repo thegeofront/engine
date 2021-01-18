@@ -21,7 +21,7 @@ export class Matrix {
         this.width = width;
         this.height = height;
         this.data = new Float32Array(this.width * this.height);
-        if (data == [])
+        if (data == [] || data.length == 0)
             this.fill(0);
         else
             this.setData(data);    
@@ -30,7 +30,7 @@ export class Matrix {
     setData(data: number[]) {
 
         if (data.length != (this.height * this.width))
-            throw "data.length does not match width * height ";
+            throw "data.length does not match width * height " + data.length.toString();
 
         for (let i = 0 ; i < data.length; i++)
         {
@@ -40,12 +40,10 @@ export class Matrix {
 
     fill(value: number) {
 
-        for (let y = 0; y < this.height; y++)
+        let size = this.height * this.width
+        for (let i = 0; i < size; i++)
         {
-            for (let x = 0; x < this.width; x++)
-            {
-                this.set(x, y, value);
-            }
+            this.data[i] = value;
         }
     }
 
@@ -505,14 +503,11 @@ export class Matrix4 extends Matrix {
     
     static newTranslation(tx: number, ty: number, tz: number) : Matrix4 {
                 
-        let matrix = new Matrix4();
-        let dst = matrix.data;
-    
         return new Matrix4([
             1,0,0,0,
             0,1,0,0,
             0,0,1,0,
-            tx,ty,tz,1,
+            tx,ty,tz,1
         ]);
     }
     
@@ -523,38 +518,23 @@ export class Matrix4 extends Matrix {
 
         return new Matrix4([
             1,0,0,0,
-            0,c,s,0,
-            0,-s,c,0,
+            0,c,-s,0,
+            0,s,c,0,
             0,0,0,1,
         ]);
     }
     
     static newYRotation(angleInRadians: number) : Matrix4 {
 
-        let matrix = new Matrix4();
-        let dst = matrix.data;
-    
         var c = Math.cos(angleInRadians);
         var s = Math.sin(angleInRadians);
     
-        dst[ 0] = c;
-        dst[ 1] = 0;
-        dst[ 2] = -s;
-        dst[ 3] = 0;
-        dst[ 4] = 0;
-        dst[ 5] = 1;
-        dst[ 6] = 0;
-        dst[ 7] = 0;
-        dst[ 8] = s;
-        dst[ 9] = 0;
-        dst[10] = c;
-        dst[11] = 0;
-        dst[12] = 0;
-        dst[13] = 0;
-        dst[14] = 0;
-        dst[15] = 1;
-    
-        return matrix;
+        return new Matrix4([
+            c,0,s,0,
+            0,1,0,0,
+            -s,0,c,0,
+            0,0,0,1,
+        ]);
     }
     
     static newZRotation(angleInRadians: number) {

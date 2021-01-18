@@ -4,6 +4,7 @@
 // purpose: general representation of a domain / range / bound of numbers
 //          
 
+import { Matrix4 } from "./matrix";
 import { Vector2, Vector3 } from "./Vector";
 
 export class Domain {
@@ -157,12 +158,30 @@ export class Domain3 {
 
     elevate(t: Vector3) : Vector3 {
         // elevate a normalized parameter to the parameter space of this domain
-        return new Vector3(this.x.elevate(t.x), this.y.elevate(t.y), this.x.elevate(t.z));
+        return new Vector3(this.x.elevate(t.x), this.y.elevate(t.y), this.z.elevate(t.z));
     }
 
     remap(value: Vector3, other: Domain3 = new Domain3()) : Vector3 {
         // normalize a value, then elevate it to a new domain
         let norm = this.normalize(value);
         return other.elevate(norm);
+    }
+
+    corners(matrix: Matrix4) : Vector3[] {
+        // render the extends of this boundary / domain
+        let dim = 3;
+        let corners = 2 ^ dim;
+        let data = [];
+        for(let x of [this.x.t0, this.x.t1])
+        {
+            for(let y of [this.y.t0, this.y.t1])
+            {
+                for(let z of [this.z.t0, this.z.t1])
+                {
+                    data.push(new Vector3(x,y,z));
+                }
+            }
+        }
+        return data;
     }
 }

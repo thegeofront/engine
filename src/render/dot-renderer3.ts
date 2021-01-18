@@ -1,16 +1,17 @@
 // jos feenstra
 
 import { Rectangle2 } from "../geo/Rectangle";
-import { Vector2 } from "../math/Vector";
+import { Matrix4 } from "../math/matrix";
+import { Vector2, Vector3 } from "../math/Vector";
 import { Renderer } from "./renderer";
 
-export class DotRenderer extends Renderer {
+export class DotRenderer3 extends Renderer {
 
     // attribute & uniform locations
     a_position: number;
     a_position_buffer: WebGLBuffer;
 
-    u_resolution: WebGLUniformLocation;
+    u_transform: WebGLUniformLocation;
     u_color: WebGLUniformLocation;
     u_size: WebGLUniformLocation;
 
@@ -27,28 +28,33 @@ export class DotRenderer extends Renderer {
         // putting them somewhere else doesnt make sense to me, 
         // they are coupled 1 to 1.
         let vertexSource: string = `
-        attribute vec2 a_position;
-        
-        uniform vec2 u_resolution;
+        precision mediump int;
+        precision mediump float;
+
+        uniform mat4 u_transform;
+        uniform vec4 u_color;
         uniform float u_size;
 
+        attribute vec3 a_vertex;
+
         void main() {
-            vec2 clipped = ((a_position / u_resolution) * 2.0) - 1.0;
-      
+            // Set the size of a rendered point.
             gl_PointSize = u_size;
-            gl_Position = vec4(clipped, 0, 1);
-            // gl_Position = vec4(0,0,0,1);
+
+            // Transform the location of the vertex.
+            gl_Position = u_transform * vec4(a_vertex, 1.0);
         }
+
         `;
         let fragmentSourceSquare: string = `
         precision mediump int;
         precision mediump float;
 
-        uniform vec4 u_Color;
-        vec2 center = vec2(0.5, 0.5);
+        uniform vec4 u_color;
+        // vec2 center = vec2(0.5, 0.5);
 
         void main() {
-            gl_FragColor = vec4(1,1,1,1);
+            gl_FragColor = u_color;
         }
         `;
 
@@ -56,14 +62,14 @@ export class DotRenderer extends Renderer {
         precision mediump int;
         precision mediump float;
 
-        uniform vec4 u_Color;
+        uniform vec4 u_color;
         vec2 center = vec2(0.5, 0.5);
 
         void main() {
             if (distance(center, gl_PointCoord) > 0.5) {
                discard;
             }
-            gl_FragColor = vec4(1,1,1,1);
+            gl_FragColor = u_color;
         }
         `;
 
@@ -74,7 +80,7 @@ export class DotRenderer extends Renderer {
             super(gl, vertexSource, fragmentSourceRound);
         }
 
-        this.u_resolution = gl.getUniformLocation(this.program, "u_resolution")!;
+        this.u_transform = gl.getUniformLocation(this.program, "u_transform")!;
         this.u_size = gl.getUniformLocation(this.program, "u_size")!;
         this.u_color = gl.getUniformLocation(this.program, "u_color")!;
 
@@ -83,19 +89,20 @@ export class DotRenderer extends Renderer {
 
         // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
         // look up where the vertex data needs to go.
-        this.a_position = gl.getAttribLocation(this.program, "a_position");
+        this.a_position = gl.getAttribLocation(this.program, "a_vertex");
         this.a_position_buffer = gl.createBuffer()!;
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);     
     }
 
     // render 1 image to the screen
-    render(gl: WebGLRenderingContext, dots: Vector2[]) {
-
+    render(gl: WebGLRenderingContext, matrix: Matrix4, dots: Vector3[]) {
+        
         // Tell it to use our program (pair of shaders)
         gl.useProgram(this.program);
 
         // set uniforms
-        gl.uniform2f(this.u_resolution, gl.canvas.width, gl.canvas.height);
+        // console.log(matrix.data);
+        gl.uniformMatrix4fv(this.u_transform, false, matrix.data);
         gl.uniform1f(this.u_size, this.size);
         gl.uniform4f(this.u_color, this.color[0], this.color[1], this.color[2], this.color[3]);
 
@@ -104,15 +111,15 @@ export class DotRenderer extends Renderer {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
 
         // // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-        var size = 2;          // 2 components per iteration
+        var size = 3;          // 2 components per iteration
         var type = gl.FLOAT;   // the data is 32bit floats
         var normalize = false; // don't normalize the data
         var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
         var offset = 0;        // start at the beginning of the buffer
+        let data = this.toFloat32Array(dots);
         gl.vertexAttribPointer(this.a_position, size, type, normalize, stride, offset);
         
         // fill with data;
-        let data = this.toFloat32Array(dots);
         gl.bufferData(gl.ARRAY_BUFFER, data, gl.DYNAMIC_DRAW);
         
         // Draw the point.
@@ -123,16 +130,13 @@ export class DotRenderer extends Renderer {
     }
 
     // Fill the buffer with the values that define a rectangle.
-    toFloat32Array(dots: Vector2[]) : Float32Array{
-        let data = new Float32Array(dots.length * 2);
+    toFloat32Array(dots: Vector3[]) : Float32Array{
+        let data = new Float32Array(dots.length * 3);
         for(let i = 0 ; i < dots.length; i++) {
-            data[i*2]     = dots[i].x;
-            data[i*2 + 1] = dots[i].y;
+            data[i*3]     = dots[i].x;
+            data[i*3 + 1] = dots[i].y;
+            data[i*3 + 2] = dots[i].z;
         }
         return data;
-    }
-
-    randomInt(range: number) : number {
-        return Math.floor(Math.random() * range);
     }
 }

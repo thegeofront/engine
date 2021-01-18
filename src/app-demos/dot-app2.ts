@@ -9,21 +9,21 @@ import { ImageRenderer } from "../render/image-renderer";
 import { RectangleRenderer } from "../render/rectangle-renderer";
 import { InputState } from "../system/InputState"
 import { App } from "../app/app"
-import { DotRenderer } from "../render/dot-renderer";
+import { DotRenderer2 } from "../render/dot-renderer2";
 
-export class DotApp extends App {
+export class DotApp2 extends App {
 
     dots: Vector2[] = [];
     dirs: Vector2[] = [];
 
     bounds: Domain2;
-    renderer: DotRenderer;
+    renderer: DotRenderer2;
 
     // unique constructors
     constructor(gl: WebGLRenderingContext) {
         super();
         this.bounds = Domain2.new(0, 500, 0, 500);
-        this.renderer = new DotRenderer(gl, 5, [1,1,1,1], true);
+        this.renderer = new DotRenderer2(gl, 5, [1,1,1,1], true);
     }
 
     start() {
