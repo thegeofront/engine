@@ -8,7 +8,7 @@ import { BellusScanData } from "../input/BellusData";
 import { CtxRenderer } from "../draw/CtxRenderer"; 
 import { Vector2 } from "../math/Vector";
 import { GeonImage } from "../img/Image";
-import { InputState } from "../system/InputHandler";
+import { InputState } from "../system/InputState";
 import { input } from "@tensorflow/tfjs";
 import { getMaxTexturesInShader } from "@tensorflow/tfjs-backend-webgl/dist/webgl_util";
 

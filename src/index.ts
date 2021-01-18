@@ -3,7 +3,7 @@
 
 import {addWebcamAppWhenReady, WebcamApp} from "./app/webcam-app";
 import {DebugApp} from "./app/debug-app";
-import { InputState } from "./system/InputHandler";
+import { InputState } from "./system/InputState";
 import { App } from "./app/app";
 import { initWebglContext, Renderer } from "./render/renderer";
 import { DotApp } from "./app-demos/dot-app";
@@ -57,9 +57,7 @@ export class Core {
 
     canvas: HTMLCanvasElement;
     gl: WebGLRenderingContext;
-
     state: InputState;
-
     private apps: App[];
     STOP = false;
 

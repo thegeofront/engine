@@ -14,7 +14,7 @@ import { Triangle2 } from "../math/Triangle2";
 import * as draw from "../draw/tensorflow-drawing";
 import { App } from "./app";
 import { Core } from "..";
-import { InputState } from "../system/InputHandler";
+import { InputState } from "../system/InputState";
 
 // PUBLIC
 

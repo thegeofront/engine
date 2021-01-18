@@ -8,7 +8,7 @@ import { Matrix3 } from "../math/matrix";
 import { Vector3 } from "../math/Vector";
 import { ImageRenderer } from "../render/image-renderer";
 import { RectangleRenderer } from "../render/rectangle-renderer";
-import { InputState } from "../system/InputHandler"
+import { InputState } from "../system/InputState"
 import { App } from "../app/app"
 
 export class RectangleApp extends App {
