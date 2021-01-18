@@ -23,13 +23,13 @@ export class DotApp extends App {
     constructor(gl: WebGLRenderingContext) {
         super();
         this.bounds = Domain2.new(0, 500, 0, 500);
-        this.renderer = new DotRenderer(gl, 100, [1,1,1,1], true);
+        this.renderer = new DotRenderer(gl, 5, [1,1,1,1], true);
     }
 
     start() {
         // additional setup of state
         let normrange = 5;
-        let count = 10000;
+        let count = 10;
         const normSpace = Domain2.new(-normrange, normrange, -normrange, normrange);
         
         for (let i = 0 ; i < count; i++) {

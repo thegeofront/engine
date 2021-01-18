@@ -14,6 +14,9 @@ export class DotRenderer extends Renderer {
     u_color: WebGLUniformLocation;
     u_size: WebGLUniformLocation;
 
+    color: number[];
+    size: number;
+
     constructor(gl: WebGLRenderingContext, 
         size: number =5, 
         color: number[] = [1,1,1,1], 
@@ -75,6 +78,9 @@ export class DotRenderer extends Renderer {
         this.u_size = gl.getUniformLocation(this.program, "u_size")!;
         this.u_color = gl.getUniformLocation(this.program, "u_color")!;
 
+        this.color = color;
+        this.size = size;
+
         // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
         // look up where the vertex data needs to go.
         this.a_position = gl.getAttribLocation(this.program, "a_position");
@@ -90,8 +96,8 @@ export class DotRenderer extends Renderer {
 
         // set uniforms
         gl.uniform2f(this.u_resolution, gl.canvas.width, gl.canvas.height);
-        gl.uniform1f(this.u_size, 1);
-        gl.uniform4f(this.u_color, 1, 1, 1, 1);
+        gl.uniform1f(this.u_size, this.size);
+        gl.uniform4f(this.u_color, this.color[0], this.color[1], this.color[2], this.color[3]);
 
         // // Bind the position buffer.
         gl.enableVertexAttribArray(this.a_position);

@@ -26,7 +26,8 @@ function main() {
     const core = new Core(canvas, gl);
 
     //core.addApp(new DebugApp(canvas, context));
-    core.addApp(new RectangleApp(gl)); 
+    // core.addApp(new RectangleApp(gl)); 
+    core.addApp(new DotApp(gl)); 
     //addWebcamAppWhenReady(core, canvas, video);
 
     // infinite loop
