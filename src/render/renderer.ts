@@ -2,18 +2,41 @@
 // 
 // author: Jos Feenstra
 // credits to : https://webglfundamentals.org/
+// note: im still figuring out how to organize this 
 
 export class Renderer {
-    
+
+    gl: WebGLRenderingContext;
     program: WebGLProgram;
 
     constructor(gl: WebGLRenderingContext, vertexScript: string, fragmentScript: string) {
+        this.gl = gl;
         this.program = createProgramFromScripts(gl, vertexScript, fragmentScript);
     }
 
-    setState() {}
+    static resizeCanvas(gl: WebGLRenderingContext) {
 
-    render() {}
+        // Lookup the size the browser is displaying the canvas in CSS pixels.
+        let canvas = gl.canvas as HTMLCanvasElement;
+
+        const displayWidth  = canvas.clientWidth;
+        const displayHeight = canvas.clientHeight;
+       
+        // Check if the canvas is not the same size.
+        const needResize = gl.canvas.width  !== displayWidth ||
+                           gl.canvas.height !== displayHeight;
+       
+        if (needResize) {
+          // Make the canvas the same size
+          gl.canvas.width  = displayWidth;
+          gl.canvas.height = displayHeight;
+        }
+       
+        // Tell WebGL how to convert from clip space to pixels
+        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
+        return needResize;
+      }
 }
 
 export function initWebglContext(canvas: HTMLCanvasElement) {

@@ -5,7 +5,6 @@ import {addWebcamAppWhenReady, WebcamApp} from "./app/webcam-app";
 import {DebugApp} from "./app/debug-app";
 import { InputState } from "./system/InputHandler";
 import { App } from "./app/app";
-import { WebglHelpers } from "./render/webgl-helpers";
 import { VectorApp } from "./app/vector-app";
 import { initWebglContext } from "./render/renderer";
 
@@ -21,16 +20,17 @@ function main() {
     let cameraStop = document.getElementById("camera-off")! as HTMLButtonElement;
     let buttonPredict = document.getElementById("predict")! as HTMLButtonElement;
     
-    const core = new Core(canvas);
+
+    let gl = initWebglContext(canvas);
+    const core = new Core(canvas, gl);
 
     //core.addApp(new DebugApp(canvas, context));
-    core.addApp(new VectorApp()); 
+    core.addApp(new VectorApp(gl)); 
     //addWebcamAppWhenReady(core, canvas, video);
 
     // infinite loop
     function loop() {
-
-        console.log(core.STOP);
+ 
         if (core.STOP) 
             return;
 
@@ -41,11 +41,11 @@ function main() {
             requestAnimationFrame(loop);
         }, 10);
     }
-    loop();
-    // requestAnimationFrame(loop);
+    // loop();
+    requestAnimationFrame(loop);
 
     // we broke out of the loop
-    console.log("app has stopped.");
+    // console.log("app has stopped.");
 }
 
 
@@ -64,9 +64,9 @@ export class Core {
     private apps: App[];
     STOP = false;
 
-    constructor(canvas: HTMLCanvasElement) {
+    constructor(canvas: HTMLCanvasElement, gl: WebGLRenderingContext) {
         this.canvas = canvas;
-        this.gl = initWebglContext(canvas);
+        this.gl = gl;
         this.state = new InputState(canvas);
         this.apps = [];
     }

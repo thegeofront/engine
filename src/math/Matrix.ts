@@ -133,8 +133,12 @@ export class Matrix3 extends Matrix {
         return this.multiply(Matrix3.newProjection(width, height))
     }
 
-    translate(dx: number, dy: number) : Matrix3 {
+    translateN(dx: number, dy: number) : Matrix3 {
         return this.multiply(Matrix3.newTranslation(dx, dy));
+    }
+
+    translate(v: Vector2) : Matrix3 {
+        return this.multiply(Matrix3.newTranslation(v.x, v.y));
     }
 
     rotate(r: number) : Matrix3 {
@@ -182,16 +186,15 @@ export class Matrix3 extends Matrix {
         ]);
     }
 
-    // transform a vector 
-    transformVector(v: Vector2) : Vector2 {
+    // transform a vector. RECYCLE IT
+    transform(v: Vector2) : Vector2 {
         let m = this.data;
         let v0 = v.x;
         let v1 = v.y;
         let d = v0 * m[0 * 3 + 2] + v1 * m[1 * 3 + 2] + m[2 * 3 + 2];
-        return new Vector2(
-          (v0 * m[0 * 3 + 0] + v1 * m[1 * 3 + 0] + m[2 * 3 + 0]) / d,
-          (v0 * m[0 * 3 + 1] + v1 * m[1 * 3 + 1] + m[2 * 3 + 1]) / d,
-        );
+        v.x = (v0 * m[0 * 3 + 0] + v1 * m[1 * 3 + 0] + m[2 * 3 + 0]) / d;
+        v.y = (v0 * m[0 * 3 + 1] + v1 * m[1 * 3 + 1] + m[2 * 3 + 1]) / d;
+        return v;
     }
     
     // return the inverse of this matrix
