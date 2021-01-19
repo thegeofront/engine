@@ -81,7 +81,6 @@ export class Vector2Array extends FloatArray {
     }
 }
 
-
 export class Vector3Array extends FloatArray {
     
     constructor(count: number) {
@@ -120,5 +119,12 @@ export class Vector3Array extends FloatArray {
             vecs.push(this.getVector(i));
         }
         return vecs;
+    }
+}
+
+export class FaceArray extends FloatArray {
+
+    constructor(count: number) {
+        super(count, 3);
     }
 }

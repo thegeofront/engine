@@ -5,7 +5,7 @@
 
 import { createUnsignedBytesMatrixTexture } from "@tensorflow/tfjs-backend-webgl/dist/gpgpu_util";
 import { browserLocalStorage } from "@tensorflow/tfjs-core/dist/io/local_storage";
-import { FloatArray, Vector2Array, Vector3Array } from "../math/Array";
+import { FaceArray, Vector2Array, Vector3Array } from "../math/Array";
 
 export class Mesh {
 
@@ -162,14 +162,6 @@ function ProcessObjFace(parts: string[]) : number[] {
 
     // data always has length 9 or 18
     return data;
-}
-
-// simple wrapper
-class FaceArray extends FloatArray {
-
-    constructor(count: number) {
-        super(count, 3);
-    }
 }
 
 class Face {

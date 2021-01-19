@@ -1,4 +1,6 @@
-// jos feenstra
+// name:    image-renderer.ts
+// author:  Jos Feenstra
+// purpose: WebGL based rendering of images / textures
 
 import { Rectangle2 } from "../geo/Rectangle";
 import { Renderer } from "./renderer";
