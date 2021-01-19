@@ -95,8 +95,10 @@ export class DotRenderer3 extends Renderer {
     }
 
     // render 1 image to the screen
-    render(gl: WebGLRenderingContext, matrix: Matrix4, dots: Vector3[]) {
+    renderQuick(gl: WebGLRenderingContext, matrix: Matrix4, data: Float32Array) {
         
+        const COMPONENTS_PER_ITERATION = 3;
+
         // Tell it to use our program (pair of shaders)
         gl.useProgram(this.program);
 
@@ -111,12 +113,11 @@ export class DotRenderer3 extends Renderer {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
 
         // // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-        var size = 3;          // 2 components per iteration
+        var size = COMPONENTS_PER_ITERATION; // componenets per iteration
         var type = gl.FLOAT;   // the data is 32bit floats
         var normalize = false; // don't normalize the data
         var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
         var offset = 0;        // start at the beginning of the buffer
-        let data = this.toFloat32Array(dots);
         gl.vertexAttribPointer(this.a_position, size, type, normalize, stride, offset);
         
         // fill with data;
@@ -125,8 +126,14 @@ export class DotRenderer3 extends Renderer {
         // Draw the point.
         var primitiveType = gl.POINTS;
         var offset = 0;
-        var count = dots.length
+        var count = data.length / COMPONENTS_PER_ITERATION;
         gl.drawArrays(primitiveType, offset, count);
+    }
+
+    render(gl: WebGLRenderingContext, matrix: Matrix4, dots: Vector3[]) {
+     
+        let data = this.toFloat32Array(dots);
+        return this.renderQuick(gl, matrix, data);
     }
 
     // Fill the buffer with the values that define a rectangle.

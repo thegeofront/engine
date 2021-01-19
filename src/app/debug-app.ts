@@ -11,6 +11,7 @@ import { GeonImage } from "../img/Image";
 import { InputState } from "../system/InputState";
 import { input } from "@tensorflow/tfjs";
 import { getMaxTexturesInShader } from "@tensorflow/tfjs-backend-webgl/dist/webgl_util";
+import { Vector2Array } from "../math/Array";
 
 const settings = require('../process/settings.json'); // note DIFFERENCE BETWEEN "" AND ''. '' WORKS, "" NOT. 
 
@@ -24,7 +25,7 @@ export class DebugApp {
     bsd?: BellusScanData;
 
     // draw things
-    landmarks: Vector2[] = [];
+    landmarks?: Vector2Array;
     images: GeonImage[] = [];
     imagelocs: Vector2[] = [];
 
@@ -61,17 +62,12 @@ export class DebugApp {
             let loc = this.imagelocs[i];
             this.r.drawImage(loc, image);
         }
-
-        // draw landmarks
-        this.landmarks.forEach((p) => {
-            this.r.drawPoint(p);
-        });  
     }
 
     addBellusData(bsd: BellusScanData) {
 
         this.bsd = bsd;
-        let landmarks = bsd.getLandmarks2f().toVector2();
+        let landmarks = bsd.getLandmarks2f();
         let image = GeonImage.fromImageData(bsd.texture);
         
         // visualize this data

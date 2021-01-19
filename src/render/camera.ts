@@ -8,13 +8,14 @@ import { InputState } from "../system/InputState";
 
 export class Camera {
 
-    offset = new Vector3(0,0,-3); // offset from rotation center
+    offset: Vector3; // offset from rotation center
     angleAlpha = 0; // rotation x 
     angleBeta = 0; // rotation y
     mousePos = Vector2.zero();
 
-    constructor(canvas: HTMLCanvasElement) {
+    constructor(canvas: HTMLCanvasElement, z_offset = 3) {
         canvas.addEventListener("wheel", this.setMouseScroll.bind(this));
+        this.offset = new Vector3(0,0, -z_offset);
     }
 
     private setMouseScroll(e: WheelEvent) {
@@ -65,7 +66,7 @@ export class Camera {
         
         const pi = Math.PI;
         const fov = 45. * pi / 100.;
-        const Z_FAR = 100.;
+        const Z_FAR = 1000.;
         const Z_NEAR = 0.1;
         let z_plane = -1. / Math.tan(pi / 8.);
         

@@ -6,7 +6,7 @@
 // - do all file -> object convertions here.         
 
 import { Mesh } from "../geo/Mesh";
-import { FloatArray } from "../math/Array";
+import { FloatArray, Vector2Array, Vector3Array } from "../math/Array";
 import { Vector2 } from "../math/Vector";
 import { loadImageFromFile, loadJSONFromFile, loadTextFromFile } from "./domwrappers";
 
@@ -72,7 +72,7 @@ export class BellusScanData {
                 let texture = await loadImageFromFile(textureFile);
                 let objtext = await loadTextFromFile(objFile);
                 // let mesh = new Mesh();
-                let mesh = await Mesh.loadFromObj(objtext);
+                let mesh = await Mesh.fromObj(objtext);
                 let front = await loadImageFromFile(frontFile);
 
                 console.log("done! bellus scan loaded.");
@@ -91,28 +91,28 @@ export class BellusScanData {
         return new Vector2(data[0], data[1]);
     }
 
-    getLandmarks2f() : FloatArray {
+    getLandmarks2f() : Vector2Array {
 
         // 2d landmarks as registered in the 'facelandmarks' json
         let data = this.landmarks.Point2f;
         let size = data.cols;
         let dim = 2;
 
-        let raw = new Float32Array(data.data);
-        let arr = new FloatArray(raw, size, dim);
+        let arr = new Vector2Array(size);
+        arr.setAll(data.data);
 
         return arr;
     }
 
-    getLandmarks3f() : FloatArray {
+    getLandmarks3f() : Vector3Array {
 
         // 2d landmarks as registered in the 'facelandmarks' json
         let data = this.landmarks.Point3f;
         let size = data.cols;
         let dim = 3;
 
-        let raw = new Float32Array(data.data);
-        let arr = new FloatArray(raw, size, dim);
+        let arr = new Vector3Array(size);
+        arr.setAll(data.data);
 
         return arr;
     }

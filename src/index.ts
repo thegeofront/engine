@@ -9,6 +9,7 @@ import { initWebglContext, Renderer } from "./render/renderer";
 import { DotApp2 } from "./app-demos/dot-app2";
 import { RectangleApp } from "./app-demos/rectangle-app";
 import { DotApp3 } from "./app-demos/dot-app3";
+import { ObjLoaderApp } from "./app/obj-loader-app";
 
 const REALTIME_DEMO = false;
 
@@ -27,7 +28,8 @@ function main() {
 
     //core.addApp(new DebugApp(canvas, context));
     // core.addApp(new RectangleApp(gl)); 
-    core.addApp(new DotApp3(gl, canvas)); 
+    // core.addApp(new DotApp3(gl, canvas)); 
+    core.addApp(new ObjLoaderApp(gl, canvas));
     //addWebcamAppWhenReady(core, canvas, video);
 
     // infinite loop
@@ -85,6 +87,7 @@ export class Core {
     }
 
     draw() {
+        
         const canvas = this.canvas;
         const gl = this.gl
 
