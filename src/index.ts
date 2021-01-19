@@ -22,7 +22,6 @@ function main() {
     let cameraStop = document.getElementById("camera-off")! as HTMLButtonElement;
     let buttonPredict = document.getElementById("predict")! as HTMLButtonElement;
     
-
     let gl = initWebglContext(canvas);
     const core = new Core(canvas, gl);
 
