@@ -3,8 +3,8 @@
 // purpose : contain all logic regarding 
 
 import { Matrix4 } from "../math/matrix";
-import { Vector2, Vector3 } from "../math/Vector"
-import { InputState } from "../system/InputState";
+import { Vector2, Vector3 } from "../math/vector"
+import { InputState } from "../system/input-state";
 
 export class Camera {
 

@@ -3,7 +3,7 @@
 
 import {addWebcamAppWhenReady, WebcamApp} from "./app/webcam-app";
 import {DebugApp} from "./app/debug-app";
-import { InputState } from "./system/InputState";
+import { InputState } from "./system/input-state";
 import { App } from "./app/app";
 import { initWebglContext, Renderer } from "./render/renderer";
 import { DotApp2 } from "./app-demos/dot-app2";

@@ -6,8 +6,8 @@
 import { GeonImage } from "../img/Image";
 import { Domain, Domain2, Domain3 } from "../math/domain";
 import { Matrix3, Matrix4 } from "../math/matrix";
-import { Vector2, Vector3 } from "../math/Vector";
-import { InputState } from "../system/InputState"
+import { Vector2, Vector3 } from "../math/vector";
+import { InputState } from "../system/input-state"
 import { App } from "../app/app"
 import { DotRenderer3 } from "../render/dot-renderer3";
 import { Camera } from "../render/camera";

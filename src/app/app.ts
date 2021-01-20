@@ -1,4 +1,4 @@
-import { InputState } from "../system/InputState"
+import { InputState } from "../system/input-state"
 
 export class App {
 

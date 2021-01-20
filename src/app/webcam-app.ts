@@ -9,12 +9,12 @@ import { MediaPipeFaceMesh } from "@tensorflow-models/face-landmarks-detection/d
 // import { model } from "@tensorflow/tfjs";
 require("@tensorflow/tfjs-backend-webgl");
 
-import { Vector2 } from "../math/Vector";
-import { Triangle2 } from "../math/Triangle2";
+import { Vector2 } from "../math/vector";
+import { Triangle2 } from "../math/triangle";
 import * as draw from "../draw/tensorflow-drawing";
 import { App } from "./app";
 import { Core } from "..";
-import { InputState } from "../system/InputState";
+import { InputState } from "../system/input-state";
 
 // PUBLIC
 

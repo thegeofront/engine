@@ -1,4 +1,4 @@
-// name:    Array.ts
+// name:    array.ts
 // author:  Jos Feenstra
 // purpose: Small wrapper around Float32Array to add interoperability with Vector2 & Vector3, 
 //          while remaining a datastructure thats easy to pass over to webgl
@@ -6,7 +6,7 @@
 // NOTE:    all these small wrappers might not be good pratice, but i 
 //          like to extract simple logic like this to not clutter the code too much
 
-import { Vector3, Vector2 } from "./Vector";
+import { Vector3, Vector2 } from "./vector";
 
 
 

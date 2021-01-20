@@ -5,9 +5,9 @@
 // - wrapper around all data gathered from Bellus3D.
 // - do all file -> object convertions here.         
 
-import { Mesh, meshFromObj } from "../geo/Mesh";
-import { FloatArray, Vector2Array, Vector3Array } from "../math/Array";
-import { Vector2 } from "../math/Vector";
+import { Mesh, meshFromObj } from "../geo/mesh";
+import { FloatArray, Vector2Array, Vector3Array } from "../math/array";
+import { Vector2 } from "../math/vector";
 import { loadImageFromFile, loadJSONFromFile, loadTextFromFile } from "./domwrappers";
 
 export class BellusScanData {

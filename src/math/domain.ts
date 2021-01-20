@@ -5,7 +5,7 @@
 //          
 
 import { Matrix4 } from "./matrix";
-import { Vector2, Vector3 } from "./Vector";
+import { Vector2, Vector3 } from "./vector";
 
 export class Domain {
 

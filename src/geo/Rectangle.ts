@@ -1,6 +1,6 @@
 import { Domain2 } from "../math/domain";
 import { Matrix3 } from "../math/matrix";
-import { Vector2 } from "../math/Vector";
+import { Vector2 } from "../math/vector";
 
 // basic 2d rectangle
 // a Matrix3 and Domain2 is used. 

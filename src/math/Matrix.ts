@@ -6,7 +6,7 @@
 // NOTE: Matrix3 & Matr
 
 import { Quaternion } from "./quaternion";
-import { Vector2, Vector3 } from "./Vector";
+import { Vector2, Vector3 } from "./vector";
 
 
 // generic all-pupose matrix of floats

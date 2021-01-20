@@ -3,15 +3,15 @@
 // purpose: environment to test eyefinder functionalities
 
 import { addDropFileEventListeners } from "../input/domwrappers";
-import { EyeFinder } from "../process/EyeFinder";
-import { BellusScanData } from "../input/BellusData";
-import { CtxRenderer } from "../draw/CtxRenderer"; 
-import { Vector2 } from "../math/Vector";
+import { EyeFinder } from "../process/eye-finder";
+import { BellusScanData } from "../input/bellus-data";
+import { CtxRenderer } from "../draw/ctx-render"; 
+import { Vector2 } from "../math/vector";
 import { GeonImage } from "../img/Image";
-import { InputState } from "../system/InputState";
+import { InputState } from "../system/input-state";
 import { input } from "@tensorflow/tfjs";
 import { getMaxTexturesInShader } from "@tensorflow/tfjs-backend-webgl/dist/webgl_util";
-import { Vector2Array } from "../math/Array";
+import { Vector2Array } from "../math/array";
 
 const settings = require('../process/settings.json'); // note DIFFERENCE BETWEEN "" AND ''. '' WORKS, "" NOT. 
 

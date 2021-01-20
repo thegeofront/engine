@@ -1,8 +1,7 @@
 // jos feenstra
 
-import { Rectangle2 } from "../geo/Rectangle";
 import { Matrix4 } from "../math/matrix";
-import { Vector2, Vector3 } from "../math/Vector";
+import { Vector3 } from "../math/vector";
 import { Renderer } from "./renderer";
 
 export class DotRenderer3 extends Renderer {

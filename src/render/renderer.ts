@@ -36,7 +36,16 @@ export class Renderer {
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
         return needResize;
-      }
+    }
+    
+    convertDrawSpeed(speed: DrawSpeed) : number {
+        if (speed == DrawSpeed.DynamicDraw) {
+            return this.gl.DYNAMIC_DRAW;
+        } else {
+            return this.gl.STATIC_DRAW;
+        }
+    }
+    
 }
 
 export function initWebglContext(canvas: HTMLCanvasElement) {
@@ -56,6 +65,14 @@ export function initWebglContext(canvas: HTMLCanvasElement) {
 
     return gl;
 }
+
+// 
+export enum DrawSpeed {
+    StaticDraw,  // if you plan on using the 'set' method only a couple of times / once
+    DynamicDraw // if you plan on using the 'set' method every frame 
+}
+
+
 
 // the setup of a program containing 2 shader scripts
 

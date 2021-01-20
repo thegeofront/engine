@@ -1,14 +1,14 @@
 // author : Jos Feenstra
 // purpose : test with Renderers, Domains & Vectors
 
-import { Rectangle2 } from "../geo/Rectangle";
+import { Rectangle2 } from "../geo/rectangle";
 import { GeonImage } from "../img/Image";
 import { Domain, Domain2, Domain3 } from "../math/domain";
 import { Matrix3 } from "../math/matrix";
-import { Vector3 } from "../math/Vector";
+import { Vector3 } from "../math/vector";
 import { ImageRenderer } from "../render/image-renderer";
 import { RectangleRenderer } from "../render/rectangle-renderer";
-import { InputState } from "../system/InputState"
+import { InputState } from "../system/input-state"
 import { App } from "../app/app"
 
 export class RectangleApp extends App {

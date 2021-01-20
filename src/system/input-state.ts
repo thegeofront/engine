@@ -2,7 +2,7 @@
 // author : Jos Feenstra
 // purpose : handle all input events.
 
-import { Vector2 } from "../math/Vector";
+import { Vector2 } from "../math/vector";
 
 enum Key {
     A, B, C, D, E, F,  G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,

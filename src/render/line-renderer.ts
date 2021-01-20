@@ -2,10 +2,10 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of a mesh.
 
-import { Rectangle2 } from "../geo/Rectangle";
-import { FaceArray, Vector3Array } from "../math/Array";
+import { Rectangle2 } from "../geo/rectangle";
+import { FaceArray, Vector3Array } from "../math/array";
 import { Matrix4 } from "../math/matrix";
-import { Vector2, Vector3 } from "../math/Vector";
+import { Vector2, Vector3 } from "../math/vector";
 import { Renderer } from "./renderer";
 
 export class LineRenderer extends Renderer {
@@ -15,16 +15,21 @@ export class LineRenderer extends Renderer {
     a_position_buffer: WebGLBuffer;
     index_buffer: WebGLBuffer;
     u_transform: WebGLUniformLocation;
+    u_color: WebGLUniformLocation;
     count: number
-    constructor(gl: WebGLRenderingContext) {
+    constructor(gl: WebGLRenderingContext, color = [1,0,0,0.5]) {
 
         // note: I like vertex & fragments to be included in the script itself.
         // when you change vertex or fragment, this class has to deal with it. 
         // putting them somewhere else doesnt make sense to me, 
         // they are coupled 1 to 1.
         const vs = `
+        precision mediump int;
+        precision mediump float;
+
         attribute vec4 a_position;
         uniform mat4 u_transform;
+        uniform vec4 u_color;
 
         void main() {
             gl_Position = u_transform * a_position;
@@ -32,10 +37,13 @@ export class LineRenderer extends Renderer {
         `;
 
         const fs = `
+        precision mediump int;
         precision mediump float;
 
+        uniform vec4 u_color;
+
         void main () {
-            gl_FragColor = vec4(1,0,0, 0.5);
+            gl_FragColor = u_color;
         }
         `;
 
@@ -43,15 +51,15 @@ export class LineRenderer extends Renderer {
         super(gl, vs, fs);
 
         this.u_transform = gl.getUniformLocation(this.program, "u_transform")!;
+        this.u_color = gl.getUniformLocation(this.program, "u_color")!;
+        gl.useProgram(this.program);
+        gl.uniform4f(this.u_color, color[0], color[1], color[2], color[3]);
         this.count = 0;
         
         // we need 2 buffers 
-        // -> 1 float buffer for the positions of all vertices.
-        // -> 1 int buffer for the index of all lines
         this.a_position = gl.getAttribLocation(this.program, "a_position");
         this.a_position_buffer = gl.createBuffer()!;
-        this.index_buffer = gl.createBuffer()!;
-        // gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);     
+        this.index_buffer = gl.createBuffer()!;    
     }
 
     set(gl: WebGLRenderingContext, verts: Vector3Array, indices: Uint16Array) {
@@ -79,7 +87,7 @@ export class LineRenderer extends Renderer {
         gl.enableVertexAttribArray(this.a_position);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
-        
+
         // set uniforms
         // console.log(matrix.data);
         gl.uniformMatrix4fv(this.u_transform, false, matrix.data);
