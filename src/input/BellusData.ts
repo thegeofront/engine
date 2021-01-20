@@ -5,7 +5,7 @@
 // - wrapper around all data gathered from Bellus3D.
 // - do all file -> object convertions here.         
 
-import { Mesh } from "../geo/Mesh";
+import { Mesh, meshFromObj } from "../geo/Mesh";
 import { FloatArray, Vector2Array, Vector3Array } from "../math/Array";
 import { Vector2 } from "../math/Vector";
 import { loadImageFromFile, loadJSONFromFile, loadTextFromFile } from "./domwrappers";
@@ -63,16 +63,14 @@ export class BellusScanData {
                 frontFile == undefined) {
                 alert("give me exactly one .json, one .ojb, and one .jpg file please!");
                 reject();
-            }
-            else 
-            {
+            } else {
                 console.log("converting files to usable objects...");
                 
                 let json = await loadJSONFromFile(jsonFile); 
                 let texture = await loadImageFromFile(textureFile);
                 let objtext = await loadTextFromFile(objFile);
                 // let mesh = new Mesh();
-                let mesh = await Mesh.fromObj(objtext);
+                let mesh = meshFromObj(objtext);
                 let front = await loadImageFromFile(frontFile);
 
                 console.log("done! bellus scan loaded.");
@@ -80,13 +78,11 @@ export class BellusScanData {
                 resolve(new BellusScanData(json, texture, mesh, front, settings));
             }
         });
-
-
     }
 
     getLandmarksImageSize() : Vector2 {
+
         // image sizes as registered in the 'facelandmarks' json.
-        
         let data = this.landmarks.ImageSize;
         return new Vector2(data[0], data[1]);
     }
@@ -115,7 +111,5 @@ export class BellusScanData {
         arr.setAll(data.data);
 
         return arr;
-    }
-
-    
+    }  
 }

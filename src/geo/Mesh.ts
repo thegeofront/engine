@@ -29,7 +29,7 @@ export class Mesh {
         
         // NOTE : this type of parsing makes my life easy, but is dangerous. This is why i created the 
         // Array class. 
-        let mesh = new Mesh(verts.length, norms.length, uvs.length, faces.length);
+        let mesh = new Mesh(verts.length / 3, norms.length / 3, uvs.length / 2, faces.length / 3);
         mesh.verts.setAll(verts);
         mesh.norms.setAll(norms);
         mesh.uvs.setAll(uvs);
@@ -37,70 +37,6 @@ export class Mesh {
         return mesh;
     }
 
-    static async fromObj(text: string) {
-
-        // This is not a full .obj parser.
-        // see http://paulbourke.net/dataformats/obj/
-        // INDEXES ORIGINALLY REFER TO LINES, so -1 is needed
-
-        // run through all lines, and temporarely store
-        // all data in raw number lists, since we dont know how 
-        // many vertices or faces well get. 
-        let verts: number[] = []; // 3 long float
-        let norms: number[] = []; // 3 long float
-        let uvs:   number[] = []; // 2 long float 
-        let faces: number[] = []; // 9 long ints, u16's should suffice. 
-        
-        // note : this is very inefficient, but it'll have to do for now...
-        const keywordRE = /(\w*)(?: )*(.*)/;
-        const lines = text.split('\n');
-    
-        for (let i = 0; i < lines.length; ++i) {
-            const line = lines[i].trim();
-
-            // filter out comments
-            if (line === '' || line.startsWith('#')) {
-                continue;
-            }
-            const m = keywordRE.exec(line);
-            if (!m) {
-                continue;
-            }
-            const [, keyword, unparsedArgs] = m;
-            const parts = line.split(/\s+/).slice(1);
-            
-            switch(keyword) {
-                case 'v':
-                    for (const part of parts) {
-                        verts.push(parseFloat(part));
-                    }
-                    break;
-                case 'vn':
-                    for (const part of parts) {
-                        norms.push(parseFloat(part));
-                    }
-                    break;
-                case 'vt':
-                    for (const part of parts) {
-                        uvs.push(parseFloat(part));
-                    }
-                    break;
-                case 'f':
-                    for (const value of ProcessObjFace(parts)) {
-                        faces.push(value);
-                    }
-                    break;
-                default:
-                    console.warn('unhandled keyword:', keyword);  // eslint-disable-line no-console
-                    continue;
-            }
-        }
-        console.log("number of vertices: " + verts.length / 3);
-        console.log("number of faces: " + faces.length / 3);
-        let mesh = Mesh.fromData(verts, norms, uvs, faces);
-        
-        return mesh;
-    }
 
     exportToObj(path: string) {
         
@@ -110,11 +46,91 @@ export class Mesh {
 
     }
 
-
-
+    getLineIds() : Uint16Array {
+        // 3 edges per face, 2 indices per edge
+        let count = this.faces.count * 6;
+        let data = new Uint16Array(count);
+        for (let i = 0 ; i < this.faces.count; i++) {
+            
+            let iData = i * 6;
+            data[iData]   = this.faces.get(i, 0);
+            data[iData+1] = this.faces.get(i, 1);
+            data[iData+2] = this.faces.get(i, 1);
+            data[iData+3] = this.faces.get(i, 2);
+            data[iData+4] = this.faces.get(i, 2);
+            data[iData+5] = this.faces.get(i, 0);
+        }
+        console.log(data);
+        return data;
+    }
 };
 
-// ================ Helpers ===================
+// ================ Obj ===================
+
+export function meshFromObj(text: string) : Mesh {
+
+    // This is not a full .obj parser.
+    // see http://paulbourke.net/dataformats/obj/
+    // INDEXES ORIGINALLY REFER TO LINES, so -1 is needed
+
+    // run through all lines, and temporarely store
+    // all data in raw number lists, since we dont know how 
+    // many vertices or faces well get. 
+    let verts: number[] = []; // 3 long float
+    let norms: number[] = []; // 3 long float
+    let uvs:   number[] = []; // 2 long float 
+    let faces: number[] = []; // 9 long ints, u16's should suffice. 
+    
+    // note : this is very inefficient, but it'll have to do for now...
+    const keywordRE = /(\w*)(?: )*(.*)/;
+    const lines = text.split('\n');
+
+    for (let i = 0; i < lines.length; ++i) {
+        const line = lines[i].trim();
+
+        // filter out comments
+        if (line === '' || line.startsWith('#')) {
+            continue;
+        }
+        const m = keywordRE.exec(line);
+        if (!m) {
+            continue;
+        }
+        const [, keyword, unparsedArgs] = m;
+        const parts = line.split(/\s+/).slice(1);
+        
+        switch(keyword) {
+            case 'v':
+                for (const part of parts) {
+                    verts.push(parseFloat(part));
+                }
+                break;
+            case 'vn':
+                for (const part of parts) {
+                    norms.push(parseFloat(part));
+                }
+                break;
+            case 'vt':
+                for (const part of parts) {
+                    uvs.push(parseFloat(part));
+                }
+                break;
+            case 'f':
+                for (const value of ProcessObjFace(parts)) {
+                    faces.push(value);
+                }
+                break;
+            default:
+                console.warn('unhandled keyword:', keyword);  // eslint-disable-line no-console
+                continue;
+        }
+    }
+    console.log("number of vertices: " + verts.length / 3);
+    console.log("number of faces: " + faces.length / 3);
+    let mesh = Mesh.fromData(verts, norms, uvs, faces);
+    
+    return mesh;
+}
 
 // verbose way of processing one single vertex/normal/uv combination in a face. 
 function ProcessObjFaceVertex(part: string) : number[] {
@@ -163,19 +179,4 @@ function ProcessObjFace(parts: string[]) : number[] {
     // data always has length 9 or 18
     return data;
 }
-
-class Face {
-
-    a: number;
-    b: number;
-    c: number;
-
-    constructor(a: number, b: number, c: number)
-    {
-        this.a = a;
-        this.b = b;
-        this.c = c;
-    }
-};
-
 
