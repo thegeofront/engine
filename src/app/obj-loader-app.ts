@@ -6,6 +6,7 @@
 import { version_converter } from "@tensorflow/tfjs";
 import { Mesh, meshFromObj } from "../geo/mesh";
 import { addDropFileEventListeners, loadTextFromFile } from "../input/domwrappers";
+import { Domain3 } from "../math/domain";
 import { Vector3 } from "../math/vector";
 import { Camera } from "../render/camera";
 import { DotRenderer3 } from "../render/dot-renderer3";
@@ -28,7 +29,7 @@ export class ObjLoaderApp extends App {
         
         super();
         this.gl = gl; // this is bad practice, but i need it during procesFiles
-        this.dotRenderer = new DotRenderer3(gl, 2, [1,0,0,1], false);
+        this.dotRenderer = new DotRenderer3(gl, 4, [0,0,1,1], false);
         this.lineRenderer = new SimpleLineRenderer(gl, [0,0,1,0.5]);
         this.meshRenderer = new SimpleMeshRenderer(gl, [0,0,1,0.25]);
         this.camera = new Camera(canvas);
@@ -37,7 +38,7 @@ export class ObjLoaderApp extends App {
     }
 
     start() {
-
+        // nothing
     }
 
     update(state: InputState) {
@@ -64,8 +65,6 @@ export class ObjLoaderApp extends App {
 }
 
 async function processFiles(this: ObjLoaderApp, files: FileList) {
-    
-    console.log(files);
 
     // assume its 1 file, the obj file.
     let file = files[0];
@@ -74,8 +73,32 @@ async function processFiles(this: ObjLoaderApp, files: FileList) {
     let objtext = await loadTextFromFile(file);
     this.obj = meshFromObj(objtext);
 
-    // scale down if too big
+    // scale down if too big.
+    // NOTE: this could also be done using matrices. Figure that out!
+    console.log("scaling...");
 
+    let bounds = Domain3.fromInclude(this.obj.verts);
+    let factor = 1 / bounds.size().largestValue();
+    for(let i = 0 ; i < this.obj.verts.count; i++) {
+        let vec = this.obj.verts.getVector(i)
+        vec.scale(factor);
+        this.obj.verts.setVector(i, vec);
+    }
+    
+    
+    // let objBounds = Domain3.fromInclude(this.obj.verts);
+    // console.log(objBounds);
+
+    // let factor = 100;
+    // let smaller = Domain3.fromRadii(
+    //     objBounds.x.size() / factor,
+    //     objBounds.y.size() / factor,
+    //     objBounds.z.size() / factor,
+    // );
+    // this.obj.verts = objBounds.remapAll(this.obj.verts, smaller);
+    console.log("done!");
+
+    // put the data into the render buffers.
     this.meshRenderer.set(this.gl, this.obj.verts, this.obj.faces);
     this.lineRenderer.set(this.gl, this.obj.verts, this.obj.getLineIds());
 }

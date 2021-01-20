@@ -65,7 +65,7 @@ export class Camera {
         let angleB = this.angleBeta;
         
         const pi = Math.PI;
-        const fov = 45. * pi / 100.;
+        const fov = 30. * pi / 100.;
         const Z_FAR = 1000.;
         const Z_NEAR = 0.1;
         let z_plane = -1. / Math.tan(pi / 8.);

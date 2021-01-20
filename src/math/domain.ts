@@ -4,6 +4,7 @@
 // purpose: general representation of a domain / range / bound of numbers
 //          
 
+import { Vector2Array, Vector3Array } from "./array";
 import { Matrix4 } from "./matrix";
 import { Vector2, Vector3 } from "./vector";
 
@@ -20,6 +21,24 @@ export class Domain {
         this.t0 = t0;
         this.t1 = t1;
     }    
+
+    static fromRadius(r: number) : Domain {
+        return new Domain(-r, r);
+    }
+
+    static fromInclude(data: Float32Array) : Domain{
+        // create a new domain which bounds all parsed values
+        let min = Number.MAX_VALUE;
+        let max = Number.MIN_VALUE;
+
+        for (let i = 0 ; i < data.length; i++) {
+            if (data[i] < min)
+                min = data[i];
+            if (data[i] > max)
+                max = data[i];
+        }
+        return new Domain(min, max);
+    }
 
     includes(value: number) : boolean {
         // note: including t0, including t1
@@ -46,7 +65,7 @@ export class Domain {
         let norm = this.normalize(value);
         return other.elevate(norm);
     }
-    
+
     *iter(count: number) : Generator<number> {
         // iterate over this Domain 'count' number of times 
         let step = this.size() / count; 
@@ -75,8 +94,20 @@ export class Domain2 {
         this.y = y;
     }
 
-    static new(x0: number, x1: number, y0: number, y1: number) : Domain2 {
+    static fromRadius(r: number) : Domain2 {
+        return new Domain2(Domain.fromRadius(r), Domain.fromRadius(r));
+    }
+
+    static fromBounds(x0: number, x1: number, y0: number, y1: number) : Domain2 {
         return new Domain2(new Domain(x0, x1), new Domain(y0, y1));
+    }
+
+    static fromInclude(data: Vector2Array) : Domain2 {
+        // note : could be quicker by going verbose, this now iterates over data 4 times
+        return new Domain2(
+            Domain.fromInclude(data.getColumn(0)),
+            Domain.fromInclude(data.getColumn(0)),
+        );
     }
 
     includes(value: Vector2) : boolean {
@@ -136,10 +167,30 @@ export class Domain3 {
         this.z = z;
     }
 
-    static new(x0: number, x1: number, y0: number, y1: number, z0: number, z1: number) : Domain3 {
+    static fromBounds(x0: number, x1: number, y0: number, y1: number, z0: number, z1: number) : Domain3 {
         return new Domain3(new Domain(x0, x1), new Domain(y0, y1), new Domain(z0, z1));
-    }   
+    }
 
+    static fromRadius(r: number) : Domain3 {
+        return new Domain3(Domain.fromRadius(r), Domain.fromRadius(r), Domain.fromRadius(r));
+    }
+
+    static fromRadii(rx: number, ry: number, rz: number) : Domain3 {
+        return new Domain3(
+            Domain.fromRadius(rx), 
+            Domain.fromRadius(ry), 
+            Domain.fromRadius(rz)
+        );
+    }
+
+    static fromInclude(data: Vector3Array) : Domain3 {
+        // note : could be quicker by going verbose, this now iterates over data 6 times
+        return new Domain3(
+            Domain.fromInclude(data.getColumn(0)),
+            Domain.fromInclude(data.getColumn(1)),
+            Domain.fromInclude(data.getColumn(2)),
+        );
+    }
 
     includes(value: Vector3) : boolean {
         // note: including t0, including t1
@@ -165,6 +216,16 @@ export class Domain3 {
         // normalize a value, then elevate it to a new domain
         let norm = this.normalize(value);
         return other.elevate(norm);
+    }
+
+    remapAll(values: Vector3Array, other: Domain3 = new Domain3()) : Vector3Array {
+        // normalize a value, then elevate it to a new domain
+        let newValues = new Vector3Array(values.count);
+        for(let i = 0 ; i < values.count; i++) {
+            let norm = this.normalize(values.getVector(i));
+            newValues.setVector(i, other.elevate(norm));
+        }
+        return newValues;
     }
 
     corners(matrix: Matrix4) : Vector3[] {

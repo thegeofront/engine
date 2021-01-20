@@ -60,7 +60,6 @@ export class Mesh {
             data[iData+4] = this.faces.get(i, 2);
             data[iData+5] = this.faces.get(i, 0);
         }
-        console.log(data);
         return data;
     }
 };

@@ -25,7 +25,7 @@ export class DotApp3 extends App {
     constructor(gl: WebGLRenderingContext, canvas: HTMLCanvasElement) {
         super();
         let n = 1;
-        this.bounds = Domain3.new(-n, n, -n, n, -n, n);
+        this.bounds = Domain3.fromBounds(-n, n, -n, n, -n, n);
         this.whiteDotRend = new DotRenderer3(gl, 10, [1,1,1,1], false);
         this.redDotRend = new DotRenderer3(gl, 10, [1,0,0,1], false);
         this.camera = new Camera(canvas);
@@ -36,7 +36,7 @@ export class DotApp3 extends App {
         // additional setup of dots
         let normrange = 0.001;
         let count = 100;
-        const normSpace = Domain3.new(-normrange, normrange, -normrange, normrange, -normrange, normrange);
+        const normSpace = Domain3.fromBounds(-normrange, normrange, -normrange, normrange, -normrange, normrange);
         
         for (let i = 0 ; i < count; i++) {
 

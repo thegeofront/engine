@@ -23,7 +23,7 @@ export class RectangleApp extends App {
     // unique constructors
     constructor(gl: WebGLRenderingContext) {
         super();
-        this.bounds = Domain3.new(0, 300, 0, 300, 0, 500);
+        this.bounds = Domain3.fromBounds(0, 300, 0, 300, 0, 500);
         this.renderer = new ImageRenderer(gl)
         this.tex = new GeonImage(20, 20).fillEvery(randomPixelColor);
     }
@@ -32,13 +32,13 @@ export class RectangleApp extends App {
         // additional setup of state
         let normrange = 5;
         let count = 10;
-        const normSpace = Domain3.new(-normrange, normrange, -normrange, normrange, -normrange, normrange);
+        const normSpace = Domain3.fromBounds(-normrange, normrange, -normrange, normrange, -normrange, normrange);
         
         for (let i = 0 ; i < count; i++) {
 
             let loc = this.bounds.elevate(Vector3.fromRandom());
             let mat = Matrix3.newIdentity().translate(loc.toVector2());
-            let domain = Domain2.new(-100, 100, -100, 100);
+            let domain = Domain2.fromBounds(-100, 100, -100, 100);
 
             this.recs.push(new Rectangle2(mat, domain));
             this.dirs.push(normSpace.elevate(Vector3.fromRandom()));

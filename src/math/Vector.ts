@@ -103,6 +103,10 @@ export class Vector3
     // #endregion
 	// #region math like vector2
 
+    largestValue() : number {
+        return Math.max(this.x, this.y, this.z);
+    }
+
     add(v: Vector3) : Vector3
     {
         this.x += v.x;

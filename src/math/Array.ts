@@ -30,8 +30,20 @@ export class FloatArray {
         return this.data[i * this.dim + j];
     }
     
-    getRow(i: number, j: number) : number {
-        return this.data[i * this.dim + j];
+    getRow(i: number) : Float32Array[] {
+        if (i < 0 || i > this.dim) throw "column is out of bounds for FloatArray"
+        throw "not implemented...";
+    }
+
+    getColumn(j: number) : Float32Array {
+        if (j < 0 || j > this.dim) throw "column is out of bounds for FloatArray"
+
+        let data = new Float32Array(this.count);
+        for (let i = 0; i < this.count; i++) {
+            let index = i * this.dim + j;
+            data[i] = this.data[index];       
+        }
+        return data;
     }
 
     set(i: number, j: number, value: number)  {
@@ -40,6 +52,7 @@ export class FloatArray {
 
     setRow(i: number, row: number[]) {
         if (this.dim != row.length) throw "dimention of floatarray is not " + row.length;
+        throw "not implemented...";
     }
 }
 
