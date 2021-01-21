@@ -14,6 +14,7 @@ import { SimpleLineRenderer } from "../render/simple-line-renderer";
 import { SimpleMeshRenderer } from "../render/simple-mesh-renderer";
 import { InputState } from "../system/input-state";
 import { App } from "./app";
+import { DrawSpeed } from "../render/renderer";
 
 
 export class ObjLoaderApp extends App {
@@ -60,7 +61,7 @@ export class ObjLoaderApp extends App {
             this.dotRenderer.render(gl, matrix, [new Vector3(0,0,0), new Vector3(1,1,1)]);
         else {
             this.dotRenderer.renderQuick(gl, matrix, this.obj!.verts.data);
-            this.meshRenderer.render(gl, matrix);
+            // this.meshRenderer.render(gl, matrix);
             this.lineRenderer.render(gl, matrix);
         }    
     }
@@ -81,7 +82,11 @@ async function processFiles(this: ObjLoaderApp, files: FileList) {
 
     let bounds = Domain3.fromInclude(this.obj.verts);
     let factor = 1 / bounds.size().largestValue();
-    for(let i = 0 ; i < this.obj.verts.count; i++) {
+    
+    // TODO : one line these types of operations? 
+    // they will be quite common i think...
+    let count = this.obj.verts.count();
+    for(let i = 0 ; i < count; i++) {
         let vec = this.obj.verts.getVector(i)
         vec.scale(factor);
         this.obj.verts.setVector(i, vec);
@@ -101,6 +106,6 @@ async function processFiles(this: ObjLoaderApp, files: FileList) {
     console.log("done!");
 
     // put the data into the render buffers.
-    this.meshRenderer.set(this.gl, this.obj.verts, this.obj.faces);
-    this.lineRenderer.set(this.gl, this.obj.verts.data, this.obj.getLineIds(), 3);
+    // this.meshRenderer.set(this.gl, this.obj.verts, this.obj.faces);
+    this.lineRenderer.set(this.gl, this.obj.verts.data, this.obj.getLineIds(), 3, DrawSpeed.StaticDraw);
 }

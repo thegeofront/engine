@@ -29,7 +29,7 @@ export class GeonImage {
     public applyKernel(kernel: Matrix) : GeonImage {
 
         // determine kernel size
-        let size = kernel.width;
+        let size = kernel.count();
         let radius = (size / 2) - 0.5;
         let image = new GeonImage(this.width - radius * 2, this.height - radius * 2);
 
@@ -48,8 +48,9 @@ export class GeonImage {
         
         // kernel space
         let sum = [0, 0, 0, 255];
-        for (let kx = 0 ; kx < kernel.width; kx++) {
-            for (let ky = 0; ky < kernel.height; ky++) {
+        let [dimx, dimy] = kernel.getDimensions();
+        for (let kx = 0 ; kx < dimx; kx++) {
+            for (let ky = 0; ky < dimy; ky++) {
 
                 let weight = kernel.get(kx, ky);
                 let pixel = this.get(x + kx - radius, y + ky - radius);

@@ -30,10 +30,10 @@ export class Mesh {
         // NOTE : this type of parsing makes my life easy, but is dangerous. This is why i created the 
         // Array class. 
         let mesh = new Mesh(verts.length / 3, norms.length / 3, uvs.length / 2, faces.length / 3);
-        mesh.verts.setAll(verts);
-        mesh.norms.setAll(norms);
-        mesh.uvs.setAll(uvs);
-        mesh.faces.setAll(faces);
+        mesh.verts.fillWith(verts);
+        mesh.norms.fillWith(norms);
+        mesh.uvs.fillWith(uvs);
+        mesh.faces.fillWith(faces);
         return mesh;
     }
 
@@ -48,9 +48,9 @@ export class Mesh {
 
     getLineIds() : Uint16Array {
         // 3 edges per face, 2 indices per edge
-        let count = this.faces.count * 6;
+        let count = this.faces.count() * 6;
         let data = new Uint16Array(count);
-        for (let i = 0 ; i < this.faces.count; i++) {
+        for (let i = 0 ; i < this.faces.count(); i++) {
             
             let iData = i * 6;
             data[iData]   = this.faces.get(i, 0);

@@ -10,16 +10,17 @@ import { Vector2, Vector3 } from "./vector";
 
 
 // generic all-pupose matrix of floats
+// NOTE: consider overlap with FloatMatrix
 export class Matrix {
 
     data: Float32Array;
-    width: number;
-    height: number;
+    protected width: number;
+    protected height: number;
 
-    constructor(width: number, height: number, data: number[] = []) {
+    constructor(height: number, width: number, data: number[] = []) {
         
-        this.width = width;
         this.height = height;
+        this.width = width;
         this.data = new Float32Array(this.width * this.height);
         if (data == [] || data.length == 0)
             this.fill(0);
@@ -38,6 +39,16 @@ export class Matrix {
         }
     }
 
+    count() {
+        // number of entries / rows.
+        // when derrived classes ask for 'how many of x?' they usually mean this.
+        return this.height;
+    }
+
+    getDimensions() : [number, number] {
+        return [this.height, this.width];
+    }
+
     fill(value: number) {
 
         let size = this.height * this.width
@@ -47,15 +58,44 @@ export class Matrix {
         }
     }
 
-    get(x: number, y: number) : number {
-
-        return this.data[y * this.width + x]
+    fillWith(data: number[]) {
+        this.data.set(data);
     }
 
-    set(x: number, y: number, value: number) {
+    get(i: number, j: number) : number {
 
-        this.data[y * this.width + x] = value;
+        return this.data[i * this.width + j]
     }
+
+    getRow(i: number) : Float32Array {
+        if (i < 0 || i > this.width) throw "column is out of bounds for FloatArray"
+        throw "not implemented...";
+    }
+
+    getColumn(j: number) : Float32Array {
+        if (j < 0 || j > this.width) throw "column is out of bounds for FloatArray"
+
+        let data = new Float32Array(this.height);
+        for (let i = 0; i < this.height; i++) {
+            let index = i * this.width + j;
+            data[i] = this.data[index];       
+        }
+        return data;
+    }
+
+    set(i: number, j : number, value: number) {
+
+        this.data[i * this.width + j] = value;
+    }
+
+    setRow(rowIndex: number, row: number[] | Float32Array) {
+        if (this.width != row.length) throw "dimention of floatarray is not " + row.length;
+        for(let j = 0; j < this.width; j++) {
+            this.set(rowIndex, j, row[j]);
+        }
+    }
+
+
 
     // perform operation directly on all elements
     divEntries(value: number) : Matrix {
@@ -76,6 +116,19 @@ export class Matrix {
         }
         return this;
     }
+    
+    takeRows(indices: number[]) : Matrix {
+
+        // create a new floatarray
+        const count = indices.length
+        let array = new Matrix(count, this.width);
+        for (let i = 0 ; i < count; i++) {
+            let getIndex = indices[i];
+            array.setRow(i, this.getRow(getIndex));
+        }
+        return array;
+    }
+
 
 }
 

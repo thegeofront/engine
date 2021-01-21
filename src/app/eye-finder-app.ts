@@ -16,16 +16,19 @@ import { SimpleLineRenderer } from "../render/simple-line-renderer";
 import { SimpleMeshRenderer } from "../render/simple-mesh-renderer";
 import { InputState } from "../system/input-state";
 import { App } from "./app";
+import { EyeFinder } from "../sfered/eye-finder";
+const settings = require('../sfered/settings.json'); // note DIFFERENCE BETWEEN "" AND ''. '' WORKS, "" NOT. 
 
-const settings = require('../process/settings.json'); // note DIFFERENCE BETWEEN "" AND ''. '' WORKS, "" NOT. 
-
-export class DebugApp extends App {
+export class EyeFinderApp extends App {
     
     // context
     gl: WebGLRenderingContext;
     
     // data 
     bsd?: BellusScanData;
+
+    // process
+    eyefinder: EyeFinder;
 
     // rendering 
     dotRenderer: DotRenderer3;
@@ -39,6 +42,10 @@ export class DebugApp extends App {
     constructor(gl: WebGLRenderingContext, canvas: HTMLCanvasElement, context: HTMLDivElement) {
         
         super();
+
+        this.eyefinder = new EyeFinder();
+
+        // setup render stuff 
         this.gl = gl; // this is bad practice, but i need it during procesFiles
         this.dotRenderer = new DotRenderer3(gl, 4, [0,0,1,1], false);
         this.redDotRenderer = new DotRenderer3(gl, 4, [1,0,0,1], false);
@@ -89,7 +96,9 @@ export class DebugApp extends App {
     addBellusData(bsd: BellusScanData) {
 
         this.bsd = bsd;
-        let image = GeonImage.fromImageData(bsd.texture);
+        
+        // start the eyefinder
+        this.eyefinder.findPupilsFromBellus(bsd);
 
         // put the data into the render buffers.
         let mesh = this.bsd?.mesh;
@@ -99,7 +108,7 @@ export class DebugApp extends App {
     }
 }
 
-async function processFiles(this: DebugApp, files: FileList) {
+async function processFiles(this: EyeFinderApp, files: FileList) {
 
     BellusScanData.fromFileList(files, settings).then(
         (bsd) => this.addBellusData(bsd)

@@ -136,6 +136,21 @@ export class Domain2 {
         return other.elevate(norm);
     }
     
+    corners(matrix: Matrix4) : Vector2[] {
+        // render the extends of this boundary / domain
+        let dim = 2;
+        let corners = 2**dim;
+        let data = [];
+        for(let x of [this.x.t0, this.x.t1])
+        {
+            for(let y of [this.y.t0, this.y.t1])
+            {
+                data.push(new Vector2(x,y));
+            }
+        }
+        return data;
+    }
+
     // *iter(countX: number, countY: number) : Generator<Vector2, void, unknown> {
     //     // iterate over this Domain 'count' number of times 
     //     for (const y in this.y.iter(countY)) {
@@ -220,8 +235,8 @@ export class Domain3 {
 
     remapAll(values: Vector3Array, other: Domain3 = new Domain3()) : Vector3Array {
         // normalize a value, then elevate it to a new domain
-        let newValues = new Vector3Array(values.count);
-        for(let i = 0 ; i < values.count; i++) {
+        let newValues = new Vector3Array(values.count());
+        for(let i = 0 ; i < values.count(); i++) {
             let norm = this.normalize(values.getVector(i));
             newValues.setVector(i, other.elevate(norm));
         }

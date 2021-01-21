@@ -29,11 +29,12 @@ export class Camera {
     public updateWithControls(state: InputState) {
 
         if (state.IsKeyPressed("Shift")) {
-            this.speed += 10;
-            console.log(this.speed);
+            this.speed *= 2;
+            console.log("speed is now: " + this.speed);
         }
         if (state.IsKeyPressed("Control")) {
-            this.speed = Math.max(this.speed - 10, 1);
+            this.speed = Math.max(this.speed * 0.5, 0.1);
+            console.log("speed is now: " + this.speed);
         }
 
         if (state.mouseLeftPressed) {

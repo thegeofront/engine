@@ -6,57 +6,10 @@
 // NOTE:    all these small wrappers might not be good pratice, but i 
 //          like to extract simple logic like this to not clutter the code too much
 
+import { Matrix } from "./matrix";
 import { Vector3, Vector2 } from "./vector";
 
-
-
-export class FloatArray {
-
-    data: Float32Array;
-    count: number;
-    dim: number;
-
-    constructor(count: number, dim: number) {
-        this.data = new Float32Array(count * dim);
-        this.count = count; // number of entries
-        this.dim = dim; // dimention of entry
-    }
-   
-    setAll(data: number[]) {
-        this.data.set(data);
-    }
-
-    get(i: number, j: number) : number {
-        return this.data[i * this.dim + j];
-    }
-    
-    getRow(i: number) : Float32Array[] {
-        if (i < 0 || i > this.dim) throw "column is out of bounds for FloatArray"
-        throw "not implemented...";
-    }
-
-    getColumn(j: number) : Float32Array {
-        if (j < 0 || j > this.dim) throw "column is out of bounds for FloatArray"
-
-        let data = new Float32Array(this.count);
-        for (let i = 0; i < this.count; i++) {
-            let index = i * this.dim + j;
-            data[i] = this.data[index];       
-        }
-        return data;
-    }
-
-    set(i: number, j: number, value: number)  {
-        this.data[i * this.dim + j] = value;
-    }
-
-    setRow(i: number, row: number[]) {
-        if (this.dim != row.length) throw "dimention of floatarray is not " + row.length;
-        throw "not implemented...";
-    }
-}
-
-export class Vector2Array extends FloatArray {
+export class Vector2Array extends Matrix {
    
     constructor(count: number) {
         super(count, 2);
@@ -73,28 +26,28 @@ export class Vector2Array extends FloatArray {
     }
 
     setVector(i: number, vec: Vector2) {
-        this.data[i * this.dim + 0] = vec.x;
-        this.data[i * this.dim + 1] = vec.y;
+        this.data[i * this.width + 0] = vec.x;
+        this.data[i * this.width + 1] = vec.y;
     }
 
     getVector(i: number) : Vector2 {
         return new Vector2(
-            this.data[i * this.dim + 0],
-            this.data[i * this.dim + 1],
+            this.data[i * this.width + 0],
+            this.data[i * this.width + 1],
         )
     }
 
     toNativeArray() : Vector2[] {
 
         let vecs: Vector2[] = [];
-        for (let i = 0 ; i < this.count; i++) {
+        for (let i = 0 ; i < this.height; i++) {
             vecs.push(this.getVector(i));
         }
         return vecs;
     }
 }
 
-export class Vector3Array extends FloatArray {
+export class Vector3Array extends Matrix {
     
     constructor(count: number) {
         super(count, 3);
@@ -112,30 +65,30 @@ export class Vector3Array extends FloatArray {
     }
 
     setVector(i: number, vec: Vector3) {
-        this.data[i * this.dim + 0] = vec.x;
-        this.data[i * this.dim + 1] = vec.y;
-        this.data[i * this.dim + 2] = vec.z;
+        this.data[i * this.width + 0] = vec.x;
+        this.data[i * this.width + 1] = vec.y;
+        this.data[i * this.width + 2] = vec.z;
     }
 
     getVector(i: number) : Vector3 {
         return new Vector3(
-            this.data[i * this.dim + 0],
-            this.data[i * this.dim + 1],
-            this.data[i * this.dim + 2],
+            this.data[i * this.width + 0],
+            this.data[i * this.width + 1],
+            this.data[i * this.width + 2],
         )
     }
 
     toNativeArray() : Vector3[] {
 
         let vecs: Vector3[] = [];
-        for (let i = 0 ; i < this.count; i++) {
+        for (let i = 0 ; i < this.height; i++) {
             vecs.push(this.getVector(i));
         }
         return vecs;
     }
 }
 
-export class FaceArray extends FloatArray {
+export class FaceArray extends Matrix {
 
     constructor(count: number) {
         super(count, 3);

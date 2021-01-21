@@ -2,7 +2,7 @@
 // Purpose: Entry point
 
 import {addWebcamAppWhenReady, WebcamApp} from "./app/webcam-app";
-import {DebugApp} from "./app/debug-app";
+import {EyeFinderApp} from "./app/eye-finder-app";
 import { InputState } from "./system/input-state";
 import { App } from "./app/app";
 import { initWebglContext, Renderer } from "./render/renderer";
@@ -26,10 +26,10 @@ function main() {
     let gl = initWebglContext(canvas);
     const core = new Core(canvas, gl);
 
-    core.addApp(new DebugApp(gl, canvas, context));
-    // core.addApp(new RectangleApp(gl)); 
-    // core.addApp(new DotApp3(gl, canvas)); 
-    // core.addApp(new ObjLoaderApp(gl, canvas));
+    // core.addApp(new EyeFinderApp(gl, canvas, context));
+    core.addApp(new RectangleApp(gl)); 
+    core.addApp(new DotApp3(gl, canvas)); 
+    core.addApp(new ObjLoaderApp(gl, canvas));
     //addWebcamAppWhenReady(core, canvas, video);
 
     // infinite loop
