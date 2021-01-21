@@ -5,15 +5,15 @@
 //          
 
 import { Vector2Array, Vector3Array } from "./array";
-import { Matrix4 } from "./matrix";
+import { Matrix, Matrix4 } from "./matrix";
 import { Vector2, Vector3 } from "./vector";
 
 export class Domain {
 
     // note: including t0, including t1
 
-    readonly t0: number;
-    readonly t1: number;
+    t0: number;
+    t1: number;
 
     constructor(t0: number = 0.0, t1: number = 1.0) {
         if (t0 > t1) console.error("created a domain with negative size.");
@@ -38,6 +38,12 @@ export class Domain {
                 max = data[i];
         }
         return new Domain(min, max);
+    }
+
+    offset(t0Offset: number, t1Offset: number) {
+        this.t0 += t0Offset;
+        this.t1 += t1Offset;
+        return this;
     }
 
     includes(value: number) : boolean {
@@ -102,12 +108,21 @@ export class Domain2 {
         return new Domain2(new Domain(x0, x1), new Domain(y0, y1));
     }
 
-    static fromInclude(data: Vector2Array) : Domain2 {
+    static fromInclude(data: Vector2Array | Matrix) : Domain2 {
         // note : could be quicker by going verbose, this now iterates over data 4 times
         return new Domain2(
             Domain.fromInclude(data.getColumn(0)),
-            Domain.fromInclude(data.getColumn(0)),
+            Domain.fromInclude(data.getColumn(1)),
         );
+    }
+
+    offset(xXyYoffset: number[]) {
+        let off = xXyYoffset
+        if (off.length != 4) throw "need 4 values";
+
+        this.x.offset(off[0], off[1]);
+        this.y.offset(off[2], off[3]);
+        return this;
     }
 
     includes(value: Vector2) : boolean {
@@ -136,7 +151,7 @@ export class Domain2 {
         return other.elevate(norm);
     }
     
-    corners(matrix: Matrix4) : Vector2[] {
+    corners(matrix: Matrix4 = Matrix4.newIdentity()) : Vector2[] {
         // render the extends of this boundary / domain
         let dim = 2;
         let corners = 2**dim;
@@ -205,6 +220,16 @@ export class Domain3 {
             Domain.fromInclude(data.getColumn(1)),
             Domain.fromInclude(data.getColumn(2)),
         );
+    }
+
+    offset(xXyYoffset: number[]) {
+        let off = xXyYoffset
+        if (off.length != 6) throw "need 6 values";
+
+        this.x.offset(off[0], off[1]);
+        this.y.offset(off[2], off[3]);
+        this.z.offset(off[4], off[5]);
+        return this;
     }
 
     includes(value: Vector3) : boolean {

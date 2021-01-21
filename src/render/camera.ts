@@ -8,6 +8,7 @@ import { InputState } from "../system/input-state";
 
 export class Camera {
 
+    pos: Vector3;
     offset: Vector3; // offset from rotation center
     angleAlpha = 0; // rotation x 
     angleBeta = 0; // rotation y
@@ -17,6 +18,7 @@ export class Camera {
 
     constructor(canvas: HTMLCanvasElement, z_offset = 3) {
         canvas.addEventListener("wheel", this.setMouseScroll.bind(this));
+        this.pos = new Vector3(0,0,0);
         this.offset = new Vector3(0,0, -z_offset);
     }
 
@@ -37,11 +39,11 @@ export class Camera {
             console.log("speed is now: " + this.speed);
         }
 
-        if (state.mouseLeftPressed) {
+        if (state.mouseRightPressed || state.mouseMiddlePressed) {
             this.mousePos = state.mousePos.clone();
         }
 
-        if (state.mouseLeftDown) {
+        if (state.mouseRightDown || state.mouseMiddleDown) {
             let newPos = state.mousePos.clone();
             let delta = state.mousePos.clone().sub(this.mousePos);
             this.mousePos = newPos;
@@ -49,24 +51,34 @@ export class Camera {
             this.angleAlpha -= delta.y * 0.01;
             this.angleBeta -= delta.x * 0.01;
         }   
-        
-        if (state.IsKeyDown("q"))
-            this.offset.z += 0.01 * this.speed;
-        if (state.IsKeyDown("e"))
-            this.offset.z -= 0.01 * this.speed;            
-        if (state.IsKeyDown("a"))
-            this.offset.x += 0.01 * this.speed;
-        if (state.IsKeyDown("d"))
-            this.offset.x -= 0.01 * this.speed;
-        if (state.IsKeyDown("s"))
-            this.offset.y += 0.01 * this.speed;
+
+        function relativeUnitZ(angle: number) {
+            let m = Matrix4.newYRotation(angle);
+            return m.multiplyVector(Vector3.unitZ());
+        }
+
+        function relativeUnitX(angle: number) {
+            let m = Matrix4.newYRotation(angle);
+            return m.multiplyVector(Vector3.unitX());
+        }
+
         if (state.IsKeyDown("w"))
-            this.offset.y -= 0.01 * this.speed;
+            this.pos.add(relativeUnitZ(-this.angleBeta).scale(0.01 * this.speed));
+        if (state.IsKeyDown("s"))
+            this.pos.add(relativeUnitZ(-this.angleBeta).scale(-0.01 * this.speed));           
+        if (state.IsKeyDown("a"))
+            this.pos.add(relativeUnitX(-this.angleBeta).scale(0.01 * this.speed));
+        if (state.IsKeyDown("d"))
+            this.pos.add(relativeUnitX(-this.angleBeta).scale(-0.01 * this.speed));
+        if (state.IsKeyDown("q"))
+            this.pos.y += 0.01 * this.speed;
+        if (state.IsKeyDown("e"))
+            this.pos.y -= 0.01 * this.speed;
     }
 
     getRenderToScreenMatrix(canvas: HTMLCanvasElement) : Matrix4 {
         
-        let pos = this.offset;
+        let offset = this.offset;
         let angleA = this.angleAlpha;
         let angleB = this.angleBeta;
         
@@ -80,14 +92,15 @@ export class Camera {
         let aspect = canvas.width / canvas.height; // note: this should be constant
     
         // translated to fit screen
-        let offset = Matrix4.newTranslation(pos.x, pos.y, pos.z);
+        let position = Matrix4.newTranslation(this.pos.x, this.pos.y, this.pos.z);
+        let mOffset = Matrix4.newTranslation(offset.x, offset.y, offset.z);
         
         // rotated by user
         let x_rotation = Matrix4.newXRotation(angleA);
         let y_rotation = Matrix4.newYRotation(angleB);
         let rotation = x_rotation.multiply(y_rotation);
         
-        let transform = offset.multiply(rotation);
+        let transform = mOffset.multiply(rotation).multiply(position);
     
         // projection to screen
         // let projection = Matrix4.newOrthographic(-1, 1, -1, 1, 0.1, 0.1);

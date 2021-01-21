@@ -1,5 +1,5 @@
-// debug-app
-// author: Jos Feenstra
+// name:    debug-app
+// author:  Jos Feenstra
 // purpose: environment to test eyefinder functionalities
 
 import { version_converter } from "@tensorflow/tfjs";
@@ -8,8 +8,8 @@ import { GeonImage } from "../img/Image";
 import { BellusScanData } from "../sfered/bellus-data";
 import { addDropFileEventListeners, loadTextFromFile } from "../system/domwrappers";
 import { Vector2Array, Vector3Array } from "../math/array";
-import { Domain3 } from "../math/domain";
-import { Vector3 } from "../math/vector";
+import { Domain, Domain2, Domain3 } from "../math/domain";
+import { Vector2, Vector3 } from "../math/vector";
 import { Camera } from "../render/camera";
 import { DotRenderer3 } from "../render/dot-renderer3";
 import { SimpleLineRenderer } from "../render/simple-line-renderer";
@@ -17,6 +17,9 @@ import { SimpleMeshRenderer } from "../render/simple-mesh-renderer";
 import { InputState } from "../system/input-state";
 import { App } from "./app";
 import { EyeFinder } from "../sfered/eye-finder";
+import { Matrix3, Matrix4 } from "../math/matrix";
+import { ImageRenderer } from "../render/image-renderer";
+import { Rectangle2 } from "../geo/rectangle";
 const settings = require('../sfered/settings.json'); // note DIFFERENCE BETWEEN "" AND ''. '' WORKS, "" NOT. 
 
 export class EyeFinderApp extends App {
@@ -30,6 +33,11 @@ export class EyeFinderApp extends App {
     // process
     eyefinder: EyeFinder;
 
+    // debug data 
+    dots2: Vector2[] = [];
+    dots3: Vector3[] = [];
+    images: GeonImage[] = [];
+
     // rendering 
     dotRenderer: DotRenderer3;
     redDotRenderer: DotRenderer3;
@@ -37,21 +45,22 @@ export class EyeFinderApp extends App {
     lineRenderer: SimpleLineRenderer;
     meshRenderer: SimpleMeshRenderer;
     camera: Camera;
-    
+    imageRenderer: ImageRenderer;
 
     constructor(gl: WebGLRenderingContext, canvas: HTMLCanvasElement, context: HTMLDivElement) {
         
         super();
 
-        this.eyefinder = new EyeFinder();
+        this.eyefinder = new EyeFinder(this);
 
         // setup render stuff 
         this.gl = gl; // this is bad practice, but i need it during procesFiles
-        this.dotRenderer = new DotRenderer3(gl, 4, [0,0,1,1], false);
+        this.dotRenderer = new DotRenderer3(gl, 6, [0,0,1,1], false);
         this.redDotRenderer = new DotRenderer3(gl, 4, [1,0,0,1], false);
         this.lineRenderer = new SimpleLineRenderer(gl, [0,0,1,0.5]);
         this.redLineRenderer = new SimpleLineRenderer(gl, [1,0,0,0.5]);
         this.meshRenderer = new SimpleMeshRenderer(gl, [0,0,1,0.25]);
+        this.imageRenderer = new ImageRenderer(gl);
         this.camera = new Camera(canvas, 3);
 
         addDropFileEventListeners(document, processFiles.bind(this));
@@ -78,18 +87,28 @@ export class EyeFinderApp extends App {
             this.redDotRenderer.render(gl, matrix, [new Vector3(0,0,0), new Vector3(1,1,1)]);
         else {
             let mesh = this.bsd?.mesh;
-            let landmarks2 = this.bsd?.landmarks2;
-            let landmarks3 = this.bsd!.landmarks3;
+            let landmarks = this.bsd?.landmarks;
 
-            this.redLineRenderer.render(gl, matrix);
-
+            //this.redLineRenderer.render(gl, matrix);
             // this.dotRenderer.renderQuick(gl, matrix, landmarks3.data, 3);
             // this.dotRenderer.renderQuick(gl, matrix, mesh.verts.data, 3);
-            // this.meshRenderer.render(gl, matrix);
-            // this.lineRenderer.render(gl, matrix);
+            this.meshRenderer.render(gl, matrix);
+            // this.redLineRenderer.render(gl, matrix);
 
-            // this.redDotRenderer.renderQuick(gl, matrix, landmarks2.data, 2);
-            // this.redDotRenderer.renderQuick(gl, matrix, landmarks3.data, 3);
+            // console.log(this.dots2);
+            this.dotRenderer.render2(gl, matrix, this.dots2) // bounding boxes
+            // this.dotRenderer.renderQuick(gl, matrix, mesh.uvs.data, 2);
+
+            this.redDotRenderer.renderQuick(gl, matrix, landmarks.data, 3);
+
+            // render images
+            let height = 200;
+            let width = 300;
+            this.images.forEach((image, i) => {
+                this.imageRenderer.render(gl, 
+                    new Rectangle2(Matrix3.newIdentity(), Domain2.fromBounds(10,10+width, i*(height+10), i*(height+10) + height)), 
+                    image.toImageData());
+            });
         }    
     }
 
@@ -102,9 +121,10 @@ export class EyeFinderApp extends App {
 
         // put the data into the render buffers.
         let mesh = this.bsd?.mesh;
-        // this.meshRenderer.set(this.gl, mesh.verts, mesh.faces);
+
+        this.meshRenderer.set(this.gl, mesh.verts, mesh.faces);
         // this.lineRenderer.set(this.gl, mesh.verts.data, mesh.getLineIds(), 3);
-        this.redLineRenderer.set(this.gl, mesh.uvs.data, mesh.getLineIds(), 2);
+        // this.redLineRenderer.set(this.gl, mesh.uvs.data, mesh.getLineIds(), 2);
     }
 }
 

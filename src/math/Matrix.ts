@@ -5,6 +5,8 @@
 // TODO: FIX MATRIX4 !!!
 // NOTE: Matrix3 & Matr
 
+import { arrayBufferToBase64String } from "@tensorflow/tfjs-core/dist/io/io_utils";
+import { Vector3Array } from "./array";
 import { Quaternion } from "./quaternion";
 import { Vector2, Vector3 } from "./vector";
 
@@ -14,70 +16,82 @@ import { Vector2, Vector3 } from "./vector";
 export class Matrix {
 
     data: Float32Array;
-    protected width: number;
-    protected height: number;
+    _width: number;
+    _height: number;
 
     constructor(height: number, width: number, data: number[] = []) {
         
-        this.height = height;
-        this.width = width;
-        this.data = new Float32Array(this.width * this.height);
+        this._height = height;
+        this._width = width;
+        this.data = new Float32Array(this._width * this._height);
         if (data == [] || data.length == 0)
             this.fill(0);
         else
             this.setData(data);    
     }
 
+    clone() {
+        let clone = new Matrix(this._height, this._width);
+        clone.data = this.data;
+        return clone;  
+    }
+
     setData(data: number[]) {
-
-        if (data.length != (this.height * this.width))
+        if (data.length != (this._height * this._width))
             throw "data.length does not match width * height " + data.length.toString();
-
-        for (let i = 0 ; i < data.length; i++)
-        {
-            this.data[i] = data[i];
-        }
+        this.data.set(data);
     }
 
     count() {
         // number of entries / rows.
         // when derrived classes ask for 'how many of x?' they usually mean this.
-        return this.height;
+        return this._height;
     }
 
     getDimensions() : [number, number] {
-        return [this.height, this.width];
+        return [this._height, this._width];
     }
 
     fill(value: number) {
 
-        let size = this.height * this.width
+        let size = this._height * this._width
         for (let i = 0; i < size; i++)
         {
             this.data[i] = value;
         }
     }
 
-    fillWith(data: number[]) {
-        this.data.set(data);
+    fillWith(data: number[], valuesPerEntry: number=this._width) {
+
+        // values per entry can be used to setData which is not of the same shape.
+        let vpe = valuesPerEntry;
+        if (vpe > this._width) throw "values per entry is larger than this._width. This will spill over.";
+        for (let i = 0 ; i < this._height; i++)
+        {   
+            for(let j = 0 ; j < vpe; j++) {
+                this.set(i, j, data[i*vpe + j]);
+            }
+        }  
     }
 
     get(i: number, j: number) : number {
-
-        return this.data[i * this.width + j]
+        return this.data[i * this._width + j]
     }
 
     getRow(i: number) : Float32Array {
-        if (i < 0 || i > this.width) throw "column is out of bounds for FloatArray"
-        throw "not implemented...";
+        // if (i < 0 || i > this.height) throw "column is out of bounds for FloatArray"
+        let data = new Float32Array(this._width);
+        for (let j = 0; j < this._width; j++) {
+            data[j] = this.get(i, j);
+        }
+        return data;
     }
 
     getColumn(j: number) : Float32Array {
-        if (j < 0 || j > this.width) throw "column is out of bounds for FloatArray"
-
-        let data = new Float32Array(this.height);
-        for (let i = 0; i < this.height; i++) {
-            let index = i * this.width + j;
+        // if (j < 0 || j > this.width) throw "column is out of bounds for FloatArray"
+        let data = new Float32Array(this._height);
+        for (let i = 0; i < this._height; i++) {
+            let index = i * this._width + j;
             data[i] = this.data[index];       
         }
         return data;
@@ -85,12 +99,12 @@ export class Matrix {
 
     set(i: number, j : number, value: number) {
 
-        this.data[i * this.width + j] = value;
+        this.data[i * this._width + j] = value;
     }
 
     setRow(rowIndex: number, row: number[] | Float32Array) {
-        if (this.width != row.length) throw "dimention of floatarray is not " + row.length;
-        for(let j = 0; j < this.width; j++) {
+        // if (this.width != row.length) throw "dimention of floatarray is not " + row.length;
+        for(let j = 0; j < this._width; j++) {
             this.set(rowIndex, j, row[j]);
         }
     }
@@ -120,8 +134,9 @@ export class Matrix {
     takeRows(indices: number[]) : Matrix {
 
         // create a new floatarray
+        console.log(this._height, this._width);
         const count = indices.length
-        let array = new Matrix(count, this.width);
+        let array = new Matrix(count, this._width);
         for (let i = 0 ; i < count; i++) {
             let getIndex = indices[i];
             array.setRow(i, this.getRow(getIndex));
@@ -1075,26 +1090,38 @@ export class Matrix4 extends Matrix {
         return matrix;
     }
 
-    // /**
-    //  * Takes a  matrix and a vector with 4 entries, transforms that vector by
-    //  * the matrix, and returns the result as a vector with 4 entries.
-    //  * @param {Matrix4} m The matrix.
-    //  * @param {Vector4} v The point in homogenous coordinates.
-    //  * @param {Vector4} dst optional vector4 to store result
-    //  * @return {Vector4} dst or new Vector4 if not provided
-    //  * @memberOf module:webgl-3d-math
-    //  */
-    // function transformVector(m, v, dst) {
-    //     dst = dst || new MatType(4);
-    //     for (var i = 0; i < 4; ++i) {
-    //         dst[i] = 0.0;
-    //         for (var j = 0; j < 4; ++j) {
-    //         dst[i] += v[j] * m[j * 4 + i];
-    //         }
-    //     }
-    //     return dst;
-    // }
+    multiplyVector(v: Vector3) : Vector3 {
+
+        let data = new Array(3);
+        for (var i = 0; i < 3; ++i) {
+            data[i] = 0.0;
+            for (var j = 0; j < 4; ++j) {
+                data[i] += v.item(j) * this.get(j, i);
+            }
+        }
+        return new Vector3(data[0], data[1], data[2]);
+    }
     
+    MultiplyM(other: Vector3Array) : Vector3Array {
+        
+        let matrix = new Vector3Array(other.count());
+
+        // for every row
+        for (var r = 0; r < other.count(); r++) {
+
+            // for every item in row
+            for (var c = 0; c < 3; ++c) {
+                
+                let item = 0.0;
+                for (var j = 0; j < 4; ++j) {
+                    item += other.get(r, c) * this.get(j, c);
+                }
+                matrix.set(r, c, item);
+            }
+        }
+        return matrix;
+    }
+
     // /**
     //  * Takes a 4-by-4 matrix and a vector with 3 entries,
     //  * interprets the vector as a point, transforms that point by the matrix, and

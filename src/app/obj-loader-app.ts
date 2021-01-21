@@ -1,7 +1,6 @@
-// obj-loader-app.ts
-//
-// author : Jos Feenstra
-// purpose : drag an obj to the canvas, and view it on the web
+// name:    obj-loader-app.ts
+// author:  Jos Feenstra
+// purpose: drag an obj to the canvas, and view it on the web
 
 import { version_converter } from "@tensorflow/tfjs";
 import { Mesh, meshFromObj } from "../geo/mesh";

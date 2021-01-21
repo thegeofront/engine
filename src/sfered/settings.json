@@ -8,9 +8,9 @@
 			"right_ear_set": [12,11,10]
 		},
 		"bounding_box_offset": {
-			"remark": "left_right_up_down. -1 means: offset indefinetly",
-			"ly": [10,10,15,15],
-			"ry": [10,10,15,15],
+			"remark": "left_right_up_down. means: offset indefinetly",
+			"ly": [-10,10,-15,15],
+			"ry": [-10,10,-15,15],
 			"la": [1200,-10,150,150],
 			"ra": [-10,1200,150,150]
 		},

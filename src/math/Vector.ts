@@ -6,7 +6,6 @@
 export class Vector3
 {
     // #region constructors
-    
     x: number;
     y: number;
     z: number;
@@ -58,7 +57,26 @@ export class Vector3
         );
 	}
 
-    // #endregion
+	// #endregion
+	// #region defaults 
+
+	static zero()  {
+		return new Vector3(0,0,0);
+	};
+
+	static unitX() {
+		return new Vector3(1,0,0);
+	};
+
+	static unitY() {
+		return new Vector3(0,1,0);
+	};
+
+	static unitZ() {
+		return new Vector3(0,0,1);
+	};
+
+	// #endregion
 	// #region basics
 
 	set(x:number, y:number, z:number) : Vector3
@@ -107,22 +125,29 @@ export class Vector3
         return Math.max(this.x, this.y, this.z);
     }
 
-    add(v: Vector3) : Vector3
-    {
+    add(v: Vector3) : Vector3 {
         this.x += v.x;
         this.y += v.y;
         this.z += v.z;
         return this;
     }
 
-    sub(v: Vector3) : Vector3
-    {
+    sub(v: Vector3) : Vector3 {
         this.x -= v.x;
         this.y -= v.y;
         this.z -= v.z;
         return this;
     }
 
+	item(i: number) {
+		switch(i) {
+			case(0) : return this.x;
+			case(1) : return this.y;
+			case(2) : return this.z;
+			case(3) : return 1;
+			default : throw "nope";
+		}
+	}
 
     mul(v: Vector3) : Vector3
     {
@@ -330,9 +355,6 @@ export class Vector3
 		// normal is assumed to have unit length
 		return this.sub(_vector.copy(normal).scale(2 * this.dot(normal)));
 	}
-
-    // #endregion
-    // TODO : matrix interactions
 }
 
 // vector object used within heavy calculations, to make sure we dont create Vectors all over the place.

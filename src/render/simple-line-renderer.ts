@@ -69,6 +69,7 @@ export class SimpleLineRenderer extends Renderer {
 
         // vertices  
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
+        gl.enableVertexAttribArray(this.a_position);
         gl.vertexAttribPointer(this.a_position, elements, gl.FLOAT, false, 0, 0);
         gl.bufferData(gl.ARRAY_BUFFER, data, this.convertDrawSpeed(speed));
 
@@ -81,6 +82,7 @@ export class SimpleLineRenderer extends Renderer {
         
         // Tell it to use our program (pair of shaders)
         gl.useProgram(this.program);
+        
         gl.enableVertexAttribArray(this.a_position);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);

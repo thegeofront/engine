@@ -26,10 +26,11 @@ function main() {
     let gl = initWebglContext(canvas);
     const core = new Core(canvas, gl);
 
-    // core.addApp(new EyeFinderApp(gl, canvas, context));
-    core.addApp(new RectangleApp(gl)); 
-    core.addApp(new DotApp3(gl, canvas)); 
-    core.addApp(new ObjLoaderApp(gl, canvas));
+    core.addApp(new EyeFinderApp(gl, canvas, context));
+    
+    // core.addApp(new RectangleApp(gl)); 
+    // core.addApp(new DotApp3(gl, canvas)); 
+    // core.addApp(new ObjLoaderApp(gl, canvas));
     //addWebcamAppWhenReady(core, canvas, video);
 
     // infinite loop

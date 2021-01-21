@@ -5,6 +5,7 @@
 // 
 // note: named GeonImage to not collide with Image classes.
 
+import { Domain2 } from "../math/domain";
 import { Matrix } from "../math/matrix";
 
 const acceptedKernels : number[] = [3,5,7,9];
@@ -103,6 +104,15 @@ export class GeonImage {
         return image;
     }
 
+    trimWithDomain(dom: Domain2) {
+        const x1 = Math.round(dom.x.t0);
+        const x2 = Math.round(dom.x.t1);
+        const y1 = Math.round(dom.y.t0);
+        const y2 = Math.round(dom.y.t1);
+
+        return this.trim(x1, y1, x2,y2);
+    }
+
     trim(x1: number, y1: number, x2: number, y2: number) : GeonImage {
 
         // return a hardcopy of this particular window
@@ -182,7 +192,7 @@ export class GeonImage {
         ]
     }
 
-    public getImageData() : ImageData {
+    public toImageData() : ImageData {
 
         return new ImageData(this.data, this.width, this.height);
     }

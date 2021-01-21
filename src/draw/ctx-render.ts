@@ -60,7 +60,7 @@ export class CtxRenderer {
         let v = this.transform(p);
         const ctx = this.ctx;
 
-        let data = image.scale(this.scale, this.scale).getImageData();
+        let data = image.scale(this.scale, this.scale).toImageData();
         ctx.putImageData(data, v.x, v.y);
     }
 

@@ -1,7 +1,8 @@
 // jos feenstra
 
+import { Vector2Array, Vector3Array } from "../math/array";
 import { Matrix4 } from "../math/matrix";
-import { Vector3 } from "../math/vector";
+import { Vector2, Vector3 } from "../math/vector";
 import { Renderer } from "./renderer";
 
 export class DotRenderer3 extends Renderer {
@@ -106,9 +107,9 @@ export class DotRenderer3 extends Renderer {
         gl.uniform4f(this.u_color, this.color[0], this.color[1], this.color[2], this.color[3]);
 
         // // Bind the position buffer.
-        gl.enableVertexAttribArray(this.a_position);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
-
+        gl.enableVertexAttribArray(this.a_position);
+        
         // // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
         gl.vertexAttribPointer(this.a_position, componentsPerIteration,  gl.FLOAT, false, 0, 0);
         
@@ -121,8 +122,14 @@ export class DotRenderer3 extends Renderer {
 
     render(gl: WebGLRenderingContext, matrix: Matrix4, dots: Vector3[]) {
      
-        let data = this.toFloat32Array(dots);
-        return this.renderQuick(gl, matrix, data);
+        let array = Vector3Array.fromNativeArray(dots);
+        return this.renderQuick(gl, matrix, array.data, 3);
+    }
+
+    render2(gl: WebGLRenderingContext, matrix: Matrix4, dots: Vector2[]) {
+     
+        let array = Vector2Array.fromNativeArray(dots);
+        return this.renderQuick(gl, matrix, array.data, 2);
     }
 
     // Fill the buffer with the values that define a rectangle.

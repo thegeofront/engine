@@ -75,7 +75,7 @@ export class RectangleApp extends App {
     draw(gl: WebGLRenderingContext) {
         for (const rec of this.recs) {
 
-            this.renderer.render(gl, rec, this.tex.getImageData());
+            this.renderer.render(gl, rec, this.tex.toImageData());
         }
     }
 }
