@@ -5,7 +5,7 @@
 
 import { version_converter } from "@tensorflow/tfjs";
 import { Mesh, meshFromObj } from "../geo/mesh";
-import { addDropFileEventListeners, loadTextFromFile } from "../input/domwrappers";
+import { addDropFileEventListeners, loadTextFromFile } from "../system/domwrappers";
 import { Domain3 } from "../math/domain";
 import { Vector3 } from "../math/vector";
 import { Camera } from "../render/camera";
@@ -18,12 +18,14 @@ import { App } from "./app";
 
 export class ObjLoaderApp extends App {
     
+    gl: WebGLRenderingContext;
+
     dotRenderer: DotRenderer3;
     lineRenderer: SimpleLineRenderer;
     meshRenderer: SimpleMeshRenderer;
     camera: Camera;
     obj?: Mesh;
-    gl: WebGLRenderingContext;
+    
 
     constructor(gl: WebGLRenderingContext, canvas: HTMLCanvasElement) {
         
@@ -100,5 +102,5 @@ async function processFiles(this: ObjLoaderApp, files: FileList) {
 
     // put the data into the render buffers.
     this.meshRenderer.set(this.gl, this.obj.verts, this.obj.faces);
-    this.lineRenderer.set(this.gl, this.obj.verts, this.obj.getLineIds());
+    this.lineRenderer.set(this.gl, this.obj.verts.data, this.obj.getLineIds(), 3);
 }

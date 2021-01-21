@@ -8,22 +8,28 @@
 import { Mesh, meshFromObj } from "../geo/mesh";
 import { FloatArray, Vector2Array, Vector3Array } from "../math/array";
 import { Vector2 } from "../math/vector";
-import { loadImageFromFile, loadJSONFromFile, loadTextFromFile } from "./domwrappers";
+import { loadImageFromFile, loadJSONFromFile, loadTextFromFile } from "../system/domwrappers";
 
 export class BellusScanData {
 
-    landmarks: any; // json
+    landmarkData: any; // json
     texture: ImageData; 
     mesh: Mesh;
     front: ImageData; 
     settings: any; // local settings file. We want this to extract the right regions.
 
-    constructor(landmarks: any, texture: ImageData, mesh: Mesh, front: ImageData, settings: any) {
-        this.landmarks = landmarks;
+    landmarks2: Vector2Array;
+    landmarks3: Vector3Array;
+
+    constructor(landmarkData: any, texture: ImageData, mesh: Mesh, front: ImageData, settings: any) {
+        this.landmarkData = landmarkData;
         this.texture = texture;
         this.mesh = mesh;
         this.front = front;
         this.settings = settings;
+
+        this.landmarks2 = this.getLandmarks2f();
+        this.landmarks3 = this.getLandmarks3f();
     }
 
     static async fromFileList(files: FileList, settings: any) : Promise<BellusScanData> {
@@ -69,7 +75,6 @@ export class BellusScanData {
                 let json = await loadJSONFromFile(jsonFile); 
                 let texture = await loadImageFromFile(textureFile);
                 let objtext = await loadTextFromFile(objFile);
-                // let mesh = new Mesh();
                 let mesh = meshFromObj(objtext);
                 let front = await loadImageFromFile(frontFile);
 
@@ -83,14 +88,14 @@ export class BellusScanData {
     getLandmarksImageSize() : Vector2 {
 
         // image sizes as registered in the 'facelandmarks' json.
-        let data = this.landmarks.ImageSize;
+        let data = this.landmarkData.ImageSize;
         return new Vector2(data[0], data[1]);
     }
 
-    getLandmarks2f() : Vector2Array {
+    private getLandmarks2f() : Vector2Array {
 
         // 2d landmarks as registered in the 'facelandmarks' json
-        let data = this.landmarks.Point2f;
+        let data = this.landmarkData.Point2f;
         let size = data.cols;
         let dim = 2;
 
@@ -100,10 +105,10 @@ export class BellusScanData {
         return arr;
     }
 
-    getLandmarks3f() : Vector3Array {
+    private getLandmarks3f() : Vector3Array {
 
         // 2d landmarks as registered in the 'facelandmarks' json
-        let data = this.landmarks.Point3f;
+        let data = this.landmarkData.Point3f;
         let size = data.cols;
         let dim = 3;
 

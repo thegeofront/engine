@@ -49,7 +49,6 @@ export class SimpleLineRenderer extends Renderer {
         super(gl, vs, fs);
         this.u_transform = gl.getUniformLocation(this.program, "u_transform")!;
         this.u_color = gl.getUniformLocation(this.program, "u_color")!;
-        gl.useProgram(this.program);
         gl.uniform4f(this.u_color, color[0], color[1], color[2], color[3]);
         this.count = 0;
         
@@ -59,17 +58,16 @@ export class SimpleLineRenderer extends Renderer {
         this.index_buffer = gl.createBuffer()!;    
     }
 
-    set(gl: WebGLRenderingContext, verts: Vector3Array, indices: Uint16Array, speed: DrawSpeed = DrawSpeed.StaticDraw) {
+    set(gl: WebGLRenderingContext, data: Float32Array, indices: Uint16Array, elements: number, speed: DrawSpeed = DrawSpeed.StaticDraw) {
         
         // save how many faces need to be drawn
         gl.useProgram(this.program);
         this.count = indices.length
 
-        // vertices 
-        const size = 3; // size of a vertex, in number of floats 
+        // vertices  
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
-        gl.vertexAttribPointer(this.a_position, size, gl.FLOAT, false, 0, 0);
-        gl.bufferData(gl.ARRAY_BUFFER, verts.data, this.convertDrawSpeed(speed));
+        gl.vertexAttribPointer(this.a_position, elements, gl.FLOAT, false, 0, 0);
+        gl.bufferData(gl.ARRAY_BUFFER, data, this.convertDrawSpeed(speed));
 
         // indices 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);

@@ -2,85 +2,105 @@
 // author: Jos Feenstra
 // purpose: environment to test eyefinder functionalities
 
-import { addDropFileEventListeners } from "../input/domwrappers";
-import { EyeFinder } from "../process/eye-finder";
-import { BellusScanData } from "../input/bellus-data";
-import { CtxRenderer } from "../draw/ctx-render"; 
-import { Vector2 } from "../math/vector";
+import { version_converter } from "@tensorflow/tfjs";
+import { Mesh, meshFromObj } from "../geo/mesh";
 import { GeonImage } from "../img/Image";
+import { BellusScanData } from "../sfered/bellus-data";
+import { addDropFileEventListeners, loadTextFromFile } from "../system/domwrappers";
+import { Vector2Array, Vector3Array } from "../math/array";
+import { Domain3 } from "../math/domain";
+import { Vector3 } from "../math/vector";
+import { Camera } from "../render/camera";
+import { DotRenderer3 } from "../render/dot-renderer3";
+import { SimpleLineRenderer } from "../render/simple-line-renderer";
+import { SimpleMeshRenderer } from "../render/simple-mesh-renderer";
 import { InputState } from "../system/input-state";
-import { input } from "@tensorflow/tfjs";
-import { getMaxTexturesInShader } from "@tensorflow/tfjs-backend-webgl/dist/webgl_util";
-import { Vector2Array } from "../math/array";
+import { App } from "./app";
 
 const settings = require('../process/settings.json'); // note DIFFERENCE BETWEEN "" AND ''. '' WORKS, "" NOT. 
 
-export class DebugApp {
-
-    canvas: HTMLCanvasElement;
-    context: HTMLDivElement;
-    r: CtxRenderer;
-
-    // main input data 
+export class DebugApp extends App {
+    
+    // context
+    gl: WebGLRenderingContext;
+    
+    // data 
     bsd?: BellusScanData;
 
-    // draw things
-    landmarks?: Vector2Array;
-    images: GeonImage[] = [];
-    imagelocs: Vector2[] = [];
+    // rendering 
+    dotRenderer: DotRenderer3;
+    redDotRenderer: DotRenderer3;
+    redLineRenderer: SimpleLineRenderer;
+    lineRenderer: SimpleLineRenderer;
+    meshRenderer: SimpleMeshRenderer;
+    camera: Camera;
+    
 
-    constructor(canvas: HTMLCanvasElement, context: HTMLDivElement) {
+    constructor(gl: WebGLRenderingContext, canvas: HTMLCanvasElement, context: HTMLDivElement) {
         
-        this.canvas = canvas;
-        this.context = context;
+        super();
+        this.gl = gl; // this is bad practice, but i need it during procesFiles
+        this.dotRenderer = new DotRenderer3(gl, 4, [0,0,1,1], false);
+        this.redDotRenderer = new DotRenderer3(gl, 4, [1,0,0,1], false);
+        this.lineRenderer = new SimpleLineRenderer(gl, [0,0,1,0.5]);
+        this.redLineRenderer = new SimpleLineRenderer(gl, [1,0,0,0.5]);
+        this.meshRenderer = new SimpleMeshRenderer(gl, [0,0,1,0.25]);
+        this.camera = new Camera(canvas, 3);
 
-        this.r = new CtxRenderer(canvas);
-        this.r.scale = 0.1;
-    }
-
-    start() {
         addDropFileEventListeners(document, processFiles.bind(this));
     }
 
-    update(state: InputState) {
+    start() {
+        // nothing
+    }
 
-        if (state.IsKeyPressed("-"))  this.r.scale += 0.01;
-        if (state.IsKeyPressed("="))  this.r.scale +=  -0.01;
-        if (state.IsKeyDown("a")) this.r.xOffset += 10;
-        if (state.IsKeyDown("d")) this.r.xOffset -= 10;
-        if (state.IsKeyDown("w")) this.r.yOffset += 10;        
-        if (state.IsKeyDown("s")) this.r.yOffset -= 10;
+    update(state: InputState) {
+        
+        // move the camera with the mouse
+        this.camera.updateWithControls(state); 
     }
 
     draw(gl: WebGLRenderingContext) {
-        
-        this.r.clear();
 
-        // draw images 
-        for (let i = 0 ; i < this.images.length; i++) {
-            let image = this.images[i];
-            let loc = this.imagelocs[i];
-            this.r.drawImage(loc, image);
-        }
+        // get to-screen matrix
+        const canvas = gl.canvas as HTMLCanvasElement;
+        let matrix = this.camera.getRenderToScreenMatrix(canvas);
+
+     
+        if (this.bsd?.mesh == undefined)
+            this.redDotRenderer.render(gl, matrix, [new Vector3(0,0,0), new Vector3(1,1,1)]);
+        else {
+            let mesh = this.bsd?.mesh;
+            let landmarks2 = this.bsd?.landmarks2;
+            let landmarks3 = this.bsd!.landmarks3;
+
+            this.redLineRenderer.render(gl, matrix);
+
+            // this.dotRenderer.renderQuick(gl, matrix, landmarks3.data, 3);
+            // this.dotRenderer.renderQuick(gl, matrix, mesh.verts.data, 3);
+            // this.meshRenderer.render(gl, matrix);
+            // this.lineRenderer.render(gl, matrix);
+
+            // this.redDotRenderer.renderQuick(gl, matrix, landmarks2.data, 2);
+            // this.redDotRenderer.renderQuick(gl, matrix, landmarks3.data, 3);
+        }    
     }
 
     addBellusData(bsd: BellusScanData) {
 
         this.bsd = bsd;
-        let landmarks = bsd.getLandmarks2f();
         let image = GeonImage.fromImageData(bsd.texture);
-        
-        // visualize this data
-        this.landmarks = landmarks; 
-        this.images.push(image);
-        this.imagelocs.push(new Vector2(0, 0));
 
-        // extract eyes, ears, and brows from the image
+        // put the data into the render buffers.
+        let mesh = this.bsd?.mesh;
+        // this.meshRenderer.set(this.gl, mesh.verts, mesh.faces);
+        // this.lineRenderer.set(this.gl, mesh.verts.data, mesh.getLineIds(), 3);
+        this.redLineRenderer.set(this.gl, mesh.uvs.data, mesh.getLineIds(), 2);
     }
 }
 
 async function processFiles(this: DebugApp, files: FileList) {
-    
+
     BellusScanData.fromFileList(files, settings).then(
         (bsd) => this.addBellusData(bsd)
     );

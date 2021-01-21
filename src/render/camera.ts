@@ -13,6 +13,8 @@ export class Camera {
     angleBeta = 0; // rotation y
     mousePos = Vector2.zero();
 
+    speed = 1;
+
     constructor(canvas: HTMLCanvasElement, z_offset = 3) {
         canvas.addEventListener("wheel", this.setMouseScroll.bind(this));
         this.offset = new Vector3(0,0, -z_offset);
@@ -20,11 +22,19 @@ export class Camera {
 
     private setMouseScroll(e: WheelEvent) {
         // console.log("we be scrollin' now...")
-        this.offset.z -= e.deltaY * 0.1;
+        this.offset.z -= e.deltaY * 0.1 * this.speed;
     }
 
 
     public updateWithControls(state: InputState) {
+
+        if (state.IsKeyPressed("Shift")) {
+            this.speed += 10;
+            console.log(this.speed);
+        }
+        if (state.IsKeyPressed("Control")) {
+            this.speed = Math.max(this.speed - 10, 1);
+        }
 
         if (state.mouseLeftPressed) {
             this.mousePos = state.mousePos.clone();
@@ -40,22 +50,17 @@ export class Camera {
         }   
         
         if (state.IsKeyDown("q"))
-            this.offset.z += 0.01;
+            this.offset.z += 0.01 * this.speed;
         if (state.IsKeyDown("e"))
-            this.offset.z -= 0.01;
-
-        if (state.IsKeyDown("q"))
-            this.offset.z += 0.01;
-        if (state.IsKeyDown("e"))
-            this.offset.z -= 0.01;            
+            this.offset.z -= 0.01 * this.speed;            
         if (state.IsKeyDown("a"))
-            this.offset.x += 0.01;
+            this.offset.x += 0.01 * this.speed;
         if (state.IsKeyDown("d"))
-            this.offset.x -= 0.01;
+            this.offset.x -= 0.01 * this.speed;
         if (state.IsKeyDown("s"))
-            this.offset.y += 0.01;
+            this.offset.y += 0.01 * this.speed;
         if (state.IsKeyDown("w"))
-            this.offset.y -= 0.01;
+            this.offset.y -= 0.01 * this.speed;
     }
 
     getRenderToScreenMatrix(canvas: HTMLCanvasElement) : Matrix4 {
@@ -66,7 +71,7 @@ export class Camera {
         
         const pi = Math.PI;
         const fov = 30. * pi / 100.;
-        const Z_FAR = 1000.;
+        const Z_FAR = 10000.;
         const Z_NEAR = 0.1;
         let z_plane = -1. / Math.tan(pi / 8.);
         
