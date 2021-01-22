@@ -10,6 +10,7 @@ import { DotApp2 } from "./app-demos/dot-app2";
 import { RectangleApp } from "./app-demos/rectangle-app";
 import { DotApp3 } from "./app-demos/dot-app3";
 import { ObjLoaderApp } from "./app/obj-loader-app";
+import { Core } from "./core";
 
 const REALTIME_DEMO = false;
 
@@ -26,8 +27,10 @@ function main() {
     let gl = initWebglContext(canvas);
     const core = new Core(canvas, gl);
 
+    // the eyefinder app itself
     core.addApp(new EyeFinderApp(gl, canvas, context));
     
+    // fun demo's to test functionality 
     // core.addApp(new RectangleApp(gl)); 
     // core.addApp(new DotApp3(gl, canvas)); 
     // core.addApp(new ObjLoaderApp(gl, canvas));
@@ -36,8 +39,11 @@ function main() {
     // infinite loop
     function loop() {
  
-        if (core.STOP) 
+        if (core.STOP) {
+            // TODO : notify the User that we have stopped running...
             return;
+        }
+            
 
         core.update();
         core.draw();
@@ -46,75 +52,9 @@ function main() {
     }
     // loop();
     requestAnimationFrame(loop);
-
-    // we broke out of the loop
-    // console.log("app has stopped.");
 }
 
-
+// __main__ 
 window.addEventListener("load", function() {
     main();
 }, false);
-
-
-export class Core {
-
-    canvas: HTMLCanvasElement;
-    gl: WebGLRenderingContext;
-    state: InputState;
-    private apps: App[];
-    STOP = false;
-
-    constructor(canvas: HTMLCanvasElement, gl: WebGLRenderingContext) {
-        this.canvas = canvas;
-        this.gl = gl;
-        this.state = new InputState(canvas);
-        this.apps = [];
-    }
-
-    addApp(app: App) {
-        this.apps.push(app);
-        app.start();
-    }
-
-    update() {
-        this.state.preUpdate();
-        if (this.state.IsKeyPressed("Esc"))
-            this.STOP = true;
-        this.apps.forEach((app) => {
-            app.update(this.state);
-        });
-        this.state.postUpdate();
-    }
-
-    draw() {
-        
-        const canvas = this.canvas;
-        const gl = this.gl
-
-        // pre-gl business
-        if (window.innerHeight != canvas.height || 
-            window.innerWidth  != canvas.width) 
-        {
-            canvas.height = window.innerHeight;
-            // canvas.clientHeight = window.innerHeight;
-            canvas.style.height = window.innerHeight.toString();
-
-            canvas.width  = window.innerWidth;
-            // canvas.clientWidth = window.innerWidth;
-            canvas.style.width = window.innerWidth.toString();
-
-            gl.viewport(0, 0, window.innerWidth, window.innerHeight);
-        }
-
-        // Renderer.resizeCanvas(this.gl);
-        this.gl.clearColor(0, 0, 0, 0);
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-
-        // render all apps
-        // TODO : reverse order
-        this.apps.forEach((app) => {
-            app.draw(this.gl);
-        })
-    }
-}

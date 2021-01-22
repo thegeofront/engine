@@ -13,7 +13,7 @@ import { Vector2 } from "../math/vector";
 import { Triangle2 } from "../math/triangle";
 import * as draw from "../draw/tensorflow-drawing";
 import { App } from "./app";
-import { Core } from "..";
+import { Core } from "../core";
 import { InputState } from "../system/input-state";
 
 // PUBLIC

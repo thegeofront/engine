@@ -4,6 +4,7 @@
 
 import { EyeFinderApp } from "../app/eye-finder-app";
 import { GeonImage } from "../img/Image";
+import { Kernels } from "../img/kernels";
 import { Vector2Array } from "../math/array";
 import { Domain2 } from "../math/domain";
 import { DotRenderer3 } from "../render/dot-renderer3";
@@ -27,14 +28,17 @@ export class EyeFinder {
 
         let eyeLeft = image.trimWithDomain(winLeft);
         let eyeRight = image.trimWithDomain(winRight);
-        
-        console.log(eyeLeft);
+
+        let edEyeLeft = this.edgeDetection(eyeLeft);
 
         // debug renderer
-        this.app?.images.push(image);
-        this.app?.images.push(eyeLeft, eyeRight);
-        this.app?.dots2.push(...winLeft.corners());
-        this.app?.dots2.push(...winRight.corners());
+    }
+
+    private edgeDetection(image: GeonImage) : GeonImage {
+
+        let blurred = image.applyKernel(Kernels.Gauss5);
+        this.app?.images.push(image, blurred);
+        return image;
     }
 
     private getEyeWindows(bsd: BellusScanData) : [Domain2, Domain2] {

@@ -92,12 +92,12 @@ export class EyeFinderApp extends App {
             //this.redLineRenderer.render(gl, matrix);
             // this.dotRenderer.renderQuick(gl, matrix, landmarks3.data, 3);
             // this.dotRenderer.renderQuick(gl, matrix, mesh.verts.data, 3);
-            this.meshRenderer.render(gl, matrix);
+            // this.meshRenderer.render(gl, matrix);
             // this.redLineRenderer.render(gl, matrix);
 
             // console.log(this.dots2);
             this.dotRenderer.render2(gl, matrix, this.dots2) // bounding boxes
-            // this.dotRenderer.renderQuick(gl, matrix, mesh.uvs.data, 2);
+            this.dotRenderer.renderQuick(gl, matrix, mesh.uvs.data, 2);
 
             this.redDotRenderer.renderQuick(gl, matrix, landmarks.data, 3);
 
@@ -122,7 +122,7 @@ export class EyeFinderApp extends App {
         // put the data into the render buffers.
         let mesh = this.bsd?.mesh;
 
-        this.meshRenderer.set(this.gl, mesh.verts, mesh.faces);
+        // this.meshRenderer.set(this.gl, mesh.verts, mesh.faces);
         // this.lineRenderer.set(this.gl, mesh.verts.data, mesh.getLineIds(), 3);
         // this.redLineRenderer.set(this.gl, mesh.uvs.data, mesh.getLineIds(), 2);
     }

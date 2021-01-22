@@ -66,9 +66,9 @@ export class Vector3Array extends Matrix {
         let length = vecs.length;
         let array = new Vector3Array(length);
         for(let i = 0; i < vecs.length; i++) {
-            array.data[i] = vecs[i].x;
-            array.data[i+1] = vecs[i].y;
-            array.data[i+2] = vecs[i].z;
+            array.data[i*3] = vecs[i].x;
+            array.data[i*3+1] = vecs[i].y;
+            array.data[i*3+2] = vecs[i].z;
         }
         return array;
     }
