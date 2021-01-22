@@ -8,53 +8,205 @@
 import { Domain2 } from "../math/domain";
 import { Matrix } from "../math/matrix";
 
+
+// TODO : x and y are not the same as i and j, and used inconsistently.
+// fix this. 
 const acceptedKernels : number[] = [3,5,7,9];
 export class GeonImage {
 
     private data: Uint8ClampedArray;
     public readonly width: number;
     public readonly height: number;
+    public readonly pixelSize: number;
 
-    constructor(width: number, height: number) {
+    constructor(width: number, height: number, pixelSize: number=4) {
         this.width = width;
         this.height = height;
-        this.data = new ImageData(width, height).data;
+        this.pixelSize = pixelSize;
+        this.data = new Uint8ClampedArray(this.width * this.height * this.pixelSize);
+        this.data.fill(0);
     }
 
     static fromImageData(id: ImageData) : GeonImage {
-        let gi = new GeonImage(id.width, id.height);
-        gi.setData(id.data);
-        return gi
+        let image = new GeonImage(id.width, id.height);
+        image.setData(id.data);
+        return image
     }
+
+    toImageData() : ImageData {
+        // imagedata requires pixelsize of 4.
+        if (this.pixelSize != 4) throw "pixelsize must be 4 for toImageData to work";
+        return new ImageData(this.data, this.width, this.height);
+    }
+
+    setData(data: Uint8ClampedArray) {
+        if (data.length != (this.height * this.width * this.pixelSize))
+            throw "data.length does not match width * height ";
+
+        this.data = data;
+    }
+
+    clone() {
+        let image = new GeonImage(this.width, this.height, this.pixelSize)
+        image.setData(this.data);
+        return image;
+    }
+
+    fill(pixel: number[]) : GeonImage {
+        for (let i = 0; i < this.height; i++) {
+            for (let j = 0; j < this.width; j++) {
+                this.set(j, i, pixel);
+            }
+        }
+        return this;
+    }
+
+    fillEvery(filler: Function) {
+        for (let i = 0; i < this.height; i++) {
+            for (let j = 0; j < this.width; j++) {
+                this.set(j, i, filler());
+            }
+        }
+        return this;
+    }
+    
+    set(x: number, y: number, pixel: number[]) {
+
+        // if (x > this.width || x < 0) throw "out of bounds";
+        // if (y > this.height || y < 0) throw "out of bounds";
+        // for(let i = 0 ; i < this.pixelSize; i++) {
+        //     this.data[this.pixelSize * (y * this.width + x) + i] = pixel[i];
+        // }
+        this.data[4 * (y * this.width + x)] = pixel[0];
+        this.data[4 * (y * this.width + x)+1] = pixel[1];
+        this.data[4 * (y * this.width + x)+2] = pixel[2];
+        this.data[4 * (y * this.width + x)+3] = pixel[3];
+    }
+
+    get(x: number, y: number) : number[] {
+
+        // if (x > this.width || x < 0) throw "out of bounds";
+        // if (y > this.height || y < 0) throw "out of bounds";
+
+        // let pixel = []; // 
+        // for(let i = 0 ; i < this.pixelSize; i++) {
+        //     pixel.push(this.pixelSize * (y * this.width + x) + i);
+        // }
+        // return pixel;
+        return [
+            this.data[4 * (y * this.width + x)],
+            this.data[4 * (y * this.width + x) + 1],
+            this.data[4 * (y * this.width + x) + 2],
+            this.data[4 * (y * this.width + x) + 3]
+        ]
+    }
+
 
     public applyKernel(kernel: Matrix) : GeonImage {
 
         // determine kernel size
         let size = kernel.count();
         let radius = (size / 2) - 0.5;
-        let image = new GeonImage(this.width - radius * 2, this.height - radius * 2);
+        let image = new GeonImage(this.width - radius * 2, this.height - radius * 2, this.pixelSize);
 
         // old image space
-        for (let x = radius ; x < this.width - radius; x++) {
-            for (let y = radius; y < this.height - radius; y++) {
-                let pixel = this.getWithKernel(x, y, kernel, radius)
-                image.set(x-radius, y-radius, pixel);
+        for (let i = radius ; i < this.width - radius; i++) {
+            for (let j = radius; j < this.height - radius; j++) {
+                
+                let pixel = this.getWithKernel(i, j, kernel, radius)
+                image.set(i-radius, j-radius, pixel);
             }
         }
 
         return image; // succes 
     }
 
-    private getWithKernel(x: number, y: number, kernel: Matrix, radius: number) : number[] {
+    getMinMax() : [number, number] {
+        // get the minimum and maximum pixel value
+        // assumes pixelsize = 1
+        return [
+            Math.min(...this.data),
+            Math.max(...this.data)
+        ]
+    }
+
+    applyThreshold(lower: number, upper: number) {
+        return this.apply((x: number,y: number) => {
+            
+            let pixel = this.get(x,y);
+
+            if(pixel[0] < lower) {
+                return [0,0,0,0];
+            } else if (pixel[0] > upper) {
+                return [255,255,255,255]; 
+            } else {
+                return pixel;
+            } 
+        });
+    }
+    
+    apply(filler: Function) : GeonImage {
+        let copy = new GeonImage(this.width, this.height, this.pixelSize);
+
+        for (let y = 0; y < this.height; y++) {
+            for (let x = 0; x < this.width; x++) {
+                copy.set(x, y, filler(x, y));
+            }
+        }
+        return copy;
+    }
+    applyNMS() : GeonImage {
+        
+        // determine kernel size
+        let size = 3;
+        let radius = (size / 2) - 0.5;
+        let copy = new GeonImage(this.width - radius * 2, this.height - radius * 2, this.pixelSize);
+
+        // old image space
+        for (let i = radius ; i < this.width - radius; i++) {
+            for (let j = radius; j < this.height - radius; j++) {
+                
+                // let pixel = this.getWithKernel(i, j, kernel, radius)
+                // copy.set(i-radius, j-radius, pixel);
+            }
+        }
+
+        // img.eachPixel(3, function(x, y, c, n) {
+        //     if (n[1][1] > n[0][1] && n[1][1] > n[2][1]) {
+        //         copy.data[x][y] = n[1][1];
+        //     } else {
+        //         copy.data[x][y] = 0;
+        //     }
+        //     if (n[1][1] > n[0][2] && n[1][1] > n[2][0]) {
+        //         copy.data[x][y] = n[1][1];
+        //     } else {
+        //         copy.data[x][y] = 0;
+        //     }
+        //     if (n[1][1] > n[1][0] && n[1][1] > n[1][2]) {
+        //         copy.data[x][y] = n[1][1];
+        //     } else {
+        //         copy.data[x][y] = 0;
+        //     }
+        //     if (n[1][1] > n[0][0] && n[1][1] > n[2][2]) {
+        //         return copy.data[x][y] = n[1][1];
+        //     } else {
+        //         return copy.data[x][y] = 0;
+        //     }
+        // });
+        return copy;
+    }
+
+
+    private getWithKernel(i: number, j: number, kernel: Matrix, radius: number) : number[] {
         
         // kernel space
         let sum = [0, 0, 0, 255];
         let [dimx, dimy] = kernel.getDimensions();
-        for (let kx = 0 ; kx < dimx; kx++) {
-            for (let ky = 0; ky < dimy; ky++) {
+        for (let ki = 0 ; ki < dimx; ki++) {
+            for (let kj = 0; kj < dimy; kj++) {
 
-                let weight = kernel.get(kx, ky);
-                let pixel = this.get(x + kx - radius, y + ky - radius);
+                let weight = kernel.get(ki, kj);
+                let pixel = this.get(i + ki - radius, j + kj - radius);
                 
                 for (let i = 0 ; i < 3; i++) {
                     sum[i] += pixel[i] * weight;
@@ -86,7 +238,7 @@ export class GeonImage {
     resize(width: number, height: number) : GeonImage {
         
         // resize the image to a new width and height, using nearest neighbour
-        const image = new GeonImage(width, height);
+        const image = new GeonImage(width, height, this.pixelSize);
         const old = this;
 
         const x_factor = ( 1 / image.width ) * old.width;
@@ -119,7 +271,7 @@ export class GeonImage {
         const imageWidth = x2 - x1;
         const imageHeight = y2 - y1;
 
-        const image = new GeonImage(imageWidth, imageHeight);
+        const image = new GeonImage(imageWidth, imageHeight, this.pixelSize);
 
         for (let y = 0; y < imageHeight; y++) {
             for (let x = 0; x < imageWidth; x++) {
@@ -131,69 +283,35 @@ export class GeonImage {
         return image;
     }
 
-    greyScale() : GeonImage {
+    toGreyscale() : GeonImage {
 
+        if (this.pixelSize != 4) throw "please, only use this when pixelsize is 4"
+
+        let image = new GeonImage(this.width, this.height, 4);
         for (let y = 0; y < this.height; y++) {
             for (let x = 0; x < this.width; x++) {
                 let pixel = this.get(x,y);
                 let avg = (pixel[0] + pixel[1] + pixel[2]) / 3;
-                this.set(x, y, [avg, avg, avg, 255]);
+                image.set(x, y, [avg, avg, avg, 255]);
             }
         }
+        return image;
+    }
+
+    toRGBA() : GeonImage {
+        
+        // if (this.pixelSize != 1) throw "please, only use this when pixelsize is 1"
+
         return this;
-    }
 
-    setData(data: Uint8ClampedArray) {
-        if (data.length != (this.height * this.width * 4))
-            throw "data.length does not match width * height ";
-
-        this.data = data;
-    }
-
-    fill(pixel: number[]) : GeonImage {
-        for (let y = 0; y < this.height; y++) {
-            for (let x = 0; x < this.width; x++) {
-                this.set(x, y, pixel);
-            }
-        }
-        return this;
-    }
-
-    fillEvery(filler: Function) {
-        for (let y = 0; y < this.height; y++) {
-            for (let x = 0; x < this.width; x++) {
-                this.set(x, y, filler());
-            }
-        }
-        return this;
-    }
-    
-    public set(x: number, y: number, pixel: number[]) {
-
-        if (x > this.width || x < 0) throw "out of bounds";
-        if (y > this.height || y < 0) throw "out of bounds";
-
-        this.data[4 * (y * this.width + x)] = pixel[0];
-        this.data[4 * (y * this.width + x)+1] = pixel[1];
-        this.data[4 * (y * this.width + x)+2] = pixel[2];
-        this.data[4 * (y * this.width + x)+3] = pixel[3];
-    }
-
-    public get(x: number, y: number) : number[] {
-
-        if (x > this.width || x < 0) throw "out of bounds";
-        if (y > this.height || y < 0) throw "out of bounds";
-
-        return [
-            this.data[4 * (y * this.width + x)],
-            this.data[4 * (y * this.width + x) + 1],
-            this.data[4 * (y * this.width + x) + 2],
-            this.data[4 * (y * this.width + x) + 3]
-        ]
-    }
-
-    public toImageData() : ImageData {
-
-        return new ImageData(this.data, this.width, this.height);
+        // let image = new GeonImage(this.width, this.height, 4);
+        // for (let y = 0; y < this.height; y++) {
+        //     for (let x = 0; x < this.width; x++) {
+        //         let pixel = this.get(x,y);
+        //         let val = pixel[0];
+        //         image.set(x, y, [val, val, val, 255]);
+        //     }
+        // }
+        // return image;
     }
 }

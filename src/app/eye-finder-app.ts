@@ -20,7 +20,19 @@ import { EyeFinder } from "../sfered/eye-finder";
 import { Matrix3, Matrix4 } from "../math/matrix";
 import { ImageRenderer } from "../render/image-renderer";
 import { Rectangle2 } from "../geo/rectangle";
+
 const settings = require('../sfered/settings.json'); // note DIFFERENCE BETWEEN "" AND ''. '' WORKS, "" NOT. 
+
+// note : sadly, this doesnt quite work. 
+// TODO : figure out some serialize sceme, aka: spitting out obj data in json format. 
+
+// const DEBUG_LANDMARKS: any = require('../../data/scan/facelandmarks.json'); // note DIFFERENCE BETWEEN "" AND ''. '' WORKS, "" NOT. 
+// const DEBUG_JPG: any = require('../../data/scan/head3d.jpg'); // note DIFFERENCE BETWEEN "" AND ''. '' WORKS, "" NOT. 
+// const DEBUG_OBJ: any = require('../../data/scan/head3d.obj'); // note DIFFERENCE BETWEEN "" AND ''. '' WORKS, "" NOT. 
+// const DEBUG_FRONT_IMAGE: any = require('../../data/scan/image.obj'); // note DIFFERENCE BETWEEN "" AND ''. '' WORKS, "" NOT. 
+
+// console.log(DEBUG_JPG);
+
 
 export class EyeFinderApp extends App {
     

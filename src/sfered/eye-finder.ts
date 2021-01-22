@@ -10,6 +10,8 @@ import { Domain2 } from "../math/domain";
 import { DotRenderer3 } from "../render/dot-renderer3";
 import { BellusScanData } from "./bellus-data";
 
+
+
 export class EyeFinder {
 
     app?: EyeFinderApp
@@ -36,9 +38,46 @@ export class EyeFinder {
 
     private edgeDetection(image: GeonImage) : GeonImage {
 
-        let blurred = image.applyKernel(Kernels.Gauss5);
-        this.app?.images.push(image, blurred);
+        let grey = image.toGreyscale();
+        let blurred = grey.applyKernel(Kernels.Gauss5);
+        let left = blurred.applyKernel(Kernels.SobelLeft);
+        let right = blurred.applyKernel(Kernels.SobelRight);
+        let sum = this.SobelSum(left, right);
+
+        let [min, max] = sum.getMinMax();
+
+        console.log("minmax: ", min, max);
+
+        let upper = max * 0.7;
+        let lower = upper * 0.3;
+        let thres = sum.applyThreshold(lower, upper);
+
+        // debug 
+        this.app?.images.push(blurred.toRGBA(), sum.toRGBA(), thres.toRGBA());
+        
         return image;
+    }
+
+    private SobelSum(hor: GeonImage, ver: GeonImage) : GeonImage {
+        
+        let width = hor.width; // assume the same as ver
+        let height = hor.height; // assume the same as ver
+        let ps = hor.pixelSize;
+
+        let sum = new GeonImage(width, height, ps);
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                
+                // assume grey value
+                let one = hor.get(x, y)[0];
+                let two = ver.get(x, y)[0];
+
+                let value = Math.round((one**2 + two**2)**0.5);
+
+                sum.set(x, y, [value, value, value, 255]);
+            }
+        }
+        return sum;
     }
 
     private getEyeWindows(bsd: BellusScanData) : [Domain2, Domain2] {
