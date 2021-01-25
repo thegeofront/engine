@@ -64,6 +64,10 @@ export class Vector2Array extends Matrix {
         }
         return array;
     }
+
+    clone() : Vector2Array {
+        return super.clone() as Vector2Array;
+    }
 }
 
 export class Vector3Array extends Matrix {

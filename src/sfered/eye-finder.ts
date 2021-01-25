@@ -3,9 +3,10 @@
 // purpose: Keeper of the full pupil-point.
 
 import { EyeFinderApp } from "../app/eye-finder-app";
+import { Mesh, TopoMesh } from "../geo/mesh";
 import { GeonImage } from "../img/Image";
 import { Kernels } from "../img/kernels";
-import { Vector2Array } from "../math/array";
+import { Vector2Array, Vector3Array } from "../math/array";
 import { Domain2 } from "../math/domain";
 import { Vector2 } from "../math/vector";
 import { DotRenderer3 } from "../render/dot-renderer3";
@@ -31,15 +32,17 @@ export class EyeFinder {
         let [winLeft, winRight] = this.getEyeWindows(bsd);
         console.log(winLeft, winRight);
 
+        let topo = TopoMesh.copyFromMesh(bsd.mesh);
+
         // left side
-        this.findPupilFromEye(image, winLeft);
+        this.findPupilFromEye(image, topo, winLeft);
 
         // right side
-        this.findPupilFromEye(image, winRight);
+        this.findPupilFromEye(image, topo, winRight);
 
     }
 
-    private findPupilFromEye(image: GeonImage, window: Domain2) {
+    private findPupilFromEye(image: GeonImage, mesh: TopoMesh,  window: Domain2) {
 
         // step 1: get points (vectors) which symbolize pixels in contrasting areas of the image (the iris).
         let eyeImg = image.trimWithDomain(window);
@@ -50,8 +53,14 @@ export class EyeFinder {
 
         // convert these points to the same space as the uv points of the mesh
         contrastPoints.forEach((p) => {
+           
+            // move from eyetrim to original image space
             p.add(new Vector2(window.x.t0, window.y.t0));
+
+            // move from pixel space to normalized uv space
             p.mul(scaleVec);
+
+            // flip and move according to uv parameters
             p.mul(new Vector2(1, -1));
             p.add(new Vector2(0, 1));
         });
@@ -59,7 +68,12 @@ export class EyeFinder {
         // debug
         this.app?.dots2.push(...contrastPoints.toNativeArray());
 
-        // step 2: 
+        // step 2: elevate from uv space to vertex space of the mesh 
+        let contrast3d = new Vector3Array(contrastPoints.count()); 
+        contrastPoints.forEach((p, i) => {
+            contrast3d.setVector(i,  mesh.elevate(p));
+        })
+
     }
 
     private contrastDetection(image: GeonImage) : GeonImage {

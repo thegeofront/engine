@@ -73,7 +73,7 @@ export class EyeFinderApp extends App {
         this.redLineRenderer = new SimpleLineRenderer(gl, [1,0,0,0.5]);
         this.meshRenderer = new SimpleMeshRenderer(gl, [0,0,1,0.25]);
         this.imageRenderer = new ImageRenderer(gl);
-        this.camera = new Camera(canvas, 3);
+        this.camera = new Camera(canvas, 0.1);
 
         addDropFileEventListeners(canvas, processFiles.bind(this));
     }

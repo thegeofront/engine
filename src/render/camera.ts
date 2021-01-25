@@ -17,7 +17,7 @@ export class Camera {
 
     speed = 1;
 
-    constructor(canvas: HTMLCanvasElement, z_offset = 3) {
+    constructor(canvas: HTMLCanvasElement, z_offset = 1) {
         this.pos = new Vector3(0,0,0);
         this.z_offset = -z_offset;
         this.offset = new Vector3(0,0, -z_offset);
@@ -25,7 +25,7 @@ export class Camera {
 
     public updateWithControls(state: InputState) {
 
-        this.offset.z = this.z_offset + -state.scrollValue * 0.5;
+        this.offset.z = this.z_offset - state.scrollValue * 0.5;
         if (state.IsKeyPressed("Shift")) {
             this.speed *= 2;
             console.log("speed is now: " + this.speed);

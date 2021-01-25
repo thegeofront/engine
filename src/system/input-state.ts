@@ -155,11 +155,14 @@ export class InputState {
 
     private setMouseScroll(e: WheelEvent) {
         // console.log("we be scrollin' now...")
+        
+        // normalize all scrolling behaviour
         let value = 0.1;
         if (e.deltaY < 0) 
             value = -0.1;
 
-        this.scrollValue += value;
+        // we dont want negative scroll values...
+        this.scrollValue = Math.max(0, this.scrollValue + value);
     }
 
     private setMousePos(e: MouseEvent)

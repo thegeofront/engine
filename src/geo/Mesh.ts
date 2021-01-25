@@ -6,6 +6,7 @@
 import { createUnsignedBytesMatrixTexture } from "@tensorflow/tfjs-backend-webgl/dist/gpgpu_util";
 import { browserLocalStorage } from "@tensorflow/tfjs-core/dist/io/local_storage";
 import { FaceArray, Vector2Array, Vector3Array } from "../math/array";
+import { Vector2, Vector3 } from "../math/vector";
 
 export class Mesh {
 
@@ -14,7 +15,6 @@ export class Mesh {
     uvs:   Vector2Array; // 2 long float 
     faces: FaceArray;
 
-    lastTouched: number = 0; // needed for triangle walk
     texture?: ImageData = undefined;
 
     constructor(vertCount: number, normCount: number, uvCount: number, faceCount: number, texture: ImageData | undefined = undefined) {
@@ -37,13 +37,8 @@ export class Mesh {
         return mesh;
     }
 
-
     exportToObj(path: string) {
         
-    }
-
-    setNeighbors() {
-
     }
 
     getLineIds() : Uint16Array {
@@ -63,6 +58,43 @@ export class Mesh {
         return data;
     }
 };
+
+// a mesh with topological information
+export class TopoMesh extends Mesh {
+
+    lastTouched = 0; // needed for triangle walk
+    map: Uint32Array;
+
+    // private -> should only be used with factory methods
+    private constructor(vertCount: number, normCount: number, uvCount: number, faceCount: number, texture: ImageData | undefined = undefined) {
+        super(vertCount, normCount, uvCount, faceCount, texture);
+        this.map = new Uint32Array(3 * this.faces.count());
+    }
+
+    static copyFromMesh(mesh: Mesh) : TopoMesh {
+        let topoMesh = new TopoMesh(mesh.verts.count(), mesh.norms.count(), mesh.uvs.count(), mesh.faces.count());
+        topoMesh.verts = mesh.verts.clone();
+        topoMesh.norms = mesh.norms.clone();
+        topoMesh.uvs = mesh.uvs.clone();
+        topoMesh.faces = mesh.faces.clone() as FaceArray;
+        topoMesh.setNeighborMap();
+        return topoMesh;
+    }
+
+    setNeighborMap() : Uint32Array {
+        return new Uint32Array();
+    }
+
+    elevate(p: Vector2) : Vector3 {
+        // 'elevate' a point in UV space to vertex space using a barycentric remap
+        return new Vector3(0,0,0);
+    }
+
+    flatten(p: Vector3) : Vector2 {
+        // 'flatten' a point in vertex space to uv space using a barycentric remap
+        return new Vector2(0,0);
+    }
+}
 
 // ================ Obj ===================
 
@@ -131,6 +163,8 @@ export function meshFromObj(text: string) : Mesh {
     return mesh;
 }
 
+// NOTE: for now, uv and normals are completely ignored!!!
+// we assume the indices are the same als the vertices!!!
 // verbose way of processing one single vertex/normal/uv combination in a face. 
 function ProcessObjFaceVertex(part: string) : number[] {
 
