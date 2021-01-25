@@ -49,13 +49,19 @@ export class EyeFinderApp extends App {
     dots2: Vector2[] = [];
     dots3: Vector3[] = [];
     images: GeonImage[] = [];
+    meshLineIds?: Uint16Array;
+
 
     // rendering 
-    dotRenderer: DotRenderer3;
+    blueDotRenderer: DotRenderer3;
     redDotRenderer: DotRenderer3;
+    whiteDotRenderer: DotRenderer3;
+
     redLineRenderer: SimpleLineRenderer;
     lineRenderer: SimpleLineRenderer;
+
     meshRenderer: SimpleMeshRenderer;
+
     camera: Camera;
     imageRenderer: ImageRenderer;
 
@@ -67,8 +73,10 @@ export class EyeFinderApp extends App {
 
         // setup render stuff 
         this.gl = gl; // this is bad practice, but i need it during procesFiles
-        this.dotRenderer = new DotRenderer3(gl, 6, [0,0,1,1], false);
+        this.blueDotRenderer = new DotRenderer3(gl, 6, [0,0,1,1], false);
         this.redDotRenderer = new DotRenderer3(gl, 4, [1,0,0,1], false);
+        this.whiteDotRenderer = new DotRenderer3(gl, 5, [0.8,0.8,0.8,1], false);
+
         this.lineRenderer = new SimpleLineRenderer(gl, [0,0,1,0.5]);
         this.redLineRenderer = new SimpleLineRenderer(gl, [1,0,0,0.5]);
         this.meshRenderer = new SimpleMeshRenderer(gl, [0,0,1,0.25]);
@@ -96,7 +104,7 @@ export class EyeFinderApp extends App {
 
      
         if (this.bsd?.mesh == undefined)
-            this.redDotRenderer.render(gl, matrix, [new Vector3(0,0,0), new Vector3(1,1,1)]);
+            this.redDotRenderer.render(gl, matrix, Vector3Array.fromNativeArray([new Vector3(0,0,0), new Vector3(1,1,1)]));
         else {
             let mesh = this.bsd?.mesh;
             let landmarks = this.bsd?.landmarks;
@@ -104,14 +112,19 @@ export class EyeFinderApp extends App {
             //this.redLineRenderer.render(gl, matrix);
             // this.dotRenderer.renderQuick(gl, matrix, landmarks3.data, 3);
             // this.dotRenderer.renderQuick(gl, matrix, mesh.verts.data, 3);
-            // this.meshRenderer.render(gl, matrix);
+            // 
             // this.redLineRenderer.render(gl, matrix);
 
             // console.log(this.dots2);
-            this.redDotRenderer.render2(gl, matrix, this.dots2) // bounding boxes
-            this.dotRenderer.renderQuick(gl, matrix, mesh.uvs.data, 2);
+            this.redDotRenderer.render(gl, matrix, Vector2Array.fromNativeArray(this.dots2)) // bounding boxes
 
-            this.redDotRenderer.renderQuick(gl, matrix, landmarks.data, 3);
+
+            // show the mesh
+            this.lineRenderer.setAndRender(gl, matrix, mesh.verts, this.meshLineIds!)
+            this.lineRenderer.setAndRender(gl, matrix, mesh.uvs, this.meshLineIds!)
+            this.whiteDotRenderer.render(gl, matrix, mesh.verts);
+            this.blueDotRenderer.render(gl, matrix, mesh.uvs);
+            this.blueDotRenderer.render(gl, matrix, mesh.uvs);
 
             // render images
             let height = 200;
@@ -135,6 +148,7 @@ export class EyeFinderApp extends App {
         let mesh = this.bsd?.mesh;
 
         // this.meshRenderer.set(this.gl, mesh.verts, mesh.faces);
+        this.meshLineIds = mesh.getLineIds();
         // this.lineRenderer.set(this.gl, mesh.verts.data, mesh.getLineIds(), 3);
         // this.redLineRenderer.set(this.gl, mesh.uvs.data, mesh.getLineIds(), 2);
     }

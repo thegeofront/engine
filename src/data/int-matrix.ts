@@ -108,6 +108,10 @@ export class IntMatrix {
         return array;
     }
 
+    toUInt16Array() : Uint16Array {
+        return new Uint16Array(this.data);
+    }
+
     forEachValue(callbackfn: (value: number, index: number) => number) : IntMatrix {
         
         for(let i = 0 ; i < this.data.length; i++) {

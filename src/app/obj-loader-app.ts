@@ -14,6 +14,7 @@ import { SimpleMeshRenderer } from "../render/simple-mesh-renderer";
 import { InputState } from "../system/input-state";
 import { App } from "./app";
 import { DrawSpeed } from "../render/renderer";
+import { Vector3Array } from "../data/vector-array";
 
 
 export class ObjLoaderApp extends App {
@@ -57,9 +58,9 @@ export class ObjLoaderApp extends App {
 
      
         if (this.obj == undefined)
-            this.dotRenderer.render(gl, matrix, [new Vector3(0,0,0), new Vector3(1,1,1)]);
+            this.dotRenderer.render(gl, matrix, Vector3Array.fromNativeArray([new Vector3(0,0,0), new Vector3(1,1,1)]));
         else {
-            this.dotRenderer.renderQuick(gl, matrix, this.obj!.verts.data);
+            this.dotRenderer.render(gl, matrix, this.obj!.verts);
             // this.meshRenderer.render(gl, matrix);
             this.lineRenderer.render(gl, matrix);
         }    
@@ -106,5 +107,5 @@ async function processFiles(this: ObjLoaderApp, files: FileList) {
 
     // put the data into the render buffers.
     // this.meshRenderer.set(this.gl, this.obj.verts, this.obj.faces);
-    this.lineRenderer.set(this.gl, this.obj.verts.data, this.obj.getLineIds(), 3, DrawSpeed.StaticDraw);
+    this.lineRenderer.set(this.gl, this.obj.verts, this.obj.getLineIds(), DrawSpeed.StaticDraw);
 }

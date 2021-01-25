@@ -1,5 +1,6 @@
 // jos feenstra
 
+import { FloatMatrix } from "../data/float-matrix";
 import { Vector2Array, Vector3Array } from "../data/vector-array";
 import { Matrix4 } from "../math/matrix";
 import { Vector2, Vector3 } from "../math/vector";
@@ -19,7 +20,7 @@ export class DotRenderer3 extends Renderer {
     size: number;
 
     constructor(gl: WebGLRenderingContext, 
-        size: number =5, 
+        radius: number =5, 
         color: number[] = [1,1,1,1], 
         square: boolean= true ) {
 
@@ -85,7 +86,7 @@ export class DotRenderer3 extends Renderer {
         this.u_color = gl.getUniformLocation(this.program, "u_color")!;
 
         this.color = color;
-        this.size = size;
+        this.size = radius;
 
         // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
         // look up where the vertex data needs to go.
@@ -94,8 +95,10 @@ export class DotRenderer3 extends Renderer {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);     
     }
 
-    // render 1 image to the screen
-    renderQuick(gl: WebGLRenderingContext, matrix: Matrix4, data: Float32Array, componentsPerIteration: number = 3) {
+    render(gl: WebGLRenderingContext, matrix: Matrix4, vectors: Vector2Array | Vector3Array | Vector2[] | Vector3[]) {
+
+        // convert all possible entries to a general entry
+        let array = this.getGeneralFloatMatrix(vectors);
 
         // Tell it to use our program (pair of shaders)
         gl.useProgram(this.program);
@@ -111,35 +114,25 @@ export class DotRenderer3 extends Renderer {
         gl.enableVertexAttribArray(this.a_position);
         
         // // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-        gl.vertexAttribPointer(this.a_position, componentsPerIteration,  gl.FLOAT, false, 0, 0);
+        gl.vertexAttribPointer(this.a_position, array._width,  gl.FLOAT, false, 0, 0);
         
         // fill with data;
-        gl.bufferData(gl.ARRAY_BUFFER, data, gl.DYNAMIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, array.data, gl.DYNAMIC_DRAW);
         
         // Draw the point.
-        gl.drawArrays( gl.POINTS, 0,  data.length / componentsPerIteration);
+        gl.drawArrays( gl.POINTS, 0, array.count());
     }
 
-    render(gl: WebGLRenderingContext, matrix: Matrix4, dots: Vector3[]) {
-     
-        let array = Vector3Array.fromNativeArray(dots);
-        return this.renderQuick(gl, matrix, array.data, 3);
-    }
+    getGeneralFloatMatrix(vectors: Vector2Array | Vector3Array | Vector2[] | Vector3[]): FloatMatrix {
 
-    render2(gl: WebGLRenderingContext, matrix: Matrix4, dots: Vector2[]) {
-     
-        let array = Vector2Array.fromNativeArray(dots);
-        return this.renderQuick(gl, matrix, array.data, 2);
-    }
-
-    // Fill the buffer with the values that define a rectangle.
-    toFloat32Array(dots: Vector3[]) : Float32Array{
-        let data = new Float32Array(dots.length * 3);
-        for(let i = 0 ; i < dots.length; i++) {
-            data[i*3]     = dots[i].x;
-            data[i*3 + 1] = dots[i].y;
-            data[i*3 + 2] = dots[i].z;
+        if(vectors instanceof Vector2Array) {
+            return vectors;
+        } else if (vectors instanceof Vector3Array) {
+            return vectors;
+        } else if (vectors[0] instanceof Vector2) {
+            return Vector2Array.fromNativeArray(vectors as Vector2[]);
+        } else {
+            return Vector3Array.fromNativeArray(vectors as Vector3[]);
         }
-        return data;
     }
 }
