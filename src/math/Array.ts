@@ -25,6 +25,16 @@ export class Vector2Array extends Matrix {
         return array;
     }
 
+    forEach(callbackfn: (value: Vector2, index: number) => void) : Vector2Array {
+        
+        for(let i = 0 ; i < this.count(); i++) {
+            let vec = this.getVector(i);
+            callbackfn(vec, i);
+            this.setVector(i, vec);
+        }
+        return this;
+    }
+
     setVector(i: number, vec: Vector2) {
         this.data[i * this._width + 0] = vec.x;
         this.data[i * this._width + 1] = vec.y;

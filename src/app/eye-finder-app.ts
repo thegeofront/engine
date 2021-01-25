@@ -75,7 +75,7 @@ export class EyeFinderApp extends App {
         this.imageRenderer = new ImageRenderer(gl);
         this.camera = new Camera(canvas, 3);
 
-        addDropFileEventListeners(document, processFiles.bind(this));
+        addDropFileEventListeners(canvas, processFiles.bind(this));
     }
 
     start() {
@@ -108,7 +108,7 @@ export class EyeFinderApp extends App {
             // this.redLineRenderer.render(gl, matrix);
 
             // console.log(this.dots2);
-            this.dotRenderer.render2(gl, matrix, this.dots2) // bounding boxes
+            this.redDotRenderer.render2(gl, matrix, this.dots2) // bounding boxes
             this.dotRenderer.renderQuick(gl, matrix, mesh.uvs.data, 2);
 
             this.redDotRenderer.renderQuick(gl, matrix, landmarks.data, 3);

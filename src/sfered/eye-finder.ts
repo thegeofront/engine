@@ -7,6 +7,7 @@ import { GeonImage } from "../img/Image";
 import { Kernels } from "../img/kernels";
 import { Vector2Array } from "../math/array";
 import { Domain2 } from "../math/domain";
+import { Vector2 } from "../math/vector";
 import { DotRenderer3 } from "../render/dot-renderer3";
 import { BellusScanData } from "./bellus-data";
 
@@ -21,22 +22,47 @@ export class EyeFinder {
     }
 
     public findPupilsFromBellus(bsd: BellusScanData) {
+
+        // the main script of finding pupil points directly from the bellus scan data. 
         console.log("finding eyes..");
 
+        // get the window with which the eyes can be extracted
         let image = GeonImage.fromImageData(bsd.texture);
         let [winLeft, winRight] = this.getEyeWindows(bsd);
+        console.log(winLeft, winRight);
 
-        console.log(winLeft);
+        // left side
+        this.findPupilFromEye(image, winLeft);
 
-        let eyeLeft = image.trimWithDomain(winLeft);
-        let eyeRight = image.trimWithDomain(winRight);
+        // right side
+        this.findPupilFromEye(image, winRight);
 
-        let edEyeLeft = this.edgeDetection(eyeLeft);
-
-        // debug renderer
     }
 
-    private edgeDetection(image: GeonImage) : GeonImage {
+    private findPupilFromEye(image: GeonImage, window: Domain2) {
+
+        // step 1: get points (vectors) which symbolize pixels in contrasting areas of the image (the iris).
+        let eyeImg = image.trimWithDomain(window);
+        let contrastEyeImg = this.contrastDetection(eyeImg);
+        let contrastPoints = this.pixelsToPoints(contrastEyeImg, 50);
+        
+        let scaleVec = new Vector2(1 / image.width, 1 / image.height);
+
+        // convert these points to the same space as the uv points of the mesh
+        contrastPoints.forEach((p) => {
+            p.add(new Vector2(window.x.t0, window.y.t0));
+            p.mul(scaleVec);
+            p.mul(new Vector2(1, -1));
+            p.add(new Vector2(0, 1));
+        });
+
+        // debug
+        this.app?.dots2.push(...contrastPoints.toNativeArray());
+
+        // step 2: 
+    }
+
+    private contrastDetection(image: GeonImage) : GeonImage {
 
         let grey = image.toGreyscale();
         let blurred = grey.applyKernel(Kernels.Gauss5);
@@ -55,7 +81,7 @@ export class EyeFinder {
         // debug 
         this.app?.images.push(blurred.toRGBA(), sum.toRGBA(), thres.toRGBA());
         
-        return image;
+        return thres;
     }
 
     private SobelSum(hor: GeonImage, ver: GeonImage) : GeonImage {
@@ -95,7 +121,19 @@ export class EyeFinder {
         return [rightWindow, leftWindow];
     }
 
-    private findPupilFromEye() {
+    private pixelsToPoints(image: GeonImage, threshold: number) : Vector2Array {
 
+        let points: Vector2[] = [];
+        for(let y = 0 ; y < image.height; y++) {
+            for(let x = 0; x < image.width; x++) {
+                let value = image.get(x, y)[0];
+                if (value > threshold) {
+                    points.push(new Vector2(x, y));
+                }
+            }
+        }
+
+        return Vector2Array.fromNativeArray(points);
     }
+
 }

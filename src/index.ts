@@ -34,7 +34,7 @@ function main() {
     // core.addApp(new RectangleApp(gl)); 
     // core.addApp(new DotApp3(gl, canvas)); 
     // core.addApp(new ObjLoaderApp(gl, canvas));
-    //addWebcamAppWhenReady(core, canvas, video);
+    // addWebcamAppWhenReady(core, canvas, video);
 
     // infinite loop
     function loop() {

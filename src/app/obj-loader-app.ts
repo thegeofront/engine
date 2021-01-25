@@ -36,7 +36,7 @@ export class ObjLoaderApp extends App {
         this.meshRenderer = new SimpleMeshRenderer(gl, [0,0,1,0.25]);
         this.camera = new Camera(canvas);
 
-        addDropFileEventListeners(document, processFiles.bind(this));
+        addDropFileEventListeners(canvas, processFiles.bind(this));
     }
 
     start() {

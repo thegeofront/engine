@@ -4,28 +4,37 @@
 
 // set any to document to add drop functionality to the entire document, or use any other div.
 type FuncGenericReturn = <T>() => T;
-export function addDropFileEventListeners(env: any, filesCallback: CallbackOneParam<FileList>) 
+export function addDropFileEventListeners(canvas: HTMLCanvasElement, filesCallback: CallbackOneParam<FileList>) 
 {
+    console.log("setting up drag events...");
+    canvas.addEventListener('dragenter', function(ev: DragEvent) {
+
+        // ev.stopPropagation();
+        ev.preventDefault();
+        console.log("entering entering...")
+        return true;
+    }, true);
+
     // setup file upload
-    env.addEventListener('dragover', function(ev: DragEvent) {
+    canvas.addEventListener('dragover', function(ev: DragEvent) {
 
         //add hover class when drag over
-        ev.stopPropagation();
+        // ev.stopPropagation();
         ev.preventDefault();
-        // console.log("entering drag....")
-        return false;
-    });
+        console.log("over drag....")
+        return true;
+    }, true);
         
-    env.addEventListener('dragleave', function(ev: DragEvent) {
+    canvas.addEventListener('dragleave', function(ev: DragEvent) {
 
         //remove hover class when drag out
-        ev.stopPropagation();
+        // ev.stopPropagation();
         ev.preventDefault();
-        // console.log("leaving drag....")
-        return false;
-    });
+        console.log("leaving drag....")
+        return true;
+    }, true);
 
-    env.addEventListener('drop', function(ev: DragEvent) {
+    canvas.addEventListener('drop', function(ev: DragEvent) {
 
         //prevent browser from open the file when drop off
         ev.stopPropagation();
@@ -35,8 +44,8 @@ export function addDropFileEventListeners(env: any, filesCallback: CallbackOnePa
         var files: FileList = ev.dataTransfer!.files;
 
         filesCallback(files);
-        return false;
-    });
+        return true;
+    }, true);
 }
 
 

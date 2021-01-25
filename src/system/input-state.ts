@@ -155,7 +155,11 @@ export class InputState {
 
     private setMouseScroll(e: WheelEvent) {
         // console.log("we be scrollin' now...")
-        this.scrollValue = e.deltaY;
+        let value = 0.1;
+        if (e.deltaY < 0) 
+            value = -0.1;
+
+        this.scrollValue += value;
     }
 
     private setMousePos(e: MouseEvent)

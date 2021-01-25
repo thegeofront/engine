@@ -10,6 +10,7 @@ export class Camera {
 
     pos: Vector3;
     offset: Vector3; // offset from rotation center
+    z_offset: number;
     angleAlpha = 0; // rotation x 
     angleBeta = 0; // rotation y
     mousePos = Vector2.zero();
@@ -17,19 +18,14 @@ export class Camera {
     speed = 1;
 
     constructor(canvas: HTMLCanvasElement, z_offset = 3) {
-        canvas.addEventListener("wheel", this.setMouseScroll.bind(this));
         this.pos = new Vector3(0,0,0);
+        this.z_offset = -z_offset;
         this.offset = new Vector3(0,0, -z_offset);
     }
 
-    private setMouseScroll(e: WheelEvent) {
-        // console.log("we be scrollin' now...")
-        this.offset.z -= e.deltaY * 0.1 * this.speed;
-    }
-
-
     public updateWithControls(state: InputState) {
 
+        this.offset.z = this.z_offset + -state.scrollValue * 0.5;
         if (state.IsKeyPressed("Shift")) {
             this.speed *= 2;
             console.log("speed is now: " + this.speed);
