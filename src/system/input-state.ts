@@ -74,6 +74,7 @@ export class InputState {
         canvas.addEventListener("wheel", this.setMouseScroll.bind(this));
         canvas.addEventListener("touchmove", this.setTouch.bind(this));
         canvas.addEventListener("touchstart", this.setTouch.bind(this));
+        canvas.addEventListener("touchend", this.setTouchUp.bind(this));
         for(let i = 0; i < 223 ;i++)
             this.keysDown[i] = false;
         
@@ -145,6 +146,11 @@ export class InputState {
 
         this.mousePos = new Vector2(e.touches[0].clientX, e.touches[0].clientY);
         this.mouseLeftDown = true;
+    }
+
+    private setTouchUp(e: TouchEvent) {
+        e.preventDefault();
+        this.mouseLeftDown = false;
     }
 
     private setMouseScroll(e: WheelEvent) {

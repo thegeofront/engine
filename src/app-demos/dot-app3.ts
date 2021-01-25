@@ -32,12 +32,13 @@ export class DotApp3 extends App {
     }
 
     start() {
+        this.spawnSome(100, 0.001);
+    }
 
-        // additional setup of dots
-        let normrange = 0.001;
-        let count = 100;
+    spawnSome(count: number, normrange: number) {
+
         const normSpace = Domain3.fromBounds(-normrange, normrange, -normrange, normrange, -normrange, normrange);
-        
+
         for (let i = 0 ; i < count; i++) {
 
             this.dots.push(this.bounds.elevate(Vector3.fromRandom()));
@@ -49,6 +50,10 @@ export class DotApp3 extends App {
         
         // move the camera with the mouse
         this.camera.updateWithControls(state);
+
+        if (state.mouseLeftPressed) {
+            this.spawnSome(100, 0.001);
+        }
 
         // update the position of all dots
         for (let i = 0 ; i < this.dots.length; i++) {

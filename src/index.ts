@@ -30,7 +30,7 @@ function main() {
     // the eyefinder app itself
     core.addApp(new EyeFinderApp(gl, canvas, context));
     
-    // fun demo's to test functionality 
+    // fun demo's to test various functionalities 
     // core.addApp(new RectangleApp(gl)); 
     // core.addApp(new DotApp3(gl, canvas)); 
     // core.addApp(new ObjLoaderApp(gl, canvas));
