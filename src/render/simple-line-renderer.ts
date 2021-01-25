@@ -4,6 +4,7 @@
 
 import { Vector2Array, Vector3Array } from "../data/vector-array";
 import { Mesh } from "../geo/mesh";
+import { Polyline } from "../geo/polyline";
 import { Matrix4 } from "../math/matrix";
 import { DrawSpeed, Renderer } from "./renderer";
 
@@ -102,10 +103,10 @@ export class SimpleLineRenderer extends Renderer {
     }
 
     setAndRenderMesh(gl: WebGLRenderingContext, matrix: Matrix4, mesh: Mesh) {
-
+        throw "todo";
     }
 
-    setAndRenderPolyline(gl: WebGLRenderingContext, matrix: Matrix4, mesh: Mesh) {
-        
+    setAndRenderPolyline(gl: WebGLRenderingContext, matrix: Matrix4, polyline: Polyline) {
+        throw "todo";
     }
 }

@@ -3,7 +3,7 @@
 // purpose: Keeper of the full pupil-point.
 
 import { EyeFinderApp } from "./eye-finder-app";
-import { Mesh, TopoMesh } from "../geo/mesh";
+import { Mesh } from "../geo/mesh";
 import { GeonImage } from "../img/Image";
 import { Kernels } from "../img/kernels";
 import { Vector2Array, Vector3Array } from "../data/vector-array";
@@ -11,6 +11,7 @@ import { Domain2 } from "../math/domain";
 import { Vector2 } from "../math/vector";
 import { DotRenderer3 } from "../render/dot-renderer3";
 import { BellusScanData } from "./bellus-data";
+import { TopoMesh } from "../geo/topo-mesh";
 
 
 
@@ -73,6 +74,8 @@ export class EyeFinder {
         contrastPoints.forEach((p, i) => {
             contrast3d.setVector(i,  mesh.elevate(p));
         })
+
+        this.app?.dots3.push(...contrast3d.toNativeArray());
 
     }
 

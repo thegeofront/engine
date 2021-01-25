@@ -61,43 +61,6 @@ export class Mesh {
     }
 };
 
-// a mesh with topological information
-export class TopoMesh extends Mesh {
-
-    lastTouched = 0; // needed for triangle walk
-    neighborMap: IntMatrix;
-
-    // private -> should only be used with factory methods
-    private constructor(vertCount: number, normCount: number, uvCount: number, faceCount: number, texture: ImageData | undefined = undefined) {
-        super(vertCount, normCount, uvCount, faceCount, texture);
-        this.neighborMap = new IntMatrix(this.faces.count(), 3);
-    }
-
-    static copyFromMesh(mesh: Mesh) : TopoMesh {
-        let topoMesh = new TopoMesh(mesh.verts.count(), mesh.norms.count(), mesh.uvs.count(), mesh.faces.count());
-        topoMesh.verts = mesh.verts.clone();
-        topoMesh.norms = mesh.norms.clone();
-        topoMesh.uvs = mesh.uvs.clone();
-        topoMesh.faces = mesh.faces.clone();
-        topoMesh.setNeighborMap();
-        return topoMesh;
-    }
-
-    setNeighborMap() : Uint32Array {
-        return new Uint32Array();
-    }
-
-    elevate(p: Vector2) : Vector3 {
-        // 'elevate' a point in UV space to vertex space using a barycentric remap
-        return new Vector3(0,0,0);
-    }
-
-    flatten(p: Vector3) : Vector2 {
-        // 'flatten' a point in vertex space to uv space using a barycentric remap
-        return new Vector2(0,0);
-    }
-}
-
 // ================ Obj ===================
 
 export function meshFromObj(text: string) : Mesh {

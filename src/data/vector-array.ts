@@ -67,7 +67,9 @@ export class Vector2Array extends FloatMatrix {
     }
 
     clone() : Vector2Array {
-        return super.clone() as Vector2Array;
+        let clone = new Vector2Array(this._height);
+        clone.data = this.data;
+        return clone;  
     }
 }
 
@@ -133,7 +135,9 @@ export class Vector3Array extends FloatMatrix {
     }
 
     clone() : Vector3Array {
-        return super.clone() as Vector3Array;
+        let clone = new Vector3Array(this._height);
+        clone.data = this.data;
+        return clone;  
     }
 }
 

@@ -64,18 +64,18 @@ export class IntMatrix {
         return this.data[i * this._width + j]
     }
 
-    getRow(i: number) : Float32Array {
+    getRow(i: number) : Int32Array {
         // if (i < 0 || i > this.height) throw "column is out of bounds for Array"
-        let data = new Float32Array(this._width);
+        let data = new Int32Array(this._width);
         for (let j = 0; j < this._width; j++) {
             data[j] = this.get(i, j);
         }
         return data;
     }
 
-    getColumn(j: number) : Float32Array {
+    getColumn(j: number) : Int32Array {
         // if (j < 0 || j > this.width) throw "column is out of bounds for Array"
-        let data = new Float32Array(this._height);
+        let data = new Int32Array(this._height);
         for (let i = 0; i < this._height; i++) {
             let index = i * this._width + j;
             data[i] = this.data[index];       
@@ -88,7 +88,7 @@ export class IntMatrix {
         this.data[i * this._width + j] = value;
     }
 
-    setRow(rowIndex: number, row: number[] | Float32Array) {
+    setRow(rowIndex: number, row: number[] | Int32Array) {
         // if (this.width != row.length) throw "dimention of floatarray is not " + row.length;
         for(let j = 0; j < this._width; j++) {
             this.set(rowIndex, j, row[j]);
@@ -116,6 +116,16 @@ export class IntMatrix {
         
         for(let i = 0 ; i < this.data.length; i++) {
             this.data[i] = callbackfn(this.data[i], i);
+        }
+        return this;
+    }
+
+    forEachRow(callbackfn: (value: Int32Array, index: number) => void) : IntMatrix {
+        
+        for(let i = 0 ; i < this._height; i++) {
+            let row = this.getRow(i);
+            callbackfn(row, i)
+            this.setRow(i, row);
         }
         return this;
     }
