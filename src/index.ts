@@ -2,7 +2,7 @@
 // Purpose: Entry point
 
 import {addWebcamAppWhenReady, WebcamApp} from "./app/webcam-app";
-import {EyeFinderApp} from "./app/eye-finder-app";
+import {EyeFinderApp} from "./sfered/eye-finder-app";
 import { InputState } from "./system/input-state";
 import { App } from "./app/app";
 import { initWebglContext, Renderer } from "./render/renderer";

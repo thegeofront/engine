@@ -5,7 +5,8 @@
 
 import { createUnsignedBytesMatrixTexture } from "@tensorflow/tfjs-backend-webgl/dist/gpgpu_util";
 import { browserLocalStorage } from "@tensorflow/tfjs-core/dist/io/local_storage";
-import { FaceArray, Vector2Array, Vector3Array } from "../data/vector-array";
+import { IntMatrix } from "../data/int-matrix";
+import { Vector2Array, Vector3Array } from "../data/vector-array";
 import { Vector2, Vector3 } from "../math/vector";
 
 export class Mesh {
@@ -13,7 +14,7 @@ export class Mesh {
     verts: Vector3Array; // 3 long float
     norms: Vector3Array; // 3 long float
     uvs:   Vector2Array; // 2 long float 
-    faces: FaceArray;
+    faces: IntMatrix;
 
     texture?: ImageData = undefined;
 
@@ -21,7 +22,8 @@ export class Mesh {
         this.verts = new Vector3Array(vertCount);
         this.norms = new Vector3Array(normCount);
         this.uvs = new Vector2Array(uvCount);
-        this.faces = new FaceArray(faceCount);
+        this.faces = new IntMatrix(faceCount, 3);
+        this.faces.fill(-1);
         this.texture = texture;
     }
 
@@ -63,12 +65,12 @@ export class Mesh {
 export class TopoMesh extends Mesh {
 
     lastTouched = 0; // needed for triangle walk
-    map: Uint32Array;
+    neighborMap: IntMatrix;
 
     // private -> should only be used with factory methods
     private constructor(vertCount: number, normCount: number, uvCount: number, faceCount: number, texture: ImageData | undefined = undefined) {
         super(vertCount, normCount, uvCount, faceCount, texture);
-        this.map = new Uint32Array(3 * this.faces.count());
+        this.neighborMap = new IntMatrix(this.faces.count(), 3);
     }
 
     static copyFromMesh(mesh: Mesh) : TopoMesh {
@@ -76,7 +78,7 @@ export class TopoMesh extends Mesh {
         topoMesh.verts = mesh.verts.clone();
         topoMesh.norms = mesh.norms.clone();
         topoMesh.uvs = mesh.uvs.clone();
-        topoMesh.faces = mesh.faces.clone() as FaceArray;
+        topoMesh.faces = mesh.faces.clone();
         topoMesh.setNeighborMap();
         return topoMesh;
     }

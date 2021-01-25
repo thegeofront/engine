@@ -2,7 +2,7 @@
 // author:  Jos Feenstra
 // purpose: Keeper of the full pupil-point.
 
-import { EyeFinderApp } from "../app/eye-finder-app";
+import { EyeFinderApp } from "./eye-finder-app";
 import { Mesh, TopoMesh } from "../geo/mesh";
 import { GeonImage } from "../img/Image";
 import { Kernels } from "../img/kernels";

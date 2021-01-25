@@ -1,9 +1,9 @@
 // name:    array.ts
 // author:  Jos Feenstra
-// purpose: Small wrapper around Float32Array to add interoperability with Vector2 & Vector3, 
+// purpose: Small wrapper around Float32Array / FloatMatrix to add interoperability with Vector2 & Vector3, 
 //          while remaining a datastructure thats easy to pass over to webgl
 // 
-// NOTE:    all these small wrappers might not be good pratice, but i 
+// NOTE:    all these small wrappers might not be good pratice, but I 
 //          like to extract simple logic like this to not clutter the code too much
 
 import { Matrix4 } from "../math/matrix";
@@ -134,12 +134,5 @@ export class Vector3Array extends FloatMatrix {
 
     clone() : Vector3Array {
         return super.clone() as Vector3Array;
-    }
-}
-
-export class FaceArray extends FloatMatrix {
-
-    constructor(count: number) {
-        super(count, 3);
     }
 }

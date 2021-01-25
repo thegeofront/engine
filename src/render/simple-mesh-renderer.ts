@@ -2,7 +2,8 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of a mesh.
 
-import { FaceArray, Vector3Array } from "../data/vector-array";
+import { IntMatrix } from "../data/int-matrix";
+import { Vector3Array } from "../data/vector-array";
 import { Matrix4 } from "../math/matrix";
 import { DrawSpeed, Renderer } from "./renderer";
 
@@ -59,7 +60,7 @@ export class SimpleMeshRenderer extends Renderer {
         this.index_buffer = gl.createBuffer()!;  
     }
 
-    set(gl: WebGLRenderingContext, verts: Vector3Array, faces: FaceArray, speed: DrawSpeed = DrawSpeed.StaticDraw) {
+    set(gl: WebGLRenderingContext, verts: Vector3Array, faces: IntMatrix, speed: DrawSpeed = DrawSpeed.StaticDraw) {
         
         // save how many faces need to be drawn
         gl.useProgram(this.program);

@@ -95,32 +95,6 @@ export class FloatMatrix {
         }
     }
 
-    /**
-     * @deprecated please use for each value
-     */
-    divEntries(value: number) : FloatMatrix {
-        // perform operation directly on all elements
-        for (let i = 0 ; i < this.data.length; i++)
-        {
-            this.data[i] /= value;
-        }
-        return this;
-    }
-
-    
-    /**
-     * @deprecated please use for each value
-     */
-    scaleEntries(value: number) : FloatMatrix {
-        
-        // perform operation directly on elements
-        for (let i = 0 ; i < this.data.length; i++)
-        {
-            this.data[i] *= value;
-        }
-        return this;
-    }
-
     forEachValue(callbackfn: (value: number, index: number) => number) : FloatMatrix {
         
         for(let i = 0 ; i < this.data.length; i++) {

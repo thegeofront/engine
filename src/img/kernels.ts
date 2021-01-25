@@ -81,7 +81,5 @@ export class Kernels
         }
         return kernel;
     }
-
-    
 }
 

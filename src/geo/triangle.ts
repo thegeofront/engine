@@ -1,4 +1,4 @@
-import { Vector2 } from "./vector";
+import { Vector2 } from "../math/vector";
 
 export class Triangle2 {
     

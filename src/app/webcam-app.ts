@@ -10,7 +10,7 @@ import { MediaPipeFaceMesh } from "@tensorflow-models/face-landmarks-detection/d
 require("@tensorflow/tfjs-backend-webgl");
 
 import { Vector2 } from "../math/vector";
-import { Triangle2 } from "../math/triangle";
+import { Triangle2 } from "../geo/triangle";
 import * as draw from "../draw/tensorflow-drawing";
 import { App } from "./app";
 import { Core } from "../core";
