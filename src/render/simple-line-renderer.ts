@@ -3,6 +3,7 @@
 // purpose: WebGL based rendering of lines.
 
 import { Vector2Array, Vector3Array } from "../data/vector-array";
+import { Mesh } from "../geo/mesh";
 import { Matrix4 } from "../math/matrix";
 import { DrawSpeed, Renderer } from "./renderer";
 
@@ -98,5 +99,13 @@ export class SimpleLineRenderer extends Renderer {
     setAndRender(gl: WebGLRenderingContext, matrix: Matrix4, vertices: Vector2Array | Vector3Array, indices: Uint16Array) {
         this.set(gl, vertices, indices, DrawSpeed.DynamicDraw);
         this.render(gl, matrix);
+    }
+
+    setAndRenderMesh(gl: WebGLRenderingContext, matrix: Matrix4, mesh: Mesh) {
+
+    }
+
+    setAndRenderPolyline(gl: WebGLRenderingContext, matrix: Matrix4, mesh: Mesh) {
+        
     }
 }

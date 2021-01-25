@@ -1,7 +1,7 @@
 // jos feenstra
 
 import { FloatMatrix } from "../data/float-matrix";
-import { Vector2Array, Vector3Array } from "../data/vector-array";
+import { getGeneralFloatMatrix, Vector2Array, Vector3Array } from "../data/vector-array";
 import { Matrix4 } from "../math/matrix";
 import { Vector2, Vector3 } from "../math/vector";
 import { Renderer } from "./renderer";
@@ -98,7 +98,7 @@ export class DotRenderer3 extends Renderer {
     render(gl: WebGLRenderingContext, matrix: Matrix4, vectors: Vector2Array | Vector3Array | Vector2[] | Vector3[]) {
 
         // convert all possible entries to a general entry
-        let array = this.getGeneralFloatMatrix(vectors);
+        let array = getGeneralFloatMatrix(vectors);
 
         // Tell it to use our program (pair of shaders)
         gl.useProgram(this.program);
@@ -121,18 +121,5 @@ export class DotRenderer3 extends Renderer {
         
         // Draw the point.
         gl.drawArrays( gl.POINTS, 0, array.count());
-    }
-
-    getGeneralFloatMatrix(vectors: Vector2Array | Vector3Array | Vector2[] | Vector3[]): FloatMatrix {
-
-        if(vectors instanceof Vector2Array) {
-            return vectors;
-        } else if (vectors instanceof Vector3Array) {
-            return vectors;
-        } else if (vectors[0] instanceof Vector2) {
-            return Vector2Array.fromNativeArray(vectors as Vector2[]);
-        } else {
-            return Vector3Array.fromNativeArray(vectors as Vector3[]);
-        }
     }
 }

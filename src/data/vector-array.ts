@@ -136,3 +136,16 @@ export class Vector3Array extends FloatMatrix {
         return super.clone() as Vector3Array;
     }
 }
+
+export function getGeneralFloatMatrix(vectors: Vector2Array | Vector3Array | Vector2[] | Vector3[]): FloatMatrix {
+
+    if(vectors instanceof Vector2Array) {
+        return vectors;
+    } else if (vectors instanceof Vector3Array) {
+        return vectors;
+    } else if (vectors[0] instanceof Vector2) {
+        return Vector2Array.fromNativeArray(vectors as Vector2[]);
+    } else {
+        return Vector3Array.fromNativeArray(vectors as Vector3[]);
+    }
+}
