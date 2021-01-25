@@ -6,7 +6,7 @@ import { EyeFinderApp } from "../app/eye-finder-app";
 import { Mesh, TopoMesh } from "../geo/mesh";
 import { GeonImage } from "../img/Image";
 import { Kernels } from "../img/kernels";
-import { Vector2Array, Vector3Array } from "../math/array";
+import { Vector2Array, Vector3Array } from "../data/vector-array";
 import { Domain2 } from "../math/domain";
 import { Vector2 } from "../math/vector";
 import { DotRenderer3 } from "../render/dot-renderer3";

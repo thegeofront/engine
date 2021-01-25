@@ -2,7 +2,7 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of a mesh.
 
-import { FaceArray, Vector3Array } from "../math/array";
+import { FaceArray, Vector3Array } from "../data/vector-array";
 import { Matrix4 } from "../math/matrix";
 import { Renderer } from "./renderer";
 

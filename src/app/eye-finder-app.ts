@@ -7,7 +7,7 @@ import { Mesh, meshFromObj } from "../geo/mesh";
 import { GeonImage } from "../img/Image";
 import { BellusScanData } from "../sfered/bellus-data";
 import { addDropFileEventListeners, loadTextFromFile } from "../system/domwrappers";
-import { Vector2Array, Vector3Array } from "../math/array";
+import { Vector2Array, Vector3Array } from "../data/vector-array";
 import { Domain, Domain2, Domain3 } from "../math/domain";
 import { Vector2, Vector3 } from "../math/vector";
 import { Camera } from "../render/camera";

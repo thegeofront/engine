@@ -6,10 +6,11 @@
 // NOTE:    all these small wrappers might not be good pratice, but i 
 //          like to extract simple logic like this to not clutter the code too much
 
-import { Matrix, Matrix4 } from "./matrix";
-import { Vector3, Vector2 } from "./vector";
+import { Matrix4 } from "../math/matrix";
+import { Vector3, Vector2 } from "../math/vector";
+import { FloatMatrix } from "./float-matrix";
 
-export class Vector2Array extends Matrix {
+export class Vector2Array extends FloatMatrix {
    
     constructor(count: number) {
         super(count, 2);
@@ -70,7 +71,7 @@ export class Vector2Array extends Matrix {
     }
 }
 
-export class Vector3Array extends Matrix {
+export class Vector3Array extends FloatMatrix {
     
     constructor(count: number) {
         super(count, 3);
@@ -85,6 +86,16 @@ export class Vector3Array extends Matrix {
             array.data[i*3+2] = vecs[i].z;
         }
         return array;
+    }
+
+    forEach(callbackfn: (value: Vector3, index: number) => void) : Vector3Array {
+        
+        for(let i = 0 ; i < this.count(); i++) {
+            let vec = this.getVector(i);
+            callbackfn(vec, i);
+            this.setVector(i, vec);
+        }
+        return this;
     }
 
     setVector(i: number, vec: Vector3) {
@@ -126,7 +137,7 @@ export class Vector3Array extends Matrix {
     }
 }
 
-export class FaceArray extends Matrix {
+export class FaceArray extends FloatMatrix {
 
     constructor(count: number) {
         super(count, 3);

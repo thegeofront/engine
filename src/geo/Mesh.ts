@@ -5,7 +5,7 @@
 
 import { createUnsignedBytesMatrixTexture } from "@tensorflow/tfjs-backend-webgl/dist/gpgpu_util";
 import { browserLocalStorage } from "@tensorflow/tfjs-core/dist/io/local_storage";
-import { FaceArray, Vector2Array, Vector3Array } from "../math/array";
+import { FaceArray, Vector2Array, Vector3Array } from "../data/vector-array";
 import { Vector2, Vector3 } from "../math/vector";
 
 export class Mesh {

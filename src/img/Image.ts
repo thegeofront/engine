@@ -6,7 +6,7 @@
 // note: named GeonImage to not collide with Image classes.
 
 import { Domain2 } from "../math/domain";
-import { Matrix } from "../math/matrix";
+import { FloatMatrix } from "../data/float-matrix";
 
 
 // TODO : x and y are not the same as i and j, and used inconsistently.
@@ -102,7 +102,7 @@ export class GeonImage {
     }
 
 
-    public applyKernel(kernel: Matrix) : GeonImage {
+    public applyKernel(kernel: FloatMatrix) : GeonImage {
 
         // determine kernel size
         let size = kernel.count();
@@ -197,7 +197,7 @@ export class GeonImage {
     }
 
 
-    private getWithKernel(i: number, j: number, kernel: Matrix, radius: number) : number[] {
+    private getWithKernel(i: number, j: number, kernel: FloatMatrix, radius: number) : number[] {
         
         // kernel space
         let sum = [0, 0, 0, 255];

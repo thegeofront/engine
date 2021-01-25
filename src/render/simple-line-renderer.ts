@@ -2,7 +2,7 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of lines.
 
-import { Vector3Array } from "../math/array";
+import { Vector3Array } from "../data/vector-array";
 import { Matrix4 } from "../math/matrix";
 import { DrawSpeed, Renderer } from "./renderer";
 

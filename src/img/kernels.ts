@@ -1,59 +1,56 @@
-import { Matrix } from "../math/matrix"
-import { GeonImage } from "./Image";
+import { FloatMatrix } from "../data/float-matrix"
 
 // kernels
 
 export class Kernels
 {
-    static readonly SmoothKernel = new Matrix(3,3, [
+    static readonly SmoothKernel = new FloatMatrix(3,3, [
         1,1,1,
         1,1,1,
         1,1,1
-    ]).scaleEntries(1/9);
+    ]).forEachValue((i) => i * 1/9);
      
-    static readonly SmoothKernel5 = new Matrix(5,5, [
+    static readonly SmoothKernel5 = new FloatMatrix(5,5, [
         1,1,1,1,1,
         1,1,1,1,1,
         1,1,1,1,1,
         1,1,1,1,1,
         1,1,1,1,1
-    ]).scaleEntries(1/25);
+    ]).forEachValue((v) => v * 1/25);
 
-    static readonly Gauss5 = new Matrix(5,5, [
+    static readonly Gauss5 = new FloatMatrix(5,5, [
         2, 4, 5, 4, 2,
         4, 9,12, 9, 4,
         5,12,15,12, 5,
         4, 9,12, 9, 4,
         2, 4, 5, 4, 2,
-    ]).scaleEntries(1/159);
+    ]).forEachValue((v) => v * 1/159);
 
-    
-
-    static readonly TestKernel = new Matrix(3,3, [
+    static readonly TestKernel = new FloatMatrix(3,3, [
           1, 0,-1,
           0, 0, 0,
          -1, 0, 1,
     ]);
 
-    static readonly SobelLeft = new Matrix(3,3, [
+    static readonly SobelLeft = new FloatMatrix(3,3, [
          1, 2, 1,
          0, 0, 0,
          -1, -2, -1,
     ]);
     
-    static readonly SobelRight = new Matrix(3,3, [
+    static readonly SobelRight = new FloatMatrix(3,3, [
         -1, -2, -1,
         0, 0, 0,
         1, 2, 1,
    ]);
 
-    static readonly SobelUp = new Matrix(3,3, [
+    static readonly SobelUp = new FloatMatrix(3,3, [
         1, 0, -1,
         2, 0, -2,
         1, 0, -1,
     ]);
 
-    static readonly SobelDown = new Matrix(3,3, [
+    static readonly SobelDown = new FloatMatrix(3,3, [
         -1, 0, 1,
         -2, 0, 2,
         -1, 0, 1,
@@ -66,7 +63,7 @@ export class Kernels
         var e, gaussian, i, j, kernel, s, sum, x, y, _i, _j, _k, _l, _ref, _ref1, _ref2, _ref3;
         s = sigmma;
         e = 2.718;
-        kernel = new Matrix(size, size);
+        kernel = new FloatMatrix(size, size);
         sum = 0;
         for (i = _i = 0, _ref = size - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
             x = -(size - 1) / 2 + i;

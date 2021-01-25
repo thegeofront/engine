@@ -7,7 +7,7 @@
 
 import { RectangleApp } from "../app-demos/rectangle-app";
 import { Mesh, meshFromObj } from "../geo/mesh";
-import { Vector2Array, Vector3Array } from "../math/array";
+import { Vector2Array, Vector3Array } from "../data/vector-array";
 import { Domain, Domain2 } from "../math/domain";
 import { Matrix4 } from "../math/matrix";
 import { Vector2 } from "../math/vector";

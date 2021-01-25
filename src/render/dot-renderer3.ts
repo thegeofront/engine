@@ -1,6 +1,6 @@
 // jos feenstra
 
-import { Vector2Array, Vector3Array } from "../math/array";
+import { Vector2Array, Vector3Array } from "../data/vector-array";
 import { Matrix4 } from "../math/matrix";
 import { Vector2, Vector3 } from "../math/vector";
 import { Renderer } from "./renderer";

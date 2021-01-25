@@ -4,8 +4,9 @@
 // purpose: general representation of a domain / range / bound of numbers
 //          
 
-import { Vector2Array, Vector3Array } from "./array";
-import { Matrix, Matrix4 } from "./matrix";
+import { FloatMatrix } from "../data/float-matrix";
+import { Vector2Array, Vector3Array } from "../data/vector-array";
+import { Matrix4 } from "./matrix";
 import { Vector2, Vector3 } from "./vector";
 
 export class Domain {
@@ -108,7 +109,7 @@ export class Domain2 {
         return new Domain2(new Domain(x0, x1), new Domain(y0, y1));
     }
 
-    static fromInclude(data: Vector2Array | Matrix) : Domain2 {
+    static fromInclude(data: Vector2Array | FloatMatrix) : Domain2 {
         // note : could be quicker by going verbose, this now iterates over data 4 times
         return new Domain2(
             Domain.fromInclude(data.getColumn(0)),
