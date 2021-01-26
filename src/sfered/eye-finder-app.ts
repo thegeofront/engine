@@ -114,22 +114,18 @@ export class EyeFinderApp extends App {
             // this.dotRenderer.renderQuick(gl, matrix, mesh.verts.data, 3);
             // 
             // this.redLineRenderer.render(gl, matrix);
-
             // console.log(this.dots2);
-            
-
 
             // show the mesh
             this.lineRenderer.setAndRender(gl, matrix, mesh.verts, this.meshLineIds!)
             this.lineRenderer.setAndRender(gl, matrix, mesh.uvs, this.meshLineIds!)
-            // this.whiteDotRenderer.render(gl, matrix, mesh.verts);
+            this.redDotRenderer.render(gl, matrix, landmarks);
             this.blueDotRenderer.render(gl, matrix, mesh.uvs);
             this.blueDotRenderer.render(gl, matrix, mesh.uvs);
 
             // debug data from eyefinder process
             this.redDotRenderer.render(gl, matrix, this.dots2);
             this.whiteDotRenderer.render(gl, matrix, this.dots3);
-            
 
             // render images
             let height = 200;
