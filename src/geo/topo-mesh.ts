@@ -154,9 +154,6 @@ export class TopoMesh extends Mesh {
         let bari = this.getBariCoords(tr, p, true);
         let point3d = this.getBariPoint(tr, bari, false) as Vector3;
 
-        console.log(bari);
-        console.log(point3d);
-
         return point3d;
     }
 

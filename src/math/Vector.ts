@@ -103,7 +103,7 @@ export class Vector3
 
     clone() : Vector3
     {
-        return this.constructor(this.x, this.y, this.z);
+        return new Vector3(this.x, this.y, this.z);
     }
 
     copy(v: Vector3) : Vector3
@@ -181,7 +181,7 @@ export class Vector3
         return this;
     }
 
-    min(other: Vector3) : Vector3 
+    minimum(other: Vector3) : Vector3 
     {
 		this.x = Math.min( this.x, other.x );
         this.y = Math.min( this.y, other.y );
@@ -189,7 +189,7 @@ export class Vector3
 		return this;
 	}
 
-	max(other: Vector3) : Vector3 
+	maximum(other: Vector3) : Vector3 
 	{
 		this.x = Math.max( this.x, other.x );
         this.y = Math.max( this.y, other.y );
@@ -346,14 +346,14 @@ export class Vector3
     {
         // project a vector 
 		_vector.copy(this).projectOnVector(normal);
-		return this.sub(_vector);
+		return this.minimum(_vector);
 	}
 
     mirror(normal: Vector3) 
     {
 		// mirror incident vector off plane orthogonal to normal
 		// normal is assumed to have unit length
-		return this.sub(_vector.copy(normal).scale(2 * this.dot(normal)));
+		return this.minimum(_vector.copy(normal).scale(2 * this.dot(normal)));
 	}
 }
 

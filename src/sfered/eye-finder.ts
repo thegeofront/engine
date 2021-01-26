@@ -8,10 +8,11 @@ import { GeonImage } from "../img/Image";
 import { Kernels } from "../img/kernels";
 import { Vector2Array, Vector3Array } from "../data/vector-array";
 import { Domain2 } from "../math/domain";
-import { Vector2 } from "../math/vector";
+import { Vector2, Vector3 } from "../math/vector";
 import { DotRenderer3 } from "../render/dot-renderer3";
 import { BellusScanData } from "./bellus-data";
 import { TopoMesh } from "../geo/topo-mesh";
+import { Plane } from "../geo/plane";
 
 
 
@@ -31,15 +32,16 @@ export class EyeFinder {
         // get the window with which the eyes can be extracted
         let image = GeonImage.fromImageData(bsd.texture);
         let [winLeft, winRight] = this.getEyeWindows(bsd);
-        console.log(winLeft, winRight);
+        // console.log(winLeft, winRight);
 
         let topo = TopoMesh.copyFromMesh(bsd.mesh);
 
         // left side
-        this.findPupilFromEye(image, topo, winLeft);
+        let leftPupilPoint = this.findPupilFromEye(image, topo, winLeft);
 
         // right side
-        this.findPupilFromEye(image, topo, winRight);
+        // let rightPupilPoint = this.findPupilFromEye(image, topo, winRight);
+
 
     }
 
@@ -75,8 +77,15 @@ export class EyeFinder {
             contrast3d.setVector(i,  mesh.elevate(p));
         })
 
+        // step 3: fit a plane through the points, and project to this plane
+        let plane = Plane.fromXYLeastSquares(contrast3d);
+        contrast3d.forEach((p) => plane.project(p));
+        
+        // debug
         this.app?.dots3.push(...contrast3d.toNativeArray());
+        this.app?.lines.push(...plane.getRenderLines().toNativeArray());
 
+        return Vector3.zero();
     }
 
     private contrastDetection(image: GeonImage) : GeonImage {

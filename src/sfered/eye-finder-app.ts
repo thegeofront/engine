@@ -50,15 +50,16 @@ export class EyeFinderApp extends App {
     dots3: Vector3[] = [];
     images: GeonImage[] = [];
     meshLineIds?: Uint16Array;
-
+    lines: Vector3[] = [];
 
     // rendering 
     blueDotRenderer: DotRenderer3;
     redDotRenderer: DotRenderer3;
     whiteDotRenderer: DotRenderer3;
 
+    whiteLineRenderer: SimpleLineRenderer;
     redLineRenderer: SimpleLineRenderer;
-    lineRenderer: SimpleLineRenderer;
+    blueLineRenderer: SimpleLineRenderer;
 
     meshRenderer: SimpleMeshRenderer;
 
@@ -77,8 +78,10 @@ export class EyeFinderApp extends App {
         this.redDotRenderer = new DotRenderer3(gl, 4, [1,0,0,1], false);
         this.whiteDotRenderer = new DotRenderer3(gl, 5, [0.8,0.8,0.8,1], false);
 
-        this.lineRenderer = new SimpleLineRenderer(gl, [0,0,1,0.5]);
+        this.whiteLineRenderer = new SimpleLineRenderer(gl, [0.9,0.9,0.9,0.9]);
+        this.blueLineRenderer = new SimpleLineRenderer(gl, [0,0,1,0.5]);
         this.redLineRenderer = new SimpleLineRenderer(gl, [1,0,0,0.5]);
+        
         this.meshRenderer = new SimpleMeshRenderer(gl, [0,0,1,0.25]);
         this.imageRenderer = new ImageRenderer(gl);
         this.camera = new Camera(canvas, 0.1);
@@ -117,8 +120,8 @@ export class EyeFinderApp extends App {
             // console.log(this.dots2);
 
             // show the mesh
-            this.lineRenderer.setAndRender(gl, matrix, mesh.verts, this.meshLineIds!)
-            this.lineRenderer.setAndRender(gl, matrix, mesh.uvs, this.meshLineIds!)
+            this.blueLineRenderer.setAndRender(gl, matrix, mesh.verts, this.meshLineIds!)
+            this.blueLineRenderer.setAndRender(gl, matrix, mesh.uvs, this.meshLineIds!)
             this.redDotRenderer.render(gl, matrix, landmarks);
             this.blueDotRenderer.render(gl, matrix, mesh.uvs);
             this.blueDotRenderer.render(gl, matrix, mesh.uvs);
@@ -126,6 +129,7 @@ export class EyeFinderApp extends App {
             // debug data from eyefinder process
             this.redDotRenderer.render(gl, matrix, this.dots2);
             this.whiteDotRenderer.render(gl, matrix, this.dots3);
+            this.whiteLineRenderer.setAndRenderLines(gl, matrix, this.lines);
 
             // render images
             let height = 200;

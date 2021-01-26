@@ -90,11 +90,11 @@ export class Vector3Array extends FloatMatrix {
         return array;
     }
 
-    forEach(callbackfn: (value: Vector3, index: number) => void) : Vector3Array {
+    forEach(callbackfn: (value: Vector3, index: number) => Vector3) : Vector3Array {
         
         for(let i = 0 ; i < this.count(); i++) {
             let vec = this.getVector(i);
-            callbackfn(vec, i);
+            vec = callbackfn(vec, i);
             this.setVector(i, vec);
         }
         return this;
@@ -138,6 +138,20 @@ export class Vector3Array extends FloatMatrix {
         let clone = new Vector3Array(this._height);
         clone.data = this.data;
         return clone;  
+    }
+
+    mean() : Vector3 {
+        // the mean vector of a series of vectors
+        let sum = Vector3.zero();
+
+        let count = this.count();
+        for(let i = 0; i < count; i++) {
+            sum.x += this.data[i*3]
+            sum.y += this.data[i*3+1]
+            sum.z += this.data[i*3+2]
+        }
+
+        return sum.scale(1 / count);
     }
 }
 

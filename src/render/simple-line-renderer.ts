@@ -6,6 +6,7 @@ import { Vector2Array, Vector3Array } from "../data/vector-array";
 import { Mesh } from "../geo/mesh";
 import { Polyline } from "../geo/polyline";
 import { Matrix4 } from "../math/matrix";
+import { Vector3 } from "../math/vector";
 import { DrawSpeed, Renderer } from "./renderer";
 
 export class SimpleLineRenderer extends Renderer {
@@ -102,11 +103,27 @@ export class SimpleLineRenderer extends Renderer {
         this.render(gl, matrix);
     }
 
+    setAndRenderLines(gl: WebGLRenderingContext, matrix: Matrix4, lines: Vector3[]) {
+        this.set(gl, Vector3Array.fromNativeArray(lines), getDefaultIndices(lines.length), DrawSpeed.DynamicDraw);
+        this.render(gl, matrix);
+    }
+
     setAndRenderMesh(gl: WebGLRenderingContext, matrix: Matrix4, mesh: Mesh) {
-        throw "todo";
+        this.set(gl, mesh.verts, mesh.getLineIds(), DrawSpeed.DynamicDraw);
+        this.render(gl, matrix);
     }
 
     setAndRenderPolyline(gl: WebGLRenderingContext, matrix: Matrix4, polyline: Polyline) {
         throw "todo";
     }
+
+   
+}
+function getDefaultIndices(length: number) {
+        
+    let data = new Uint16Array(length);
+    for(let i = 0 ; i < length; i++) {
+        data[i] = i;
+    }
+    return data; 
 }

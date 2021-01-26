@@ -965,24 +965,34 @@ export class Matrix4 extends FloatMatrix {
         return new Vector3(data[0], data[1], data[2]);
     }
     
-    MultiplyM(other: Vector3Array) : Vector3Array {
+    multiplyVectors(other: Vector3Array) : Vector3Array {
         
-        let matrix = new Vector3Array(other.count());
-
-        // for every row
-        for (var r = 0; r < other.count(); r++) {
-
-            // for every item in row
-            for (var c = 0; c < 3; ++c) {
-                
-                let item = 0.0;
-                for (var j = 0; j < 4; ++j) {
-                    item += other.get(r, c) * this.get(j, c);
-                }
-                matrix.set(r, c, item);
-            }
+        // dumb way
+        for(let i = 0 ; i < this.count(); i++) {
+            let vec = other.getVector(i);
+            vec = this.multiplyVector(vec);
+            other.setVector(i, vec);
         }
-        return matrix;
+        return other;
+
+        // smart way
+        // let matrix = new Vector3Array(other.count());
+        // // for every row
+        // for (var r = 0; r < other.count(); r++) {
+
+        //     // for every item in row
+        //     for (var c = 0; c < 3; ++c) {
+                
+        //         let item = 0.0;
+        //         for (var j = 0; j < 4; ++j) {
+        //             item += other.get(r, c) * this.get(j, c);
+        //         }
+        //         matrix.set(r, c, item);
+        //     }
+        // }
+
+        // other.data = matrix.data;
+        return other;
     }
 
     // /**

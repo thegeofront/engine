@@ -106,7 +106,6 @@ export class FloatMatrix {
     takeRows(indices: number[]) : FloatMatrix {
 
         // create a new floatarray
-        console.log(this._height, this._width);
         const count = indices.length
         let array = new FloatMatrix(count, this._width);
         for (let i = 0 ; i < count; i++) {
