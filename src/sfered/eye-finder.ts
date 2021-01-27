@@ -13,6 +13,8 @@ import { DotRenderer3 } from "../render/dot-renderer3";
 import { BellusScanData } from "./bellus-data";
 import { TopoMesh } from "../geo/topo-mesh";
 import { Plane } from "../geo/plane";
+import { Matrix4 } from "../math/matrix";
+import { RansacCircle2d } from "./ransac";
 
 
 
@@ -37,7 +39,8 @@ export class EyeFinder {
         let topo = TopoMesh.copyFromMesh(bsd.mesh);
 
         // left side
-        let leftPupilPoint = this.findPupilFromEye(image, topo, winLeft);
+        let ransacSettings = bsd.settings.process_ransac;
+        let leftPupilPoint = this.findPupilFromEye(image, topo, winLeft, ransacSettings);
 
         // right side
         // let rightPupilPoint = this.findPupilFromEye(image, topo, winRight);
@@ -45,7 +48,7 @@ export class EyeFinder {
 
     }
 
-    private findPupilFromEye(image: GeonImage, mesh: TopoMesh,  window: Domain2) {
+    private findPupilFromEye(image: GeonImage, mesh: TopoMesh,  window: Domain2, ransacSettings: any) {
 
         // step 1: get points (vectors) which symbolize pixels in contrasting areas of the image (the iris).
         let eyeImg = image.trimWithDomain(window);
@@ -72,32 +75,33 @@ export class EyeFinder {
         this.app?.dots2.push(...contrastPoints.toNativeArray());
 
         // step 2: elevate from uv space to vertex space of the mesh 
-        let contrast3d = new Vector3Array(contrastPoints.count()); 
+        let cps = new Vector3Array(contrastPoints.count()); 
         contrastPoints.forEach((p, i) => {
-            contrast3d.setVector(i,  mesh.elevate(p));
+            cps.setVector(i,  mesh.elevate(p));
         })
 
         // step 3: fit a plane through the points, and project to this plane
-        let plane = Plane.fromXYLeastSquares(contrast3d);
-        let mat = plane.matrix.inverse();
-
-
-        let plane2 = Plane.WorldXZ();
-        let mat2 = plane2.getPlaneMatrix();
-
-        console.log(mat);
-        contrast3d.forEach((p) => {
-            p = mat.multiplyVector(p);
-            p = mat2.multiplyVector(p);
-            return p;
-        });
+        let plane = Plane.fromXYLeastSquares(cps);
+        cps.forEach((p) => plane.pullToPlane(p));
+        let cpsFixed = cps.to2D();
         
+  
+        
+        // step 4: ransac! 
+        let rss = ransacSettings;
+        let [bestCircle, values] = RansacCircle2d(cpsFixed, rss.iterations, rss.radius, rss.tolerance, rss.seed, rss.min_score, rss.max_radius_deviation)!;
+
+        let eyePoint = plane.pushToWorld(bestCircle.center.to3D());
+      
         // debug
-        this.app?.dots3.push(...contrast3d.toNativeArray());
+        cps.forEach((p) => {
+            p.z = 0;
+            return plane.pushToWorld(p);
+        })
+        this.app?.whiteDots.push(...cps.toNativeArray());
         this.app?.lines.push(...plane.getRenderLines().toNativeArray());
-        this.app?.lines.push(...plane2.getRenderLines().toNativeArray());
+        this.app?.redDots.push(eyePoint);
         
-
         return Vector3.zero();
     }
 

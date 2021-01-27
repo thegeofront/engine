@@ -1,7 +1,10 @@
-// author: Jos Feenstra
+// author: 	Jos Feenstra
 // inspiration from Three.js
-// note: recycle the class as much as possble, building a new class is expensive,
-// especially in javascript
+// note: 	recycle the class as much as possble, building a new class is expensive,
+// 			especially in javascript
+// todo: 	BIJ NADER INZIEN: dont go the copy route. rewrite this in a more functional way creating new classes is expensive, but we really need immutable vectors. 
+// 			these types of consistent vectors are only useful in niche cases, and complitate a lot of common cases. 
+
 
 export class Vector3
 {
@@ -363,7 +366,8 @@ const _vector = new Vector3(0,0,0);
 export class Vector2
 {
     x: number;
-    y: number;
+	y: number;
+	
     constructor(x : number, y : number)
     {
         this.x = x;
@@ -456,6 +460,10 @@ export class Vector2
 	}
 
 	// --- basics
+
+	to3D() : Vector3 {
+		return new Vector3(this.x, this.y, 0);
+	}
 
 	set(x:number, y:number) : Vector2
 	{

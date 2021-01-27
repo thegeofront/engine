@@ -47,7 +47,8 @@ export class EyeFinderApp extends App {
 
     // debug data 
     dots2: Vector2[] = [];
-    dots3: Vector3[] = [];
+    whiteDots: Vector3[] = [];
+    redDots: Vector3[] = [];
     images: GeonImage[] = [];
     meshLineIds?: Uint16Array;
     lines: Vector3[] = [];
@@ -128,7 +129,8 @@ export class EyeFinderApp extends App {
 
             // debug data from eyefinder process
             this.redDotRenderer.render(gl, matrix, this.dots2);
-            this.whiteDotRenderer.render(gl, matrix, this.dots3);
+            this.whiteDotRenderer.render(gl, matrix, this.whiteDots);
+            this.redDotRenderer.render(gl, matrix, this.redDots);
             this.whiteLineRenderer.setAndRenderLines(gl, matrix, this.lines);
 
             // render images

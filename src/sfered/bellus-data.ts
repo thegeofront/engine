@@ -96,7 +96,7 @@ export class BellusScanData {
         
         let tf1 = Matrix4.newScaler(1/scaleX, -1/scaleY, 0)
         let tf2 = Matrix4.newTranslation(0,1,0)
-        let tf = tf2.multiply(tf1);
+        let tf = tf1.multiply(tf2);
         return vectors.clone().transform(tf);
     }
 

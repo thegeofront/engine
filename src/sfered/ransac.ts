@@ -40,6 +40,8 @@ export function RansacCircle2d(
     // TODO SEED
     //np.random.seed(seed)
 
+    console.log(points);
+
     // TODO do-over of high score system
     let high_score = 0
     let high_score_center: Vector2 = new Vector2(0,0);
@@ -53,9 +55,9 @@ export function RansacCircle2d(
         let this_radius = radius + (Math.random() - 0.5) * max_radius_deviation
 
         // choose two, and create a circle with it
-        let id1 = randInt(0, points.count());
-        let id2 = randInt(0, points.count());
-        let centers = Circle2.centersFromPPR(id1, id2, this_radius)
+        let id1 = randInt(0, num_points);
+        let id2 = randInt(0, num_points);
+        let centers = Circle2.centersFromPPR(points.getVector(id1), points.getVector(id2), this_radius)
 
         // print("found some centers: ", centers)
         for(let center of centers) {
@@ -103,5 +105,5 @@ function idsWithinCircle(pts: Vector2Array, center: Vector2, radius: number, tol
  * @param  {number} upper=1, excluding
  */
 function randInt(lower: number, upper: number) {
-    return Math.floor(lower + Math.random() * (lower-upper));
+    return Math.floor(lower + (Math.random() * (upper-lower)));
 }

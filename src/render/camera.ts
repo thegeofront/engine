@@ -94,16 +94,19 @@ export class Camera {
         // rotated by user
         let x_rotation = Matrix4.newXRotation(angleA);
         let y_rotation = Matrix4.newYRotation(angleB);
-        let rotation = x_rotation.multiply(y_rotation);
+        let rotation = y_rotation.multiply(x_rotation);
         
-        let transform = mOffset.multiply(rotation).multiply(position);
+        // let transform = mOffset.multiply(rotation).multiply(position);
     
+        let transform = position.multiply(rotation).multiply(mOffset);
+        
+
         // projection to screen
         // let projection = Matrix4.newOrthographic(-1, 1, -1, 1, 0.1, 0.1);
         let projection = Matrix4.newPerspective(fov, aspect, Z_NEAR, Z_FAR);
     
         // return
-        return projection.multiply(transform);
+        return transform.multiply(projection);
     }
 
 }

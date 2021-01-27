@@ -188,9 +188,9 @@ export class Matrix4 extends FloatMatrix {
 
     multiply(other: Matrix4) {
   
-        // TODO : swap a and b. manually change EVERY multiply call...
-        const a = this.data;
-        const b = other.data; 
+        // NOTE: i swapped a and b, this makes more sense to me, but i could be wrong about it...
+        const a = other.data;
+        const b = this.data; 
 
         var b00 = b[0 * 4 + 0];
         var b01 = b[0 * 4 + 1];

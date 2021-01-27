@@ -134,9 +134,21 @@ export class Vector3Array extends FloatMatrix {
         return this;
     }
 
+    to2D() : Vector2Array {
+        let clone = new Vector2Array(this._height);
+        for (let i = 0; i < this._height; i++) {
+            for (let j = 0; j < 2; j++) {
+                clone.set(i, j, this.get(i, j));
+            }
+        }
+        return clone;  
+    }
+
     clone() : Vector3Array {
         let clone = new Vector3Array(this._height);
-        clone.data = this.data;
+        for (let i = 0; i < this.data.length; i++) {
+            clone.data[i] = this.data[i];
+        }
         return clone;  
     }
 
