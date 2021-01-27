@@ -79,11 +79,24 @@ export class EyeFinder {
 
         // step 3: fit a plane through the points, and project to this plane
         let plane = Plane.fromXYLeastSquares(contrast3d);
-        contrast3d.forEach((p) => plane.project(p));
+        let mat = plane.matrix.inverse();
+
+
+        let plane2 = Plane.WorldXZ();
+        let mat2 = plane2.getPlaneMatrix();
+
+        console.log(mat);
+        contrast3d.forEach((p) => {
+            p = mat.multiplyVector(p);
+            p = mat2.multiplyVector(p);
+            return p;
+        });
         
         // debug
         this.app?.dots3.push(...contrast3d.toNativeArray());
         this.app?.lines.push(...plane.getRenderLines().toNativeArray());
+        this.app?.lines.push(...plane2.getRenderLines().toNativeArray());
+        
 
         return Vector3.zero();
     }

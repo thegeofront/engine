@@ -172,7 +172,8 @@ export class Matrix4 extends FloatMatrix {
         ]);
     }
 
-    static newCopy(other: Matrix4) : Matrix4 { 
+    static newCopy(other: Matrix4) : Matrix4 {
+        
         let result = new Matrix4();
         for (let i = 0 ; i < 16; i++)
         {
@@ -181,8 +182,13 @@ export class Matrix4 extends FloatMatrix {
         return result;
     }
 
+    clone() : Matrix4 {
+        return Matrix4.newCopy(this);
+    }
+
     multiply(other: Matrix4) {
   
+        // TODO : swap a and b. manually change EVERY multiply call...
         const a = this.data;
         const b = other.data; 
 

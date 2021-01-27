@@ -16,9 +16,11 @@ export class FloatMatrix {
             this.setData(data);    
     }
 
-    clone() {
+    clone() : FloatMatrix {
         let clone = new FloatMatrix(this._height, this._width);
-        clone.data = this.data;
+        for (let i = 0 ; i < this.data.length; i++) {
+            clone.data[i] = this.data[i]
+        }
         return clone;  
     }
 

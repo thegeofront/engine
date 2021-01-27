@@ -1,6 +1,7 @@
 // name:    plane.ts
 // author:  Jos Feenstra
 // purpose: definition of a 3d plane. 
+// todo:    turn Center, Ihat, Jhat, Khat construction to an actual matrix
 
 import { Vector3Array } from "../data/vector-array";
 import { Const } from "../math/const";
@@ -9,13 +10,12 @@ import { Vector2, Vector3 } from "../math/vector";
 
 export class Plane {
     
-    center!: Vector3;
-    ihat!: Vector3;
-    jhat!: Vector3;
-    khat!: Vector3;
-    d!: number;
+    _matrix!: Matrix4;
+
+    _d!: number; // TODO dynamically calculate d, right now i dont know how
 
     constructor(a: Vector3, b: Vector3, c: Vector3) {
+        this._matrix = new Matrix4();
         this.setDataFromPoints(a, b, c);
     }
 
@@ -30,7 +30,7 @@ export class Plane {
         this.ihat = v1.normalize()
         this.jhat = v1.clone().cross(khat);
         this.khat = khat;
-        this.d = khat.clone().dot(c) * -1;
+        this._d = khat.clone().dot(c) * -1;
     }
 
     static WorldXY(): Plane {
@@ -56,27 +56,42 @@ export class Plane {
         return Plane.WorldXY().transform(Matrix4.newTranslation(mean.x, mean.y, mean.z));       
     }
 
-    transform(m: Matrix4) : Plane {
-        // this is not how it should work, but it does the job
-        // NOTE: i really should overhaul how transforms work...
-        let abc = Vector3Array.fromNativeArray([
-            this.center,
-            this.center.clone().add(this.ihat),
-            this.center.clone().add(this.jhat),
+    public get ihat() {return Vector3.fromArray(this._matrix.getRow(0))}
+    public get jhat() {return Vector3.fromArray(this._matrix.getRow(1))}
+    public get khat() {return Vector3.fromArray(this._matrix.getRow(2))}
+    public get center() {return Vector3.fromArray(this._matrix.getRow(3))}
+    public get matrix() {return this._matrix.clone()}
+
+    public set ihat(v: Vector3)   { this._matrix.setRow(0, [v.x, v.y, v.z, 0]);}
+    public set jhat(v: Vector3)   { this._matrix.setRow(1, [v.x, v.y, v.z, 0]);}
+    public set khat(v: Vector3)   { this._matrix.setRow(2, [v.x, v.y, v.z, 0]);}
+    public set center(v: Vector3) { this._matrix.setRow(3, [v.x, v.y, v.z, 1]);}
+    public set matrix(m: Matrix4) { this._matrix = m;}
+
+    getPlaneMatrix() {
+
+        return this._matrix;
+    }
+
+    static getPlaneMatrix(c: Vector3, i: Vector3, j: Vector3, k: Vector3) {
+
+        return new Matrix4([
+            i.x, i.y, i.z, 0,
+            j.x, j.y, j.z, 0,
+            k.x, k.y, k.z, 0,
+            c.x, c.y, c.z, 1,
         ]);
+    }
 
-        console.log(abc.toNativeArray());
-        m.multiplyVectors(abc);
-        console.log(abc.toNativeArray());
-
-        this.setDataFromPoints(abc.getVector(0), abc.getVector(1), abc.getVector(2));
+    transform(m: Matrix4) : Plane {
+        this._matrix = m.multiply(this._matrix);
         return this;
     }
 
     getPlaneParams() : [number, number, number, number] {
         // get a, b, c, and d parameters
         let k = this.khat;
-        return [k.x, k.y, k.z, this.d];
+        return [k.x, k.y, k.z, this._d];
     }
 
     getRenderLines() : Vector3Array {

@@ -1,4 +1,4 @@
-// generic all-pupose matrix of floats
+// generic all-pupose matrix of ints
 export class IntMatrix {
 
     data: Int32Array;
@@ -128,5 +128,14 @@ export class IntMatrix {
             this.setRow(i, row);
         }
         return this;
+    }
+
+    trueForAll(callbackfn: (value: number, index: number) => boolean) : boolean {
+        for(let i = 0 ; i < this.data.length; i++) {
+            if (!callbackfn(this.data[i], i)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

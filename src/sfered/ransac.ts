@@ -34,6 +34,7 @@ export function RansacCircle2d(
     //  TODO ideeen:
     //  - varreer kleine beetjes in de radius?
     //  - high score : top 5 gemiddelde <- might not be useful: results already amazing
+    //  - embrace ovaal vorm 
 
     // seed
     // TODO SEED

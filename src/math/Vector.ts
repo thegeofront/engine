@@ -25,7 +25,7 @@ export class Vector3
 		);
 	}
 
-    static fromArray(a: Array<number>) : Vector3 {
+    static fromArray(a: Float32Array | number[] | Array<number>) : Vector3 {
         return new Vector3(a[0], a[1], a[2]);
     }
 
