@@ -42,23 +42,6 @@ export class Mesh {
     exportToObj(path: string) {
         
     }
-
-    getLineIds() : Uint16Array {
-        // 3 edges per face, 2 indices per edge
-        let count = this.faces.count() * 6;
-        let data = new Uint16Array(count);
-        for (let i = 0 ; i < this.faces.count(); i++) {
-            
-            let iData = i * 6;
-            data[iData]   = this.faces.get(i, 0);
-            data[iData+1] = this.faces.get(i, 1);
-            data[iData+2] = this.faces.get(i, 1);
-            data[iData+3] = this.faces.get(i, 2);
-            data[iData+4] = this.faces.get(i, 2);
-            data[iData+5] = this.faces.get(i, 0);
-        }
-        return data;
-    }
 };
 
 // ================ Obj ===================

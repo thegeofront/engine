@@ -2,7 +2,9 @@
 // purpose: represents a 3d circle
 
 import { Const } from "../math/const";
+import { Matrix4 } from "../math/matrix";
 import { Vector3 } from "../math/vector";
+import { Circle2 } from "./circle2";
 import { Plane } from "./plane";
 
 
@@ -15,6 +17,15 @@ export class Circle3 {
     constructor(plane: Plane, radius: number) {
         this.plane = plane;
         this.radius = radius;
+    }
+
+    static fromCircle2(circle2: Circle2, plane = Plane.WorldXY()) {
+
+        // elevate center of circle, make it the center of a plane
+        let center3d = plane.pushToWorld(circle2.center.to3D());
+        plane = plane.clone();
+        plane.center = center3d;
+        return new Circle3(plane, circle2.radius);
     }
 
     includes(p: Vector3) : boolean {

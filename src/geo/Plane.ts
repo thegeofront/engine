@@ -13,12 +13,11 @@ export class Plane {
     _matrix!: Matrix4;
     // _inverse!: Matrix4; // NOTE: currently im not caching this. Might be needed.
 
-    _d!: number; // TODO dynamically calculate d, right now i dont know how
+    //_d!: number; // TODO dynamically calculate d, right now i dont know how
 
     // NOTE : d is not really needed anymore...
-    constructor(m: Matrix4, d: number) {
+    constructor(m: Matrix4) {
         this._matrix = m;
-        this._d = d;
     }
 
     static from3pt(a: Vector3, b: Vector3, c: Vector3) {
@@ -33,8 +32,7 @@ export class Plane {
         let jhat = v1.clone().cross(khat);
         
         let mat = Plane.planeMatrixFromVecs(center, ihat, jhat, khat);
-        let d = khat.clone().dot(c) * -1;
-        return new Plane(mat, d)
+        return new Plane(mat)
     }
 
     static WorldXY(): Plane {
@@ -60,6 +58,16 @@ export class Plane {
         return Plane.WorldXY().transform(Matrix4.newTranslation(mean.x, mean.y, mean.z));       
     }
 
+    static planeMatrixFromVecs(c: Vector3, i: Vector3, j: Vector3, k: Vector3) {
+
+        return new Matrix4([
+            i.x, i.y, i.z, 0,
+            j.x, j.y, j.z, 0,
+            k.x, k.y, k.z, 0,
+            c.x, c.y, c.z, 1,
+        ]);
+    }
+
     public get ihat() {return Vector3.fromArray(this._matrix.getRow(0))}
     public get jhat() {return Vector3.fromArray(this._matrix.getRow(1))}
     public get khat() {return Vector3.fromArray(this._matrix.getRow(2))}
@@ -72,18 +80,10 @@ export class Plane {
     public set center(v: Vector3) { this._matrix.setRow(3, [v.x, v.y, v.z, 1]);}
     public set matrix(m: Matrix4) { this._matrix = m;}
 
-
-
     public get inverse() {return this._matrix.inverse()}
 
-    static planeMatrixFromVecs(c: Vector3, i: Vector3, j: Vector3, k: Vector3) {
-
-        return new Matrix4([
-            i.x, i.y, i.z, 0,
-            j.x, j.y, j.z, 0,
-            k.x, k.y, k.z, 0,
-            c.x, c.y, c.z, 1,
-        ]);
+    clone() {
+        return new Plane(this._matrix.clone());
     }
 
     transform(m: Matrix4) : Plane {
@@ -91,11 +91,13 @@ export class Plane {
         return this;
     }
 
-    getPlaneParams() : [number, number, number, number] {
-        // get a, b, c, and d parameters
-        let k = this.khat;
-        return [k.x, k.y, k.z, this._d];
-    }
+    // getPlaneParams() : [number, number, number, number] {
+    //     // get a, b, c, and d parameters
+    //     let k = this.khat;
+    //     // TODO : figure out how to calculate d...
+    //     // let d = khat.clone().dot(c) * -1;
+    //     return [k.x, k.y, k.z, this._d];
+    // }
 
     getRenderLines() : Vector3Array {
         let count = Const.PLANE_RENDER_LINECOUNT;

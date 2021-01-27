@@ -2,11 +2,13 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of lines.
 
+import { FloatMatrix } from "../data/float-matrix";
 import { Vector2Array, Vector3Array } from "../data/vector-array";
 import { Mesh } from "../geo/mesh";
 import { Polyline } from "../geo/polyline";
 import { Matrix4 } from "../math/matrix";
 import { Vector3 } from "../math/vector";
+import { LineRenderable } from "./line-render-data";
 import { DrawSpeed, Renderer } from "./renderer";
 
 export class SimpleLineRenderer extends Renderer {
@@ -64,22 +66,22 @@ export class SimpleLineRenderer extends Renderer {
         this.count = 0;
     }
 
-    set(gl: WebGLRenderingContext, vertices: Vector2Array | Vector3Array, indices: Uint16Array, speed = DrawSpeed.StaticDraw) {
+    set(gl: WebGLRenderingContext, data: LineRenderable, speed = DrawSpeed.StaticDraw) {
         
         // save how many faces need to be drawn
         gl.useProgram(this.program);
-        this.count = indices.length
+        this.count = data.ids.length
         let drawspeed = this.convertDrawSpeed(speed);
 
         // vertices  
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
         gl.enableVertexAttribArray(this.a_position);
-        gl.vertexAttribPointer(this.a_position, vertices._width, gl.FLOAT, false, 0, 0);
-        gl.bufferData(gl.ARRAY_BUFFER, vertices.data, drawspeed);
+        gl.vertexAttribPointer(this.a_position, data.verts._width, gl.FLOAT, false, 0, 0);
+        gl.bufferData(gl.ARRAY_BUFFER, data.verts.data, drawspeed);
 
         // indices 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, drawspeed);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, data.ids, drawspeed);
     }
 
     render(gl: WebGLRenderingContext, matrix: Matrix4) {
@@ -98,32 +100,8 @@ export class SimpleLineRenderer extends Renderer {
         gl.drawElements(gl.LINES, this.count, gl.UNSIGNED_SHORT, 0);
     }
 
-    setAndRender(gl: WebGLRenderingContext, matrix: Matrix4, vertices: Vector2Array | Vector3Array, indices: Uint16Array) {
-        this.set(gl, vertices, indices, DrawSpeed.DynamicDraw);
+    setAndRender(gl: WebGLRenderingContext, matrix: Matrix4, data: LineRenderable) {
+        this.set(gl, data, DrawSpeed.DynamicDraw);
         this.render(gl, matrix);
     }
-
-    setAndRenderLines(gl: WebGLRenderingContext, matrix: Matrix4, lines: Vector3[]) {
-        this.set(gl, Vector3Array.fromNativeArray(lines), getDefaultIndices(lines.length), DrawSpeed.DynamicDraw);
-        this.render(gl, matrix);
-    }
-
-    setAndRenderMesh(gl: WebGLRenderingContext, matrix: Matrix4, mesh: Mesh) {
-        this.set(gl, mesh.verts, mesh.getLineIds(), DrawSpeed.DynamicDraw);
-        this.render(gl, matrix);
-    }
-
-    setAndRenderPolyline(gl: WebGLRenderingContext, matrix: Matrix4, polyline: Polyline) {
-        throw "todo";
-    }
-
-   
-}
-function getDefaultIndices(length: number) {
-        
-    let data = new Uint16Array(length);
-    for(let i = 0 ; i < length; i++) {
-        data[i] = i;
-    }
-    return data; 
 }

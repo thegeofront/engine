@@ -15,6 +15,8 @@ import { TopoMesh } from "../geo/topo-mesh";
 import { Plane } from "../geo/plane";
 import { Matrix4 } from "../math/matrix";
 import { RansacCircle2d } from "./ransac";
+import { LineRenderable } from "../render/line-render-data";
+import { Circle3 } from "../geo/circle3";
 
 
 
@@ -85,12 +87,9 @@ export class EyeFinder {
         cps.forEach((p) => plane.pullToPlane(p));
         let cpsFixed = cps.to2D();
         
-  
-        
         // step 4: ransac! 
         let rss = ransacSettings;
         let [bestCircle, values] = RansacCircle2d(cpsFixed, rss.iterations, rss.radius, rss.tolerance, rss.seed, rss.min_score, rss.max_radius_deviation)!;
-
         let eyePoint = plane.pushToWorld(bestCircle.center.to3D());
       
         // debug
@@ -101,7 +100,8 @@ export class EyeFinder {
         this.app?.whiteDots.push(...cps.toNativeArray());
         this.app?.lines.push(...plane.getRenderLines().toNativeArray());
         this.app?.redDots.push(eyePoint);
-        
+        this.app?.lineRenderables.push(LineRenderable.fromCircle(Circle3.fromCircle2(bestCircle, plane)));
+
         return Vector3.zero();
     }
 
