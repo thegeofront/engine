@@ -16,7 +16,7 @@ export class Vector2Array extends FloatMatrix {
         super(count, 2);
     }
     
-    static fromNativeArray(vecs: Vector2[]) : Vector2Array {
+    static fromList(vecs: Vector2[]) : Vector2Array {
         let length = vecs.length;
         let array = new Vector2Array(length);
         for(let i = 0; i < vecs.length; i++) {
@@ -48,7 +48,7 @@ export class Vector2Array extends FloatMatrix {
         )
     }
 
-    toNativeArray() : Vector2[] {
+    toList() : Vector2[] {
 
         let vecs: Vector2[] = [];
         for (let i = 0 ; i < this._height; i++) {
@@ -79,7 +79,7 @@ export class Vector3Array extends FloatMatrix {
         super(count, 3);
     }
 
-    static fromNativeArray(vecs: Vector3[]) : Vector3Array {
+    static fromList(vecs: Vector3[]) : Vector3Array {
         let length = vecs.length;
         let array = new Vector3Array(length);
         for(let i = 0; i < vecs.length; i++) {
@@ -114,7 +114,7 @@ export class Vector3Array extends FloatMatrix {
         )
     }
 
-    toNativeArray() : Vector3[] {
+    toList() : Vector3[] {
 
         let vecs: Vector3[] = [];
         for (let i = 0 ; i < this._height; i++) {
@@ -174,8 +174,8 @@ export function getGeneralFloatMatrix(vectors: Vector2Array | Vector3Array | Vec
     } else if (vectors instanceof Vector3Array) {
         return vectors;
     } else if (vectors[0] instanceof Vector2) {
-        return Vector2Array.fromNativeArray(vectors as Vector2[]);
+        return Vector2Array.fromList(vectors as Vector2[]);
     } else {
-        return Vector3Array.fromNativeArray(vectors as Vector3[]);
+        return Vector3Array.fromList(vectors as Vector3[]);
     }
 }

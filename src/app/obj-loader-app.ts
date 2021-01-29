@@ -15,7 +15,7 @@ import { InputState } from "../system/input-state";
 import { App } from "./app";
 import { DrawSpeed } from "../render/renderer";
 import { Vector3Array } from "../data/vector-array";
-import { LineRenderable } from "../render/line-render-data";
+import { LineArray } from "../render/line-render-data";
 
 
 export class ObjLoaderApp extends App {
@@ -27,7 +27,7 @@ export class ObjLoaderApp extends App {
     meshRenderer: SimpleMeshRenderer;
     camera: Camera;
     obj?: Mesh;
-    renderable?: LineRenderable;
+    renderable?: LineArray;
 
     constructor(gl: WebGLRenderingContext, canvas: HTMLCanvasElement) {
         
@@ -59,7 +59,7 @@ export class ObjLoaderApp extends App {
 
      
         if (this.obj == undefined)
-            this.dotRenderer.render(gl, matrix, Vector3Array.fromNativeArray([new Vector3(0,0,0), new Vector3(1,1,1)]));
+            this.dotRenderer.render(gl, matrix, Vector3Array.fromList([new Vector3(0,0,0), new Vector3(1,1,1)]));
         else {
             this.dotRenderer.render(gl, matrix, this.obj!.verts);
             // this.meshRenderer.render(gl, matrix);
@@ -76,7 +76,7 @@ async function processFiles(this: ObjLoaderApp, files: FileList) {
     // see if we can build an correct obj from the files
     let objtext = await loadTextFromFile(file);
     this.obj = meshFromObj(objtext);
-    this.renderable = LineRenderable.fromMesh(this.obj);
+    this.renderable = LineArray.fromMesh(this.obj);
 
     // scale down if too big.
     // NOTE: this could also be done using matrices. Figure that out!

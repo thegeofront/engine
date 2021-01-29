@@ -99,59 +99,6 @@ export class Plane {
     //     return [k.x, k.y, k.z, this._d];
     // }
 
-    getRenderLines() : Vector3Array {
-        let count = Const.PLANE_RENDER_LINECOUNT;
-        let dis = Const.PLANE_RENDER_LINEDISTANCE;
-        let disSmall = dis / 10;
-        let halfTotalSize = ((count-1) * dis) / 2;
-
-        // 2 vectors per line, 2 lines per count
-        // plus 5 lines, for ihat and jhat icons 
-        let lines = new Vector3Array(count * 4 + 5 * 2);
-
-        // x lines
-        for(let i = 0 ; i < count; i++) {
-            let t = -halfTotalSize + dis * i;
-            lines.setVector(i*2,     new Vector3(t, -halfTotalSize, 0));
-            lines.setVector(i*2 + 1, new Vector3(t,  halfTotalSize, 0));
-        }
-
-        // y lines 
-        for(let i = 0 ; i < count; i++) {
-            let t = -halfTotalSize + dis * i;
-            lines.setVector(2*count + i*2,     new Vector3(-halfTotalSize, -halfTotalSize + dis * i, 0));
-            lines.setVector(2*count + i*2 + 1, new Vector3( halfTotalSize, -halfTotalSize + dis * i ,0));
-        }
-
-        // icon I  to show ihat
-        let iconLine1 = lines.count() - 10;
-        lines.setVector(iconLine1, new Vector3(halfTotalSize+disSmall,-disSmall, 0));
-        lines.setVector(iconLine1+1, new Vector3(halfTotalSize+disSmall*4, disSmall, 0));
-
-        let iconLine2 = lines.count() - 8;
-        lines.setVector(iconLine2, new Vector3(halfTotalSize+disSmall, disSmall, 0));
-        lines.setVector(iconLine2+1, new Vector3(halfTotalSize+disSmall*4, -disSmall, 0));
-
-        // icon II to show jhat
-        let iconLine3 = lines.count() - 6;
-        lines.setVector(iconLine3, new Vector3(0, halfTotalSize+disSmall*2.5, 0));
-        lines.setVector(iconLine3+1, new Vector3(disSmall, halfTotalSize+disSmall*4, 0));
-
-        let iconLine4 = lines.count() - 4;
-        lines.setVector(iconLine4, new Vector3(disSmall, halfTotalSize+disSmall, 0));
-        lines.setVector(iconLine4+1, new Vector3(-disSmall, halfTotalSize+disSmall*4, 0));
-
-        // icon III to show khat / normal direction
-        let iconLine5 = lines.count() - 2;
-        lines.setVector(iconLine5, new Vector3(0, 0, 0));
-        lines.setVector(iconLine5+1, new Vector3(0, 0, dis));
-
-        // finally, transform everything to worldspace
-        lines.forEach((v) => this.pushToWorld(v));
-
-        return lines
-    }
-
     // NOTE: pulling is inefficient since i do not cache the inverse.
     pullToPlane(p: Vector3) : Vector3 {
         return this.inverse.multiplyVector(p);

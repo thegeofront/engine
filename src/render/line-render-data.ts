@@ -7,13 +7,14 @@ import { FloatMatrix } from "../data/float-matrix";
 import { getGeneralFloatMatrix, Vector2Array, Vector3Array } from "../data/vector-array"
 import { Circle2 } from "../geo/circle2";
 import { Circle3 } from "../geo/circle3";
+import { Cube } from "../geo/cube";
 import { Mesh } from "../geo/mesh";
 import { Plane } from "../geo/plane";
 import { Const } from "../math/const";
 import { Matrix4 } from "../math/matrix";
 import { Vector2, Vector3 } from "../math/vector";
 
-export class LineRenderable {
+export class LineArray {
     
     verts: FloatMatrix;
     ids: Uint16Array;
@@ -30,11 +31,11 @@ export class LineRenderable {
     static fromLines(verts: Vector2[] | Vector3[] | Vector2Array | Vector3Array) {
         
         let data = getGeneralFloatMatrix(verts);
-        return new LineRenderable(data);
+        return new LineArray(data);
     }
 
     // get all lines from a mesh
-    static fromMesh(mesh: Mesh, uv=false) : LineRenderable {
+    static fromMesh(mesh: Mesh, uv=false) : LineArray {
         
         // 3 edges per face, 2 indices per edge
         let count = mesh.faces.count() * 6;
@@ -50,14 +51,14 @@ export class LineRenderable {
             data[iData+5] = mesh.faces.get(i, 0);
         }
         if (uv) {
-            return new LineRenderable(mesh.uvs, data);
+            return new LineArray(mesh.uvs, data);
         } else {
-            return new LineRenderable(mesh.verts, data);
+            return new LineArray(mesh.verts, data);
         }
     }
     
     // get all lines from a plane
-    static fromPlane(plane: Plane) : LineRenderable {
+    static fromPlane(plane: Plane) : LineArray {
 
         let count = Const.PLANE_RENDER_LINECOUNT;
         let dis = Const.PLANE_RENDER_LINEDISTANCE;
@@ -107,14 +108,14 @@ export class LineRenderable {
 
         // finally, transform everything to worldspace, and create the linerenderdata object
         lines.forEach((v) => plane.pushToWorld(v));
-        return new LineRenderable(lines);
+        return new LineArray(lines);
     }
 
     // get all lines representing a circle in 2d. use an optional matrix to 
-    static fromCircle(c: Circle3) : LineRenderable {
-        //let count = Const.CIRCLE_SEGMENTS;
-
-        let count = 12;
+    static fromCircle(c: Circle3) : LineArray {
+        
+        let count = Const.CIRCLE_SEGMENTS;
+        // let count = 12;
         let verts = new Vector3Array(count);
 
         // x lines
@@ -126,7 +127,7 @@ export class LineRenderable {
                 c.plane.pushToWorld(new Vector3(Math.cos(t) *c.radius, Math.sin(t) * c.radius, 0))
             );
         }
-        return new LineRenderable(verts, getPairIndices(count));
+        return new LineArray(verts, getPairIndices(count));
     }
 
     // turn a spline into a polyline, and render it
@@ -134,7 +135,12 @@ export class LineRenderable {
         throw "todo!";
     }
 
+    static fromCube(cube: Cube) : LineArray {
 
+        let verts = Vector3Array.fromList(cube.getCorners());
+
+        return new LineArray(verts, );
+    }
 }
 
 // just get an int sequence from 0 to length. 
@@ -154,7 +160,7 @@ function getPairIndices(count: number) : Uint16Array {
     let data = new Uint16Array(length);
     for(let i = 0 ; i < count; i++) {
         data[i*2] = i;
-        data[i*2 + 1] = i + 1 % count;
+        data[i*2 + 1] = (i + 1) % count;
     }
     return data; 
 }

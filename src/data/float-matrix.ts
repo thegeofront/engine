@@ -1,3 +1,5 @@
+import { outerProduct } from "@tensorflow/tfjs";
+
 // generic all-pupose matrix of floats
 export class FloatMatrix {
 
@@ -115,6 +117,49 @@ export class FloatMatrix {
             array.setRow(i, this.getRow(getIndex));
         }
         return array;
+    }
+
+    // generalized multiplication
+    multiply(b: FloatMatrix) : FloatMatrix {
+
+        let a = this;
+        if (b._width !== a._height) {
+            throw new Error('Columns in A should be the same as the number of rows in B');
+        }
+        var product = new FloatMatrix(a._height, b._width);
+
+        for (var i = 0; i < product._height; i++) {
+            for (var j = 0; j < b._width; j++) {
+                for (var k = 0; k < a._width; k++) {
+                    product.set(i, j, product.get(i, j) + a.get(i, k) * b.get(k, j));
+                }
+            }
+        }
+        return product;
+    }
+
+    static fromNative(native: number[][]) : FloatMatrix {
+        // assume all subarrays have the same shape!!
+        let height = native.length;
+        let width = native[0].length;
+        let matrix = new FloatMatrix(height, width);
+        for (var i = 0; i < native.length; i++) {
+            for (var j = 0; j < native[0].length; j++) {
+                matrix.set(i, j, native[i][j]);
+            }
+        }
+        return matrix; 
+    }
+
+    toNative() : number[][] {
+        let native: number[][] = []
+        for (var i = 0; i < this._height; i++) {
+            native[i] = [];
+            for (var j = 0; j < this._width; j++) {
+                native[i][j] = this.get(i, j);
+            }
+        }
+        return native;
     }
 }
 

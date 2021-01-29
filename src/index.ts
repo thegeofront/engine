@@ -11,6 +11,7 @@ import { RectangleApp } from "./app-demos/rectangle-app";
 import { DotApp3 } from "./app-demos/dot-app3";
 import { ObjLoaderApp } from "./app/obj-loader-app";
 import { Core } from "./core";
+import { StatApp } from "./app/stat-app";
 
 const REALTIME_DEMO = false;
 
@@ -28,7 +29,8 @@ function main() {
     const core = new Core(canvas, gl);
 
     // the eyefinder app itself
-    core.addApp(new EyeFinderApp(gl, canvas, context));
+    core.addApp(new StatApp(gl, canvas));
+    // core.addApp(new EyeFinderApp(gl, canvas, context));
     
     // fun demo's to test various functionalities 
     // core.addApp(new RectangleApp(gl)); 
@@ -38,16 +40,12 @@ function main() {
 
     // infinite loop
     function loop() {
- 
         if (core.STOP) {
             // TODO : notify the User that we have stopped running...
             return;
         }
-            
-
         core.update();
         core.draw();
-        
         requestAnimationFrame(loop);
     }
     // loop();

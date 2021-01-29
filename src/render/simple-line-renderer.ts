@@ -8,7 +8,7 @@ import { Mesh } from "../geo/mesh";
 import { Polyline } from "../geo/polyline";
 import { Matrix4 } from "../math/matrix";
 import { Vector3 } from "../math/vector";
-import { LineRenderable } from "./line-render-data";
+import { LineArray } from "./line-render-data";
 import { DrawSpeed, Renderer } from "./renderer";
 
 export class SimpleLineRenderer extends Renderer {
@@ -66,7 +66,7 @@ export class SimpleLineRenderer extends Renderer {
         this.count = 0;
     }
 
-    set(gl: WebGLRenderingContext, data: LineRenderable, speed = DrawSpeed.StaticDraw) {
+    set(gl: WebGLRenderingContext, data: LineArray, speed = DrawSpeed.StaticDraw) {
         
         // save how many faces need to be drawn
         gl.useProgram(this.program);
@@ -100,7 +100,7 @@ export class SimpleLineRenderer extends Renderer {
         gl.drawElements(gl.LINES, this.count, gl.UNSIGNED_SHORT, 0);
     }
 
-    setAndRender(gl: WebGLRenderingContext, matrix: Matrix4, data: LineRenderable) {
+    setAndRender(gl: WebGLRenderingContext, matrix: Matrix4, data: LineArray) {
         this.set(gl, data, DrawSpeed.DynamicDraw);
         this.render(gl, matrix);
     }

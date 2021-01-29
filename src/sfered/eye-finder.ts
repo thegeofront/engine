@@ -15,7 +15,7 @@ import { TopoMesh } from "../geo/topo-mesh";
 import { Plane } from "../geo/plane";
 import { Matrix4 } from "../math/matrix";
 import { RansacCircle2d } from "./ransac";
-import { LineRenderable } from "../render/line-render-data";
+import { LineArray } from "../render/line-render-data";
 import { Circle3 } from "../geo/circle3";
 
 
@@ -74,7 +74,7 @@ export class EyeFinder {
         });
 
         // debug
-        this.app?.dots2.push(...contrastPoints.toNativeArray());
+        this.app?.dots2.push(...contrastPoints.toList());
 
         // step 2: elevate from uv space to vertex space of the mesh 
         let cps = new Vector3Array(contrastPoints.count()); 
@@ -94,13 +94,13 @@ export class EyeFinder {
       
         // debug
         cps.forEach((p) => {
-            p.z = 0;
+            // p.z = 0;
             return plane.pushToWorld(p);
         })
-        this.app?.whiteDots.push(...cps.toNativeArray());
-        this.app?.lines.push(...plane.getRenderLines().toNativeArray());
+        this.app?.whiteDots.push(...cps.toList());
+        this.app?.lineRenderables.push(LineArray.fromPlane(plane));
         this.app?.redDots.push(eyePoint);
-        this.app?.lineRenderables.push(LineRenderable.fromCircle(Circle3.fromCircle2(bestCircle, plane)));
+        this.app?.lineRenderables.push(LineArray.fromCircle(Circle3.fromCircle2(bestCircle, plane)));
 
         return Vector3.zero();
     }
@@ -176,7 +176,7 @@ export class EyeFinder {
             }
         }
 
-        return Vector2Array.fromNativeArray(points);
+        return Vector2Array.fromList(points);
     }
 
 }

@@ -20,7 +20,7 @@ import { EyeFinder } from "./eye-finder";
 import { Matrix3, Matrix4 } from "../math/matrix";
 import { ImageRenderer } from "../render/image-renderer";
 import { Rectangle2 } from "../geo/rectangle";
-import { LineRenderable } from "../render/line-render-data";
+import { LineArray } from "../render/line-render-data";
 import { Circle3 } from "../geo/circle3";
 import { Plane } from "../geo/plane";
 
@@ -55,7 +55,7 @@ export class EyeFinderApp extends App {
     images: GeonImage[] = [];
     meshLineIds?: Uint16Array;
     lines: Vector3[] = [];
-    lineRenderables: LineRenderable[] = [];
+    lineRenderables: LineArray[] = [];
 
     // rendering 
     blueDotRenderer: DotRenderer3;
@@ -96,7 +96,9 @@ export class EyeFinderApp extends App {
 
     start() {
         // nothing
-        let lines = LineRenderable.fromCircle(new Circle3(Plane.WorldXY(), 100));
+        console.log("hoi");
+        let lines = LineArray.fromCircle(new Circle3(Plane.WorldXY(), 0.5));
+        this.lineRenderables.push(lines);
         console.log(lines);
     }
 
@@ -112,9 +114,12 @@ export class EyeFinderApp extends App {
         const canvas = gl.canvas as HTMLCanvasElement;
         let matrix = this.camera.getRenderToScreenMatrix(canvas);
 
+        this.lineRenderables.forEach((renderable) => {
+            this.redLineRenderer.setAndRender(gl, matrix, renderable);
+        })
      
         if (this.bsd?.mesh == undefined)
-            this.redDotRenderer.render(gl, matrix, Vector3Array.fromNativeArray([new Vector3(0,0,0), new Vector3(1,1,1)]));
+            this.redDotRenderer.render(gl, matrix, Vector3Array.fromList([new Vector3(0,0,0), new Vector3(1,1,1)]));
         else {
             let mesh = this.bsd?.mesh;
             let landmarks = this.bsd?.landmarks;
@@ -127,8 +132,8 @@ export class EyeFinderApp extends App {
             // console.log(this.dots2);
 
             // show the mesh
-            this.blueLineRenderer.setAndRender(gl, matrix, LineRenderable.fromMesh(mesh, true))
-            this.blueLineRenderer.setAndRender(gl, matrix, LineRenderable.fromMesh(mesh, false))
+            this.blueLineRenderer.setAndRender(gl, matrix, LineArray.fromMesh(mesh, true))
+            this.blueLineRenderer.setAndRender(gl, matrix, LineArray.fromMesh(mesh, false))
             this.redDotRenderer.render(gl, matrix, landmarks);
             this.blueDotRenderer.render(gl, matrix, mesh.uvs);
             this.blueDotRenderer.render(gl, matrix, mesh.uvs);
@@ -137,11 +142,7 @@ export class EyeFinderApp extends App {
             this.redDotRenderer.render(gl, matrix, this.dots2);
             this.whiteDotRenderer.render(gl, matrix, this.whiteDots);
             this.redDotRenderer.render(gl, matrix, this.redDots);
-            this.whiteLineRenderer.setAndRender(gl, matrix, LineRenderable.fromLines(this.lines));
-
-            // this.lineRenderables.forEach((renderable) => {
-            //     this.redLineRenderer.setAndRender(gl, matrix, renderable);
-            // })
+            this.whiteLineRenderer.setAndRender(gl, matrix, LineArray.fromLines(this.lines));
 
             //this.redLineRenderer.setAndRender(gl, matrix, ));
 
