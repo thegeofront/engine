@@ -83,7 +83,7 @@ export class EyeFinder {
         })
 
         // step 3: fit a plane through the points, and project to this plane
-        let plane = Plane.fromXYLeastSquares(cps);
+        let plane = Plane.fromLeastSquares(cps);
         cps.forEach((p) => plane.pullToPlane(p));
         let cpsFixed = cps.to2D();
         
@@ -94,7 +94,7 @@ export class EyeFinder {
       
         // debug
         cps.forEach((p) => {
-            // p.z = 0;
+            p.z = 0;
             return plane.pushToWorld(p);
         })
         this.app?.whiteDots.push(...cps.toList());

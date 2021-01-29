@@ -91,6 +91,12 @@ export class Stat {
     } 
     
 
+    static eig(A: FloatMatrix) : [Float32Array, FloatMatrix] {
+        let results = this.svd(A);
+        return [results[1], results[2]]
+    }
+
+
    /**
     * Single Value Decomposition. 
     * Can be used for Eigen Value Decomposition

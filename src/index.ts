@@ -29,8 +29,8 @@ function main() {
     const core = new Core(canvas, gl);
 
     // the eyefinder app itself
-    core.addApp(new StatApp(gl, canvas));
-    // core.addApp(new EyeFinderApp(gl, canvas, context));
+    // core.addApp(new StatApp(gl, canvas));
+    core.addApp(new EyeFinderApp(gl, canvas, context));
     
     // fun demo's to test various functionalities 
     // core.addApp(new RectangleApp(gl)); 

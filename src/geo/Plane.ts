@@ -6,6 +6,7 @@
 import { Vector3Array } from "../data/vector-array";
 import { Const } from "../math/const";
 import { Matrix4 } from "../math/matrix";
+import { Stat } from "../math/statistics";
 import { Vector2, Vector3 } from "../math/vector";
 
 export class Plane {
@@ -20,12 +21,10 @@ export class Plane {
         this._matrix = m;
     }
 
-    static from3pt(a: Vector3, b: Vector3, c: Vector3) {
-        let v1 = b.clone().sub(a);
-        let v2 = c.clone().sub(a);
+    static fromPVV(a: Vector3, v1: Vector3, v2: Vector3) {
 
-        // check if we still need this -1 thing 
-        let khat = v1.clone().cross(v2).normalize().scale(-1);
+        // TODO check if we still need this -1 thing 
+        let khat = v1.clone().cross(v2).normalize(); //.scale(-1);
 
         let center = a.clone();
         let ihat = v1.normalize()
@@ -33,6 +32,12 @@ export class Plane {
         
         let mat = Plane.planeMatrixFromVecs(center, ihat, jhat, khat);
         return new Plane(mat)
+    }
+
+    static from3pt(a: Vector3, b: Vector3, c: Vector3) {
+        let v1 = b.clone().sub(a);
+        let v2 = c.clone().sub(a);
+        return this.fromPVV(a, v1, v2);
     }
 
     static WorldXY(): Plane {
@@ -48,8 +53,16 @@ export class Plane {
     }
 
     static fromLeastSquares(pts: Vector3Array) : Plane{
-        // TODO THIS IS HARD
-        return Plane.WorldXY();
+
+        let mean = pts.mean();
+        let cov = Stat.cov(pts);
+        let [eigValues, eigVectors] = Stat.eig(cov);
+        console.log(eigValues);
+
+        let biggestEigenVector = Vector3.fromArray(eigVectors.getColumn(0));
+        let secondBiggestEigenVector = Vector3.fromArray(eigVectors.getColumn(1))
+
+        return Plane.fromPVV(mean, biggestEigenVector, secondBiggestEigenVector);
     }
 
     static fromXYLeastSquares(pts: Vector3Array) : Plane {
@@ -90,14 +103,6 @@ export class Plane {
         this._matrix = this._matrix.multiply(m);
         return this;
     }
-
-    // getPlaneParams() : [number, number, number, number] {
-    //     // get a, b, c, and d parameters
-    //     let k = this.khat;
-    //     // TODO : figure out how to calculate d...
-    //     // let d = khat.clone().dot(c) * -1;
-    //     return [k.x, k.y, k.z, this._d];
-    // }
 
     // NOTE: pulling is inefficient since i do not cache the inverse.
     pullToPlane(p: Vector3) : Vector3 {
