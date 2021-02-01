@@ -15,13 +15,11 @@ import { InputState } from "../system/input-state";
 import { App } from "./app";
 import { DrawSpeed } from "../render/renderer";
 import { Vector3Array } from "../data/vector-array";
-import { LineArray } from "../render/line-render-data";
+import { LineArray } from "../data/line-array";
 
 
 export class ObjLoaderApp extends App {
     
-    gl: WebGLRenderingContext;
-
     dotRenderer: DotRenderer3;
     lineRenderer: SimpleLineRenderer;
     meshRenderer: SimpleMeshRenderer;
@@ -31,8 +29,7 @@ export class ObjLoaderApp extends App {
 
     constructor(gl: WebGLRenderingContext, canvas: HTMLCanvasElement) {
         
-        super();
-        this.gl = gl; // this is bad practice, but i need it during procesFiles
+        super(gl);
         this.dotRenderer = new DotRenderer3(gl, 4, [0,0,1,1], false);
         this.lineRenderer = new SimpleLineRenderer(gl, [0,0,1,0.5]);
         this.meshRenderer = new SimpleMeshRenderer(gl, [0,0,1,0.25]);

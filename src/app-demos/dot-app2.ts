@@ -21,7 +21,7 @@ export class DotApp2 extends App {
 
     // unique constructors
     constructor(gl: WebGLRenderingContext) {
-        super();
+        super(gl);
         this.bounds = Domain2.fromBounds(0, 500, 0, 500);
         this.renderer = new DotRenderer2(gl, 5, [1,1,1,1], true);
     }

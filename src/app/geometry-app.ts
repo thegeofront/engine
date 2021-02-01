@@ -17,11 +17,13 @@ import { Vector3Array } from "../data/vector-array";
 import { LineArray } from "../data/line-array";
 import { FloatMatrix } from "../data/float-matrix";
 import { Stat } from "../math/statistics";
+import { Plane } from "../geo/plane";
 
-export class StatApp extends App {
+export class GeometryApp extends App {
 
     dotRenderer: DotRenderer3;
-    lineRenderer: SimpleLineRenderer;
+    whiteLineRenderer: SimpleLineRenderer;
+    greyLineRenderer: SimpleLineRenderer;
     meshRenderer: SimpleMeshRenderer;
 
     camera: Camera;
@@ -30,31 +32,24 @@ export class StatApp extends App {
     dots: Vector3[] = [];
     renderable?: LineArray;
 
+    plane: Plane = Plane.WorldXZ();
+    gridLarge!: LineArray;
+    gridSmall!: LineArray;
+
     constructor(gl: WebGLRenderingContext, canvas: HTMLCanvasElement) {
         
         super(gl);
         this.dotRenderer = new DotRenderer3(gl, 4, [0,0,1,1], false);
-        this.lineRenderer = new SimpleLineRenderer(gl, [0,0,1,0.5]);
+        this.whiteLineRenderer = new SimpleLineRenderer(gl, [0.2,0,1,1]);
+        this.greyLineRenderer = new SimpleLineRenderer(gl, [0.2,0,1,0.5]);
         this.meshRenderer = new SimpleMeshRenderer(gl, [0,0,1,0.25]);
         this.camera = new Camera(canvas);
     }
 
     start() {
-        // test things
-        let a = FloatMatrix.fromNative([
-            [22.,10., 2.,  3., 7.],
-            [14., 7.,10.,  0., 8.],
-            [-1.,13.,-1.,-11., 3.],
-            [-3.,-2.,13., -2., 4.],
-            [ 9., 8., 1., -2., 4.],
-            [ 9., 1.,-7.,  5.,-1.],
-            [ 2.,-6., 6.,  5., 1.],
-            [ 4., 5., 0., -2., 2.]
-        ]);
-
-        let data = Stat.svd(a); 
-        console.log(data);
-        console.log(Math.sqrt(1248.),20.,Math.sqrt(384.),0.,0.);
+        let size = 100;
+        this.gridLarge = LineArray.fromGrid(this.plane, size, 1);
+        this.gridSmall = LineArray.fromGrid(this.plane, (size*10)-1, 0.1);
     }
 
     update(state: InputState) {
@@ -69,7 +64,7 @@ export class StatApp extends App {
         const canvas = gl.canvas as HTMLCanvasElement;
         let matrix = this.camera.getRenderToScreenMatrix(canvas);
 
-
-
+        this.whiteLineRenderer.setAndRender(gl, matrix, this.gridLarge);
+        this.greyLineRenderer.setAndRender(gl, matrix, this.gridSmall);
     }
 }

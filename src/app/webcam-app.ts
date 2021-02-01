@@ -15,12 +15,13 @@ import * as draw from "../draw/tensorflow-drawing";
 import { App } from "./app";
 import { Core } from "../core";
 import { InputState } from "../system/input-state";
+import { CtxApp } from "./CtxApp";
 
 // PUBLIC
 
-export function addWebcamAppWhenReady(core: Core, canvas: HTMLCanvasElement, video: HTMLVideoElement) {
+export function addWebcamAppWhenReady(core: Core, ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, video: HTMLVideoElement) {
         
-    let app: App;
+    let app: CtxApp;
     var constraints = {audio:false, video:true};
 
     var p = navigator.mediaDevices.getUserMedia(constraints);
@@ -37,14 +38,12 @@ export function addWebcamAppWhenReady(core: Core, canvas: HTMLCanvasElement, vid
     });
 
     tffl.load(tffl.SupportedPackages.mediapipeFacemesh).then((model) => {
-        app = new WebcamApp(canvas, video, model);
+        app = new WebcamApp(ctx, canvas, video, model);
         // 
     });
 }
 
-// PRIVATE
-
-export class WebcamApp extends App {
+export class WebcamApp extends CtxApp {
 
     video: HTMLVideoElement;
     
@@ -55,8 +54,8 @@ export class WebcamApp extends App {
     model: MediaPipeFaceMesh;
     // ------- basics -------
 
-    constructor(canvas: HTMLCanvasElement, video: HTMLVideoElement, model: MediaPipeFaceMesh) {
-        super();
+    constructor(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, video: HTMLVideoElement, model: MediaPipeFaceMesh) {
+        super(ctx);
         this.video = video;
         this.points = [];
         this.triangles = [];

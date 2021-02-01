@@ -1,12 +1,12 @@
 import { InputState } from "../system/input-state"
 
-export class App {
+export class CtxApp {
 
-    gl: WebGLRenderingContext;
+    ctx: CanvasRenderingContext2D;
 
-    constructor(gl: WebGLRenderingContext) {
+    constructor(ctx: CanvasRenderingContext2D) {
         // unique constructor    
-        this.gl = gl;
+        this.ctx = ctx;
     }
 
     start() {

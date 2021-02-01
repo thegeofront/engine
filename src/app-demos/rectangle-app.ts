@@ -22,7 +22,7 @@ export class RectangleApp extends App {
 
     // unique constructors
     constructor(gl: WebGLRenderingContext) {
-        super();
+        super(gl);
         this.bounds = Domain3.fromBounds(0, 300, 0, 300, 0, 500);
         this.renderer = new ImageRenderer(gl)
         this.tex = new GeonImage(20, 20).fillEvery(randomPixelColor);

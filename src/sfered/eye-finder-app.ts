@@ -20,7 +20,7 @@ import { EyeFinder } from "./eye-finder";
 import { Matrix3, Matrix4 } from "../math/matrix";
 import { ImageRenderer } from "../render/image-renderer";
 import { Rectangle2 } from "../geo/rectangle";
-import { LineArray } from "../render/line-render-data";
+import { LineArray } from "../data/line-array";
 import { Circle3 } from "../geo/circle3";
 import { Plane } from "../geo/plane";
 
@@ -38,10 +38,7 @@ const settings = require('../sfered/settings.json'); // note DIFFERENCE BETWEEN 
 
 
 export class EyeFinderApp extends App {
-    
-    // context
-    gl: WebGLRenderingContext;
-    
+
     // data 
     bsd?: BellusScanData;
 
@@ -73,12 +70,11 @@ export class EyeFinderApp extends App {
 
     constructor(gl: WebGLRenderingContext, canvas: HTMLCanvasElement, context: HTMLDivElement) {
         
-        super();
+        super(gl);
 
         this.eyefinder = new EyeFinder(this);
 
         // setup render stuff 
-        this.gl = gl; // this is bad practice, but i need it during procesFiles
         this.blueDotRenderer = new DotRenderer3(gl, 6, [0,0,1,1], false);
         this.redDotRenderer = new DotRenderer3(gl, 4, [1,0,0,1], false);
         this.whiteDotRenderer = new DotRenderer3(gl, 5, [0.8,0.8,0.8,1], false);

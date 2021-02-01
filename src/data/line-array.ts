@@ -3,8 +3,8 @@
 // purpose: represents an object which can be fed directly to a linerenderer.
 //          use it to not continuously have to calculate these aspects if the underlying object is unchanged.
 
-import { FloatMatrix } from "../data/float-matrix";
-import { getGeneralFloatMatrix, Vector2Array, Vector3Array } from "../data/vector-array"
+import { FloatMatrix } from "./float-matrix";
+import { getGeneralFloatMatrix, Vector2Array, Vector3Array } from "./vector-array"
 import { Circle2 } from "../geo/circle2";
 import { Circle3 } from "../geo/circle3";
 import { Cube } from "../geo/cube";
@@ -14,6 +14,7 @@ import { Const } from "../math/const";
 import { Matrix4 } from "../math/matrix";
 import { Vector2, Vector3 } from "../math/vector";
 
+// represents a collection of multiple lines. These could form 1 polyline, but this is not a requirement
 export class LineArray {
     
     verts: FloatMatrix;
@@ -28,8 +29,8 @@ export class LineArray {
         }
     }
 
+    // this assumes even vectices are 'from' points, and odd vertices are 'to' points
     static fromLines(verts: Vector2[] | Vector3[] | Vector2Array | Vector3Array) {
-        
         let data = getGeneralFloatMatrix(verts);
         return new LineArray(data);
     }
@@ -57,6 +58,33 @@ export class LineArray {
         }
     }
     
+    // create lines as a grid centered at a plane 
+    static fromGrid(plane: Plane, count: number, dis: number) {
+        let halfTotalSize = ((count-1) * dis) / 2;
+
+        // 2 vectors per line, 2 lines per count
+        // plus 5 lines, for ihat and jhat icons 
+        let lines = new Vector3Array(count * 4);
+
+        // x lines
+        for(let i = 0 ; i < count; i++) {
+            let t = -halfTotalSize + dis * i;
+            lines.setVector(i*2,     new Vector3(t, -halfTotalSize, 0));
+            lines.setVector(i*2 + 1, new Vector3(t,  halfTotalSize, 0));
+        }
+
+        // y lines 
+        for(let i = 0 ; i < count; i++) {
+            let t = -halfTotalSize + dis * i;
+            lines.setVector(2*count + i*2,     new Vector3(-halfTotalSize, -halfTotalSize + dis * i, 0));
+            lines.setVector(2*count + i*2 + 1, new Vector3( halfTotalSize, -halfTotalSize + dis * i ,0));
+        }
+
+        // finally, transform everything to worldspace, and create the linerenderdata object
+        lines.forEach((v) => plane.pushToWorld(v));
+        return new LineArray(lines);
+    }
+
     // get all lines from a plane
     static fromPlane(plane: Plane) : LineArray {
 
