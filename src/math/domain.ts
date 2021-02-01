@@ -152,7 +152,7 @@ export class Domain2 {
         return other.elevate(norm);
     }
     
-    corners(matrix: Matrix4 = Matrix4.newIdentity()) : Vector2[] {
+    corners() : Vector2[] {
         // render the extends of this boundary / domain
         let dim = 2;
         let corners = 2**dim;

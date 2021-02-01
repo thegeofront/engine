@@ -90,6 +90,14 @@ export class Vector3Array extends FloatMatrix {
         return array;
     }
 
+    fillFromList(vecs: Vector3[]) {
+        for(let i = 0; i < vecs.length; i++) {
+            this.data[i*3] = vecs[i].x;
+            this.data[i*3+1] = vecs[i].y;
+            this.data[i*3+2] = vecs[i].z;
+        }
+    }
+
     forEach(callbackfn: (value: Vector3, index: number) => Vector3) : Vector3Array {
         
         for(let i = 0 ; i < this.count(); i++) {

@@ -1,6 +1,6 @@
 // jos feenstra
 
-import { Rectangle2 } from "../geo/rectangle";
+import { Rectangle2 } from "../geo/rectangle2";
 import { Renderer } from "./renderer";
 
 export class RectangleRenderer extends Renderer {

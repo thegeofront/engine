@@ -18,31 +18,32 @@ import { LineArray } from "../data/line-array";
 import { FloatMatrix } from "../data/float-matrix";
 import { Stat } from "../math/statistics";
 import { Plane } from "../geo/plane";
+import { Cube } from "../geo/cube";
+import { MeshRenderer } from "../render/mesh-renderer";
+import { Matrix4 } from "../math/matrix";
 
 export class GeometryApp extends App {
 
+    // renderinfo
     dotRenderer: DotRenderer3;
     whiteLineRenderer: SimpleLineRenderer;
     greyLineRenderer: SimpleLineRenderer;
-    meshRenderer: SimpleMeshRenderer;
-
+    meshRenderer: MeshRenderer;
     camera: Camera;
 
-    obj?: Mesh;
-    dots: Vector3[] = [];
-    renderable?: LineArray;
-
-    plane: Plane = Plane.WorldXZ();
+    // data 
+    plane: Plane = Plane.WorldXY();
     gridLarge!: LineArray;
     gridSmall!: LineArray;
-
+    geo: Mesh[] = [];
+    dots: Vector3[] = [];
     constructor(gl: WebGLRenderingContext, canvas: HTMLCanvasElement) {
         
         super(gl);
-        this.dotRenderer = new DotRenderer3(gl, 4, [0,0,1,1], false);
+        this.dotRenderer = new DotRenderer3(gl, 4, [1,0,0,1], false);
         this.whiteLineRenderer = new SimpleLineRenderer(gl, [0.2,0,1,1]);
         this.greyLineRenderer = new SimpleLineRenderer(gl, [0.2,0,1,0.5]);
-        this.meshRenderer = new SimpleMeshRenderer(gl, [0,0,1,0.25]);
+        this.meshRenderer = new MeshRenderer(gl, [1,0,0,0.25]);
         this.camera = new Camera(canvas);
     }
 
@@ -50,21 +51,43 @@ export class GeometryApp extends App {
         let size = 100;
         this.gridLarge = LineArray.fromGrid(this.plane, size, 1);
         this.gridSmall = LineArray.fromGrid(this.plane, (size*10)-1, 0.1);
+
+        this.whiteLineRenderer.set(this.gl, this.gridLarge, DrawSpeed.StaticDraw);
+        this.greyLineRenderer.set(this.gl, this.gridSmall, DrawSpeed.StaticDraw);
+
+        let cube = new Cube(Plane.WorldXZ(), Domain3.fromBounds(-0.5, 0.5, -0.5,0.5, 0,1));
+        this.geo.push(Mesh.fromCube(cube));
     }
 
     update(state: InputState) {
         
         // move the camera with the mouse
-        this.camera.updateWithControls(state); 
+        this.camera.update(state); 
     }
 
     draw(gl: WebGLRenderingContext) {
 
         // get to-screen matrix
         const canvas = gl.canvas as HTMLCanvasElement;
-        let matrix = this.camera.getRenderToScreenMatrix(canvas);
+        let matrix = this.camera.getTotalMatrix();
 
-        this.whiteLineRenderer.setAndRender(gl, matrix, this.gridLarge);
-        this.greyLineRenderer.setAndRender(gl, matrix, this.gridSmall);
+        // render the grid
+        this.greyLineRenderer.render(gl, matrix);
+        this.whiteLineRenderer.render(gl, matrix);
+
+        // render the boxes
+        for(let geo of this.geo) {
+            this.meshRenderer.setAndRender(gl, matrix, geo);
+        }
+
+        // render some debug points
+        // let vec = this.camera.pos;
+        // console.log(vec.clone().scale(-1));
+        
+        // this is the location of the camera
+        let vec = this.camera.worldMatrix.inverse().multiplyVector(new Vector3(0,0,0));
+        // vec.y = 0;
+        vec.z = 0;
+        this.dotRenderer.render(gl, matrix, [this.camera.pos, vec]);
     }
 }

@@ -29,6 +29,8 @@ export interface IKeys
 
 export class InputState {
 
+    canvas: HTMLCanvasElement;
+
     tick: number;
     oldTime: number;
     newTime: number;
@@ -57,6 +59,9 @@ export class InputState {
     // delegate functions
     onMouseWheelScroll?: Function;
     constructor(canvas: HTMLCanvasElement) {
+
+        // link
+        this.canvas = canvas;
 
         // time
         this.tick = 0;

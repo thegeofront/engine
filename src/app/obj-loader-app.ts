@@ -45,14 +45,14 @@ export class ObjLoaderApp extends App {
     update(state: InputState) {
         
         // move the camera with the mouse
-        this.camera.updateWithControls(state); 
+        this.camera.update(state); 
     }
 
     draw(gl: WebGLRenderingContext) {
 
         // get to-screen matrix
         const canvas = gl.canvas as HTMLCanvasElement;
-        let matrix = this.camera.getRenderToScreenMatrix(canvas);
+        let matrix = this.camera.getTotalMatrix();
 
      
         if (this.obj == undefined)

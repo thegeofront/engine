@@ -8,13 +8,15 @@ import { browserLocalStorage } from "@tensorflow/tfjs-core/dist/io/local_storage
 import { IntMatrix } from "../data/int-matrix";
 import { Vector2Array, Vector3Array } from "../data/vector-array";
 import { Vector2, Vector3 } from "../math/vector";
+import { Cube } from "./cube";
+import { Rectangle3 } from "./rectangle3";
 
 export class Mesh {
 
     verts: Vector3Array; // 3 long float
     norms: Vector3Array; // 3 long float
     uvs:   Vector2Array; // 2 long float 
-    faces: IntMatrix;
+    faces: IntMatrix; // 3 width, count height integers
 
     texture?: ImageData = undefined;
 
@@ -39,10 +41,65 @@ export class Mesh {
         return mesh;
     }
 
+    static fromCube(cube: Cube) : Mesh {
+
+        let verts = cube.getCorners();
+
+        // we cant handle quads yet 
+        let faces: number[] = []
+        for(let face of cubeFaces) {
+            faces.push(...quadToTri(face));
+        }
+
+        let mesh = new Mesh(8, 0, 0, cubeFaces.length * 2);
+        mesh.verts.fillFromList(verts);
+        mesh.faces.setData(faces);
+        return mesh;
+    }
+
+    static fromRect(rect: Rectangle3) : Mesh {
+
+        let verts = rect.getCorners();
+
+        // we cant handle quads yet 
+        let faces: number[] = []
+        faces.push(...quadToTri(cubeFaces[0]));
+
+        let mesh = new Mesh(8, 0, 0, cubeFaces.length * 2);
+        mesh.verts.fillFromList(verts);
+        mesh.faces.setData(faces);
+        return mesh;
+    }
+
     exportToObj(path: string) {
-        
+        throw "todo";
     }
 };
+
+// ================ Help ==================
+
+// 0 ------- 1
+// | \     / |
+// |  4---5  |
+// |  |   |  |
+// |  6---7  |
+// | /     \ | 
+// 2 ------- 3
+const cubeFaces = [
+    [0,1,3,2], // front 
+    [4,0,2,6], // left
+    [1,0,4,5], // top
+    [1,5,7,3], // right
+    [2,3,7,6], // bottom
+    [5,4,6,7], // back
+];
+
+function quadToTri(abcd: number[]) : number[] {
+    return [
+        abcd[0], abcd[1], abcd[2], 
+        abcd[0], abcd[2], abcd[3]
+    ]
+}
 
 // ================ Obj ===================
 

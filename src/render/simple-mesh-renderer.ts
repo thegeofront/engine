@@ -4,6 +4,7 @@
 
 import { IntMatrix } from "../data/int-matrix";
 import { Vector3Array } from "../data/vector-array";
+import { Mesh } from "../geo/mesh";
 import { Matrix4 } from "../math/matrix";
 import { DrawSpeed, Renderer } from "./renderer";
 
@@ -15,8 +16,8 @@ export class SimpleMeshRenderer extends Renderer {
     index_buffer: WebGLBuffer;
     u_transform: WebGLUniformLocation;
     u_color: WebGLUniformLocation;
-    count: number
-
+    count: number;
+    size: number;
     constructor(gl: WebGLRenderingContext, color = [1,0,0,0.25]) {
 
         const vs = `
@@ -51,13 +52,18 @@ export class SimpleMeshRenderer extends Renderer {
         gl.useProgram(this.program);
         gl.uniform4f(this.u_color, color[0], color[1], color[2], color[3]);
         this.count = 0;
-        
+        this.size = 0;
+
         // we need 2 buffers 
         // -> 1 float buffer for the positions of all vertices.
         // -> 1 int buffer for the index of all triangles
         this.a_position = gl.getAttribLocation(this.program, "a_position");
         this.a_position_buffer = gl.createBuffer()!;
         this.index_buffer = gl.createBuffer()!;  
+    }
+
+    setMesh(gl: WebGLRenderingContext, mesh: Mesh, speed: DrawSpeed = DrawSpeed.StaticDraw) {
+        return this.set(gl, mesh.verts, mesh.faces, speed);
     }
 
     set(gl: WebGLRenderingContext, verts: Vector3Array, faces: IntMatrix, speed: DrawSpeed = DrawSpeed.StaticDraw) {
@@ -68,10 +74,10 @@ export class SimpleMeshRenderer extends Renderer {
 
         // vertices 
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
-        var size = 3;
+        this.size = 3;
         var type = gl.FLOAT;
         var normalize = false; 
-        gl.vertexAttribPointer(this.a_position, size, gl.FLOAT, false, 0, 0);
+        gl.vertexAttribPointer(this.a_position, this.size, gl.FLOAT, false, 0, 0);
         gl.bufferData(gl.ARRAY_BUFFER, verts.data, this.convertDrawSpeed(speed));
 
         // indices 
@@ -86,6 +92,7 @@ export class SimpleMeshRenderer extends Renderer {
         gl.useProgram(this.program);
         gl.enableVertexAttribArray(this.a_position);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
+        gl.vertexAttribPointer(this.a_position, this.size, gl.FLOAT, false, 0, 0);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
         
         // set uniforms

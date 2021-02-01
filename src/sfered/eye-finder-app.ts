@@ -19,7 +19,7 @@ import { App } from "../app/app";
 import { EyeFinder } from "./eye-finder";
 import { Matrix3, Matrix4 } from "../math/matrix";
 import { ImageRenderer } from "../render/image-renderer";
-import { Rectangle2 } from "../geo/rectangle";
+import { Rectangle2 } from "../geo/rectangle2";
 import { LineArray } from "../data/line-array";
 import { Circle3 } from "../geo/circle3";
 import { Plane } from "../geo/plane";
@@ -101,14 +101,14 @@ export class EyeFinderApp extends App {
     update(state: InputState) {
         
         // move the camera with the mouse
-        this.camera.updateWithControls(state); 
+        this.camera.update(state); 
     }
 
     draw(gl: WebGLRenderingContext) {
 
         // get to-screen matrix
         const canvas = gl.canvas as HTMLCanvasElement;
-        let matrix = this.camera.getRenderToScreenMatrix(canvas);
+        let matrix = this.camera.getTotalMatrix();
 
         this.lineRenderables.forEach((renderable) => {
             this.redLineRenderer.setAndRender(gl, matrix, renderable);

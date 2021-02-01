@@ -49,7 +49,7 @@ export class DotApp3 extends App {
     update(state: InputState) {
         
         // move the camera with the mouse
-        this.camera.updateWithControls(state);
+        this.camera.update(state);
 
         if (state.mouseLeftPressed) {
             this.spawnSome(100, 0.001);
@@ -79,7 +79,7 @@ export class DotApp3 extends App {
 
         // get to-screen matrix
         const canvas = gl.canvas as HTMLCanvasElement;
-        let matrix = this.camera.getRenderToScreenMatrix(canvas);
+        let matrix = this.camera.getTotalMatrix();
 
         // render the corners of the box with the red renderer,
         // and the dots themselves with the white renderer

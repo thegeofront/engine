@@ -1,7 +1,7 @@
 // author : Jos Feenstra
 // purpose : test with Renderers, Domains & Vectors
 
-import { Rectangle2 } from "../geo/rectangle";
+import { Rectangle2 } from "../geo/rectangle2";
 import { GeonImage } from "../img/Image";
 import { Domain, Domain2, Domain3 } from "../math/domain";
 import { Matrix3 } from "../math/matrix";

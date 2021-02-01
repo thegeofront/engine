@@ -2,7 +2,7 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of images / textures
 
-import { Rectangle2 } from "../geo/rectangle";
+import { Rectangle2 } from "../geo/rectangle2";
 import { Renderer } from "./renderer";
 
 export class ImageRenderer extends Renderer {
