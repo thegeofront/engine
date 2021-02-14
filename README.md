@@ -9,8 +9,8 @@ http://josfeenstra.nl/geon/
 
 ## Install 
 ```
-git clone https://github.com/josfeenstra/geon
-cd geon 
+git clone https://github.com/josfeenstra/eyefinder-ts
+cd eyefinder-ts 
 npm install 
 npm run build
 ```
