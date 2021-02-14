@@ -5,6 +5,9 @@
 // todo: 	BIJ NADER INZIEN: dont go the copy route. rewrite this in a more functional way creating new classes is expensive, but we really need immutable vectors. 
 // 			these types of consistent vectors are only useful in niche cases, and complitate a lot of common cases. 
 
+import { Const } from "./const";
+import { Matrix4 } from "./matrix";
+
 
 export class Vector3
 {
@@ -136,6 +139,7 @@ export class Vector3
     }
 
     sub(v: Vector3) : Vector3 {
+		// return new Vector3(v.x, v.y, v.z);
         this.x -= v.x;
         this.y -= v.y;
         this.z -= v.z;
@@ -223,53 +227,46 @@ export class Vector3
 		return this.divscale( length || 1 ).scale( Math.max(min, Math.min(max, length)));
 	}
 
-	floor() : Vector3 
-	{
+	floor() : Vector3 {
 		this.x = Math.floor(this.x);
         this.y = Math.floor(this.y);
         this.z = Math.floor(this.z);
 		return this;
 	}
 
-	ceil() : Vector3 
-	{
+	ceil() : Vector3 {
 		this.x = Math.ceil(this.x);
         this.y = Math.ceil(this.y);
         this.z = Math.ceil(this.z);
 		return this;
 	}
 
-	round() : Vector3 
-	{
+	round() : Vector3 {
 		this.x = Math.round(this.x);
         this.y = Math.round(this.y);
         this.z = Math.round(this.z);
 		return this;
 	}
 
-	roundToZero() : Vector3 
-	{
+	roundToZero() : Vector3 {
 		this.x = (this.x < 0) ? Math.ceil( this.x ) : Math.floor( this.x );
         this.y = (this.y < 0) ? Math.ceil( this.y ) : Math.floor( this.y );
         this.z = (this.z < 0) ? Math.ceil( this.z ) : Math.floor( this.z );
 		return this;
 	}
 
-	negate() : Vector3 
-	{
+	negate() : Vector3 {
 		this.x = -this.x;
         this.y = -this.y;
         this.z = -this.z;
 		return this;
 	}
 
-	dot( v:Vector3 ) : number 
-	{
+	dot( v:Vector3 ) : number {
 		return this.x * v.x + this.y * v.y + this.z * v.z;
 	}
 
-	cross( other:Vector3 ) : Vector3
-	{
+	cross( other:Vector3 ) : Vector3 {
         const ax = this.x, ay = this.y, az = this.z;
 		const bx = other.x, by = other.y, bz = other.z;
 
@@ -280,28 +277,27 @@ export class Vector3
 		return this;
 	}
 
-	getLengthSquared() : number
-	{
+	getLengthSquared() : number {
 		return this.x * this.x + this.y * this.y + this.z * this.z;
 	}
 
-	length() : number
-	{
+	length() : number {
 		return Math.sqrt(this.getLengthSquared());
 	}
 
-	manhat() : number
-	{
+	manhat() : number {
 		return Math.abs( this.x ) + Math.abs( this.y ) + Math.abs( this.z );
 	}
 
-	normalize() : Vector3
-	{
+	normalize() : Vector3 {
 		return this.divscale( this.length() || 1 );
 	}
 
-	disTo(v: Vector3) : number
-	{
+	isNormal() : boolean {
+		return Math.abs(this.length() - 1) < Const.TOLERANCE;
+	}
+
+	disTo(v: Vector3) : number {
 		return Math.sqrt(this.disToSquared(v));
 	}
 
@@ -357,6 +353,11 @@ export class Vector3
 		// mirror incident vector off plane orthogonal to normal
 		// normal is assumed to have unit length
 		return this.minimum(_vector.copy(normal).scale(2 * this.dot(normal)));
+	}
+
+	rotate(axis: Vector3, angle: number) : Vector3 {
+		let mat = Matrix4.newAxisRotation(axis, angle);
+		return mat.multiplyVector(this); 
 	}
 }
 

@@ -317,7 +317,6 @@ export class Matrix4 extends FloatMatrix {
      * @param {number} far far Z clipping plane
      * @param {Matrix4} [dst] optional matrix to store result
      * @return {Matrix4} dst or a new matrix if none provided
-     * @memberOf module:webgl-3d-math
      */
     static newPerspective(fov: number, aspect: number, near: number, far: number) : Matrix4 {
 
@@ -363,7 +362,6 @@ export class Matrix4 extends FloatMatrix {
      * @param {number} far The negative z coordinate of the far plane of the box.
      * @param {Matrix4} [dst] optional matrix to store result
      * @return {Matrix4} dst or a new matrix if none provided
-     * @memberOf module:webgl-3d-math
      */
     static newOrthographic(left: number, right: number, bottom: number, top: number, near: number, far: number) : Matrix4 {
     
@@ -407,7 +405,6 @@ export class Matrix4 extends FloatMatrix {
      * @param {number} far The negative z coordinate of the far plane of the box.
      * @param {Matrix4} [dst] optional matrix to store result
      * @return {Matrix4} dst or a new matrix if none provided
-     * @memberOf module:webgl-3d-math
      */
     static newFrustum(left: number, right: number, bottom: number, top: number, near: number, far: number) : Matrix4 {
         
@@ -507,9 +504,7 @@ export class Matrix4 extends FloatMatrix {
      * Makes an rotation matrix around an arbitrary axis
      * @param {Vector3} axis axis to rotate around
      * @param {number} angleInRadians amount to rotate
-     * @param {Matrix4} [dst] optional matrix to store result
      * @return {Matrix4} dst or a new matrix if none provided
-     * @memberOf module:webgl-3d-math
      */
     static newAxisRotation(axis: Vector3, angleInRadians: number) {
 

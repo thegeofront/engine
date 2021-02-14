@@ -28,6 +28,7 @@ export class GeometryApp extends App {
     dotRenderer: DotRenderer3;
     whiteLineRenderer: SimpleLineRenderer;
     greyLineRenderer: SimpleLineRenderer;
+    redLineRenderer: SimpleLineRenderer;
     meshRenderer: MeshRenderer;
     camera: Camera;
 
@@ -43,6 +44,7 @@ export class GeometryApp extends App {
         this.dotRenderer = new DotRenderer3(gl, 4, [1,0,0,1], false);
         this.whiteLineRenderer = new SimpleLineRenderer(gl, [0.2,0,1,1]);
         this.greyLineRenderer = new SimpleLineRenderer(gl, [0.2,0,1,0.5]);
+        this.redLineRenderer = new SimpleLineRenderer(gl, [0.8,0,0,1]);
         this.meshRenderer = new MeshRenderer(gl, [1,0,0,0.25]);
         this.camera = new Camera(canvas);
     }
@@ -75,17 +77,23 @@ export class GeometryApp extends App {
         this.greyLineRenderer.render(gl, matrix);
         this.whiteLineRenderer.render(gl, matrix);
 
+        // render mouse to world line 
+        // let mouseWorldLine = this.camera.getMouseWorldRay();
+        if (this.camera.mouseRayVisual)
+            this.redLineRenderer.setAndRender(gl, matrix, this.camera.mouseRayVisual);
+
         // render the boxes
         for(let geo of this.geo) {
             this.meshRenderer.setAndRender(gl, matrix, geo);
         }
 
         // render some debug points
-        // let vec = this.camera.pos;
+        let vec = this.camera.getCameraPoint();
         // console.log(vec.clone().scale(-1));
         
         // this is the location of the camera
-        let vec = this.camera.worldMatrix.inverse().multiplyVector(new Vector3(0,0,0));
+        // console.log(vec);
+        // console.log(this.camera.pos);
         // vec.y = 0;
         vec.z = 0;
         this.dotRenderer.render(gl, matrix, [this.camera.pos, vec]);
