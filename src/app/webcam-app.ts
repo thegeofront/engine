@@ -15,7 +15,7 @@ import * as draw from "../draw/tensorflow-drawing";
 import { App } from "./app";
 import { Core } from "../core";
 import { InputState } from "../system/input-state";
-import { CtxApp } from "./CtxApp";
+import { CtxApp } from "./ctx-app";
 
 // PUBLIC
 

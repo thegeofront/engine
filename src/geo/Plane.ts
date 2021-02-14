@@ -14,8 +14,6 @@ export class Plane {
     _matrix!: Matrix4;
     // _inverse!: Matrix4; // NOTE: currently im not caching this. Might be needed.
 
-    //_d!: number; // TODO dynamically calculate d, right now i dont know how
-
     // NOTE : d is not really needed anymore...
     constructor(m: Matrix4) {
         this._matrix = m;
@@ -86,6 +84,9 @@ export class Plane {
     public get khat() {return Vector3.fromArray(this._matrix.getRow(2))}
     public get center() {return Vector3.fromArray(this._matrix.getRow(3))}
     public get matrix() {return this._matrix.clone()}
+
+    public get normal() {return this.khat}
+    public get d() : number {return this.closestPoint(Vector3.zero())[1]}
 
     public set ihat(v: Vector3)   { this._matrix.setRow(0, [v.x, v.y, v.z, 0]);}
     public set jhat(v: Vector3)   { this._matrix.setRow(1, [v.x, v.y, v.z, 0]);}

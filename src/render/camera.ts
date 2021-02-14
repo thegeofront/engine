@@ -17,6 +17,7 @@ export class Camera {
     angleAlpha = 0; // rotation x 
     angleBeta = 0; // rotation y
     mousePos = Vector2.zero();
+    mouseRay?: Ray;
     mouseRayVisual?: LineArray;
 
     // camera matrix properties
@@ -66,12 +67,7 @@ export class Camera {
         let prevPos = this.mousePos.clone();
         this.mousePos = state.mousePos.clone();
         let delta = prevPos.clone().sub(this.mousePos);
-
-        if (state.mouseLeftPressed) {
-            // in the future 
-            // TODO: this is gathered from the previous world state, delay, not good.
-            let ray = this.getMouseWorldRay(state.canvas.width, state.canvas.height);
-        }
+        this.mouseRay = this.getMouseWorldRay(state.canvas.width, state.canvas.height);
 
         if (state.mouseRightDown) {
             this.angleAlpha += delta.y * 0.01;
@@ -108,6 +104,8 @@ export class Camera {
 
     getMouseWorldRay(canvasWidth: number, canvasHeight: number) : Ray {
         
+        // get a ray from origin through mousepos 
+
         // mouse unit screen position: 
         //       -------------- -0.5
         //       |            |
@@ -125,7 +123,6 @@ export class Camera {
         let mouseUnitY = -size + (mp.y / canvasHeight);
         
         let f = size / Math.tan(this.fov / 2); // focal length 
-        console.log(f);
 
         let invWorld = this.worldMatrix.inverse();
         let origin = invWorld.multiplyVector(new Vector3(0,0,0));
@@ -144,6 +141,9 @@ export class Camera {
             .add(ihat.clone().scale(mouseUnitX))
             .add(jhat.clone().scale(-mouseUnitY));
             
+        this.mouseRayVisual = LineArray.fromLines([
+            origin, screenPoint
+        ])
         return new Ray(origin, screenPoint);
     }
 

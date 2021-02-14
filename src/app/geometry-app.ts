@@ -21,6 +21,7 @@ import { Plane } from "../geo/plane";
 import { Cube } from "../geo/cube";
 import { MeshRenderer } from "../render/mesh-renderer";
 import { Matrix4 } from "../math/matrix";
+import { Circle3 } from "../geo/circle3";
 
 export class GeometryApp extends App {
 
@@ -79,8 +80,22 @@ export class GeometryApp extends App {
 
         // render mouse to world line 
         // let mouseWorldLine = this.camera.getMouseWorldRay();
-        if (this.camera.mouseRayVisual)
+        if (this.camera.mouseRayVisual) 
             this.redLineRenderer.setAndRender(gl, matrix, this.camera.mouseRayVisual);
+
+        if (this.camera.mouseRay) {
+            let ray = this.camera.mouseRay;
+            let cursor = ray.at(ray.xPlane(this.plane));
+            // this.dotRenderer.render(gl, matrix, [cursor]);
+            this.dotRenderer.render(gl, matrix, [
+                ray.at(-1), ray.at(-2), ray.at(-3), ray.at(-4), ray.at(-5)
+            ]);
+            console.log(ray.at(1), ray.at(2), ray.at(3), ray.at(4), ray.at(5))
+            let plane = Plane.WorldXY()
+            plane.matrix = plane.matrix.multiply(Matrix4.newTranslation(cursor.x, cursor.y, cursor.z));
+            this.redLineRenderer.setAndRender(gl, matrix, 
+                LineArray.fromCircle(new Circle3(plane, 0.1)));
+        }
 
         // render the boxes
         for(let geo of this.geo) {
