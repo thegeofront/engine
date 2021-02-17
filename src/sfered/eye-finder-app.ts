@@ -5,7 +5,7 @@
 import { version_converter } from "@tensorflow/tfjs";
 import { Mesh, meshFromObj } from "../geo/mesh";
 import { GeonImage } from "../img/Image";
-import { BellusScanData } from "./bellus-data";
+import { BellusScanData, NextcloudScanData } from "./scan-data";
 import { addDropFileEventListeners, loadTextFromFile } from "../system/domwrappers";
 import { Vector2Array, Vector3Array } from "../data/vector-array";
 import { Domain, Domain2, Domain3 } from "../math/domain";
@@ -23,6 +23,8 @@ import { Rectangle2 } from "../geo/rectangle2";
 import { LineArray } from "../data/line-array";
 import { Circle3 } from "../geo/circle3";
 import { Plane } from "../geo/plane";
+import { TextureMeshRenderer } from "../render/texture-mesh-renderer";
+import { DrawSpeed } from "../render/renderer";
 
 const settings = require('../sfered/settings.json'); // note DIFFERENCE BETWEEN "" AND ''. '' WORKS, "" NOT. 
 
@@ -40,7 +42,8 @@ const settings = require('../sfered/settings.json'); // note DIFFERENCE BETWEEN 
 export class EyeFinderApp extends App {
 
     // data 
-    bsd?: BellusScanData;
+    mesh?: Mesh;
+    landmarks?: Vector3Array;
 
     // process
     eyefinder: EyeFinder;
@@ -63,7 +66,7 @@ export class EyeFinderApp extends App {
     redLineRenderer: SimpleLineRenderer;
     blueLineRenderer: SimpleLineRenderer;
 
-    meshRenderer: SimpleMeshRenderer;
+    meshRenderer: TextureMeshRenderer;
 
     camera: Camera;
     imageRenderer: ImageRenderer;
@@ -83,7 +86,7 @@ export class EyeFinderApp extends App {
         this.blueLineRenderer = new SimpleLineRenderer(gl, [0,0,1,0.5]);
         this.redLineRenderer = new SimpleLineRenderer(gl, [1,0,0,0.5]);
         
-        this.meshRenderer = new SimpleMeshRenderer(gl, [0,0,1,0.25]);
+        this.meshRenderer = new TextureMeshRenderer(gl);
         this.imageRenderer = new ImageRenderer(gl);
         this.camera = new Camera(canvas, 0.1);
 
@@ -114,11 +117,11 @@ export class EyeFinderApp extends App {
             this.redLineRenderer.setAndRender(gl, matrix, renderable);
         })
      
-        if (this.bsd?.mesh == undefined)
+        if (this.mesh == undefined)
             this.redDotRenderer.render(gl, matrix, Vector3Array.fromList([new Vector3(0,0,0), new Vector3(1,1,1)]));
         else {
-            let mesh = this.bsd?.mesh;
-            let landmarks = this.bsd?.landmarks;
+            let mesh = this.mesh;
+            let landmarks = this.landmarks;
 
             //this.redLineRenderer.render(gl, matrix);
             // this.dotRenderer.renderQuick(gl, matrix, landmarks3.data, 3);
@@ -128,10 +131,11 @@ export class EyeFinderApp extends App {
             // console.log(this.dots2);
 
             // show the mesh
-            this.blueLineRenderer.setAndRender(gl, matrix, LineArray.fromMesh(mesh, true))
-            this.blueLineRenderer.setAndRender(gl, matrix, LineArray.fromMesh(mesh, false))
-            this.redDotRenderer.render(gl, matrix, landmarks);
-            this.blueDotRenderer.render(gl, matrix, mesh.uvs);
+            this.meshRenderer.render(gl, matrix);
+            // this.blueLineRenderer.render(gl, matrix);
+            // this.blueLineRenderer.setAndRender(gl, matrix, LineArray.fromMesh(mesh, false))
+            if (landmarks)
+                this.redDotRenderer.render(gl, matrix, landmarks);
             this.blueDotRenderer.render(gl, matrix, mesh.uvs);
 
             // debug data from eyefinder process
@@ -140,38 +144,84 @@ export class EyeFinderApp extends App {
             this.redDotRenderer.render(gl, matrix, this.redDots);
             this.whiteLineRenderer.setAndRender(gl, matrix, LineArray.fromLines(this.lines));
 
-            //this.redLineRenderer.setAndRender(gl, matrix, ));
+            this.redLineRenderer.render(gl, matrix);
 
             // render images
             let height = 200;
             let width = 300;
-            this.images.forEach((image, i) => {
-                this.imageRenderer.render(gl, 
-                    new Rectangle2(Matrix3.newIdentity(), Domain2.fromBounds(10,10+width, i*(height+10), i*(height+10) + height)), 
-                    image.toImageData());
-            });
+            // this.images.forEach((image, i) => {
+            //     this.imageRenderer.setAndRender(gl, 
+            //         new Rectangle2(Matrix3.newIdentity(), Domain2.fromBounds(10,10+width, i*(height+10), i*(height+10) + height)), 
+            //         image.toImageData());
+            // });
         }    
+    }
+
+    addNextcloudData(data: NextcloudScanData) {
+        console.log("TODO");
     }
 
     addBellusData(bsd: BellusScanData) {
 
-        this.bsd = bsd;
-        
         // start the eyefinder
-        this.eyefinder.findPupilsFromBellus(bsd);
+        let [left, right] = this.eyefinder.findPupilsFromBellus(bsd);
+
+        this.camera.pos = left.clone();
+        // this.camera.offset.x = 100;
 
         // put the data into the render buffers.
-        let mesh = this.bsd?.mesh;
+        let mesh = bsd.mesh;
 
-        // this.meshRenderer.set(this.gl, mesh.verts, mesh.faces);
-        // this.lineRenderer.set(this.gl, mesh.verts.data, mesh.getLineIds(), 3);
+        this.meshRenderer.set(this.gl, mesh);
+        this.blueLineRenderer.set(this.gl, LineArray.fromMesh(mesh), DrawSpeed.StaticDraw);
         // this.redLineRenderer.set(this.gl, mesh.uvs.data, mesh.getLineIds(), 2);
+
+        this.mesh = bsd.mesh;
+        this.landmarks = bsd.landmarks;
     }
+}
+
+enum Format {
+    None,
+    Bellus, // the special dataset gathered at an earlier step
+    NextCloudDataset // the 140 or so scans on nextcloud 
+}
+
+function getFormat(files: FileList) : Format {
+
+    let format = Format.None;
+    for(let i = 0 ; i < files.length; i++) {
+        let file = files.item(i)!;
+        if (file.name == "facelandmarks.json") {
+            return Format.Bellus;
+        }
+        if (file.name == "scaninfo.txt") {
+            return Format.NextCloudDataset;
+        }
+    }
+    return Format.None;
 }
 
 async function processFiles(this: EyeFinderApp, files: FileList) {
 
-    BellusScanData.fromFileList(files, settings).then(
-        (bsd) => this.addBellusData(bsd)
-    );
+    let format = getFormat(files);
+    switch(format) {
+        case Format.Bellus: 
+            console.log("found a bellus-style dataset! processing...")
+            BellusScanData.fromFileList(files, settings).then(
+                (bsd) => this.addBellusData(bsd)
+            );
+            break;
+        case Format.NextCloudDataset: 
+            console.log("found a scan from the nextcloud format! processing...")
+            NextcloudScanData.fromFileList(files, settings).then(
+                (data) => this.addNextcloudData(data)
+            );
+            break;
+        case Format.None: 
+            console.log("couldnt read the files you gave me...")
+            break;
+    }
+
+
 }

@@ -10,7 +10,7 @@ import { Vector2Array, Vector3Array } from "../data/vector-array";
 import { Domain2 } from "../math/domain";
 import { Vector2, Vector3 } from "../math/vector";
 import { DotRenderer3 } from "../render/dot-renderer3";
-import { BellusScanData } from "./bellus-data";
+import { BellusScanData } from "./scan-data";
 import { TopoMesh } from "../geo/topo-mesh";
 import { Plane } from "../geo/plane";
 import { Matrix4 } from "../math/matrix";
@@ -31,7 +31,7 @@ export class EyeFinder {
     public findPupilsFromBellus(bsd: BellusScanData) {
 
         // the main script of finding pupil points directly from the bellus scan data. 
-        console.log("finding eyes..");
+        console.log("finding eyes...");
 
         // get the window with which the eyes can be extracted
         let image = GeonImage.fromImageData(bsd.texture);
@@ -45,9 +45,9 @@ export class EyeFinder {
         let leftPupilPoint = this.findPupilFromEye(image, topo, winLeft, ransacSettings);
 
         // right side
-        // let rightPupilPoint = this.findPupilFromEye(image, topo, winRight);
+        let rightPupilPoint = this.findPupilFromEye(image, topo, winRight, ransacSettings);
 
-
+        return [leftPupilPoint, rightPupilPoint];
     }
 
     private findPupilFromEye(image: GeonImage, mesh: TopoMesh,  window: Domain2, ransacSettings: any) {
@@ -175,8 +175,6 @@ export class EyeFinder {
                 }
             }
         }
-
         return Vector2Array.fromList(points);
     }
-
 }

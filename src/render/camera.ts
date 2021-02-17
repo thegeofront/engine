@@ -4,6 +4,7 @@
 
 import { norm } from "@tensorflow/tfjs";
 import { LineArray } from "../data/line-array";
+import { Plane } from "../geo/plane";
 import { Matrix4 } from "../math/matrix";
 import { Ray } from "../math/ray";
 import { Vector2, Vector3 } from "../math/vector"
@@ -17,8 +18,6 @@ export class Camera {
     angleAlpha = 0; // rotation x 
     angleBeta = 0; // rotation y
     mousePos = Vector2.zero();
-    mouseRay?: Ray;
-    mouseRayVisual?: LineArray;
 
     // camera matrix properties
     fov = 20. * Math.PI / 100.;
@@ -28,6 +27,7 @@ export class Camera {
     // other consts
     speed = 1;
 
+    worldPlane = Plane.WorldXY();
     worldMatrix: Matrix4;
     projectMatrix: Matrix4;    
 
@@ -45,7 +45,18 @@ export class Camera {
         this.worldMatrix = this.getWorldMatrix();
         this.projectMatrix = this.getProjectionMatrix(state.canvas);
         this.updateClick(state);
+
+        if(state.IsKeyPressed("p")) {
+            console.log(this.pos);
+            console.log(this.offset);
+        }
     }
+
+    lookat(position: Vector3, target: Vector3) {
+        // set matrices to the thing
+        let matrix = Matrix4.newLookAt(position, target, this.worldPlane.khat);
+    }
+
 
     private updateClick(state: InputState) {
         // todo
@@ -67,7 +78,8 @@ export class Camera {
         let prevPos = this.mousePos.clone();
         this.mousePos = state.mousePos.clone();
         let delta = prevPos.clone().sub(this.mousePos);
-        this.mouseRay = this.getMouseWorldRay(state.canvas.width, state.canvas.height);
+
+        this.getMouseWorldRay(state.canvas.width, state.canvas.height);
 
         if (state.mouseRightDown) {
             this.angleAlpha += delta.y * 0.01;
@@ -140,11 +152,8 @@ export class Camera {
             .add(khat.clone().scale(f))
             .add(ihat.clone().scale(mouseUnitX))
             .add(jhat.clone().scale(-mouseUnitY));
-            
-        this.mouseRayVisual = LineArray.fromLines([
-            origin, screenPoint
-        ])
-        return new Ray(origin, screenPoint);
+          
+        return Ray.fromPoints(origin, screenPoint);
     }
 
     getWorldMatrix() : Matrix4 {

@@ -11,15 +11,28 @@ export class Ray {
     origin: Vector3;
     normal: Vector3;
 
-    constructor(origin: Vector3, normal: Vector3) {
+    // i do this to force intent : from points, or from normal. Both vector3, so otherwise confusing
+    private constructor(origin: Vector3, normal: Vector3) {
         this.origin = origin;
         this.normal = normal.normalize();
     }
+
+
+    static fromNormal(origin: Vector3, normal: Vector3) : Ray {
+        return new Ray(origin, normal);
+    }
+
+
+    static fromPoints(origin: Vector3, through: Vector3) : Ray {
+        return new Ray(origin, through.clone().sub(origin).normalize());
+    } 
+    
 
     at(t: number) : Vector3 {
         return this.origin.clone().add(this.normal.clone().scale(t));
     }
 
+    
     xPlane(plane: Plane) : number {
         
         // ray : pt = rOrigin + t * rNormal

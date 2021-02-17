@@ -13,6 +13,9 @@ export class ImageRenderer extends Renderer {
     u_resolution: WebGLUniformLocation;
     u_color: WebGLUniformLocation;
 
+    texture: WebGLTexture;
+    u_image: WebGLUniformLocation;
+
     constructor(gl: WebGLRenderingContext) {
 
         // note: I like vertex & fragments to be included in the script itself.
@@ -55,6 +58,8 @@ export class ImageRenderer extends Renderer {
         // look up where the vertex data needs to go.
         this.a_position = gl.getAttribLocation(this.program, "a_position");
         this.a_position_buffer = gl.createBuffer()!;
+
+        this.u_image =  gl.getUniformLocation(this.program, "u_image")!;
         this.u_resolution = gl.getUniformLocation(this.program, "u_resolution")!;
         this.u_color = gl.getUniformLocation(this.program, "u_color")!;
 
@@ -78,8 +83,8 @@ export class ImageRenderer extends Renderer {
         gl.vertexAttribPointer(a_texCoord, 2, gl.FLOAT, false, 0, 0);
         
         // Create a texture.
-        var texture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, texture);
+        this.texture = gl.createTexture()!;
+        gl.bindTexture(gl.TEXTURE_2D, this.texture);
         
         // Set the parameters so we can render any size image.
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -89,12 +94,16 @@ export class ImageRenderer extends Renderer {
     }
 
     // render 1 image to the screen
-    render(gl: WebGLRenderingContext, r: Rectangle2, image: ImageData) {
+    setAndRender(gl: WebGLRenderingContext, r: Rectangle2, image: ImageData) {
 
         // Tell it to use our program (pair of shaders)
         gl.useProgram(this.program);
 
-        // Upload the image into the texture.
+        // set uniforms
+        // gl.uniform1i(this.u_image, 1);
+
+        // activate & fill texture
+        // gl.bindTexture(gl.TEXTURE_2D, this.texture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
 
         // Turn on the attribute
@@ -129,12 +138,12 @@ export class ImageRenderer extends Renderer {
     setRectangle(gl: WebGLRenderingContext, r: Rectangle2) {
         let verts = r.getVertices();
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-        verts[0].x, verts[0].y,
-        verts[1].x, verts[1].y,
-        verts[2].x, verts[2].y,
-        verts[2].x, verts[2].y,
-        verts[1].x, verts[1].y,
-        verts[3].x, verts[3].y,
+            verts[0].x, verts[0].y,
+            verts[1].x, verts[1].y,
+            verts[2].x, verts[2].y,
+            verts[2].x, verts[2].y,
+            verts[1].x, verts[1].y,
+            verts[3].x, verts[3].y,
         ]), gl.STATIC_DRAW);
     }
 

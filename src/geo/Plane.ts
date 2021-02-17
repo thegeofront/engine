@@ -105,6 +105,11 @@ export class Plane {
         return this;
     }
 
+    move(origin: Vector3) {
+        this.center = origin;
+        return this;
+    }
+
     // NOTE: pulling is inefficient since i do not cache the inverse.
     pullToPlane(p: Vector3) : Vector3 {
         return this.inverse.multiplyVector(p);

@@ -101,6 +101,27 @@ export class GeonImage {
         ]
     }
 
+    flipHor() : GeonImage {
+        let image = new GeonImage(this.width, this.height, this.pixelSize)
+        for (let i = 0; i < this.height; i++) {
+            for (let j = 0; j < this.width; j++) {
+                let jMirror = this.width - 1 - j;
+                image.set(j, i, this.get(jMirror, i));
+            }
+        }
+        return image;
+    }
+
+    flipVer() : GeonImage {
+        let image = new GeonImage(this.width, this.height, this.pixelSize)
+        for (let i = 0; i < this.height; i++) {
+            let iMirror = this.height - 1 - i;
+            for (let j = 0; j < this.width; j++) {
+                image.set(j, i, this.get(j, iMirror));
+            }
+        }
+        return image;
+    }
 
     public applyKernel(kernel: FloatMatrix) : GeonImage {
 

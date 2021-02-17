@@ -280,7 +280,7 @@ export class Domain3 {
             {
                 for(let z of [this.z.t0, this.z.t1])
                 {
-                    data.push(new Vector3(x,y,z));
+                    data.push(matrix.multiplyVector(new Vector3(x,y,z)));
                 }
             }
         }

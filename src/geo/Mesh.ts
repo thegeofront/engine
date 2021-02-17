@@ -29,6 +29,7 @@ export class Mesh {
         this.texture = texture;
     }
 
+
     static fromData(verts: number[], norms: number[], uvs: number[], faces: number[]) : Mesh {
         
         // NOTE : this type of parsing makes my life easy, but is dangerous. This is why i created the 
@@ -40,6 +41,7 @@ export class Mesh {
         mesh.faces.fillWith(faces);
         return mesh;
     }
+
 
     static fromCube(cube: Cube) : Mesh {
 
@@ -57,6 +59,7 @@ export class Mesh {
         return mesh;
     }
 
+
     static fromRect(rect: Rectangle3) : Mesh {
 
         let verts = rect.getCorners();
@@ -71,9 +74,52 @@ export class Mesh {
         return mesh;
     }
 
+
+    static fromJoin(meshes: Mesh[]) : Mesh {
+
+        // join meshes, dont try to look for duplicate vertices
+        // TODO : make this the trouble of Matrices and Arrays
+        let vertCount = 0;
+        let faceCount = 0;
+        for (let mesh of meshes) {
+            vertCount += mesh.verts.count();
+            faceCount += mesh.faces.count();
+        }
+
+        let joined = new Mesh(vertCount, 0, 0, faceCount);
+
+        let accVerts = 0;
+        let accFaces = 0;
+        for (let mesh of meshes) {
+            for (let i = 0 ; i < mesh.verts.count(); i++) {
+                joined.verts.setVector(accVerts + i, mesh.verts.getVector(i));
+            }
+            for (let i = 0 ; i < mesh.faces.count(); i++) {
+                let face = mesh.faces.getRow(i);
+                for (let j = 0 ; j < face.length; j++) {
+                    face[j] = face[j] + accVerts;
+                }
+                joined.faces.setRow(accFaces + i, face);
+            }
+            accVerts += mesh.verts.count();
+            accFaces += mesh.faces.count();
+        }
+
+        return joined;
+    }
+
+
+    setTexture(texture: ImageData) {
+        this.texture = texture;
+    }
+
+    
     exportToObj(path: string) {
         throw "todo";
     }
+
+
+    
 };
 
 // ================ Help ==================
@@ -163,8 +209,11 @@ export function meshFromObj(text: string) : Mesh {
     }
     console.log("number of vertices: " + verts.length / 3);
     console.log("number of faces: " + faces.length / 3);
+    console.log("number of uvs: " + uvs.length / 2);
+    console.log("number of norms: " + norms.length / 3);
+
     let mesh = Mesh.fromData(verts, norms, uvs, faces);
-    
+  
     return mesh;
 }
 
