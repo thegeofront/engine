@@ -49,6 +49,7 @@ export class EyeFinderApp extends App {
     eyefinder: EyeFinder;
 
     // debug data 
+    dots?: Vector3Array;
     dots2: Vector2[] = [];
     whiteDots: Vector3[] = [];
     redDots: Vector3[] = [];
@@ -123,20 +124,15 @@ export class EyeFinderApp extends App {
             let mesh = this.mesh;
             let landmarks = this.landmarks;
 
-            //this.redLineRenderer.render(gl, matrix);
-            // this.dotRenderer.renderQuick(gl, matrix, landmarks3.data, 3);
-            // this.dotRenderer.renderQuick(gl, matrix, mesh.verts.data, 3);
-            // 
-            // this.redLineRenderer.render(gl, matrix);
-            // console.log(this.dots2);
-
+            
+    
             // show the mesh
             this.meshRenderer.render(gl, matrix);
-            // this.blueLineRenderer.render(gl, matrix);
+            this.blueLineRenderer.render(gl, matrix);
             // this.blueLineRenderer.setAndRender(gl, matrix, LineArray.fromMesh(mesh, false))
             if (landmarks)
                 this.redDotRenderer.render(gl, matrix, landmarks);
-            this.blueDotRenderer.render(gl, matrix, mesh.uvs);
+            this.blueDotRenderer.render(gl, matrix, mesh.uvs);   
 
             // debug data from eyefinder process
             this.redDotRenderer.render(gl, matrix, this.dots2);
@@ -154,11 +150,34 @@ export class EyeFinderApp extends App {
             //         new Rectangle2(Matrix3.newIdentity(), Domain2.fromBounds(10,10+width, i*(height+10), i*(height+10) + height)), 
             //         image.toImageData());
             // });
+
+            // render some dots 
+            if (this.dots) {
+                //
+                this.redDotRenderer.render(gl, matrix, this.dots);
+            }
         }    
     }
 
     addNextcloudData(data: NextcloudScanData) {
-        console.log("TODO");
+
+        // start the eyefinder
+        let [left, right] = this.eyefinder.findPupilsFromNextcloud(data);
+
+        // console.log(left);
+        // console.log(right);
+
+        let mesh = data.mesh;        
+        // this.meshRenderer.set(this.gl, mesh);
+        this.blueLineRenderer.set(this.gl, LineArray.fromMesh(mesh), DrawSpeed.StaticDraw);
+        this.mesh = mesh;
+
+        console.log(data.eyePointsEdited);
+        this.dots = data.eyePointsEdited;
+        this.dots.forEach((v, n) => {
+            console.log(v);
+        });
+        
     }
 
     addBellusData(bsd: BellusScanData) {
@@ -189,7 +208,6 @@ enum Format {
 
 function getFormat(files: FileList) : Format {
 
-    let format = Format.None;
     for(let i = 0 ; i < files.length; i++) {
         let file = files.item(i)!;
         if (file.name == "facelandmarks.json") {

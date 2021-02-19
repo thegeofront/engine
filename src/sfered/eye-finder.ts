@@ -10,7 +10,7 @@ import { Vector2Array, Vector3Array } from "../data/vector-array";
 import { Domain2 } from "../math/domain";
 import { Vector2, Vector3 } from "../math/vector";
 import { DotRenderer3 } from "../render/dot-renderer3";
-import { BellusScanData } from "./scan-data";
+import { BellusScanData, NextcloudScanData } from "./scan-data";
 import { TopoMesh } from "../geo/topo-mesh";
 import { Plane } from "../geo/plane";
 import { Matrix4 } from "../math/matrix";
@@ -27,6 +27,33 @@ export class EyeFinder {
     constructor(app?: EyeFinderApp) {
         this.app = app;
     }
+
+
+    public findPupilsFromNextcloud(data: NextcloudScanData): [any, any] {
+
+        // the main script of finding pupil points directly from the bellus scan data. 
+        console.log("finding eyes...");
+
+        let topo = TopoMesh.copyFromMesh(data.mesh);
+        let image = GeonImage.fromImageData(data.texture);
+        let [winLeft, winRight] = this.getEyeWindowsNextcloud(data, topo);
+
+        // get the window with which the eyes can be extracted
+       
+        
+        // console.log(winLeft, winRight);
+
+        
+        // left side
+        let ransacSettings = data.settings.process_ransac;
+        let leftPupilPoint = this.findPupilFromEye(image, topo, winLeft, ransacSettings);
+
+        // right side
+        let rightPupilPoint = this.findPupilFromEye(image, topo, winRight, ransacSettings);
+
+        return [leftPupilPoint, rightPupilPoint];  
+    }
+
 
     public findPupilsFromBellus(bsd: BellusScanData) {
 
@@ -49,6 +76,7 @@ export class EyeFinder {
 
         return [leftPupilPoint, rightPupilPoint];
     }
+
 
     private findPupilFromEye(image: GeonImage, mesh: TopoMesh,  window: Domain2, ransacSettings: any) {
 
@@ -105,6 +133,7 @@ export class EyeFinder {
         return Vector3.zero();
     }
 
+
     private contrastDetection(image: GeonImage) : GeonImage {
 
         let grey = image.toGreyscale();
@@ -127,6 +156,7 @@ export class EyeFinder {
         return thres;
     }
 
+    
     private SobelSum(hor: GeonImage, ver: GeonImage) : GeonImage {
         
         let width = hor.width; // assume the same as ver
@@ -149,9 +179,32 @@ export class EyeFinder {
         return sum;
     }
 
+
+    private getEyeWindowsNextcloud(data: NextcloudScanData, mesh: TopoMesh) : [Domain2, Domain2] {
+        
+        let bb_o = data.settings.process.bounding_box_offset;
+
+        let eyeGuessLeft = data.eyePointsEdited.getVector(0);
+        let eyeGuessRight = data.eyePointsEdited.getVector(1);
+
+        console.log("eyeGuessLeft, eyeGuessRight");
+        console.log(eyeGuessLeft, eyeGuessRight);
+
+        let eyeLandmarksLeft = mesh.flattenClosestPoint(eyeGuessLeft);
+        let eyeLandmarksRight = mesh.flattenClosestPoint(eyeGuessRight);
+
+        console.log("eyeLandmarksLeft, eyeLandmarksRight");
+        console.log(eyeLandmarksLeft, eyeLandmarksRight);
+
+        let rightWindow = Domain2.fromInclude(Vector2Array.fromList([eyeLandmarksLeft])).offset(bb_o.ly);
+        let leftWindow = Domain2.fromInclude(Vector2Array.fromList([eyeLandmarksRight])).offset(bb_o.ry);
+
+        return [rightWindow, leftWindow];
+    }
+
+
     private getEyeWindows(bsd: BellusScanData) : [Domain2, Domain2] {
 
-        // get a window around the left- and right-eye feature points, so they can be extracted
         let pr = bsd.settings.process.point_ranges;
         let bb_o = bsd.settings.process.bounding_box_offset;
 
@@ -163,6 +216,7 @@ export class EyeFinder {
 
         return [rightWindow, leftWindow];
     }
+
 
     private pixelsToPoints(image: GeonImage, threshold: number) : Vector2Array {
 

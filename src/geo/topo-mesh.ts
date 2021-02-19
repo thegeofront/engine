@@ -1,8 +1,10 @@
 import { getBinaryCache } from "@tensorflow/tfjs-backend-webgl/dist/backend_webgl";
 import { HashTable } from "../data/hash-table";
 import { IntMatrix } from "../data/int-matrix";
+import { Vector3Array } from "../data/vector-array";
 import { Vector2, Vector3 } from "../math/vector";
 import { Mesh } from "./mesh";
+import { Triangle2, Triangle3 } from "./triangle";
 
 // a mesh with topological information
 export class TopoMesh extends Mesh {
@@ -92,6 +94,8 @@ export class TopoMesh extends Mesh {
 
     
     /**
+     * Get the triangle based on a UV point somewhere on the mesh.
+     * Returns -1 if the point is not on the mesh TODO OR IF THE PATH HAS HOLES IN IT TODO FIX THIS!
      * @param  {Vector2} point
      * @returns triangleIndex, or -1 if failure
      */
@@ -140,26 +144,86 @@ export class TopoMesh extends Mesh {
         return -1;
     }
 
+    // find the faces closest to the point 
+    // -1 if the mesh does not contain triangles
+    closestFaces(point: Vector3) : number[] {
+
+        let closestVertexId = this.verts.closestId(point);
+
+        // get all face ids containing closestVertex, along with their centers
+        let closestFaces: number[] = [];  
+        //let centers: Vector3[] = []
+        this.faces.forEachRow((tr, i) => {
+            if (tr.includes(closestVertexId)) {
+                closestFaces.push(i);
+                //let center = Vector3Array.fromList(this.getFacePoints(i, false)).average();
+                //centers.push(center);
+            }
+        });
+
+        // select the triangle with the closest baricenter
+        return closestFaces;
+    }
+
     elevate(p: Vector2) : Vector3 {
         // 'elevate' a point in UV space to vertex space using a barycentric remap
         
         // figure out where this point is located on the mesh
-        let tr = this.walkUV(p);
+        let face = this.walkUV(p);
         
-        if (tr == -1) {
+        if (face == -1) {
             console.warn("got a point not on triangle...");
             return new Vector3(0,0,0);
         } 
 
-        let bari = this.getBariCoords(tr, p, true);
-        let point3d = this.getBariPoint(tr, bari, false) as Vector3;
-
-        return point3d;
+        let tr3 = this.getTriangle3(face);
+        let tr2 = this.getTriangle2(face);
+        
+        let bari = tr2.toBarycentric(p);
+        return tr3.fromBarycentric(bari);
     }
 
-    flatten(p: Vector3) : Vector2 {
-        // 'flatten' a point in vertex space to uv space using a barycentric remap
-        return new Vector2(0,0);
+    closestPoint(p: Vector3) : [Vector3, number] {
+        let faceIds = this.closestFaces(p);
+        let closestPoints = new Vector3Array(faceIds.length);
+        faceIds.forEach((id, i) => {
+            let tr = this.getTriangle3(id);
+            let cp = tr.closestPoint(p);
+            closestPoints.setVector(i, cp);
+        })
+
+        // find the closest closest point 
+        let id = closestPoints.closestId(p);
+        return [closestPoints.getVector(id), faceIds[id]];
+    }
+
+    // 'flatten' a point in vertex space to uv space using a barycentric remap
+    // NOTE : this is not exactly a 'project to closest triangle', something like that wouldnt always work
+    flatten(p: Vector3, face: number) : Vector2 {
+        
+        let tr3 = this.getTriangle3(face);
+        let tr2 = this.getTriangle2(face);
+
+        let bari = tr3.toBarycentric(p);
+        return tr2.fromBarycentric(bari);
+    }
+
+
+    // combo
+    flattenClosestPoint(p: Vector3) {
+        let [cp, face] = this.closestPoint(p);
+        return this.flatten(cp, face);
+    }
+
+
+    public getTriangle2(id: number) : Triangle2 {
+        let p = this.getFacePoints(id, true);
+        return new Triangle2(p[0], p[1], p[2]);
+    }
+
+    public getTriangle3(id: number) : Triangle3 {
+        let p = this.getFacePoints(id, false);
+        return new Triangle3(p[0], p[1], p[2]);
     }
 
     private pointSignUV(a: Vector2, edge: [number, number]) {
@@ -169,6 +233,7 @@ export class TopoMesh extends Mesh {
 
         return ((a.x - c.x) * (b.y - c.y)) - ((b.x - c.x) * (a.y- c.y));
     }
+
 
     private setNb(faceIndex: number, commonEdge: Int32Array, nbIndex: number) {
         
@@ -183,6 +248,7 @@ export class TopoMesh extends Mesh {
         throw "these are not actually neighbors!";
     }
 
+
     private getNb(faceIndex: number, commonEdge: Int32Array | [number, number] ) : number {
         for(let j = 0 ; j < 3; j++) {
             if (!commonEdge.includes(this.faces.get(faceIndex, j))) {
@@ -194,7 +260,8 @@ export class TopoMesh extends Mesh {
         throw "common edge does not match triangle index!";
     }
 
-    private getFacePoints(tr: number, uv=true) : [any, any, any] {
+
+    private getFacePoints(tr: number, uv: boolean) : [any, any, any] {
         
         let pointIds = this.faces.getRow(tr);
         if (uv) {
@@ -213,30 +280,31 @@ export class TopoMesh extends Mesh {
         
     }
 
-    private getBariCoords(faceIndex: number, p: Vector2, fromUV: boolean) : Vector3 {
-        // get vectors
-        let [a, b, c] = this.getFacePoints(faceIndex, fromUV);
 
-        // this can be more elegant using matrices, but this formula works
-        let [px, py] = [p.x, p.y];
-        let [x1, y1] = [a.x, a.y];
-        let [x2, y2] = [b.x, b.y];
-        let [x3, y3] = [c.x, c.y];
-        let denom = ((y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3))
-        let u = ((y2 - y3) * (px - x3) + (x3 - x2) * (py - y3)) / denom
-        let v = ((y3 - y1) * (px - x3) + (x1 - x3) * (py - y3)) / denom
-        let w = 1 - u - v
-        return new Vector3(u, v, w);
-    }
+    // private getBariCoords(faceIndex: number, p: Vector2) : Vector3 {
+    //     // get vectors
+    //     let [a, b, c] = this.getFacePoints(faceIndex, true);
 
-    private getBariPoint(faceIndex: number, barycoord: Vector3, fromUV: boolean) : Vector2 | Vector3 {
-        let [a, b, c] = this.getFacePoints(faceIndex, fromUV);
+    //     // this can be more elegant using matrices, but this formula works
+    //     let [px, py] = [p.x, p.y];
+    //     let [x1, y1] = [a.x, a.y];
+    //     let [x2, y2] = [b.x, b.y];
+    //     let [x3, y3] = [c.x, c.y];
+    //     let denom = ((y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3))
+    //     let u = ((y2 - y3) * (px - x3) + (x3 - x2) * (py - y3)) / denom
+    //     let v = ((y3 - y1) * (px - x3) + (x1 - x3) * (py - y3)) / denom
+    //     let w = 1 - u - v
+    //     return new Vector3(u, v, w);
+    // }
 
-        a.scale(barycoord.x);
-        b.scale(barycoord.y);
-        c.scale(barycoord.z);
 
-        return a.add(b).add(c);
+    // private getBariPoint(faceIndex: number, barycoord: Vector3, fromUV: boolean) : Vector2 | Vector3 {
+    //     let [a, b, c] = this.getFacePoints(faceIndex, fromUV);
 
-    }
+    //     a.scale(barycoord.x);
+    //     b.scale(barycoord.y);
+    //     c.scale(barycoord.z);
+
+    //     return a.add(b).add(c);
+    // }
 }

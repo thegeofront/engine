@@ -6,6 +6,7 @@
 // NOTE:    all these small wrappers might not be good pratice, but I 
 //          like to extract simple logic like this to not clutter the code too much
 
+import { isDownloadFloatTextureEnabled } from "@tensorflow/tfjs-backend-webgl/dist/webgl_util";
 import { Matrix4 } from "../math/matrix";
 import { Vector3, Vector2 } from "../math/vector";
 import { FloatMatrix } from "./float-matrix";
@@ -90,6 +91,18 @@ export class Vector3Array extends FloatMatrix {
         return array;
     }
 
+    static fromNative(native: number[][]) : Vector3Array {
+        // assume all subarrays have the same shape!!
+        let height = native.length;
+        let matrix = new Vector3Array(height);
+        for (var i = 0; i < native.length; i++) {
+            for (var j = 0; j < native[0].length; j++) {
+                matrix.set(i, j, native[i][j]);
+            }
+        }
+        return matrix; 
+    }
+
     fillFromList(vecs: Vector3[]) {
         for(let i = 0; i < vecs.length; i++) {
             this.data[i*3] = vecs[i].x;
@@ -98,12 +111,14 @@ export class Vector3Array extends FloatMatrix {
         }
     }
 
-    forEach(callbackfn: (value: Vector3, index: number) => Vector3) : Vector3Array {
+    forEach(callbackfn: (value: Vector3, index: number) => any) : Vector3Array {
         
         for(let i = 0 ; i < this.count(); i++) {
             let vec = this.getVector(i);
-            vec = callbackfn(vec, i);
-            this.setVector(i, vec);
+            vec = callbackfn(vec, i)!;
+            if (vec instanceof Vector3) {
+                this.setVector(i, vec);
+            }
         }
         return this;
     }
@@ -172,6 +187,52 @@ export class Vector3Array extends FloatMatrix {
         }
 
         return sum.scale(1 / count);
+    }
+
+    average() : Vector3 {
+        let sum = new Vector3(0,0,0);
+        this.forEach((v, i) => {
+            sum = sum.add(v)
+        })
+        return sum.divscale(this.count());
+    }
+
+    closestId(point: Vector3) : number {
+
+        let lowScore = Infinity
+        let id = -1;
+
+        this.forEach((v, i) => {
+            let disSquared = point.disToSquared(v);
+            if (disSquared < lowScore) {
+                lowScore = disSquared;
+                id = i;
+            }
+        })
+        return id;
+    }
+
+    closestIds(point: Vector3, n: number) : number[] {
+        // O(m*n)... TODO implement quicksort 
+
+        let ids: number[] = [];
+
+        for(let i = 0 ; i < n; i++) {
+            
+            let lowScore = Infinity;
+            let id = -1;
+            this.forEach((v, i) => {
+                if (ids.includes(id)) 
+                    return;
+                let disSquared = point.disToSquared(v);
+                if (disSquared < lowScore) {
+                    lowScore = disSquared;
+                    id = i;
+                }
+            })
+            ids.push(id);
+        }
+        return ids;
     }
 }
 

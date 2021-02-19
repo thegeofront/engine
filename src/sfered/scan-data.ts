@@ -146,20 +146,32 @@ export class NextcloudScanData {
     texture: ImageData; 
     mesh: Mesh;
     settings: any; // local settings file. We want this to extract the right regions.
+    json: any;
+    eyePointsEdited!: Vector3Array;
+    eyePoints!: Vector3Array;
 
-    constructor(landmarkData: any, texture: ImageData, mesh: Mesh, settings: any) {
+    // data to be found in the json
+
+
+    constructor(landmarkData: any, texture: ImageData, mesh: Mesh, settings: any, json: any) {
 
         this.landmarkData = landmarkData;
         this.texture = texture;
         this.mesh = mesh;
         this.settings = settings;
-        // this.landmarks3 = this.getLandmarks3f(); // NOTE - we will not use the bellus 3d landmarks. 
-        // they are located within a uncypherable space
+        this.json = json;
+
+        this.readJson(json);
+    }
+
+    private readJson(json: any) {
+        this.eyePoints = Vector3Array.fromNative(json.pupil_pts);
+        this.eyePointsEdited = Vector3Array.fromNative(json.pupil_pts_edited);
     }
 
 
     static async fromFileList(files: FileList, settings: any) : Promise<NextcloudScanData> {
-        
+        1
         // assign the correct files.
         let textFile: File | undefined;
         let textureFile: File | undefined;
@@ -215,6 +227,9 @@ export class NextcloudScanData {
                 } 
                 let json: JSON = JSON.parse(jsonbit);
 
+                console.log("found the following json:");
+                console.log(json);
+
                 // read the rest
                 let texture = await loadImageFromFile(textureFile);
                 let objtext = await loadTextFromFile(objFile);
@@ -230,7 +245,7 @@ export class NextcloudScanData {
                 console.log("done! bellus scan loaded.");
 
                 // return
-                resolve(new NextcloudScanData(json, texture, mesh, settings));
+                resolve(new NextcloudScanData(json, texture, mesh, settings, json));
             }
         });
     }
