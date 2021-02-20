@@ -9,7 +9,7 @@ export class Const {
 
     // ----- Line Render Settings ----- 
     static PLANE_RENDER_LINECOUNT = 9;
-    static PLANE_RENDER_LINEDISTANCE = 3;
+    static PLANE_RENDER_LINEDISTANCE = .3;
 
     static CIRCLE_SEGMENTS = 100;
 } 

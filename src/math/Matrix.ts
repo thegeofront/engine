@@ -186,7 +186,7 @@ export class Matrix4 extends FloatMatrix {
         return Matrix4.newCopy(this);
     }
 
-    multiply(other: Matrix4) {
+    multiplied(other: Matrix4) {
   
         // NOTE: i swapped a and b, this makes more sense to me, but i could be wrong about it...
         const a = other.data;
@@ -244,7 +244,13 @@ export class Matrix4 extends FloatMatrix {
             b30 * a03 + b31 * a13 + b32 * a23 + b33 * a33,
         ]);
     }
+   
     
+    multiply(other: Matrix4) {
+        this.data = this.multiplied(other).data;
+        return this;
+    }
+
     
     transpose() : Matrix4 {
         let matrix = new Matrix4();

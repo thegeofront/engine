@@ -66,7 +66,7 @@ export class GeometryApp extends App {
         super(gl);
         this.camera = new Camera(canvas);
         this.dotRenderer = new DotRenderer3(gl, 4, [1,0,0,1], false);
-        this.whiteLineRenderer = new SimpleLineRenderer(gl, [0.2,0,1,1]);
+        this.whiteLineRenderer = new SimpleLineRenderer(gl, [1,1,1,1]);
         this.greyLineRenderer = new SimpleLineRenderer(gl, [0.2,0,1,0.5]);
         this.redLineRenderer = new SimpleLineRenderer(gl, [0.8,0,0,1]);
         this.meshRenderer = new MeshRenderer(gl);
@@ -146,23 +146,25 @@ export class GeometryApp extends App {
         let mouseRay = this.camera.getMouseWorldRay(state.canvas.width, state.canvas.height);
         
         // snap to world
-        let cursor = mouseRay.at(mouseRay.xPlane(this.plane));
-        let mapCursor = this.worldToMap(cursor);
-        let coord = this.mapToWorld(mapCursor);
+        // let cursor = mouseRay.at(mouseRay.xPlane(this.plane));
+        // let mapCursor = this.worldToMap(cursor);
+        // let coord = this.mapToWorld(mapCursor);
 
         // place circle at cursor
-        let plane = this.plane.clone();
-        plane.matrix = plane.matrix.multiply(Matrix4.newTranslation(cursor.x, cursor.y, cursor.z));
-        this.cursorVisual = LineArray.fromCircle(new Circle3(plane, 0.1));
+        // let plane = this.plane.clone();
+        // plane.matrix = plane.matrix.multiply(Matrix4.newTranslation(cursor.x, cursor.y, cursor.z));
+        // this.cursorVisual = LineArray.fromCircle(new Circle3(plane, 0.1));
         
-        // get empty cube location
-        if (state.mouseLeftPressed) {
+        // figure out which cube we are pointing to
+        let cubeCursor: Vector3; 
+        {
             this.flushPreviewCubes();
-            let cubeID = this.voxelRaycast(mouseRay, 20);
+            let [cubeID, cubePrevious] = this.voxelRaycast(mouseRay, 40);
             if (cubeID == -1) {
                 
             } else {
-                let cubePoint = this.map.getCoords(cubeID);   
+                let cubeCursor = this.map.getCoords(cubeID);   
+                this.addPreviewCube(cubeCursor);
             }
         }
 
@@ -172,17 +174,17 @@ export class GeometryApp extends App {
         // this.geo.push(Mesh.fromCube(cube));  
         
         // click
-        // if (state.mouseLeftDown) {
-        //     if (state.IsKeyDown(" ")) {
-        //         if (this.map.get(mapCursor.x, mapCursor.y, mapCursor.z) == 0) 
-        //             return;
-        //         this.map.set(mapCursor.x, mapCursor.y, mapCursor.z, 0);
-        //         this.buffer();
-        //     } else if (this.map.get(mapCursor.x, mapCursor.y, mapCursor.z) != 1) {
-        //         this.map.set(mapCursor.x, mapCursor.y, mapCursor.z, 1);
-        //         this.buffer();
-        //     } 
-        // }
+        if (state.mouseLeftDown) {
+            if (state.IsKeyDown(" ")) {
+                if (this.map.get(mapCursor.x, mapCursor.y, mapCursor.z) == 0) 
+                    return;
+                this.map.set(mapCursor.x, mapCursor.y, mapCursor.z, 0);
+                this.buffer();
+            } else if (this.map.get(mapCursor.x, mapCursor.y, mapCursor.z) != 1) {
+                this.map.set(mapCursor.x, mapCursor.y, mapCursor.z, 1);
+                this.buffer();
+            } 
+        }
     }
 
     
@@ -190,10 +192,7 @@ export class GeometryApp extends App {
     // A Fast Voxel Traversal Algorithm for Ray Tracing
     // Amanatides, Woo
     // Dept. of Computer Science
-    voxelRaycast(ray: Ray, range: number) : number {
-
-        // debug ray
-        this.whiteLineRenderer.set(this.gl, ray.toLine(100), DrawSpeed.StaticDraw);
+    voxelRaycast(ray: Ray, range: number) : [number, number] {
 
         let startPoint = this.worldToMap(ray.origin);
         let voxelCenter = this.mapToWorld(startPoint);
@@ -217,29 +216,53 @@ export class GeometryApp extends App {
         let deltay = voxelsize / Math.abs(ray.normal.y);
         let deltaz = voxelsize / Math.abs(ray.normal.z);
 
-        // intit tx, ty, and tz, at their first intersection
+        // intit tx, ty, and tz, at their first intersection with corresponding plane
         voxelCenter.add(new Vector3(voxelsize/2 * stepX, voxelsize/2 * stepY, voxelsize/2 * stepZ));
 
+        let move = Matrix4.newTranslation(voxelCenter.x, voxelCenter.y, voxelCenter.z);
         let xy = Plane.WorldXY();
-        xy.matrix.multiply(Matrix4.newTranslation(voxelCenter.x, voxelCenter.y, voxelCenter.z));
+        xy._matrix.multiply(move);
         let yz = Plane.WorldYZ();
-        yz.matrix.multiply(Matrix4.newTranslation(voxelCenter.x, voxelCenter.y, voxelCenter.z));
+        yz._matrix.multiply(move);
         let xz = Plane.WorldXZ();
-        xz.matrix.multiply(Matrix4.newTranslation(voxelCenter.x, voxelCenter.y, voxelCenter.z));
+        xz._matrix.multiply(move);
 
         let tx = ray.xPlane(yz);
         let ty = ray.xPlane(xz);
         let tz = ray.xPlane(xy);
 
-        console.log("voxel raycast initialized with:");
-        console.log("deltas: ", deltax, deltay, deltaz);
-        console.log("t's: ", tx, ty, tz);
+        if (tx < 0 || ty < 0 || tz < 0) {
+            console.log("something critical went wrong!");
+            return [-1, -1];
+        }
+
+        // debug ray
+        // let lineSets: LineArray[] = [ray.toLine(100), LineArray.fromPlane(xy), LineArray.fromPlane(yz), LineArray.fromPlane(xz)];
+        // this.whiteLineRenderer.set(this.gl, LineArray.fromJoin(lineSets), DrawSpeed.StaticDraw);
+
+        // console.log("voxel raycast initialized with:");
+        // console.log("deltas: ", deltax, deltay, deltaz);
+        // console.log("t's: ", tx, ty, tz);
 
         // start iterating
-        console.log("cast away!");
-        this.addPreviewCube(new Vector3(x,y,z));
-        console.log(x,y,z);
+        // console.log("cast away!");
+        // this.addPreviewCube(new Vector3(x,y,z));
+        // console.log(x,y,z);
         for(let i = 0 ; i < range; i++) {
+
+            // this.addPreviewCube(new Vector3(xprev,yprev,zprev));
+
+            // if hit, return previous
+            let value = this.map.get(x,y,z);
+            if (value == 1) {
+                // console.log("found a cube after " + i + "steps...");
+                // this.addPreviewCube(new Vector3(xprev,yprev,zprev));
+                return [this.map.getIndex(x, y, z), this.map.getIndex(xprev, yprev, zprev)];
+            } else {
+                xprev = x;
+                yprev = y;
+                zprev = z;
+            }
 
             // to the next cube!
             if (tx < ty && tx < tz) {
@@ -255,21 +278,8 @@ export class GeometryApp extends App {
                 tz += deltaz;
                 z += stepZ;
             }
-
-            this.addPreviewCube(new Vector3(x,y,z));
-            console.log(x,y,z);
-            // if hit, return previous
-            let value = this.map.get(x,y,z);
-            if (value == 1) {
-                console.log("found a cube after " + i + "steps...");
-                return this.map.getIndex(xprev, yprev, zprev);
-            } else {
-                xprev = x;
-                yprev = y;
-                zprev = z;
-            }
         }
-        return -1
+        return [-1, -1]
     }
 
 
@@ -305,7 +315,7 @@ export class GeometryApp extends App {
     createCube(center: Vector3) {
         let hs = this.cellSize / 2;
         let move = Matrix4.newTranslation(center.x, center.y, center.z);
-        let cube = new Cube(Plane.WorldXY().transform(move), Domain3.fromBounds(-hs, hs, -hs, hs, 0, this.cellSize));
+        let cube = new Cube(Plane.WorldXY().transform(move), Domain3.fromBounds(-hs, hs, -hs, hs,-hs, hs));
         return cube;
     }
 }

@@ -167,7 +167,37 @@ export class LineArray {
 
         let verts = Vector3Array.fromList(cube.getCorners());
 
-        return new LineArray(verts, );
+        return new LineArray(verts);
+    }
+
+    static fromJoin(lines: LineArray[]) : LineArray {
+
+        // join meshes, dont try to look for duplicate vertices
+        // TODO : make this the trouble of Matrices and Arrays
+        let idsCount = 0;
+        let vertCount = 0;
+        for (let line of lines) {
+            idsCount += line.ids.length;
+            vertCount += line.verts.count();
+        }
+
+        let verts = new Vector3Array(vertCount);
+        let ids = new Uint16Array(idsCount);
+
+        let accVerts = 0;
+        let accFaces = 0;
+        for (let lineset of lines) {
+            for (let i = 0 ; i < lineset.verts.count(); i++) {
+                verts.setRow(accVerts + i, lineset.verts.getRow(i));
+            }
+            for (let i = 0 ; i < lineset.ids.length; i++) {
+                ids[accFaces+i] = lineset.ids[i] + accVerts;
+            }
+            accVerts += lineset.verts.count();
+            accFaces += lineset.ids.length;
+        }
+
+        return new LineArray(verts, ids);
     }
 }
 
