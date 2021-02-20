@@ -25,9 +25,9 @@ export class Triangle2 {
 
     fromBarycentric(bari: Vector3) : Vector2 {
 
-        let a = this.a.clone().scale(bari.x);
-        let b = this.b.clone().scale(bari.y);
-        let c = this.c.clone().scale(bari.z);
+        let a = this.a.scale(bari.x);
+        let b = this.b.scale(bari.y);
+        let c = this.c.scale(bari.z);
 
         return a.add(b).add(c);
 

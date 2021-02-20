@@ -144,14 +144,14 @@ export class Camera {
         let jDestiny = invWorld.multiplyVector(new Vector3(0,1,0));
         let kDestiny = invWorld.multiplyVector(new Vector3(0,0,-1));
 
-        let ihat = iDestiny.clone().sub(origin).normalize();
-        let jhat = jDestiny.clone().sub(origin).normalize();
-        let khat = kDestiny.clone().sub(origin).normalize();
+        let ihat = iDestiny.sub(origin).normalize();
+        let jhat = jDestiny.sub(origin).normalize();
+        let khat = kDestiny.sub(origin).normalize();
 
-        let screenPoint = origin.clone()
-            .add(khat.clone().scale(f))
-            .add(ihat.clone().scale(mouseUnitX))
-            .add(jhat.clone().scale(-mouseUnitY));
+        let screenPoint = origin
+            .added(khat.scaled(f))
+            .add(ihat.scaled(mouseUnitX))
+            .add(jhat.scaled(-mouseUnitY));
           
         return Ray.fromPoints(origin, screenPoint);
     }

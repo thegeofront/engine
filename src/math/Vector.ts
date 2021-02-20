@@ -22,6 +22,7 @@ export class Vector3
         this.z = z;
     }
 
+
 	static fromLerp( v1:Vector3, v2:Vector3, alpha:number ) : Vector3 
 	{
 		return new Vector3(
@@ -31,9 +32,11 @@ export class Vector3
 		);
 	}
 
+
     static fromArray(a: Float32Array | number[] | Array<number>) : Vector3 {
         return new Vector3(a[0], a[1], a[2]);
     }
+
 
     static fromRandom() : Vector3 
     {
@@ -43,6 +46,7 @@ export class Vector3
 		    Math.random()
         )
 	}
+
 
     static fromSphere(radius:number, theta:number, phi:number) : Vector3
     {
@@ -54,6 +58,7 @@ export class Vector3
         );
 	}
 
+
     static fromCylinder(radius:number, theta:number, height:number) : Vector3 
     {
         return this.constructor(
@@ -63,6 +68,7 @@ export class Vector3
         );
 	}
 
+
 	// #endregion
 	// #region defaults 
 
@@ -70,20 +76,25 @@ export class Vector3
 		return new Vector3(0,0,0);
 	};
 
+	
 	static unitX() {
 		return new Vector3(1,0,0);
 	};
 
+	
 	static unitY() {
 		return new Vector3(0,1,0);
 	};
+
 
 	static unitZ() {
 		return new Vector3(0,0,1);
 	};
 
+
 	// #endregion
 	// #region basics
+
 
 	set(x:number, y:number, z:number) : Vector3
 	{
@@ -93,24 +104,29 @@ export class Vector3
 		return this 		
 	}
 
+
 	equals(v:Vector3) : boolean
 	{
 		return ( ( v.x === this.x ) && ( v.y === this.y ) && ( v.z === this.z ) );
 	}
+
 
     toString() : string
     {
         return `Vector3(${this.x}, ${this.y}, ${this.z})`;
     }
 
+
 	toVector2() : Vector2 {
 		return new Vector2(this.x, this.y);
 	}
+
 
     clone() : Vector3
     {
         return new Vector3(this.x, this.y, this.z);
     }
+
 
     copy(v: Vector3) : Vector3
     {
@@ -120,31 +136,54 @@ export class Vector3
         return this;
     }
 
+
 	to2D(): Vector2 {
         return new Vector2(this.x, this.y);
     }
 
+
     // #endregion
 	// #region math like vector2
+
 
     largestValue() : number {
         return Math.max(this.x, this.y, this.z);
     }
 
-    add(v: Vector3) : Vector3 {
-        this.x += v.x;
-        this.y += v.y;
-        this.z += v.z;
-        return this;
+
+    added(v: Vector3) : Vector3 {
+		return new Vector3(
+			this.x + v.x,
+			this.y + v.y,
+			this.z + v.z
+		);
     }
 
-    sub(v: Vector3) : Vector3 {
-		// return new Vector3(v.x, v.y, v.z);
-        this.x -= v.x;
-        this.y -= v.y;
-        this.z -= v.z;
-        return this;
+
+	add(v: Vector3) : Vector3 {
+		this.x += v.x,
+		this.y += v.y,
+		this.z += v.z
+		return this;
     }
+
+
+    subbed(v: Vector3) : Vector3 {
+		return new Vector3(
+			this.x - v.x, 
+			this.y - v.y, 
+			this.z - v.z
+		);
+    }
+
+
+	sub(v: Vector3) : Vector3 {
+		this.x -= v.x,
+		this.y -= v.y,
+		this.z -= v.z
+		return this;
+    }
+
 
 	item(i: number) {
 		switch(i) {
@@ -156,150 +195,205 @@ export class Vector3
 		}
 	}
 
-    mul(v: Vector3) : Vector3
+
+    scaled(v: number) : Vector3
     {
-        this.x += v.x;
-        this.y += v.y;
-        this.z == v.z;
-        return this;
+        return new Vector3(
+			this.x * v, 
+			this.y * v, 
+			this.z * v
+		);
     }
+
 
     scale(v: number) : Vector3
     {
-        this.x *= v;
-        this.y *= v;
-        this.z *= v;
-        return this;
+		this.x *= v, 
+		this.y *= v, 
+		this.z *= v
+		return this;
     }
 
-    div(v: Vector3) : Vector3
+
+    divVector(vector: Vector3) : Vector3
     {
-        this.x /= v.x;
-        this.y /= v.y;
-        this.z /= v.z;
-        return this;
+		return new Vector3(
+			this.x / vector.x, 
+			this.y / vector.y, 
+			this.z / vector.z
+		);
     }
 
-    divscale(v: number) : Vector3
+
+    dived(value: number) : Vector3
     {
-        this.x /= v;
-        this.y /= v;
-        this.z /= v;
-        return this;
+		return new Vector3(
+			this.x / value, 
+			this.y / value, 
+			this.z / value
+		);
     }
 
-    minimum(other: Vector3) : Vector3 
+
+	div(value: number) : Vector3 {
+		this.x /= value, 
+		this.y /= value, 
+		this.z /= value
+		return this;
+    }
+
+
+    minimumed(other: Vector3) : Vector3 
     {
-		this.x = Math.min( this.x, other.x );
-        this.y = Math.min( this.y, other.y );
-        this.z = Math.min( this.z, other.z );
-		return this;
+		return new Vector3(
+			Math.min(this.x, other.x),
+			Math.min(this.y, other.y), 
+			Math.min(this.z, other.z),
+		);
 	}
 
-	maximum(other: Vector3) : Vector3 
+
+	maximumed(other: Vector3) : Vector3 
 	{
-		this.x = Math.max( this.x, other.x );
-        this.y = Math.max( this.y, other.y );
-        this.z = Math.max( this.z, other.z );
-		return this;
+		return new Vector3(
+			Math.max(this.x, other.x),
+			Math.max(this.y, other.y), 
+			Math.max(this.z, other.z)
+		);
 	}
 
-	clamp(min: Vector3, max: Vector3) : Vector3 
+
+	clamped(min: Vector3, max: Vector3) : Vector3 
 	{
-		// assumes min < max, componentwise
-		this.x = Math.max(min.x, Math.min(max.x, this.x));
-        this.y = Math.max(min.y, Math.min(max.y, this.y));
-        this.z = Math.max(min.z, Math.min(max.z, this.z));
-		return this;
+		return new Vector3(
+			Math.max(min.x, Math.min(max.x, this.x)),
+			Math.max(min.y, Math.min(max.y, this.y)), 
+			Math.max(min.z, Math.min(max.z, this.z))
+		);
 	}
 
-	clampScalar(minVal:number, maxVal:number) : Vector3 
+
+	clampScalared(min:number, max:number) : Vector3 
 	{
-		this.x = Math.max( minVal, Math.min(maxVal, this.x));
-        this.y = Math.max( minVal, Math.min(maxVal, this.y));
-        this.z = Math.max( minVal, Math.min(maxVal, this.z));
-		return this;
+		return new Vector3(
+			clamp(this.x, min, max),
+			clamp(this.y, min, max),
+			clamp(this.z, min, max),
+		);
 	}
 
-	clampLength(min:number, max:number) : Vector3
+
+	clampLengthed(min:number, max:number) : Vector3
 	{
 		const length = this.length();
-		return this.divscale( length || 1 ).scale( Math.max(min, Math.min(max, length)));
+		return this.div(length || 1).scale(Math.max(min,Math.min(max, length)));
 	}
 
-	floor() : Vector3 {
-		this.x = Math.floor(this.x);
-        this.y = Math.floor(this.y);
-        this.z = Math.floor(this.z);
-		return this;
+
+	floored() : Vector3 {
+		return new Vector3(
+			Math.floor(this.x),
+			Math.floor(this.y),
+			Math.floor(this.z),
+		);
 	}
 
-	ceil() : Vector3 {
-		this.x = Math.ceil(this.x);
-        this.y = Math.ceil(this.y);
-        this.z = Math.ceil(this.z);
-		return this;
+
+	ceiled() : Vector3 {
+		return new Vector3(
+			Math.ceil(this.x),
+			Math.ceil(this.y),
+			Math.ceil(this.z),
+		);
 	}
 
-	round() : Vector3 {
-		this.x = Math.round(this.x);
-        this.y = Math.round(this.y);
-        this.z = Math.round(this.z);
-		return this;
+
+	rounded() : Vector3 {
+		return new Vector3(
+			Math.round(this.x),
+			Math.round(this.y),
+			Math.round(this.z),
+		);
 	}
 
-	roundToZero() : Vector3 {
-		this.x = (this.x < 0) ? Math.ceil( this.x ) : Math.floor( this.x );
-        this.y = (this.y < 0) ? Math.ceil( this.y ) : Math.floor( this.y );
-        this.z = (this.z < 0) ? Math.ceil( this.z ) : Math.floor( this.z );
-		return this;
+
+	roundedToZero() : Vector3 {
+		return new Vector3(
+			(this.x < 0) ? Math.ceil( this.x ) : Math.floor( this.x ),
+			(this.y < 0) ? Math.ceil( this.y ) : Math.floor( this.y ),
+			(this.z < 0) ? Math.ceil( this.z ) : Math.floor( this.z ),
+		)
 	}
+
 
 	negate() : Vector3 {
 		this.x = -this.x;
-        this.y = -this.y;
-        this.z = -this.z;
+		this.y = -this.y;
+		this.z = -this.z;
 		return this;
 	}
 
-	dot( v:Vector3 ) : number {
+
+	negated() : Vector3 {
+		return new Vector3(
+			-this.x,
+			-this.y,
+			-this.z,
+		);
+	}
+
+
+	dot(v:Vector3) : number {
 		return this.x * v.x + this.y * v.y + this.z * v.z;
 	}
 
-	cross( other:Vector3 ) : Vector3 {
+
+	cross(other:Vector3) : Vector3 {
         const ax = this.x, ay = this.y, az = this.z;
 		const bx = other.x, by = other.y, bz = other.z;
 
-		this.x = ay * bz - az * by;
-		this.y = az * bx - ax * bz;
-		this.z = ax * by - ay * bx;
-
-		return this;
+		return new Vector3(
+			ay * bz - az * by,
+			az * bx - ax * bz,
+			ax * by - ay * bx,
+		);
 	}
+
 
 	getLengthSquared() : number {
 		return this.x * this.x + this.y * this.y + this.z * this.z;
 	}
 
+
 	length() : number {
 		return Math.sqrt(this.getLengthSquared());
 	}
 
+
 	manhat() : number {
-		return Math.abs( this.x ) + Math.abs( this.y ) + Math.abs( this.z );
+		return Math.abs(this.x) + Math.abs(this.y) + Math.abs(this.z);
 	}
 
+
 	normalize() : Vector3 {
-		return this.divscale( this.length() || 1 );
+		return this.div(this.length() || 1);
 	}
+
+
+	normalized() : Vector3 {
+		return this.dived(this.length() || 1);
+	}
+
 
 	isNormal() : boolean {
 		return Math.abs(this.length() - 1) < Const.TOLERANCE;
 	}
 
+
 	disTo(v: Vector3) : number {
 		return Math.sqrt(this.disToSquared(v));
 	}
+
 
 	disToSquared(v: Vector3) : number
 	{
@@ -309,6 +403,7 @@ export class Vector3
 		return dx * dx + dy * dy + dz * dz;
 	}
 
+
 	disToManhat(v: Vector3) : number
 	{
         return Math.abs(this.x - v.x) 
@@ -316,21 +411,26 @@ export class Vector3
              + Math.abs(this.z - v.z);
 	}
 
+
 	setLength(length: number) : Vector3
 	{
 		return this.normalize().scale(length);
 	}
 
+
 	lerp(other: Vector3, alpha:number) : Vector3
 	{
-		this.x += ( other.x - this.x ) * alpha;
-        this.y += ( other.y - this.y ) * alpha;
-        this.z += ( other.z - this.z ) * alpha;
-		return this;
+		return new Vector3(
+			( other.x - this.x ) * alpha,
+			( other.y - this.y ) * alpha,
+			( other.z - this.z ) * alpha,
+		);
     }
     
+
     // #endregion
     // #region math specific 
+
 
     projectOnVector(other: Vector3) 
     {
@@ -341,27 +441,29 @@ export class Vector3
 		return this.copy(other).scale(scalar);
 	}
 
-    projectOnPlane(normal: Vector3) 
+    
+	projectedOnPlane(normal: Vector3) 
     {
         // project a vector 
 		_vector.copy(this).projectOnVector(normal);
-		return this.minimum(_vector);
+		return this.minimumed(_vector);
 	}
 
-    mirror(normal: Vector3) 
+    
+	mirrored(normal: Vector3) 
     {
 		// mirror incident vector off plane orthogonal to normal
 		// normal is assumed to have unit length
-		return this.minimum(_vector.copy(normal).scale(2 * this.dot(normal)));
+		return this.minimumed(_vector.copy(normal).scale(2 * this.dot(normal)));
 	}
 
-	rotate(axis: Vector3, angle: number) : Vector3 {
+	
+	rotated(axis: Vector3, angle: number) : Vector3 {
 		let mat = Matrix4.newAxisRotation(axis, angle);
 		return mat.multiplyVector(this); 
 	}
 }
 
-// vector object used within heavy calculations, to make sure we dont create Vectors all over the place.
 const _vector = new Vector3(0,0,0);
 
 export class Vector2
@@ -381,24 +483,22 @@ export class Vector2
         return new Vector2(a[0], a[1]);
     }
 
-	static fromLerp( v1:Vector2, v2:Vector2, alpha:number ) : Vector2 
-	{
+	static fromLerp( v1:Vector2, v2:Vector2, alpha:number ) : Vector2 {
 		return new Vector2(
 			v1.x + ( v2.x - v1.x ) * alpha,
 			v1.y + ( v2.y - v1.y ) * alpha
 		);
 	}
 
-    static fromRandom() : Vector2
-    {
+    static fromRandom() : Vector2 {
         return new Vector2(
 		    Math.random(),
 		    Math.random()
         )
 	}
 
-    static fromRandomAngle() : Vector2
-    {
+
+    static fromRandomAngle() : Vector2 {
 		let alpha = Math.random() * Math.PI * 2;
 		
         return new Vector2(
@@ -407,26 +507,28 @@ export class Vector2
         )
 	}
 
-	static from2Pt(from: Vector2, to: Vector2) : Vector2
-	{
+
+	static from2Pt(from: Vector2, to: Vector2) : Vector2 {
 		return new Vector2(
 			from.x - to.x,
 			from.y - to.y
 		)
 	}
 
-	static fromCopy(other: Vector2) : Vector2
-	{
+
+	static fromCopy(other: Vector2) : Vector2 {
 		return this.zero().copy(other);	
 	}
+
 
 	static zero() { return new Vector2(0, 0); }
 
 
 	static NaN() { return new Vector2(NaN, NaN); }
 
-	static fromCircumcenter(a: Vector2, b: Vector2, c: Vector2) : Vector2
-    {
+
+	static fromCircumcenter(a: Vector2, b: Vector2, c: Vector2) : Vector2 {
+
         const asum = a.squareSum();
         const bsum = b.squareSum();
         const csum = c.squareSum();
@@ -450,8 +552,8 @@ export class Vector2
         return new Vector2(x,y);
     }
 
-	static getSign(a:Vector2, b:Vector2 , c:Vector2) : number
-	{
+
+	static getSign(a:Vector2, b:Vector2 , c:Vector2) : number {
 		// test half plane relationship
 		// <0 : point on first half
 		// 0  : points collinear
@@ -460,42 +562,44 @@ export class Vector2
 		       (b.x - c.x) * (a.y - c.y);
 	}
 
+
 	// --- basics
+
 
 	to3D() : Vector3 {
 		return new Vector3(this.x, this.y, 0);
 	}
 
-	set(x:number, y:number) : Vector2
-	{
+	
+	set(x:number, y:number) : Vector2 {
 		this.x = x;
 		this.y = y;
 		return this 		
 	}
 
-	roughlyEquals(v: Vector2, tol:number) : boolean
-	{
+
+	roughlyEquals(v: Vector2, tol:number) : boolean {
 		return (Math.abs(this.x - v.x) < tol && 
 				Math.abs(this.y - v.y) < tol)
 	}
 
-	equals(v:Vector2) : boolean
-	{
+
+	equals(v:Vector2) : boolean {
 		return ( ( v.x === this.x ) && ( v.y === this.y ) );
 	}
 
-    toString() : string
-    {
+
+    toString() : string {
         return `Vector2(${this.x}, ${this.y})`;
     }
 
-    clone() : Vector2
-    {
+
+    clone() : Vector2 {
         return new Vector2(this.x, this.y);
     }
 
-    copy(v: Vector2) : Vector2
-    {
+
+    copy(v: Vector2) : Vector2 {
         this.x = v.x;
         this.y = v.y;
         return this;
@@ -503,12 +607,20 @@ export class Vector2
 
 	// --- math
 
-    add(v: Vector2) : Vector2
-    {
+	add(v: Vector2) : Vector2 {
         this.x += v.x;
         this.y += v.y;
         return this;
     }
+
+
+    added(v: Vector2) : Vector2 {
+        return new Vector2(
+			this.x + v.x,
+			this.y + v.y
+		);
+    }
+
 
 	addn(arg0: number, arg1: number): Vector2 {
 		this.x += arg0;
@@ -516,179 +628,213 @@ export class Vector2
 		return this;
     }
 
-    sub(v: Vector2) : Vector2
-    {
+
+	sub(v: Vector2) : Vector2 {
         this.x -= v.x;
         this.y -= v.y;
         return this;
     }
 
 
-    mul(v: Vector2) : Vector2
-    {
+    subbed(v: Vector2) : Vector2 {
+        return new Vector2(
+			this.x - v.x,
+			this.y - v.y
+		);
+    }
+
+
+    mul(v: Vector2) : Vector2 {
         this.x *= v.x;
         this.y *= v.y;
         return this;
     }
 
-    scale(v: number) : Vector2
-    {
+
+    scale(v: number) : Vector2 {
         this.x *= v;
         this.y *= v;
         return this;
     }
 
-    div(v: Vector2) : Vector2
-    {
+	
+	scaled(v: number) : Vector2 {
+		return new Vector2(
+			this.x * v,
+			this.y * v,
+		);
+	}
+
+
+    divVector(v: Vector2) : Vector2 {
         this.x /= v.x;
         this.y /= v.y;
         return this;
     }
 
-    divscale(v: number) : Vector2
-    {
+	
+    div(v: number) : Vector2 {
         this.x /= v;
         this.y /= v;
         return this;
     }
 
-    min(other: Vector2) : Vector2 
-    {
+
+	dived(v: number) : Vector2 {
+        return new Vector2(
+			this.x / v,
+			this.y / v,
+		);
+    }
+
+
+    minimum(other: Vector2) : Vector2 {
 		this.x = Math.min( this.x, other.x );
 		this.y = Math.min( this.y, other.y );
 		return this;
 	}
 
-	max(other: Vector2) : Vector2 
-	{
+
+	maximum(other: Vector2) : Vector2 {
 		this.x = Math.max( this.x, other.x );
 		this.y = Math.max( this.y, other.y );
 		return this;
 	}
 
-	clamp(min: Vector2, max: Vector2) : Vector2 
-	{
+
+	clamp(min: Vector2, max: Vector2) : Vector2 {
 		// assumes min < max, componentwise
 		this.x = Math.max(min.x, Math.min(max.x, this.x));
 		this.y = Math.max(min.y, Math.min(max.y, this.y));
 		return this;
 	}
 
-	clampScalar(minVal:number, maxVal:number) : Vector2 
-	{
+
+	clampScalar(minVal:number, maxVal:number) : Vector2 {
 		this.x = Math.max( minVal, Math.min(maxVal, this.x));
 		this.y = Math.max( minVal, Math.min(maxVal, this.y));
 		return this;
 	}
 
-	clampLength(min:number, max:number) : Vector2
-	{
+
+	clampLength(min:number, max:number) : Vector2 {
 		const length = this.length();
-		return this.divscale( length || 1 ).scale( Math.max(min, Math.min(max, length)));
+		return this.div( length || 1 ).scale( Math.max(min, Math.min(max, length)));
 	}
 
-	floor() : Vector2 
-	{
+
+	floor() : Vector2 {
 		this.x = Math.floor(this.x);
 		this.y = Math.floor(this.y);
 		return this;
 	}
 
-	ceil() : Vector2 
-	{
+
+	ceil() : Vector2 {
 		this.x = Math.ceil(this.x);
 		this.y = Math.ceil(this.y);
 		return this;
 	}
 
-	round() : Vector2 
-	{
+
+	round() : Vector2 {
 		this.x = Math.round(this.x);
 		this.y = Math.round(this.y);
 		return this;
 	}
 
-	roundToZero() : Vector2 
-	{
+
+	roundToZero() : Vector2 {
 		this.x = (this.x < 0) ? Math.ceil( this.x ) : Math.floor( this.x );
 		this.y = (this.y < 0) ? Math.ceil( this.y ) : Math.floor( this.y );
 		return this;
 	}
 
-	negate() : Vector2 
-	{
+
+	negate() : Vector2 {
 		this.x = - this.x;
 		this.y = - this.y;
 		return this;
 	}
 
-	dot( v:Vector2 ) : number 
-	{
+
+	dot( v:Vector2 ) : number {
 		return this.x * v.x + this.y * v.y;
 	}
 
-	cross( v:Vector2 ) : number
-	{
+
+	cross( v:Vector2 ) : number {
 		return this.x * v.y - this.y * v.x; // ????
 	}
 
-	squareSum() : number
-	{
+
+	squareSum() : number {
 		return this.x * this.x + this.y * this.y;
 	}
 
-	length() : number
-	{
+
+	length() : number {
 		return Math.sqrt(this.x * this.x + this.y * this.y);
 	}
 
-	manhat() : number
-	{
+
+	manhat() : number {
 		return Math.abs( this.x ) + Math.abs( this.y );
 	}
 
-	normalize() : Vector2
-	{
-		return this.divscale( this.length() || 1 );
+
+	normalize() : Vector2 {
+		return this.div( this.length() || 1 );
 	}
 
-	angle() : number
-	{
+
+	normalized() : Vector2 {
+		return this.dived( this.length() || 1 );
+	}
+
+
+	angle() : number {
 		// computes the angle in radians with respect to the positive x-axis
 		const angle = Math.atan2( - this.y, - this.x ) + Math.PI;
 		return angle;
 
 	}
 
-	disTo(v: Vector2) : number
-	{
+
+	disTo(v: Vector2) : number {
 		return Math.sqrt(this.disToSquared(v));
 	}
 
-	disToSquared(v: Vector2) : number
-	{
+
+	disToSquared(v: Vector2) : number {
 		const dx = this.x - v.x, 
 			  dy = this.y - v.y;
 		return dx * dx + dy * dy;
 	}
 
-	disToManhat(v: Vector2) : number
-	{
+
+	disToManhat(v: Vector2) : number {
 		return Math.abs(this.x - v.x) + Math.abs(this.y - v.y);
 	}
 
-	setLength(length: number) : Vector2
-	{
+
+	setLength(length: number) : Vector2 {
 		return this.normalize().scale(length);
 	}
 
-	lerp(other: Vector2, alpha:number) : Vector2
-	{
-		this.x += ( other.x - this.x ) * alpha;
-		this.y += ( other.y - this.y ) * alpha;
-		return this;
+
+	lerp(other: Vector2, alpha:number) : Vector2 {
+		return new Vector2(
+			this.x + ( other.x - this.x ) * alpha,
+			this.y + ( other.y - this.y ) * alpha,
+		);
 	}
 }
+
+function clamp(value: number, min: number, max: number) : number {
+	return Math.max(min, Math.min(max, value));
+}
+
 
 export function radToDeg(r: number) {
 	return r * 180 / Math.PI;

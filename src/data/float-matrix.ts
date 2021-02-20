@@ -162,4 +162,3 @@ export class FloatMatrix {
         return native;
     }
 }
-

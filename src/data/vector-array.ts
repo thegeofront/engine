@@ -80,6 +80,7 @@ export class Vector3Array extends FloatMatrix {
         super(count, 3);
     }
 
+
     static fromList(vecs: Vector3[]) : Vector3Array {
         let length = vecs.length;
         let array = new Vector3Array(length);
@@ -90,6 +91,7 @@ export class Vector3Array extends FloatMatrix {
         }
         return array;
     }
+
 
     static fromNative(native: number[][]) : Vector3Array {
         // assume all subarrays have the same shape!!
@@ -103,6 +105,7 @@ export class Vector3Array extends FloatMatrix {
         return matrix; 
     }
 
+
     fillFromList(vecs: Vector3[]) {
         for(let i = 0; i < vecs.length; i++) {
             this.data[i*3] = vecs[i].x;
@@ -110,6 +113,7 @@ export class Vector3Array extends FloatMatrix {
             this.data[i*3+2] = vecs[i].z;
         }
     }
+
 
     forEach(callbackfn: (value: Vector3, index: number) => any) : Vector3Array {
         
@@ -123,11 +127,13 @@ export class Vector3Array extends FloatMatrix {
         return this;
     }
 
+
     setVector(i: number, vec: Vector3) {
         this.data[i * this._width + 0] = vec.x;
         this.data[i * this._width + 1] = vec.y;
         this.data[i * this._width + 2] = vec.z;
     }
+
 
     getVector(i: number) : Vector3 {
         return new Vector3(
@@ -137,6 +143,7 @@ export class Vector3Array extends FloatMatrix {
         )
     }
 
+
     toList() : Vector3[] {
 
         let vecs: Vector3[] = [];
@@ -145,6 +152,7 @@ export class Vector3Array extends FloatMatrix {
         }
         return vecs;
     }
+
 
     transform(m: Matrix4) : Vector3Array {
 
@@ -157,6 +165,7 @@ export class Vector3Array extends FloatMatrix {
         return this;
     }
 
+
     to2D() : Vector2Array {
         let clone = new Vector2Array(this._height);
         for (let i = 0; i < this._height; i++) {
@@ -167,6 +176,7 @@ export class Vector3Array extends FloatMatrix {
         return clone;  
     }
 
+
     clone() : Vector3Array {
         let clone = new Vector3Array(this._height);
         for (let i = 0; i < this.data.length; i++) {
@@ -174,6 +184,7 @@ export class Vector3Array extends FloatMatrix {
         }
         return clone;  
     }
+
 
     mean() : Vector3 {
         // the mean vector of a series of vectors
@@ -189,13 +200,11 @@ export class Vector3Array extends FloatMatrix {
         return sum.scale(1 / count);
     }
 
+
     average() : Vector3 {
-        let sum = new Vector3(0,0,0);
-        this.forEach((v, i) => {
-            sum = sum.add(v)
-        })
-        return sum.divscale(this.count());
+        return this.mean();
     }
+
 
     closestId(point: Vector3) : number {
 
@@ -212,6 +221,7 @@ export class Vector3Array extends FloatMatrix {
         return id;
     }
 
+    
     closestIds(point: Vector3, n: number) : number[] {
         // O(m*n)... TODO implement quicksort 
 

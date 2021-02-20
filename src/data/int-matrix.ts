@@ -16,11 +16,13 @@ export class IntMatrix {
             this.setData(data);    
     }
 
+
     clone() {
         let clone = new IntMatrix(this._height, this._width);
         clone.data = this.data;
         return clone;  
     }
+
 
     setData(data: number[]) {
         if (data.length != (this._height * this._width))
@@ -28,15 +30,23 @@ export class IntMatrix {
         this.data.set(data);
     }
 
+
     count() {
         // number of entries / rows.
         // when derrived classes ask for 'how many of x?' they usually mean this.
         return this._height;
     }
 
+
     getDimensions() : [number, number] {
         return [this._height, this._width];
     }
+
+
+    inRange(i: number, j: number) : boolean {
+        return !(i < 0 || i > this._height -1 || j < 0 || j > this._width - 1)
+    }
+
 
     fill(value: number) {
 
@@ -47,6 +57,7 @@ export class IntMatrix {
         }
     }
 
+    
     fillWith(data: number[], valuesPerEntry: number=this._width) {
 
         // values per entry can be used to setData which is not of the same shape.
@@ -60,10 +71,16 @@ export class IntMatrix {
         }  
     }
 
+    
     get(i: number, j: number) : number {
+        if (!this.inRange(i , j)) {
+            console.warn("out of range!")
+            return 0;
+        }
         return this.data[i * this._width + j]
     }
 
+    
     getRow(i: number) : Int32Array {
         // if (i < 0 || i > this.height) throw "column is out of bounds for Array"
         let data = new Int32Array(this._width);
@@ -73,6 +90,7 @@ export class IntMatrix {
         return data;
     }
 
+    
     getColumn(j: number) : Int32Array {
         // if (j < 0 || j > this.width) throw "column is out of bounds for Array"
         let data = new Int32Array(this._height);
@@ -83,17 +101,23 @@ export class IntMatrix {
         return data;
     }
 
+    
     set(i: number, j : number, value: number) {
-
+        if (!this.inRange(i, j)) {
+            console.warn("out of range!");
+            return;
+        } 
         this.data[i * this._width + j] = value;
     }
 
+    
     setRow(rowIndex: number, row: number[] | Int32Array) {
         // if (this.width != row.length) throw "dimention of floatarray is not " + row.length;
         for(let j = 0; j < this._width; j++) {
             this.set(rowIndex, j, row[j]);
         }
     }
+    
     
     takeRows(indices: number[]) : IntMatrix {
 
@@ -108,10 +132,12 @@ export class IntMatrix {
         return array;
     }
 
+    
     toUInt16Array() : Uint16Array {
         return new Uint16Array(this.data);
     }
 
+    
     forEachValue(callbackfn: (value: number, index: number) => number) : IntMatrix {
         
         for(let i = 0 ; i < this.data.length; i++) {
@@ -120,6 +146,7 @@ export class IntMatrix {
         return this;
     }
 
+    
     forEachRow(callbackfn: (value: Int32Array, index: number) => void) : IntMatrix {
         
         for(let i = 0 ; i < this._height; i++) {
@@ -130,6 +157,7 @@ export class IntMatrix {
         return this;
     }
 
+    
     trueForAll(callbackfn: (value: number, index: number) => boolean) : boolean {
         for(let i = 0 ; i < this.data.length; i++) {
             if (!callbackfn(this.data[i], i)) {
@@ -139,3 +167,4 @@ export class IntMatrix {
         return true;
     }
 }
+
