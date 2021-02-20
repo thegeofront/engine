@@ -115,10 +115,10 @@ export class GeometryApp extends App {
         let matrix = this.camera.getTotalMatrix();
 
         // render the grid
-        this.greyLineRenderer.render(gl, matrix);
-        this.whiteLineRenderer.render(gl, matrix);
+        // this.greyLineRenderer.render(gl, matrix);
+        // this.whiteLineRenderer.render(gl, matrix);
 
-        this.redLineRenderer.setAndRender(gl, matrix, this.cursorVisual!);
+        // this.redLineRenderer.setAndRender(gl, matrix, this.cursorVisual!);
 
         // render the map
         // TODO create MeshArray
@@ -156,17 +156,16 @@ export class GeometryApp extends App {
         // this.cursorVisual = LineArray.fromCircle(new Circle3(plane, 0.1));
         
         // figure out which cube we are pointing to
-        let cubeCursor: Vector3; 
-        {
-            this.flushPreviewCubes();
-            let [cubeID, cubePrevious] = this.voxelRaycast(mouseRay, 40);
-            if (cubeID == -1) {
-                
-            } else {
-                let cubeCursor = this.map.getCoords(cubeID);   
-                this.addPreviewCube(cubeCursor);
-            }
+        this.flushPreviewCubes();
+        let [cubeID, cubeIDprevious] = this.voxelRaycast(mouseRay, 40);
+        if (cubeID == -1) {
+            // nothing else to do
+            return;        
         }
+
+        let cubeCursor = this.map.getCoords(cubeIDprevious);   
+        this.addPreviewCube(cubeCursor);
+        
 
         // render cube at this position
         
@@ -174,14 +173,15 @@ export class GeometryApp extends App {
         // this.geo.push(Mesh.fromCube(cube));  
         
         // click
-        if (state.mouseLeftDown) {
+        if (state.mouseLeftPressed) {
+            console.log("click")
             if (state.IsKeyDown(" ")) {
-                if (this.map.get(mapCursor.x, mapCursor.y, mapCursor.z) == 0) 
+                if (this.map.data[cubeID] == 0) 
                     return;
-                this.map.set(mapCursor.x, mapCursor.y, mapCursor.z, 0);
+                this.map.data[cubeID] = 0;
                 this.buffer();
-            } else if (this.map.get(mapCursor.x, mapCursor.y, mapCursor.z) != 1) {
-                this.map.set(mapCursor.x, mapCursor.y, mapCursor.z, 1);
+            } else if (this.map.data[cubeIDprevious] != 1) {
+                this.map.data[cubeIDprevious] = 1;
                 this.buffer();
             } 
         }
@@ -257,7 +257,7 @@ export class GeometryApp extends App {
             if (value == 1) {
                 // console.log("found a cube after " + i + "steps...");
                 // this.addPreviewCube(new Vector3(xprev,yprev,zprev));
-                return [this.map.getIndex(x, y, z), this.map.getIndex(xprev, yprev, zprev)];
+                return [this.map.getIndex(x,y,z), this.map.getIndex(xprev, yprev, zprev)];
             } else {
                 xprev = x;
                 yprev = y;
