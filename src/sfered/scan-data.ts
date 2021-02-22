@@ -250,6 +250,13 @@ export class NextcloudScanData {
         });
     }
 
+    getTextureToUVMatrix() : Matrix4 {
+        let [scaleY, scaleX] = [2048, 2048];
+        let tf1 = Matrix4.newScaler(1/scaleX, -1/scaleY, 0)
+        let tf2 = Matrix4.newTranslation(0,1,0)
+        return  tf1.multiply(tf2);
+    }
+
 
     fromTextureToUVSpace(vectors: Vector3Array) : Vector3Array {
 

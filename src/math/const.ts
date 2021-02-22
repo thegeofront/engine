@@ -12,4 +12,9 @@ export class Const {
     static PLANE_RENDER_LINEDISTANCE = .3;
 
     static CIRCLE_SEGMENTS = 100;
+
+
+    static IsRouglyZero(value: number) {
+        return Math.abs(value) < this.TOLERANCE;
+    }
 } 

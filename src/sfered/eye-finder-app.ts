@@ -72,6 +72,7 @@ export class EyeFinderApp extends App {
     camera: Camera;
     imageRenderer: ImageRenderer;
 
+
     constructor(gl: WebGLRenderingContext, canvas: HTMLCanvasElement, context: HTMLDivElement) {
         
         super(gl);
@@ -94,19 +95,19 @@ export class EyeFinderApp extends App {
         addDropFileEventListeners(canvas, processFiles.bind(this));
     }
 
+
     start() {
-        // nothing
-        console.log("hoi");
         let lines = LineArray.fromCircle(new Circle3(Plane.WorldXY(), 0.5));
         this.lineRenderables.push(lines);
-        console.log(lines);
     }
+
 
     update(state: InputState) {
         
         // move the camera with the mouse
         this.camera.update(state); 
     }
+
 
     draw(gl: WebGLRenderingContext) {
 
@@ -124,10 +125,8 @@ export class EyeFinderApp extends App {
             let mesh = this.mesh;
             let landmarks = this.landmarks;
 
-            
-    
             // show the mesh
-            this.meshRenderer.render(gl, matrix);
+            // this.meshRenderer.render(gl, matrix);
             this.blueLineRenderer.render(gl, matrix);
             // this.blueLineRenderer.setAndRender(gl, matrix, LineArray.fromMesh(mesh, false))
             if (landmarks)
@@ -145,11 +144,11 @@ export class EyeFinderApp extends App {
             // render images
             let height = 200;
             let width = 300;
-            // this.images.forEach((image, i) => {
-            //     this.imageRenderer.setAndRender(gl, 
-            //         new Rectangle2(Matrix3.newIdentity(), Domain2.fromBounds(10,10+width, i*(height+10), i*(height+10) + height)), 
-            //         image.toImageData());
-            // });
+            this.images.forEach((image, i) => {
+                this.imageRenderer.setAndRender(gl, 
+                    new Rectangle2(Matrix3.newIdentity(), Domain2.fromBounds(10,10+width, i*(height+10), i*(height+10) + height)), 
+                    image.toImageData());
+            });
 
             // render some dots 
             if (this.dots) {
@@ -159,10 +158,16 @@ export class EyeFinderApp extends App {
         }    
     }
 
+
     addNextcloudData(data: NextcloudScanData) {
 
         // start the eyefinder
-        let [left, right] = this.eyefinder.findPupilsFromNextcloud(data);
+        let r = this.eyefinder.findPupilsFromNextcloud(data);
+        if (r) {
+            console.log("eyepoints found")    
+        } else {
+            console.log("eyepoints couldnt be found...")
+        }
 
         // console.log(left);
         // console.log(right);
@@ -176,16 +181,21 @@ export class EyeFinderApp extends App {
         this.dots = data.eyePointsEdited;
         this.dots.forEach((v, n) => {
             console.log(v);
-        });
-        
+        });    
     }
+
 
     addBellusData(bsd: BellusScanData) {
 
         // start the eyefinder
-        let [left, right] = this.eyefinder.findPupilsFromBellus(bsd);
+        let r = this.eyefinder.findPupilsFromBellus(bsd);
+        if (r) {
+            console.log("eyepoints found");     
+        } else {
+            console.log("eyepoints couldnt be found...");
+        }
 
-        this.camera.pos = left.clone();
+        // this.camera.pos = left.clone();
         // this.camera.offset.x = 100;
 
         // put the data into the render buffers.
@@ -200,11 +210,13 @@ export class EyeFinderApp extends App {
     }
 }
 
+
 enum Format {
     None,
     Bellus, // the special dataset gathered at an earlier step
     NextCloudDataset // the 140 or so scans on nextcloud 
 }
+
 
 function getFormat(files: FileList) : Format {
 
@@ -219,6 +231,7 @@ function getFormat(files: FileList) : Format {
     }
     return Format.None;
 }
+
 
 async function processFiles(this: EyeFinderApp, files: FileList) {
 
@@ -240,6 +253,4 @@ async function processFiles(this: EyeFinderApp, files: FileList) {
             console.log("couldnt read the files you gave me...")
             break;
     }
-
-
 }

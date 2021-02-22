@@ -497,6 +497,7 @@ export class Vector2
 
 	// --- factories & other statics
 
+
     static fromArray(a: Array<number>) : Vector2 {
         return new Vector2(a[0], a[1]);
     }
@@ -526,12 +527,12 @@ export class Vector2
 	}
 
 
-	static from2Pt(from: Vector2, to: Vector2) : Vector2 {
-		return new Vector2(
-			from.x - to.x,
-			from.y - to.y
-		)
-	}
+	// static from2Pt(from: Vector2, to: Vector2) : Vector2 {
+	// 	return new Vector2(
+	// 		from.x - to.x,
+	// 		from.y - to.y
+	// 	)
+	// }
 
 
 	static fromCopy(other: Vector2) : Vector2 {
@@ -792,7 +793,12 @@ export class Vector2
 
 
 	length() : number {
-		return Math.sqrt(this.x * this.x + this.y * this.y);
+		return Math.sqrt(this.lengthSquared());
+	}
+
+
+	lengthSquared() : number {
+		return this.x * this.x + this.y * this.y;
 	}
 
 
@@ -815,7 +821,6 @@ export class Vector2
 		// computes the angle in radians with respect to the positive x-axis
 		const angle = Math.atan2( - this.y, - this.x ) + Math.PI;
 		return angle;
-
 	}
 
 
@@ -846,6 +851,21 @@ export class Vector2
 			this.x + ( other.x - this.x ) * alpha,
 			this.y + ( other.y - this.y ) * alpha,
 		);
+	}
+
+	// calculate the 'triangle sign' of three points. Can be used to determine clockwise & counter clockwise
+	sign(b: Vector2, c: Vector2) : number {
+		return ((this.x - c.x) * (b.y - c.y)) - ((b.x - c.x) * (this.y- c.y));
+	}
+
+
+	// use dot product to project this vector on the other vector
+	projectOnVector(other: Vector2) 
+    {
+		const denominator = other.lengthSquared();
+		if (denominator === 0) return this.set(0, 0);
+		const scalar = other.dot(this) / denominator;
+		return this.copy(other).scale(scalar);
 	}
 }
 

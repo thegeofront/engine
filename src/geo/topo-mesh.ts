@@ -120,7 +120,11 @@ export class TopoMesh extends DisplayMesh {
 
                 let face = this.faces.getRow(faceIndex);
                 let edge: [number, number] = [face[i], face[j]];
-                let sign = this.pointSignUV(point, edge);
+                
+                let b = this.uvs.getVector(edge[0]);
+                let c = this.uvs.getVector(edge[1]);
+                
+                let sign = point.sign(b, c);
 
                 if (sign < 0) {
                     faceIndex = this.getNb(faceIndex, edge);
@@ -224,14 +228,6 @@ export class TopoMesh extends DisplayMesh {
     public getTriangle3(id: number) : Triangle3 {
         let p = this.getFacePoints(id, false);
         return new Triangle3(p[0], p[1], p[2]);
-    }
-
-    private pointSignUV(a: Vector2, edge: [number, number]) {
-
-        let b = this.uvs.getVector(edge[0]);
-        let c = this.uvs.getVector(edge[1]);
-
-        return ((a.x - c.x) * (b.y - c.y)) - ((b.x - c.x) * (a.y- c.y));
     }
 
 

@@ -29,62 +29,64 @@ export class EyeFinder {
     }
 
 
-    public findPupilsFromNextcloud(data: NextcloudScanData): [any, any] {
+    public findPupilsFromNextcloud(data: NextcloudScanData) {
 
-        // the main script of finding pupil points directly from the bellus scan data. 
-        console.log("finding eyes...");
+        console.log("finding eyes from nextcloud set...");
 
         let topo = TopoMesh.copyFromMesh(data.mesh);
         let image = GeonImage.fromImageData(data.texture);
         let [winLeft, winRight] = this.getEyeWindowsNextcloud(data, topo);
 
-        // get the window with which the eyes can be extracted
-       
-        
-        // console.log(winLeft, winRight);
+        console.log("windows: ", winLeft, winRight);
 
-        
-        // left side
-        let ransacSettings = data.settings.process_ransac;
-        let leftPupilPoint = this.findPupilFromEye(image, topo, winLeft, ransacSettings);
-
-        // right side
-        let rightPupilPoint = this.findPupilFromEye(image, topo, winRight, ransacSettings);
-
-        return [leftPupilPoint, rightPupilPoint];  
+        return this.findPupils(image, topo, data.settings, winLeft, winRight);
     }
 
 
     public findPupilsFromBellus(bsd: BellusScanData) {
 
-        // the main script of finding pupil points directly from the bellus scan data. 
-        console.log("finding eyes...");
+        console.log("finding eyes from bellus...");
 
         // get the window with which the eyes can be extracted
+        let topo = TopoMesh.copyFromMesh(bsd.mesh);
         let image = GeonImage.fromImageData(bsd.texture);
         let [winLeft, winRight] = this.getEyeWindows(bsd);
-        // console.log(winLeft, winRight);
+        
+        console.log("windows: ", winLeft, winRight);
 
-        let topo = TopoMesh.copyFromMesh(bsd.mesh);
 
+        return this.findPupils(image, topo, bsd.settings, winLeft, winRight);
+    }
+
+    // some stupid wrapping
+    public findPupils(image: GeonImage, topo: TopoMesh, settings: any, winLeft: Domain2, winRight: Domain2) {
+        
         // left side
-        let ransacSettings = bsd.settings.process_ransac;
+        let ransacSettings = settings.process_ransac;
         let leftPupilPoint = this.findPupilFromEye(image, topo, winLeft, ransacSettings);
 
         // right side
         let rightPupilPoint = this.findPupilFromEye(image, topo, winRight, ransacSettings);
 
-        return [leftPupilPoint, rightPupilPoint];
+        if (leftPupilPoint && rightPupilPoint) {
+            return [leftPupilPoint, rightPupilPoint] 
+        } else {
+            return;
+        }
     }
 
 
-    private findPupilFromEye(image: GeonImage, mesh: TopoMesh,  window: Domain2, ransacSettings: any) {
+    private findPupilFromEye(image: GeonImage, mesh: TopoMesh,  window: Domain2, ransacSettings: any) : Vector3 | undefined {
 
         // step 1: get points (vectors) which symbolize pixels in contrasting areas of the image (the iris).
         let eyeImg = image.trimWithDomain(window);
         let contrastEyeImg = this.contrastDetection(eyeImg);
         let contrastPoints = this.pixelsToPoints(contrastEyeImg, 50);
         
+        if (contrastPoints.count() < 0) {
+            return;
+        }
+
         let scaleVec = new Vector2(1 / image.width, 1 / image.height);
 
         // convert these points to the same space as the uv points of the mesh
@@ -117,9 +119,19 @@ export class EyeFinder {
         
         // step 4: ransac! 
         let rss = ransacSettings;
-        let [bestCircle, values] = RansacCircle2d(cpsFixed, rss.iterations, rss.radius, rss.tolerance, rss.seed, rss.min_score, rss.max_radius_deviation)!;
-        let eyePoint = plane.pushToWorld(bestCircle.center.to3D());
-      
+        let r = RansacCircle2d(cpsFixed, rss.iterations, rss.radius, rss.tolerance, rss.seed, rss.min_score, rss.max_radius_deviation);
+
+        let eyepoint;
+        let bestCircle;
+        if (!r) {
+            console.error("couldnt find eyepoint...");
+            return;
+        } else {
+            let [bestCircle, values] = r;
+            eyepoint = plane.pushToWorld(bestCircle.center.to3D());    
+            this.app?.lineRenderables.push(LineArray.fromCircle(Circle3.fromCircle2(bestCircle, plane)));
+        }
+
         // debug
         cps.forEach((p) => {
             p.z = 0;
@@ -127,10 +139,9 @@ export class EyeFinder {
         })
         this.app?.whiteDots.push(...cps.toList());
         this.app?.lineRenderables.push(LineArray.fromPlane(plane));
-        this.app?.redDots.push(eyePoint);
-        this.app?.lineRenderables.push(LineArray.fromCircle(Circle3.fromCircle2(bestCircle, plane)));
-
-        return Vector3.zero();
+        this.app?.redDots.push(eyepoint);
+        
+        return eyepoint;
     }
 
 
@@ -151,6 +162,7 @@ export class EyeFinder {
         let thres = sum.applyThreshold(lower, upper);
 
         // debug 
+        console.log("adding images:")
         this.app?.images.push(blurred.toRGBA(), sum.toRGBA(), thres.toRGBA());
         
         return thres;
@@ -187,17 +199,30 @@ export class EyeFinder {
         let eyeGuessLeft = data.eyePointsEdited.getVector(0);
         let eyeGuessRight = data.eyePointsEdited.getVector(1);
 
-        console.log("eyeGuessLeft, eyeGuessRight");
+        console.log("groundTruthLeft, groundTruthRight");
         console.log(eyeGuessLeft, eyeGuessRight);
+
+        this.app?.whiteDots?.push(eyeGuessLeft);
+        this.app?.whiteDots?.push(eyeGuessRight);
 
         let eyeLandmarksLeft = mesh.flattenClosestPoint(eyeGuessLeft);
         let eyeLandmarksRight = mesh.flattenClosestPoint(eyeGuessRight);
 
-        console.log("eyeLandmarksLeft, eyeLandmarksRight");
+        console.log("eyeLandmarksLeft, eyeLandmarksRight: ");
         console.log(eyeLandmarksLeft, eyeLandmarksRight);
 
-        let rightWindow = Domain2.fromInclude(Vector2Array.fromList([eyeLandmarksLeft])).offset(bb_o.ly);
-        let leftWindow = Domain2.fromInclude(Vector2Array.fromList([eyeLandmarksRight])).offset(bb_o.ry);
+        // to texture pixel space 
+        let mat = data.getTextureToUVMatrix().inverse();
+        let leftPixel = mat.multiplyVector(eyeLandmarksLeft.to3D()).to2D();
+        let rightPixel = mat.multiplyVector(eyeLandmarksRight.to3D()).to2D();
+
+
+        console.log("in pixelspace: ");
+        console.log(leftPixel, rightPixel);
+
+
+        let rightWindow = Domain2.fromInclude(Vector2Array.fromList([leftPixel])).offset(bb_o.ly);
+        let leftWindow = Domain2.fromInclude(Vector2Array.fromList([rightPixel])).offset(bb_o.ry);
 
         return [rightWindow, leftWindow];
     }

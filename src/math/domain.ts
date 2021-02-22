@@ -17,8 +17,8 @@ export class Domain {
     t1: number;
 
     constructor(t0: number = 0.0, t1: number = 1.0) {
-        if (t0 > t1) console.error("created a domain with negative size.");
-        if (t0 == t1) console.warn("created a domain with size is 0.0. could cause problems");
+        // if (t0 > t1) console.error("created a domain with negative size.");
+        // if (t0 == t1) console.warn("created a domain with size is 0.0. could cause problems");
         this.t0 = t0;
         this.t1 = t1;
     }    
@@ -86,6 +86,18 @@ export class Domain {
         for(let i = this.t0; i < this.t1; i += step) {
             yield i;
         }      
+    }
+
+
+    // comform a number to the bound
+    comform(value: number) {
+        if (value < this.t0) {
+            return this.t0;
+        } else if (value > this.t1) {
+            return this.t1
+        } else {
+            return value;
+        }
     }
 }
 
