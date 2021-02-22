@@ -13,6 +13,7 @@ import { ObjLoaderApp } from "./app/obj-loader-app";
 import { Core } from "./core";
 import { StatApp } from "./app/stat-app";
 import { GeometryApp } from "./app/geometry-app";
+import { MarchingCubeApp } from "./app/marching-cube-app";
 
 const REALTIME_DEMO = false;
 let core: Core;
@@ -32,10 +33,11 @@ function main() {
 
     // the eyefinder app itself
     // core.addApp(new StatApp(gl, canvas));
-    // core.addApp(new EyeFinderApp(gl, canvas, context));
+    core.addApp(new EyeFinderApp(gl, canvas, context));
     
     // fun demo's to test various functionalities 
-    core.addApp(new GeometryApp(gl, canvas));
+    // core.addApp(new GeometryApp(gl, canvas));
+    // core.addApp(new MarchingCubeApp(gl, canvas));
     // core.addApp(new RectangleApp(gl)); 
     // core.addApp(new DotApp3(gl, canvas)); 
     // core.addApp(new ObjLoaderApp(gl, canvas));

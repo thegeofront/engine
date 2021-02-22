@@ -11,7 +11,70 @@ import { Vector2, Vector3 } from "../math/vector";
 import { Cube } from "./cube";
 import { Rectangle3 } from "./rectangle3";
 
-export class Mesh {
+
+// TODO make distinctions between
+// - PureMesh (only verts & links)
+// - NavMesh | TopoMesh (mesh which is topologically sound) 
+// - DisplayMesh (PureMesh + uvs, texture, normals, material, etc...)
+
+
+// a very pure idea of a mesh : Vertices + links between vertices. 
+// Could be anything with these properties.
+export class PureMesh {
+
+    verts: Vector3Array;
+    links: IntMatrix; // relationships, can be 2 (lines) | 3 (triangles) | 4 (quads)
+
+    constructor(verts: Vector3Array, links: IntMatrix) {
+        this.verts = verts;
+        this.links = links;
+    }
+
+
+    static fromEmpty() : PureMesh {
+        return new PureMesh(new Vector3Array(0), new IntMatrix(0,0));
+    }
+
+
+    static fromJoin(meshes: PureMesh[]) : PureMesh {
+
+        // join meshes, dont try to look for duplicate vertices
+        // TODO : make this the trouble of Matrices and Arrays
+        let vertCount = 0;
+        let faceCount = 0;
+
+        for (let mesh of meshes) {
+            vertCount += mesh.verts.count();
+            faceCount += mesh.links.count();
+        }
+
+        let verts = new Vector3Array(vertCount);
+        let links = new IntMatrix(3, faceCount);
+
+        let accVerts = 0;
+        let accFaces = 0;
+
+        for (let mesh of meshes) {
+            for (let i = 0 ; i < mesh.verts.count(); i++) {
+                verts.setVector(accVerts + i, mesh.verts.getVector(i));
+            }
+            for (let i = 0 ; i < mesh.links.count(); i++) {
+                let face = mesh.links.getRow(i);
+                for (let j = 0 ; j < face.length; j++) {
+                    face[j] = face[j] + accVerts;
+                }
+                links.setRow(accFaces + i, face);
+            }
+            accVerts += mesh.verts.count();
+            accFaces += mesh.links.count();
+        }
+
+        return new PureMesh(verts, links);
+    }
+}
+
+
+export class DisplayMesh {
 
     verts: Vector3Array; // 3 long float
     norms: Vector3Array; // 3 long float
@@ -30,11 +93,11 @@ export class Mesh {
     }
 
 
-    static fromData(verts: number[], norms: number[], uvs: number[], faces: number[]) : Mesh {
+    static fromData(verts: number[], norms: number[], uvs: number[], faces: number[]) : DisplayMesh {
         
         // NOTE : this type of parsing makes my life easy, but is dangerous. This is why i created the 
         // Array class. 
-        let mesh = new Mesh(verts.length / 3, norms.length / 3, uvs.length / 2, faces.length / 3);
+        let mesh = new DisplayMesh(verts.length / 3, norms.length / 3, uvs.length / 2, faces.length / 3);
         mesh.verts.fillWith(verts);
         mesh.norms.fillWith(norms);
         mesh.uvs.fillWith(uvs);
@@ -43,7 +106,7 @@ export class Mesh {
     }
 
 
-    static fromCube(cube: Cube) : Mesh {
+    static fromCube(cube: Cube) : DisplayMesh {
 
         let verts = cube.getCorners();
 
@@ -53,14 +116,14 @@ export class Mesh {
             faces.push(...quadToTri(face));
         }
 
-        let mesh = new Mesh(8, 0, 0, cubeFaces.length * 2);
+        let mesh = new DisplayMesh(8, 0, 0, cubeFaces.length * 2);
         mesh.verts.fillFromList(verts);
         mesh.faces.setData(faces);
         return mesh;
     }
 
 
-    static fromRect(rect: Rectangle3) : Mesh {
+    static fromRect(rect: Rectangle3) : DisplayMesh {
 
         let verts = rect.getCorners();
 
@@ -68,14 +131,14 @@ export class Mesh {
         let faces: number[] = []
         faces.push(...quadToTri(cubeFaces[0]));
 
-        let mesh = new Mesh(8, 0, 0, cubeFaces.length * 2);
+        let mesh = new DisplayMesh(8, 0, 0, cubeFaces.length * 2);
         mesh.verts.fillFromList(verts);
         mesh.faces.setData(faces);
         return mesh;
     }
 
 
-    static fromJoin(meshes: Mesh[]) : Mesh {
+    static fromJoin(meshes: DisplayMesh[]) : DisplayMesh {
 
         // join meshes, dont try to look for duplicate vertices
         // TODO : make this the trouble of Matrices and Arrays
@@ -86,7 +149,7 @@ export class Mesh {
             faceCount += mesh.faces.count();
         }
 
-        let joined = new Mesh(vertCount, 0, 0, faceCount);
+        let joined = new DisplayMesh(vertCount, 0, 0, faceCount);
 
         let accVerts = 0;
         let accFaces = 0;
@@ -149,7 +212,7 @@ function quadToTri(abcd: number[]) : number[] {
 
 // ================ Obj ===================
 
-export function meshFromObj(text: string) : Mesh {
+export function meshFromObj(text: string) : DisplayMesh {
 
     // This is not a full .obj parser.
     // see http://paulbourke.net/dataformats/obj/
@@ -212,7 +275,7 @@ export function meshFromObj(text: string) : Mesh {
     console.log("number of uvs: " + uvs.length / 2);
     console.log("number of norms: " + norms.length / 3);
 
-    let mesh = Mesh.fromData(verts, norms, uvs, faces);
+    let mesh = DisplayMesh.fromData(verts, norms, uvs, faces);
   
     return mesh;
 }

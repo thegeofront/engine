@@ -3,7 +3,7 @@
 // purpose: drag an obj to the canvas, and view it on the web
 
 import { version_converter } from "@tensorflow/tfjs";
-import { Mesh, meshFromObj } from "../geo/mesh";
+import { DisplayMesh, meshFromObj } from "../geo/mesh";
 import { addDropFileEventListeners, loadTextFromFile } from "../system/domwrappers";
 import { Domain3 } from "../math/domain";
 import { Vector3 } from "../math/vector";
@@ -24,7 +24,7 @@ export class ObjLoaderApp extends App {
     lineRenderer: SimpleLineRenderer;
     meshRenderer: SimpleMeshRenderer;
     camera: Camera;
-    obj?: Mesh;
+    obj?: DisplayMesh;
     renderable?: LineArray;
 
     constructor(gl: WebGLRenderingContext, canvas: HTMLCanvasElement) {
@@ -56,9 +56,9 @@ export class ObjLoaderApp extends App {
 
      
         if (this.obj == undefined)
-            this.dotRenderer.render(gl, matrix, Vector3Array.fromList([new Vector3(0,0,0), new Vector3(1,1,1)]));
+            this.dotRenderer.setAndRender(gl, matrix, Vector3Array.fromList([new Vector3(0,0,0), new Vector3(1,1,1)]));
         else {
-            this.dotRenderer.render(gl, matrix, this.obj!.verts);
+            this.dotRenderer.setAndRender(gl, matrix, this.obj!.verts);
             // this.meshRenderer.render(gl, matrix);
             this.lineRenderer.render(gl, matrix);
         }    

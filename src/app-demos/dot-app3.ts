@@ -83,7 +83,7 @@ export class DotApp3 extends App {
 
         // render the corners of the box with the red renderer,
         // and the dots themselves with the white renderer
-        this.redDotRend.render(gl, matrix, this.bounds.corners(Matrix4.newIdentity()));
-        this.whiteDotRend.render(gl, matrix, this.dots);
+        this.redDotRend.setAndRender(gl, matrix, this.bounds.corners(Matrix4.newIdentity()));
+        this.whiteDotRend.setAndRender(gl, matrix, this.dots);
     }
 }

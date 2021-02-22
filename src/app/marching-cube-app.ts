@@ -35,7 +35,7 @@ import { IntMatrix } from "../data/int-matrix";
 import { IntCube } from "../data/int-cube";
 import { Ray } from "../math/ray";
 
-export class GeometryApp extends App {
+export class MarchingCubeApp extends App {
 
     // renderinfo
     dotRenderer: DotRenderer3;
@@ -296,6 +296,7 @@ export class GeometryApp extends App {
                 mapGeo.push(DisplayMesh.fromCube(cube));
             }
         });
+
         this.meshRenderer.set(this.gl, DisplayMesh.fromJoin(mapGeo));
     }
 

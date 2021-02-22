@@ -3,7 +3,7 @@
 // purpose: Keeper of the full pupil-point.
 
 import { EyeFinderApp } from "./eye-finder-app";
-import { Mesh } from "../geo/mesh";
+import { DisplayMesh } from "../geo/mesh";
 import { GeonImage } from "../img/Image";
 import { Kernels } from "../img/kernels";
 import { Vector2Array, Vector3Array } from "../data/vector-array";

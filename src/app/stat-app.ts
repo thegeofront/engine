@@ -2,7 +2,7 @@
 // author:  Jos Feenstra
 // purpose: test statistic functionalties
 
-import { Mesh, meshFromObj } from "../geo/mesh";
+import { DisplayMesh, meshFromObj } from "../geo/mesh";
 import { addDropFileEventListeners, loadTextFromFile } from "../system/domwrappers";
 import { Domain3 } from "../math/domain";
 import { Vector3 } from "../math/vector";
@@ -26,7 +26,7 @@ export class StatApp extends App {
 
     camera: Camera;
 
-    obj?: Mesh;
+    obj?: DisplayMesh;
     dots: Vector3[] = [];
     renderable?: LineArray;
 

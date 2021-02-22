@@ -3,11 +3,11 @@ import { HashTable } from "../data/hash-table";
 import { IntMatrix } from "../data/int-matrix";
 import { Vector3Array } from "../data/vector-array";
 import { Vector2, Vector3 } from "../math/vector";
-import { Mesh } from "./mesh";
+import { DisplayMesh } from "./mesh";
 import { Triangle2, Triangle3 } from "./triangle";
 
 // a mesh with topological information
-export class TopoMesh extends Mesh {
+export class TopoMesh extends DisplayMesh {
 
     lastTouched = 0; // needed for triangle walk
     neighborMap: IntMatrix;
@@ -18,7 +18,7 @@ export class TopoMesh extends Mesh {
         this.neighborMap = new IntMatrix(this.faces.count(), 3);
     }
 
-    static copyFromMesh(mesh: Mesh) : TopoMesh {
+    static copyFromMesh(mesh: DisplayMesh) : TopoMesh {
         let topoMesh = new TopoMesh(mesh.verts.count(), mesh.norms.count(), mesh.uvs.count(), mesh.faces.count());
         topoMesh.verts = mesh.verts.clone();
         topoMesh.norms = mesh.norms.clone();

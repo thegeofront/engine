@@ -69,6 +69,24 @@ export class Vector3
 	}
 
 
+	static fromLerpWeights(p1: Vector3, p2: Vector3, tP1: number, tP2: number, t: number) {
+		
+		if (Math.abs(t - tP1) < 0.00001)
+			return(p1);
+		if (Math.abs(t - tP2) < 0.00001)
+			return(p2);
+		if (Math.abs(tP1 - tP2) < 0.00001)
+			return(p1);
+		let mu = (t - tP1) / (tP2 - tP1);
+
+		return new Vector3(
+			p1.x + mu * (p2.x - p1.x),
+			p1.y + mu * (p2.y - p1.y),
+			p1.z + mu * (p2.z - p1.z),
+		);
+	}
+
+
 	// #endregion
 	// #region defaults 
 

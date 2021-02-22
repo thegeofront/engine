@@ -3,7 +3,7 @@
 // purpose: environment to test eyefinder functionalities
 
 import { version_converter } from "@tensorflow/tfjs";
-import { Mesh, meshFromObj } from "../geo/mesh";
+import { DisplayMesh, meshFromObj } from "../geo/mesh";
 import { GeonImage } from "../img/Image";
 import { BellusScanData, NextcloudScanData } from "./scan-data";
 import { addDropFileEventListeners, loadTextFromFile } from "../system/domwrappers";
@@ -42,7 +42,7 @@ const settings = require('../sfered/settings.json'); // note DIFFERENCE BETWEEN 
 export class EyeFinderApp extends App {
 
     // data 
-    mesh?: Mesh;
+    mesh?: DisplayMesh;
     landmarks?: Vector3Array;
 
     // process
@@ -119,7 +119,7 @@ export class EyeFinderApp extends App {
         })
      
         if (this.mesh == undefined)
-            this.redDotRenderer.render(gl, matrix, Vector3Array.fromList([new Vector3(0,0,0), new Vector3(1,1,1)]));
+            this.redDotRenderer.setAndRender(gl, matrix, Vector3Array.fromList([new Vector3(0,0,0), new Vector3(1,1,1)]));
         else {
             let mesh = this.mesh;
             let landmarks = this.landmarks;
@@ -131,13 +131,13 @@ export class EyeFinderApp extends App {
             this.blueLineRenderer.render(gl, matrix);
             // this.blueLineRenderer.setAndRender(gl, matrix, LineArray.fromMesh(mesh, false))
             if (landmarks)
-                this.redDotRenderer.render(gl, matrix, landmarks);
-            this.blueDotRenderer.render(gl, matrix, mesh.uvs);   
+                this.redDotRenderer.setAndRender(gl, matrix, landmarks);
+            this.blueDotRenderer.setAndRender(gl, matrix, mesh.uvs);   
 
             // debug data from eyefinder process
-            this.redDotRenderer.render(gl, matrix, this.dots2);
-            this.whiteDotRenderer.render(gl, matrix, this.whiteDots);
-            this.redDotRenderer.render(gl, matrix, this.redDots);
+            this.redDotRenderer.setAndRender(gl, matrix, this.dots2);
+            this.whiteDotRenderer.setAndRender(gl, matrix, this.whiteDots);
+            this.redDotRenderer.setAndRender(gl, matrix, this.redDots);
             this.whiteLineRenderer.setAndRender(gl, matrix, LineArray.fromLines(this.lines));
 
             this.redLineRenderer.render(gl, matrix);
@@ -154,7 +154,7 @@ export class EyeFinderApp extends App {
             // render some dots 
             if (this.dots) {
                 //
-                this.redDotRenderer.render(gl, matrix, this.dots);
+                this.redDotRenderer.setAndRender(gl, matrix, this.dots);
             }
         }    
     }

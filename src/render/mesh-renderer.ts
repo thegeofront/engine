@@ -5,7 +5,7 @@
 import { IntMatrix } from "../data/int-matrix";
 import { LineArray } from "../data/line-array";
 import { Vector3Array } from "../data/vector-array";
-import { Mesh } from "../geo/mesh";
+import { DisplayMesh } from "../geo/mesh";
 import { Matrix4 } from "../math/matrix";
 import { DrawSpeed, Renderer } from "./renderer";
 import { SimpleLineRenderer } from "./simple-line-renderer";
@@ -21,12 +21,12 @@ export class MeshRenderer {
         this.lineRend = new SimpleLineRenderer(gl, edgeColor);
     }
 
-    setAndRender(gl: WebGLRenderingContext, matrix: Matrix4, mesh: Mesh) {
+    setAndRender(gl: WebGLRenderingContext, matrix: Matrix4, mesh: DisplayMesh) {
         this.set(gl, mesh);
         this.render(gl, matrix);
     }
 
-    set(gl: WebGLRenderingContext, mesh: Mesh) {
+    set(gl: WebGLRenderingContext, mesh: DisplayMesh) {
         this.faceRend.setMesh(gl, mesh);
         this.lineRend.set(gl, LineArray.fromMesh(mesh), DrawSpeed.StaticDraw);
     }

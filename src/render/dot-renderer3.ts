@@ -4,7 +4,7 @@ import { FloatMatrix } from "../data/float-matrix";
 import { getGeneralFloatMatrix, Vector2Array, Vector3Array } from "../data/vector-array";
 import { Matrix4 } from "../math/matrix";
 import { Vector2, Vector3 } from "../math/vector";
-import { Renderer } from "./renderer";
+import { DrawSpeed, Renderer } from "./renderer";
 
 export class DotRenderer3 extends Renderer {
 
@@ -18,6 +18,7 @@ export class DotRenderer3 extends Renderer {
 
     color: number[];
     size: number;
+    count: number;
 
     constructor(gl: WebGLRenderingContext, 
         radius: number =5, 
@@ -87,6 +88,7 @@ export class DotRenderer3 extends Renderer {
 
         this.color = color;
         this.size = radius;
+        this.count = 0;
 
         // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
         // look up where the vertex data needs to go.
@@ -95,10 +97,23 @@ export class DotRenderer3 extends Renderer {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);     
     }
 
-    render(gl: WebGLRenderingContext, matrix: Matrix4, vectors: Vector2Array | Vector3Array | Vector2[] | Vector3[]) {
+    set(vectors: Vector2Array | Vector3Array | Vector2[] | Vector3[], speed: DrawSpeed) {
+        let gl = this.gl;
+        gl.useProgram(this.program);
 
         // convert all possible entries to a general entry
         let array = getGeneralFloatMatrix(vectors);
+
+        // from some other thing
+        this.count = array.count();
+
+        // // Bind the position buffer.
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
+        gl.vertexAttribPointer(this.a_position, array._width,  gl.FLOAT, false, 0, 0);
+        gl.bufferData(gl.ARRAY_BUFFER, array.data, super.convertDrawSpeed(speed));
+    }
+
+    render(gl: WebGLRenderingContext, matrix: Matrix4) {
 
         // Tell it to use our program (pair of shaders)
         gl.useProgram(this.program);
@@ -113,13 +128,12 @@ export class DotRenderer3 extends Renderer {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
         gl.enableVertexAttribArray(this.a_position);
         
-        // // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-        gl.vertexAttribPointer(this.a_position, array._width,  gl.FLOAT, false, 0, 0);
-        
-        // fill with data;
-        gl.bufferData(gl.ARRAY_BUFFER, array.data, gl.DYNAMIC_DRAW);
-        
         // Draw the point.
-        gl.drawArrays( gl.POINTS, 0, array.count());
+        gl.drawArrays( gl.POINTS, 0, this.count);
+    }
+
+    setAndRender(gl: WebGLRenderingContext, matrix: Matrix4, vectors: Vector2Array | Vector3Array | Vector2[] | Vector3[]) {
+        this.set(vectors, DrawSpeed.DynamicDraw);
+        this.render(gl, matrix);
     }
 }
