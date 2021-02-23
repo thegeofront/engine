@@ -25,6 +25,7 @@ import { Circle3 } from "../geo/circle3";
 import { Plane } from "../geo/plane";
 import { TextureMeshRenderer } from "../render/texture-mesh-renderer";
 import { DrawSpeed } from "../render/renderer";
+import { TopoMesh } from "../geo/topo-mesh";
 
 const settings = require('../sfered/settings.json'); // note DIFFERENCE BETWEEN "" AND ''. '' WORKS, "" NOT. 
 
@@ -131,7 +132,7 @@ export class EyeFinderApp extends App {
             // this.blueLineRenderer.setAndRender(gl, matrix, LineArray.fromMesh(mesh, false))
             if (landmarks)
                 this.redDotRenderer.setAndRender(gl, matrix, landmarks);
-            this.blueDotRenderer.setAndRender(gl, matrix, mesh.uvs);   
+            // this.blueDotRenderer.setAndRender(gl, matrix, mesh.uvs);   
 
             // debug data from eyefinder process
             this.redDotRenderer.setAndRender(gl, matrix, this.dots2);
@@ -182,6 +183,39 @@ export class EyeFinderApp extends App {
         this.dots.forEach((v, n) => {
             console.log(v);
         });    
+    }
+
+
+    testBaricentricElevation(bsd: BellusScanData) {
+        
+        let topo = TopoMesh.copyFromMesh(bsd.mesh);
+        let count = 100;
+        let center = new Vector2(0.5, 0.5);
+        for(let i = 0; i < count; i++) {
+            let theta =  (i / count) * 2 * Math.PI;
+            let test = Vector2.fromCircle(center, 0.05, theta);
+            this.whiteDots.push(test.to3D());    
+
+            let face = topo.walkUV(test);
+        
+            if (face == -1) {
+                console.warn("got a point not on triangle...");
+                return new Vector3(0,0,0);
+            } 
+    
+            let tr3 = topo.getTriangle3(face);
+            let tr2 = topo.getTriangle2(face);
+
+            let triangle2points = tr2.points().toVector3Array().toList();
+            // console.log(triangle2points);
+
+            this.whiteDots.push(test.to3D());    
+
+            let bari = tr2.toBarycentric(test);
+            let test3d = tr3.fromBarycentric(bari);
+
+            this.whiteDots.push(test3d);
+        }
     }
 
 

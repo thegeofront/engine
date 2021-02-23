@@ -153,7 +153,6 @@ export class TopoMesh extends DisplayMesh {
     closestFaces(point: Vector3) : number[] {
 
         let closestVertexId = this.verts.closestId(point);
-
         // get all face ids containing closestVertex, along with their centers
         let closestFaces: number[] = [];  
         //let centers: Vector3[] = []
@@ -170,8 +169,8 @@ export class TopoMesh extends DisplayMesh {
     }
 
     elevate(p: Vector2) : Vector3 {
-        // 'elevate' a point in UV space to vertex space using a barycentric remap
-        
+
+        // 'elevate' a point in UV space to vertex space using a barycentric remap   
         // figure out where this point is located on the mesh
         let face = this.walkUV(p);
         
@@ -188,6 +187,7 @@ export class TopoMesh extends DisplayMesh {
     }
 
     closestPoint(p: Vector3) : [Vector3, number] {
+
         let faceIds = this.closestFaces(p);
         let closestPoints = new Vector3Array(faceIds.length);
         faceIds.forEach((id, i) => {
@@ -215,17 +215,20 @@ export class TopoMesh extends DisplayMesh {
 
     // combo
     flattenClosestPoint(p: Vector3) {
+
         let [cp, face] = this.closestPoint(p);
         return this.flatten(cp, face);
     }
 
 
     public getTriangle2(id: number) : Triangle2 {
+
         let p = this.getFacePoints(id, true);
         return new Triangle2(p[0], p[1], p[2]);
     }
 
     public getTriangle3(id: number) : Triangle3 {
+
         let p = this.getFacePoints(id, false);
         return new Triangle3(p[0], p[1], p[2]);
     }

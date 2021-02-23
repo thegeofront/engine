@@ -179,9 +179,9 @@ export class Vector3
 
 
 	add(v: Vector3) : Vector3 {
-		this.x += v.x,
-		this.y += v.y,
-		this.z += v.z
+		this.x += v.x;
+		this.y += v.y;
+		this.z += v.z;
 		return this;
     }
 
@@ -226,9 +226,9 @@ export class Vector3
 
     scale(v: number) : Vector3
     {
-		this.x *= v, 
-		this.y *= v, 
-		this.z *= v
+		this.x *= v;
+		this.y *= v;
+		this.z *= v;
 		return this;
     }
 
@@ -535,6 +535,15 @@ export class Vector2
 	// }
 
 
+	static fromCircle(center: Vector2, radius: number, theta: number) : Vector2
+    {
+        return new Vector2(
+            center.x + radius * Math.sin(theta),
+            center.y + radius * Math.cos(theta)
+        );
+	}
+
+
 	static fromCopy(other: Vector2) : Vector2 {
 		return this.zero().copy(other);	
 	}
@@ -830,8 +839,8 @@ export class Vector2
 
 
 	disToSquared(v: Vector2) : number {
-		const dx = this.x - v.x, 
-			  dy = this.y - v.y;
+		let dx = this.x - v.x;
+		let dy = this.y - v.y;
 		return dx * dx + dy * dy;
 	}
 

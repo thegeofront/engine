@@ -106,16 +106,20 @@ export class EyeFinder {
         // debug
         this.app?.dots2.push(...contrastPoints.toList());
 
-        // step 2: elevate from uv space to vertex space of the mesh 
+        // step 2: elevate from uv space to vertex space of the mesh
+        // HIER GAAT IETS GOED MIS 
         let cps = new Vector3Array(contrastPoints.count()); 
         contrastPoints.forEach((p, i) => {
             cps.setVector(i,  mesh.elevate(p));
         })
 
+        this.app?.whiteDots.push(...cps.toList());   
+
         // step 3: fit a plane through the points, and project to this plane
         let plane = Plane.fromLeastSquares(cps);
         cps.forEach((p) => plane.pullToPlane(p));
         let cpsFixed = cps.to2D();
+        1
         
         // step 4: ransac! 
         let rss = ransacSettings;
@@ -137,7 +141,7 @@ export class EyeFinder {
             p.z = 0;
             return plane.pushToWorld(p);
         })
-        this.app?.whiteDots.push(...cps.toList());
+        
         this.app?.lineRenderables.push(LineArray.fromPlane(plane));
         this.app?.redDots.push(eyepoint);
         

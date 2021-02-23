@@ -1,3 +1,4 @@
+import { Vector2Array } from "../data/vector-array";
 import { Const } from "../math/const";
 import { Vector2, Vector3 } from "../math/vector";
 import { LineCurve2 } from "./line";
@@ -9,22 +10,36 @@ export class Triangle2 {
     b: Vector2;
     c: Vector2;
 
+
     constructor(a: Vector2, b: Vector2, c: Vector2) {
+
         this.a = a;
         this.b = b;
         this.c = c;
     }
 
 
+    points() : Vector2Array {
+        return Vector2Array.fromList([this.a, this.b, this.c]);
+    }
+    
+
     toBarycentric(point: Vector2) : Vector3 {
 
-        let disa = this.a.disTo(point);
-        let disb = this.b.disTo(point);
-        let disc = this.c.disTo(point);
-
-        let distotal = disa + disb + disc;
-
-        return new Vector3(disa / distotal, disb / distotal, disc / distotal);
+        let v0 = this.b.subbed(this.a);
+        let v1 = this.c.subbed(this.a);
+        let v2 = point.subbed(this.a);
+        let d00 = v0.dot(v0);
+        let d01 = v0.dot(v1);
+        let d11 = v1.dot(v1);
+        let d20 = v2.dot(v0);
+        let d21 = v2.dot(v1);
+        let denom = d00 * d11 - d01 * d01;
+        let v = (d11 * d20 - d01 * d21) / denom;
+        let w = (d00 * d21 - d01 * d20) / denom;
+        let u = 1.0 - v - w;
+        
+        return new Vector3(u, v, w);
     }
 
 
@@ -76,10 +91,17 @@ export class Triangle3 {
     b: Vector3;
     c: Vector3;
 
+
     constructor(a: Vector3, b: Vector3, c: Vector3) {
+
         this.a = a;
         this.b = b;
         this.c = c;
+    }
+
+
+    points() : Vector3[] {
+        return [this.a, this.b, this.c];
     }
 
 
@@ -87,7 +109,9 @@ export class Triangle3 {
         return Plane.from3pt(this.a, this.b, this.c);
     }
 
+
     to2D(plane: Plane = Plane.WorldXY()) : Triangle2 {
+
         return new Triangle2(
             plane.pullToPlane(this.a).to2D(),
             plane.pullToPlane(this.b).to2D(),
@@ -95,7 +119,9 @@ export class Triangle3 {
         )
     }
 
+
     closestPoint(point: Vector3) : Vector3 {
+
         let plane = this.getPlane();
         let [cp, _] = plane.closestPoint(point);
         let planeCP = plane.pullToPlane(cp);
@@ -104,25 +130,33 @@ export class Triangle3 {
         return point;
     }
 
+    // Transcribed from Christer Ericson's Real-Time Collision Detection:
+    // http://realtimecollisiondetection.net/
     toBarycentric(point: Vector3) : Vector3 {
 
-        let disa = this.a.disTo(point);
-        let disb = this.b.disTo(point);
-        let disc = this.c.disTo(point);
+        let v0 = this.b.subbed(this.a);
+        let v1 = this.c.subbed(this.a);
+        let v2 = point.subbed(this.a);
+        let d00 = v0.dot(v0);
+        let d01 = v0.dot(v1);
+        let d11 = v1.dot(v1);
+        let d20 = v2.dot(v0);
+        let d21 = v2.dot(v1);
+        let denom = d00 * d11 - d01 * d01;
+        let v = (d11 * d20 - d01 * d21) / denom;
+        let w = (d00 * d21 - d01 * d20) / denom;
+        let u = 1.0 - v - w;
 
-        let distotal = disa + disb + disc;
-
-        return new Vector3(disa / distotal, disb / distotal, disc / distotal);
+        return new Vector3(u, v, w);
     }
+
 
     fromBarycentric(bari: Vector3) : Vector3 {
 
-        let a = this.a.scaled(bari.x);
-        let b = this.b.scaled(bari.y);
-        let c = this.c.scaled(bari.z);
+        let a = this.a.clone().scale(bari.x);
+        let b = this.b.clone().scale(bari.y);
+        let c = this.c.clone().scale(bari.z);
 
-        return a.add(b).add(c);
-
+        return a.added(b).add(c);
     }
-
 }
