@@ -70,34 +70,25 @@ export class GeonImage {
         return this;
     }
     
-    set(x: number, y: number, pixel: number[]) {
-
-        // if (x > this.width || x < 0) throw "out of bounds";
-        // if (y > this.height || y < 0) throw "out of bounds";
-        // for(let i = 0 ; i < this.pixelSize; i++) {
-        //     this.data[this.pixelSize * (y * this.width + x) + i] = pixel[i];
-        // }
-        this.data[4 * (y * this.width + x)] = pixel[0];
-        this.data[4 * (y * this.width + x)+1] = pixel[1];
-        this.data[4 * (y * this.width + x)+2] = pixel[2];
-        this.data[4 * (y * this.width + x)+3] = pixel[3];
+    includes(x: number, y: number) : boolean {
+        return (x < this.width && x >= 0 && y < this.height && y >= 0);
     }
 
-    get(x: number, y: number) : number[] {
+    set(i: number, j: number, pixel: number[]) {
 
-        // if (x > this.width || x < 0) throw "out of bounds";
-        // if (y > this.height || y < 0) throw "out of bounds";
+        this.data[4 * ((j * this.width + i))] = pixel[0];
+        this.data[4 * ((j * this.width + i)) + 1] = pixel[1];
+        this.data[4 * ((j * this.width + i)) + 2] = pixel[2];
+        this.data[4 * ((j * this.width + i)) + 3] = pixel[3];
+    }
 
-        // let pixel = []; // 
-        // for(let i = 0 ; i < this.pixelSize; i++) {
-        //     pixel.push(this.pixelSize * (y * this.width + x) + i);
-        // }
-        // return pixel;
+    get(i: number, j: number) : number[] {
+
         return [
-            this.data[4 * (y * this.width + x)],
-            this.data[4 * (y * this.width + x) + 1],
-            this.data[4 * (y * this.width + x) + 2],
-            this.data[4 * (y * this.width + x) + 3]
+            this.data[4 * (j * this.width + i)],
+            this.data[4 * (j * this.width + i) + 1],
+            this.data[4 * (j * this.width + i) + 2],
+            this.data[4 * (j * this.width + i) + 3]
         ]
     }
 
@@ -145,10 +136,19 @@ export class GeonImage {
     getMinMax() : [number, number] {
         // get the minimum and maximum pixel value
         // assumes pixelsize = 1
-        return [
-            Math.min(...this.data),
-            Math.max(...this.data)
-        ]
+
+        let min = Infinity;
+        let max = 0;
+
+        for (let i = 0; i < this.data.length; i++) {
+            if (this.data[i] < min) {
+                min = this.data[i];
+            } else if (this.data[i] > max) {
+                max = this.data[i];
+            }
+        }
+
+        return [ min, max]
     }
 
     applyThreshold(lower: number, upper: number) {
@@ -267,12 +267,47 @@ export class GeonImage {
 
         for (let y = 0; y < image.height; y++) {
             for (let x = 0; x < image.width; x++) {
-                let pixel = this.get(
+                let pixel = old.get(
                     Math.round(x * x_factor), 
                     Math.round(y * y_factor));
                 image.set(x, y, pixel);
             }
         }
+
+        return image;
+    }
+
+    // add borders till this size is achieved
+    buffer(width: number, height: number) : GeonImage {
+        
+        // resize the image to a new width and height, using nearest neighbour
+        const image = new GeonImage(width, height, this.pixelSize);
+        const old = this;
+
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+
+                // console.log(x, y);
+                let pixel = old.includes(x, y) ? old.get(x, y) : [0,0,0,255];
+                image.set(x, y, pixel);
+            }
+        }
+
+
+        // for (let y = 0; y < height; y++) {
+        //     for (let x = 0; x < width; x++) {
+        //         image.set(x, y, [x,0,0,255]);
+        //     }
+        // }
+
+
+        // build some simple image instead to test
+        // for (let i = 0; i < image.data.length / 4; i++) {
+        //     image.data[i*4 + 0] = i % 255;
+        //     image.data[i*4 + 1] = 0;
+        //     image.data[i*4 + 2] = 0;
+        //     image.data[i*4 + 3] = 255;
+        // }
 
         return image;
     }

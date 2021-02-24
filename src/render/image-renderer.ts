@@ -2,152 +2,175 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of images / textures
 
-import { Rectangle2 } from "../geo/rectangle2";
-import { Renderer } from "./renderer";
+import { Rectangle2 } from "../geo/rectangle";
+import { DrawSpeed, Renderer } from "./renderer";
 
-export class ImageRenderer extends Renderer {
 
-    // attribute & uniform locations
-    a_position: number;
-    a_position_buffer: WebGLBuffer;
-    u_resolution: WebGLUniformLocation;
-    u_color: WebGLUniformLocation;
 
-    texture: WebGLTexture;
-    u_image: WebGLUniformLocation;
+// NOTE: DEPRICATED / NOT WORKING PROPERLY
+// export class ImageRenderer extends Renderer {
 
-    constructor(gl: WebGLRenderingContext) {
+//     texture_id: number;
 
-        // note: I like vertex & fragments to be included in the script itself.
-        // when you change vertex or fragment, this class has to deal with it. 
-        // putting them somewhere else doesnt make sense to me, 
-        // they are coupled 1 to 1.
-        let vertexSource: string = `
-        attribute vec2 a_position;
-        attribute vec2 a_texCoord;
+//     // attribute & uniform locations
+//     a_verts: number;
+//     a_verts_buffer: WebGLBuffer;
+//     u_resolution: WebGLUniformLocation;
+//     u_color: WebGLUniformLocation;
 
-        uniform vec2 u_resolution;
+//     texture: WebGLTexture;
+//     u_texture: WebGLUniformLocation;
+//     a_uvs: number;
+//     a_uvs_buffer: WebGLBuffer | null;
 
-        varying vec2 v_texCoord;
+//     constructor(gl: WebGLRenderingContext) {
 
-        void main() {
-            // convert the rectangle from pixels to 0.0 to 1.0
-            vec2 zeroToOne = ((a_position / u_resolution) * 2.0) - 1.0;
+//         // note: I like vertex & fragments to be included in the script itself.
+//         // when you change vertex or fragment, this class has to deal with it. 
+//         // putting them somewhere else doesnt make sense to me, 
+//         // they are coupled 1 to 1.
+//         let vertexSource: string = `
+//         attribute vec2 a_position;
+//         attribute vec2 a_texCoord;
 
-            gl_Position = vec4(zeroToOne * vec2(1, -1), 0, 1);
+//         uniform vec2 u_resolution;
 
-            v_texCoord = a_texCoord;
-        }
-        `;
-        let fragmentSource: string = `
-        precision mediump float;
+//         varying vec2 v_texCoord;
+
+//         void main() {
+//             // convert the rectangle from pixels to 0.0 to 1.0
+//             vec2 zeroToOne = ((a_position / u_resolution) * 2.0) - 1.0;
+
+//             gl_Position = vec4(zeroToOne * vec2(1, -1), 0, 1);
+
+//             v_texCoord = a_texCoord;
+//         }
+//         `;
+//         let fragmentSource: string = `
+//         precision mediump float;
  
-        uniform sampler2D u_image;
+//         uniform sampler2D u_texture;
 
-        varying vec2 v_texCoord;
+//         varying vec2 v_texCoord;
         
-        void main() {
-            // Look up a color from the texture.
-            gl_FragColor = texture2D(u_image, v_texCoord);
-        }
-        `;
+//         void main() {
+//             // Look up a color from the texture.
+//             gl_FragColor = texture2D(u_texture, v_texCoord);
+//         }
+//         `;
 
-        // setup program
-        super(gl, vertexSource, fragmentSource);
+//         // setup program
+//         super(gl, vertexSource, fragmentSource);
 
-        // look up where the vertex data needs to go.
-        this.a_position = gl.getAttribLocation(this.program, "a_position");
-        this.a_position_buffer = gl.createBuffer()!;
+//         // init uniforms
+//         this.u_texture =  gl.getUniformLocation(this.program, "u_texture")!;
+//         this.u_resolution = gl.getUniformLocation(this.program, "u_resolution")!;
+//         this.u_color = gl.getUniformLocation(this.program, "u_color")!;
 
-        this.u_image =  gl.getUniformLocation(this.program, "u_image")!;
-        this.u_resolution = gl.getUniformLocation(this.program, "u_resolution")!;
-        this.u_color = gl.getUniformLocation(this.program, "u_color")!;
+//         // verts buffer
+//         this.a_verts = gl.getAttribLocation(this.program, "a_position");
+//         this.a_verts_buffer = gl.createBuffer()!;
 
-        // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);     
+//         // uvs buffer
+//         this.a_uvs = gl.getAttribLocation(this.program, "a_texCoord");
+//         this.a_uvs_buffer = gl.createBuffer();
+   
+//         // Create a texture.
+//         this.texture = gl.createTexture()!;
+//         this.texture_id = Renderer.getNextTextureID();
+//     }
+
+//     set(r: Rectangle2, image: ImageData, speed: DrawSpeed) {
         
-        // look up where the texture coordinates need to go.
-        var a_texCoord = gl.getAttribLocation(this.program, "a_texCoord");
+//         let gl = this.gl;
+//         let drawspeed = super.convertDrawSpeed(speed);
+//         gl.useProgram(this.program);
+
+//         // set uniforms
+//         gl.uniform2f(this.u_resolution, gl.canvas.width, gl.canvas.height);
+    
+//         // enable the texture 
+//         gl.uniform1i(this.u_texture, this.texture_id);
+//         gl.activeTexture(gl.TEXTURE0 + this.texture_id);
+//         gl.bindTexture(gl.TEXTURE_2D, this.texture);
+
+//         // fill the texture
+//         // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+//         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 128, 128, 255]));
+//         // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, mesh.texture.data);
+
+//         // Set the parameters so we can render any size image.
+//         // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+//         // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+//         // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+//         // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+//         // enable UVs
+//         gl.enableVertexAttribArray(this.a_uvs);
+//         gl.vertexAttribPointer(this.a_uvs, 2, gl.FLOAT, false, 0, 0);
+//         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_uvs_buffer);
+//         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+//             0.0,  0.0,
+//             1.0,  0.0,
+//             0.0,  1.0,
+//             0.0,  1.0,
+//             1.0,  0.0,
+//             1.0,  1.0]), drawspeed);
+
+//         // enable & set verts
+//         gl.enableVertexAttribArray(this.a_verts);
+//         var size = 2;          // 2 components per iteration
+//         var type = gl.FLOAT;   // the data is 32bit floats
+//         var normalize = false; // don't normalize the data
+//         var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
+//         var offset = 0;        // start at the beginning of the buffer
+//         gl.vertexAttribPointer(this.a_verts, size, type, false, 0, 0);
+//         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_verts_buffer);
+//         let verts = r.getVertices();
+//         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+//             verts[0].x, verts[0].y,
+//             verts[1].x, verts[1].y,
+//             verts[2].x, verts[2].y,
+//             verts[2].x, verts[2].y,
+//             verts[1].x, verts[1].y,
+//             verts[3].x, verts[3].y,
+//         ]), drawspeed);
+//     }
+
+//     render() {
+ 
+//         // use the program
+//         let gl = this.gl;
+//         gl.useProgram(this.program);
         
-        // provide texture coordinates for the rectangle.
-        var a_texCoord_buffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, a_texCoord_buffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-            0.0,  0.0,
-            1.0,  0.0,
-            0.0,  1.0,
-            0.0,  1.0,
-            1.0,  0.0,
-            1.0,  1.0]), gl.STATIC_DRAW);
-        gl.enableVertexAttribArray(a_texCoord);
-        gl.vertexAttribPointer(a_texCoord, 2, gl.FLOAT, false, 0, 0);
-        
-        // Create a texture.
-        this.texture = gl.createTexture()!;
-        gl.bindTexture(gl.TEXTURE_2D, this.texture);
-        
-        // Set the parameters so we can render any size image.
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-    }
+//         // set uniforms
+//         gl.uniform1i(this.u_texture, this.texture_id);
 
-    // render 1 image to the screen
-    setAndRender(gl: WebGLRenderingContext, r: Rectangle2, image: ImageData) {
+//         // set texture 
+//         gl.activeTexture(gl.TEXTURE0 + this.texture_id);
+//         gl.bindTexture(gl.TEXTURE_2D, this.texture);
 
-        // Tell it to use our program (pair of shaders)
-        gl.useProgram(this.program);
+//         // buffer verts
+//         gl.enableVertexAttribArray(this.a_verts);
+//         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_verts_buffer);
+//         gl.vertexAttribPointer(this.a_verts, 2, gl.FLOAT, false, 0, 0);
 
-        // set uniforms
-        // gl.uniform1i(this.u_image, 1);
+//         // buffer uvs
+//         gl.enableVertexAttribArray(this.a_uvs);
+//         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_uvs_buffer);
+//         gl.vertexAttribPointer(this.a_uvs, 2, gl.FLOAT, false, 0, 0);
 
-        // activate & fill texture
-        // gl.bindTexture(gl.TEXTURE_2D, this.texture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+//         // draw!
+//         gl.drawArrays(gl.TRIANGLES, 0, 6);
+//     }
 
-        // Turn on the attribute
-        gl.enableVertexAttribArray(this.a_position);
+//     // render 1 image to the screen
+//     setAndRender(gl: WebGLRenderingContext, r: Rectangle2, image: ImageData) {
+//         this.set(r, image, DrawSpeed.DynamicDraw);
+//         this.render();
+//     }
 
-        gl.uniform2f(this.u_resolution, gl.canvas.width, gl.canvas.height);
-
-        // Bind the position buffer.
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
-
-        // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-        var size = 2;          // 2 components per iteration
-        var type = gl.FLOAT;   // the data is 32bit floats
-        var normalize = false; // don't normalize the data
-        var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-        var offset = 0;        // start at the beginning of the buffer
-        gl.vertexAttribPointer(this.a_position, size, type, normalize, stride, offset);
-
-        this.setRectangle(gl, r);
-
-        // Set a random color.
-        gl.uniform4f(this.u_color, Math.random(), Math.random(), Math.random(), 1);
-
-        // Draw the rectangle.
-        var primitiveType = gl.TRIANGLES;
-        var offset = 0;
-        var count = 6;
-        gl.drawArrays(primitiveType, offset, count);
-    }
-
-    // Fill the buffer with the values that define a rectangle.
-    setRectangle(gl: WebGLRenderingContext, r: Rectangle2) {
-        let verts = r.getVertices();
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-            verts[0].x, verts[0].y,
-            verts[1].x, verts[1].y,
-            verts[2].x, verts[2].y,
-            verts[2].x, verts[2].y,
-            verts[1].x, verts[1].y,
-            verts[3].x, verts[3].y,
-        ]), gl.STATIC_DRAW);
-    }
-
-    randomInt(range: number) : number {
-        return Math.floor(Math.random() * range);
-    }
-}
+//     randomInt(range: number) : number {
+//         return Math.floor(Math.random() * range);
+//     }
+// }

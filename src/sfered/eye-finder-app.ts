@@ -2,24 +2,21 @@
 // author:  Jos Feenstra
 // purpose: environment to test eyefinder functionalities
 
-import { version_converter } from "@tensorflow/tfjs";
 import { DisplayMesh, meshFromObj } from "../geo/mesh";
 import { GeonImage } from "../img/Image";
 import { BellusScanData, NextcloudScanData } from "./scan-data";
 import { addDropFileEventListeners, loadTextFromFile } from "../system/domwrappers";
-import { Vector2Array, Vector3Array } from "../data/vector-array";
-import { Domain, Domain2, Domain3 } from "../math/domain";
+import { Vector3Array } from "../data/vector-array";
+import { Domain2 } from "../math/domain";
 import { Vector2, Vector3 } from "../math/vector";
 import { Camera } from "../render/camera";
 import { DotRenderer3 } from "../render/dot-renderer3";
 import { SimpleLineRenderer } from "../render/simple-line-renderer";
-import { SimpleMeshRenderer } from "../render/simple-mesh-renderer";
 import { InputState } from "../system/input-state";
 import { App } from "../app/app";
 import { EyeFinder } from "./eye-finder";
 import { Matrix3, Matrix4 } from "../math/matrix";
-import { ImageRenderer } from "../render/image-renderer";
-import { Rectangle2 } from "../geo/rectangle2";
+import { Rectangle2, Rectangle3 } from "../geo/rectangle";
 import { LineArray } from "../data/line-array";
 import { Circle3 } from "../geo/circle3";
 import { Plane } from "../geo/plane";
@@ -59,6 +56,8 @@ export class EyeFinderApp extends App {
     lines: Vector3[] = [];
     lineRenderables: LineArray[] = [];
 
+    imageMeshes: DisplayMesh[] = [];
+
     // rendering 
     blueDotRenderer: DotRenderer3;
     redDotRenderer: DotRenderer3;
@@ -71,8 +70,9 @@ export class EyeFinderApp extends App {
     meshRenderer: TextureMeshRenderer;
 
     camera: Camera;
-    imageRenderer: ImageRenderer;
+    randomMeshRenderer: TextureMeshRenderer;
 
+    
 
     constructor(gl: WebGLRenderingContext, canvas: HTMLCanvasElement, context: HTMLDivElement) {
         
@@ -90,7 +90,7 @@ export class EyeFinderApp extends App {
         this.redLineRenderer = new SimpleLineRenderer(gl, [1,0,0,0.5]);
         
         this.meshRenderer = new TextureMeshRenderer(gl);
-        this.imageRenderer = new ImageRenderer(gl);
+        this.randomMeshRenderer = new TextureMeshRenderer(gl);
         this.camera = new Camera(canvas, 0.1);
 
         addDropFileEventListeners(canvas, processFiles.bind(this));
@@ -127,12 +127,12 @@ export class EyeFinderApp extends App {
             let landmarks = this.landmarks;
 
             // show the mesh
-            // this.meshRenderer.render(gl, matrix);
+            this.meshRenderer.render(gl, matrix);
             this.blueLineRenderer.render(gl, matrix);
             // this.blueLineRenderer.setAndRender(gl, matrix, LineArray.fromMesh(mesh, false))
             if (landmarks)
                 this.redDotRenderer.setAndRender(gl, matrix, landmarks);
-            // this.blueDotRenderer.setAndRender(gl, matrix, mesh.uvs);   
+            this.blueDotRenderer.setAndRender(gl, matrix, mesh.uvs);   
 
             // debug data from eyefinder process
             this.redDotRenderer.setAndRender(gl, matrix, this.dots2);
@@ -143,13 +143,9 @@ export class EyeFinderApp extends App {
             this.redLineRenderer.render(gl, matrix);
 
             // render images
-            let height = 200;
-            let width = 300;
-            this.images.forEach((image, i) => {
-                this.imageRenderer.setAndRender(gl, 
-                    new Rectangle2(Matrix3.newIdentity(), Domain2.fromBounds(10,10+width, i*(height+10), i*(height+10) + height)), 
-                    image.toImageData());
-            });
+            this.imageMeshes.forEach((mesh) =>{
+                this.randomMeshRenderer.setAndRender(gl, matrix, mesh);
+            })
 
             // render some dots 
             if (this.dots) {
@@ -157,6 +153,32 @@ export class EyeFinderApp extends App {
                 this.redDotRenderer.setAndRender(gl, matrix, this.dots);
             }
         }    
+    }
+
+
+    bufferImageMeshes() {
+        // i was having trouble rendering images... this is a workaround:
+        // convert the this.images[] list into the this.imageMeshes list. then render that with the normal renderer
+        
+        let size = 256;
+
+        let accHeight = 0;
+
+        this.imageMeshes = [];
+        this.images.forEach((image, i) => {
+
+            let height = image.height;
+            let width = image.width; 
+
+            let rec = new Rectangle3(
+                Plane.fromPVV(new Vector3(0,0,0), new Vector3(1,0,0), new Vector3(0,1,0)),
+                Domain2.fromBounds(10,10+width, accHeight, accHeight + height));
+            let mesh = DisplayMesh.fromRect(rec);
+            mesh.setTexture(image.resize(size, size).toImageData()); // note: webgl can only work with 2^x * 512 images
+            this.imageMeshes.push(mesh);
+
+            accHeight += height + 10;
+        });
     }
 
 
@@ -169,12 +191,13 @@ export class EyeFinderApp extends App {
         } else {
             console.log("eyepoints couldnt be found...")
         }
+        this.bufferImageMeshes();
 
         // console.log(left);
         // console.log(right);
 
         let mesh = data.mesh;        
-        // this.meshRenderer.set(this.gl, mesh);
+        this.meshRenderer.set(this.gl, mesh);
         this.blueLineRenderer.set(this.gl, LineArray.fromMesh(mesh), DrawSpeed.StaticDraw);
         this.mesh = mesh;
 
@@ -183,6 +206,32 @@ export class EyeFinderApp extends App {
         this.dots.forEach((v, n) => {
             console.log(v);
         });    
+    }
+
+
+    addBellusData(bsd: BellusScanData) {
+
+        // start the eyefinder
+        let r = this.eyefinder.findPupilsFromBellus(bsd);
+        if (r) {
+            console.log("eyepoints found");     
+        } else {
+            console.log("eyepoints couldnt be found...");
+        }
+
+        this.bufferImageMeshes();
+        // this.camera.pos = left.clone();
+        // this.camera.offset.x = 100;
+
+        // put the data into the render buffers.
+        let mesh = bsd.mesh;
+
+        this.meshRenderer.set(this.gl, mesh);
+        this.blueLineRenderer.set(this.gl, LineArray.fromMesh(mesh), DrawSpeed.StaticDraw);
+        // this.redLineRenderer.set(this.gl, mesh.uvs.data, mesh.getLineIds(), 2);
+
+        this.mesh = bsd.mesh;
+        this.landmarks = bsd.landmarks;
     }
 
 
@@ -218,30 +267,6 @@ export class EyeFinderApp extends App {
         }
     }
 
-
-    addBellusData(bsd: BellusScanData) {
-
-        // start the eyefinder
-        let r = this.eyefinder.findPupilsFromBellus(bsd);
-        if (r) {
-            console.log("eyepoints found");     
-        } else {
-            console.log("eyepoints couldnt be found...");
-        }
-
-        // this.camera.pos = left.clone();
-        // this.camera.offset.x = 100;
-
-        // put the data into the render buffers.
-        let mesh = bsd.mesh;
-
-        this.meshRenderer.set(this.gl, mesh);
-        this.blueLineRenderer.set(this.gl, LineArray.fromMesh(mesh), DrawSpeed.StaticDraw);
-        // this.redLineRenderer.set(this.gl, mesh.uvs.data, mesh.getLineIds(), 2);
-
-        this.mesh = bsd.mesh;
-        this.landmarks = bsd.landmarks;
-    }
 }
 
 

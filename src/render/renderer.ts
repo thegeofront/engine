@@ -4,6 +4,8 @@
 // credits to : https://webglfundamentals.org/
 // note: im still figuring out how to organize this 
 
+var nextTextureId = 0;
+
 export class Renderer {
 
     gl: WebGLRenderingContext;
@@ -12,6 +14,12 @@ export class Renderer {
     constructor(gl: WebGLRenderingContext, vertexScript: string, fragmentScript: string) {
         this.gl = gl;
         this.program = createProgramFromScripts(gl, vertexScript, fragmentScript);
+    }
+
+    static getNextTextureID() {
+        let id = nextTextureId;
+        nextTextureId += 1;
+        return id;
     }
 
     static resizeCanvas(gl: WebGLRenderingContext) {

@@ -275,35 +275,6 @@ export class TopoMesh extends DisplayMesh {
                 this.verts.getVector(pointIds[1]),
                 this.verts.getVector(pointIds[2]),
             ]
-        }
-        
+        }   
     }
-
-
-    // private getBariCoords(faceIndex: number, p: Vector2) : Vector3 {
-    //     // get vectors
-    //     let [a, b, c] = this.getFacePoints(faceIndex, true);
-
-    //     // this can be more elegant using matrices, but this formula works
-    //     let [px, py] = [p.x, p.y];
-    //     let [x1, y1] = [a.x, a.y];
-    //     let [x2, y2] = [b.x, b.y];
-    //     let [x3, y3] = [c.x, c.y];
-    //     let denom = ((y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3))
-    //     let u = ((y2 - y3) * (px - x3) + (x3 - x2) * (py - y3)) / denom
-    //     let v = ((y3 - y1) * (px - x3) + (x1 - x3) * (py - y3)) / denom
-    //     let w = 1 - u - v
-    //     return new Vector3(u, v, w);
-    // }
-
-
-    // private getBariPoint(faceIndex: number, barycoord: Vector3, fromUV: boolean) : Vector2 | Vector3 {
-    //     let [a, b, c] = this.getFacePoints(faceIndex, fromUV);
-
-    //     a.scale(barycoord.x);
-    //     b.scale(barycoord.y);
-    //     c.scale(barycoord.z);
-
-    //     return a.add(b).add(c);
-    // }
 }

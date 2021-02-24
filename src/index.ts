@@ -7,7 +7,6 @@ import { InputState } from "./system/input-state";
 import { App } from "./app/app";
 import { initWebglContext, Renderer } from "./render/renderer";
 import { DotApp2 } from "./app-demos/dot-app2";
-import { RectangleApp } from "./app-demos/rectangle-app";
 import { DotApp3 } from "./app-demos/dot-app3";
 import { ObjLoaderApp } from "./app/obj-loader-app";
 import { Core } from "./core";

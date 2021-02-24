@@ -5,7 +5,6 @@ import { GeonImage } from "../img/Image";
 import { Domain, Domain2, Domain3 } from "../math/domain";
 import { Matrix3 } from "../math/matrix";
 import { Vector2, Vector3 } from "../math/vector";
-import { ImageRenderer } from "../render/image-renderer";
 import { RectangleRenderer } from "../render/rectangle-renderer";
 import { InputState } from "../system/input-state"
 import { App } from "../app/app"

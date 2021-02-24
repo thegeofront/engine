@@ -26,6 +26,8 @@ export class TextureMeshRenderer extends Renderer {
     a_texcoord: number;
     a_texcoord_buffer: WebGLBuffer;
     u_texture: WebGLUniformLocation;
+    texture_id: number;
+    texture: WebGLTexture | null;
 
     constructor(gl: WebGLRenderingContext) {
         const vs = `
@@ -63,14 +65,11 @@ export class TextureMeshRenderer extends Renderer {
         this.count = 0;
         this.size = 0;
 
-        // create uniforms & buffers, get pointers for all data to be used
+        // init uniforms 
         this.u_transform = gl.getUniformLocation(this.program, "u_transform")!;
         this.u_texture = gl.getUniformLocation(this.program, "u_texture")!;
 
-        // we need 3 buffers 
-        // -> 1 float buffer for the positions of all vertices.
-        // -> 1 float buffer for texture positions
-        // -> 1 int buffer for the index of all triangles
+        // init three buffers: verts | uvs | links
         this.a_position = gl.getAttribLocation(this.program, "a_position");
         this.a_position_buffer = gl.createBuffer()!;
 
@@ -78,6 +77,10 @@ export class TextureMeshRenderer extends Renderer {
         this.a_texcoord_buffer = gl.createBuffer()!;
 
         this.index_buffer = gl.createBuffer()!; 
+
+        // init texture
+        this.texture_id = Renderer.getNextTextureID();
+        this.texture = gl.createTexture();
     }
 
     setAndRender(gl: WebGLRenderingContext, matrix: Matrix4, mesh: DisplayMesh) {
@@ -111,16 +114,14 @@ export class TextureMeshRenderer extends Renderer {
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(mesh.faces.data), this.convertDrawSpeed(speed));
 
         // texture 
-        var texture = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, texture);
+        gl.activeTexture(gl.TEXTURE0 + this.texture_id);
+        gl.bindTexture(gl.TEXTURE_2D, this.texture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, mesh.texture);
         // alternative texture -> Fill the texture with a 1x1 blue pixel.
         // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 128, 128, 255]));
         // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, mesh.texture.data);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
         gl.generateMipmap(gl.TEXTURE_2D);
-        
-        console.log("setting texture stuff ..");
     }
 
     // render 1 image to the screen
@@ -130,7 +131,14 @@ export class TextureMeshRenderer extends Renderer {
 
         // use the program
         gl.useProgram(this.program);
-        gl.uniform1i(this.u_texture, 0);
+        
+        // set uniforms
+        gl.uniformMatrix4fv(this.u_transform, false, matrix.data);
+        
+        // set texture 
+        gl.uniform1i(this.u_texture, this.texture_id);
+        gl.activeTexture(gl.TEXTURE0 + this.texture_id);
+        gl.bindTexture(gl.TEXTURE_2D, this.texture);
 
         // buffer 1
         gl.enableVertexAttribArray(this.a_position);
@@ -145,9 +153,6 @@ export class TextureMeshRenderer extends Renderer {
         // buffer 3
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
         
-        // set uniforms
-        gl.uniformMatrix4fv(this.u_transform, false, matrix.data);
-
         // draw!
         gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
     }

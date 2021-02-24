@@ -37,8 +37,6 @@ export class EyeFinder {
         let image = GeonImage.fromImageData(data.texture);
         let [winLeft, winRight] = this.getEyeWindowsNextcloud(data, topo);
 
-        console.log("windows: ", winLeft, winRight);
-
         return this.findPupils(image, topo, data.settings, winLeft, winRight);
     }
 
@@ -51,9 +49,6 @@ export class EyeFinder {
         let topo = TopoMesh.copyFromMesh(bsd.mesh);
         let image = GeonImage.fromImageData(bsd.texture);
         let [winLeft, winRight] = this.getEyeWindows(bsd);
-        
-        console.log("windows: ", winLeft, winRight);
-
 
         return this.findPupils(image, topo, bsd.settings, winLeft, winRight);
     }
@@ -151,6 +146,8 @@ export class EyeFinder {
 
     private contrastDetection(image: GeonImage) : GeonImage {
 
+        // console.log("processing image with size: ", image.width, image.height);
+
         let grey = image.toGreyscale();
         let blurred = grey.applyKernel(Kernels.Gauss5);
         let left = blurred.applyKernel(Kernels.SobelLeft);
@@ -159,14 +156,14 @@ export class EyeFinder {
 
         let [min, max] = sum.getMinMax();
 
-        console.log("minmax: ", min, max);
+        // console.log("minmax: ", min, max);
 
         let upper = max * 0.7;
         let lower = upper * 0.3;
         let thres = sum.applyThreshold(lower, upper);
 
         // debug 
-        console.log("adding images:")
+        // console.log("adding images:")
         this.app?.images.push(blurred.toRGBA(), sum.toRGBA(), thres.toRGBA());
         
         return thres;
@@ -200,6 +197,8 @@ export class EyeFinder {
         
         let bb_o = data.settings.process.bounding_box_offset;
 
+        console.log(bb_o);
+
         let eyeGuessLeft = data.eyePointsEdited.getVector(0);
         let eyeGuessRight = data.eyePointsEdited.getVector(1);
 
@@ -212,21 +211,25 @@ export class EyeFinder {
         let eyeLandmarksLeft = mesh.flattenClosestPoint(eyeGuessLeft);
         let eyeLandmarksRight = mesh.flattenClosestPoint(eyeGuessRight);
 
-        console.log("eyeLandmarksLeft, eyeLandmarksRight: ");
-        console.log(eyeLandmarksLeft, eyeLandmarksRight);
+        this.app?.whiteDots?.push(eyeLandmarksLeft.to3D());
+        this.app?.whiteDots?.push(eyeLandmarksRight.to3D());
 
         // to texture pixel space 
-        let mat = data.getTextureToUVMatrix().inverse();
-        let leftPixel = mat.multiplyVector(eyeLandmarksLeft.to3D()).to2D();
-        let rightPixel = mat.multiplyVector(eyeLandmarksRight.to3D()).to2D();
 
+        let mat = data.getTextureToUVMatrix().inverse();
+
+        console.log(mat);
+
+        // let mat = data.getTextureToUVMatrix().inverse();
+        let leftPixel  = mat.multiplyVector(eyeLandmarksLeft.to3D()).to2D();
+        let rightPixel = mat.multiplyVector(eyeLandmarksRight.to3D()).to2D();
 
         console.log("in pixelspace: ");
         console.log(leftPixel, rightPixel);
 
-
-        let rightWindow = Domain2.fromInclude(Vector2Array.fromList([leftPixel])).offset(bb_o.ly);
-        let leftWindow = Domain2.fromInclude(Vector2Array.fromList([rightPixel])).offset(bb_o.ry);
+        let window = [-70, 70, -70, 70];
+        let rightWindow = Domain2.fromInclude(Vector2Array.fromList([leftPixel])).offset(window);
+        let leftWindow = Domain2.fromInclude(Vector2Array.fromList([rightPixel])).offset(window);
 
         return [rightWindow, leftWindow];
     }

@@ -5,7 +5,6 @@
 // - wrapper around all data gathered from Bellus3D.
 // - do all file -> object convertions here.         
 
-import { RectangleApp } from "../app-demos/rectangle-app";
 import { DisplayMesh, meshFromObj } from "../geo/mesh";
 import { Vector2Array, Vector3Array } from "../data/vector-array";
 import { Domain, Domain2 } from "../math/domain";
@@ -251,8 +250,8 @@ export class NextcloudScanData {
     }
 
     getTextureToUVMatrix() : Matrix4 {
-        let [scaleY, scaleX] = [2048, 2048];
-        let tf1 = Matrix4.newScaler(1/scaleX, -1/scaleY, 0)
+        let [scaleY, scaleX] = [this.texture.height, this.texture.width];
+        let tf1 = Matrix4.newScaler(1/scaleX, -1/scaleY, 1)
         let tf2 = Matrix4.newTranslation(0,1,0)
         return  tf1.multiply(tf2);
     }
@@ -262,8 +261,8 @@ export class NextcloudScanData {
 
         let [scaleY, scaleX] = this.getLandmarksImageSize();
         console.log("scaling landmarks down by " + scaleX + ", " + scaleY);
-        
-        let tf1 = Matrix4.newScaler(1/scaleX, -1/scaleY, 0)
+
+        let tf1 = Matrix4.newScaler(1/scaleX, -1/scaleY, 1)
         let tf2 = Matrix4.newTranslation(0,1,0)
         let tf = tf1.multiply(tf2);
         return vectors.clone().transform(tf);

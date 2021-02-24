@@ -9,7 +9,7 @@ import { IntMatrix } from "../data/int-matrix";
 import { Vector2Array, Vector3Array } from "../data/vector-array";
 import { Vector2, Vector3 } from "../math/vector";
 import { Cube } from "./cube";
-import { Rectangle3 } from "./rectangle3";
+import { Rectangle3 } from "./rectangle";
 
 
 // TODO make distinctions between
@@ -130,10 +130,19 @@ export class DisplayMesh {
         // we cant handle quads yet 
         let faces: number[] = []
         faces.push(...quadToTri(cubeFaces[0]));
-
-        let mesh = new DisplayMesh(8, 0, 0, cubeFaces.length * 2);
+        let mesh = new DisplayMesh(4, 0, 0, 2);
         mesh.verts.fillFromList(verts);
         mesh.faces.setData(faces);
+
+        console.log(mesh.verts);
+        console.log(mesh.faces);
+
+        mesh.setUvs(new Float32Array([
+            0.0,  0.0,
+            0.0,  1.0,
+            1.0,  0.0,
+            1.0,  1.0])
+            );
         return mesh;
     }
 
@@ -174,8 +183,19 @@ export class DisplayMesh {
 
     setTexture(texture: ImageData) {
         this.texture = texture;
+        // recalculate things if needed
     }
 
+
+    setUvs(uvs: Vector2Array | Float32Array) {
+        if (uvs instanceof Float32Array) {
+            this.uvs.data = uvs;
+        } else {
+            this.uvs = uvs;
+        }
+        
+        // recalculate if needed
+    }
     
     exportToObj(path: string) {
         throw "todo";
@@ -192,7 +212,7 @@ export class DisplayMesh {
 // |  4---5  |
 // |  |   |  |
 // |  6---7  |
-// | /     \ | 
+// | /     \ |
 // 2 ------- 3
 const cubeFaces = [
     [0,1,3,2], // front 

@@ -62,6 +62,16 @@ export class Matrix3 extends FloatMatrix {
           ]);
     }
 
+    toMat4() : Matrix4 {
+        let d = this.data;
+        return new Matrix4([
+            d[0], d[1],    0,    d[2],
+            d[3], d[4],    0,    d[5],
+            0   ,  0 ,     1,    0,
+            d[6], d[7],    0,    d[8],
+          ]);
+    }
+
     project(width: number, height: number) : Matrix3 {
         return this.multiply(Matrix3.newProjection(width, height))
     }
