@@ -20,7 +20,7 @@ import { Rectangle3 } from "./rectangle";
 
 // a very pure idea of a mesh : Vertices + links between vertices. 
 // Could be anything with these properties.
-export class PureMesh {
+export class Mesh {
 
     verts: Vector3Array;
     links: IntMatrix; // relationships, can be 2 (lines) | 3 (triangles) | 4 (quads)
@@ -31,12 +31,20 @@ export class PureMesh {
     }
 
 
-    static fromEmpty() : PureMesh {
-        return new PureMesh(new Vector3Array(0), new IntMatrix(0,0));
+    static fromLists(verts: Vector3[], faces: number[]) : Mesh {
+        return new Mesh(
+            Vector3Array.fromList(verts), 
+            IntMatrix.fromList(faces, 3)
+        );
     }
 
 
-    static fromJoin(meshes: PureMesh[]) : PureMesh {
+    static fromEmpty() : Mesh {
+        return new Mesh(new Vector3Array(0), new IntMatrix(0,0));
+    }
+
+
+    static fromJoin(meshes: Mesh[]) : Mesh {
 
         // join meshes, dont try to look for duplicate vertices
         // TODO : make this the trouble of Matrices and Arrays
@@ -49,7 +57,7 @@ export class PureMesh {
         }
 
         let verts = new Vector3Array(vertCount);
-        let links = new IntMatrix(3, faceCount);
+        let links = new IntMatrix(faceCount, 3);
 
         let accVerts = 0;
         let accFaces = 0;
@@ -69,7 +77,164 @@ export class PureMesh {
             accFaces += mesh.links.count();
         }
 
-        return new PureMesh(verts, links);
+        return new Mesh(verts, links);
+    }
+
+
+    static fromCube(cube: Cube) : Mesh {
+
+        let verts = cube.getCorners();
+        let faces: number[] = []
+        for(let face of cubeFaces) {
+            faces.push(...quadToTri(face));
+        }
+
+        return this.fromLists(verts, faces);
+    }
+
+
+    static fromSphere(center: Vector3, radius: number, numRings: number, numPerRing: number) : Mesh {
+
+        
+        // verts
+        let vertCount = numRings * numPerRing + 2;
+        let verts = new Vector3Array(vertCount);
+        let setVert = function(i: number, vector: Vector3) {
+            verts.setVector(i, vector.scale(radius).add(center));
+        }
+
+        setVert(0, new Vector3(0,0,1));
+        for (let ring = 0; ring < numRings; ring++)
+        {
+            for (let perRing = 0; perRing < numPerRing; perRing++)
+            {
+                let alpha = Math.PI * (ring+1) / (numRings+1);
+                let beta = 2 * Math.PI * perRing/numPerRing;
+
+                let x = Math.sin(alpha)
+                      * Math.cos(beta);
+                let y = Math.sin(alpha) 
+                      * Math.sin(beta);
+                let z = Math.cos(alpha);
+
+                let index = 1 + ring * numPerRing + perRing;
+                setVert(index, new Vector3(x, y, z));
+            }
+        }
+        setVert(vertCount-1, new Vector3(0,0,-1));
+        
+        // faces 
+        let faceCount = numPerRing * (numRings) * 2;
+        let links = new IntMatrix(faceCount, 3);
+        links.fill(-1);
+        let setFace = function(i: number, row: number[]) {
+            links.setRow(i, row);
+        }
+
+        // faces top
+        for (let i = 0; i < numPerRing; i++) {
+            setFace(i, [
+                0,
+                i+1,
+                (i+1) % numPerRing + 1
+            ]);
+        }
+
+        // faces middle
+         // we are at this cursor
+        console.log("faces", faceCount);
+
+        for (let ring = 0; ring < numRings-1; ring++) {
+
+            let vertCursor = numPerRing * ring + 1;
+            let vertCursorBelow = vertCursor + numPerRing;
+
+            for (let perRing = 0; perRing < numPerRing; perRing++) {
+                let a = vertCursor + perRing;
+                let b = vertCursor + ((perRing + 1) % numPerRing);
+
+                let c = vertCursorBelow + perRing;
+                let d = vertCursorBelow + ((perRing + 1) % numPerRing);
+
+                let iFace = numPerRing + (numPerRing * ring * 2) + perRing * 2
+                
+                console.log(iFace);
+                setFace(iFace, [a,c,b]);
+                setFace(iFace+1, [c,d,b]);
+            }
+        }
+
+        // faces bottom 
+        for (let i = 0; i < numPerRing; i++) {
+
+            let iNext = ((i+1) % numPerRing);
+            let last = vertCount - 1;
+
+            let iFace = faceCount - numPerRing + i;
+
+            let zero = vertCount - numPerRing - 1;
+            let vertI = zero + i;
+            let vertINext = zero + iNext;
+
+            console.log(iFace);
+            console.log("face", last, vertINext, vertI);
+
+            setFace(iFace,[
+                last,
+                vertINext,
+                vertI,
+            ]);
+        }
+
+        return new Mesh(verts, links);
+    }
+
+
+    static fromCone(center: Vector3, radius: number, height: number, numPerRing: number) {
+
+        let numVerts = numPerRing + 2;
+        let numFaces = numPerRing * 2;
+        let verts = new Vector3Array(numVerts);
+        let setVert = function(i: number, vector: Vector3) {
+            verts.setVector(i, vector.add(center));
+        }
+        let links = new IntMatrix(numFaces, 3);
+        links.fill(-1);
+        let setFace = function(i: number, row: number[]) {
+            links.setRow(i, row);
+        }
+
+        // set verts
+        setVert(0, new Vector3(0,0,0)); 
+        for (let i = 0; i < numPerRing; i++) {
+            setVert(i+1, new Vector3(
+                Math.cos(Math.PI * 2 * i / numPerRing),
+                Math.sin(Math.PI * 2 * i / numPerRing),
+            0).scale(radius))
+        }
+        setVert(numVerts-1, new Vector3(0,0,height));
+
+        // set faces 
+        for (let i = 0; i < numPerRing; i++) {
+            
+            let a = 0;
+            let b = numVerts-1;
+            let c = 1 + i;
+            let d = 1 + ((i+1) % numPerRing)
+            
+            setFace(i*2, [a,c,d]);
+            setFace(i*2+1, [c,b,d]);
+        }
+
+
+        return new Mesh(verts, links);
+    }
+
+    toDisplayMesh() : DisplayMesh {
+        let mesh = new DisplayMesh(this.verts.count(), 0, 0, this.links.count());
+        mesh.verts.data = this.verts.data;
+        mesh.links.data = this.links.data;
+        return mesh;
     }
 }
 
@@ -79,7 +244,7 @@ export class DisplayMesh {
     verts: Vector3Array; // 3 long float
     norms: Vector3Array; // 3 long float
     uvs:   Vector2Array; // 2 long float 
-    faces: IntMatrix; // 3 width, count height integers
+    links: IntMatrix; // 3 width, count height integers
 
     texture?: ImageData = undefined;
 
@@ -87,8 +252,8 @@ export class DisplayMesh {
         this.verts = new Vector3Array(vertCount);
         this.norms = new Vector3Array(normCount);
         this.uvs = new Vector2Array(uvCount);
-        this.faces = new IntMatrix(faceCount, 3);
-        this.faces.fill(-1);
+        this.links = new IntMatrix(faceCount, 3);
+        this.links.fill(-1);
         this.texture = texture;
     }
 
@@ -101,24 +266,7 @@ export class DisplayMesh {
         mesh.verts.fillWith(verts);
         mesh.norms.fillWith(norms);
         mesh.uvs.fillWith(uvs);
-        mesh.faces.fillWith(faces);
-        return mesh;
-    }
-
-
-    static fromCube(cube: Cube) : DisplayMesh {
-
-        let verts = cube.getCorners();
-
-        // we cant handle quads yet 
-        let faces: number[] = []
-        for(let face of cubeFaces) {
-            faces.push(...quadToTri(face));
-        }
-
-        let mesh = new DisplayMesh(8, 0, 0, cubeFaces.length * 2);
-        mesh.verts.fillFromList(verts);
-        mesh.faces.setData(faces);
+        mesh.links.fillWith(faces);
         return mesh;
     }
 
@@ -132,10 +280,10 @@ export class DisplayMesh {
         faces.push(...quadToTri(cubeFaces[0]));
         let mesh = new DisplayMesh(4, 0, 0, 2);
         mesh.verts.fillFromList(verts);
-        mesh.faces.setData(faces);
+        mesh.links.setData(faces);
 
         console.log(mesh.verts);
-        console.log(mesh.faces);
+        console.log(mesh.links);
 
         mesh.setUvs(new Float32Array([
             0.0,  0.0,
@@ -155,7 +303,7 @@ export class DisplayMesh {
         let faceCount = 0;
         for (let mesh of meshes) {
             vertCount += mesh.verts.count();
-            faceCount += mesh.faces.count();
+            faceCount += mesh.links.count();
         }
 
         let joined = new DisplayMesh(vertCount, 0, 0, faceCount);
@@ -166,15 +314,15 @@ export class DisplayMesh {
             for (let i = 0 ; i < mesh.verts.count(); i++) {
                 joined.verts.setVector(accVerts + i, mesh.verts.getVector(i));
             }
-            for (let i = 0 ; i < mesh.faces.count(); i++) {
-                let face = mesh.faces.getRow(i);
+            for (let i = 0 ; i < mesh.links.count(); i++) {
+                let face = mesh.links.getRow(i);
                 for (let j = 0 ; j < face.length; j++) {
                     face[j] = face[j] + accVerts;
                 }
-                joined.faces.setRow(accFaces + i, face);
+                joined.links.setRow(accFaces + i, face);
             }
             accVerts += mesh.verts.count();
-            accFaces += mesh.faces.count();
+            accFaces += mesh.links.count();
         }
 
         return joined;

@@ -11,7 +11,7 @@
 // TODO: MARCHING WAVE FUNCTION COLLAPSE 
 // - how to make interesting prototypes, but still use a bitmap data model?
 
-import { DisplayMesh, meshFromObj } from "../geo/mesh";
+import { DisplayMesh, meshFromObj, Mesh } from "../geo/mesh";
 import { addDropFileEventListeners, loadTextFromFile } from "../system/domwrappers";
 import { Domain3 } from "../math/domain";
 import { Vector2, Vector3 } from "../math/vector";
@@ -34,6 +34,7 @@ import { Circle3 } from "../geo/circle3";
 import { IntMatrix } from "../data/int-matrix";
 import { IntCube } from "../data/int-cube";
 import { Ray } from "../math/ray";
+import { Perlin } from "../algorithms/perlin-noise";
 
 export class MarchingCubeApp extends App {
 
@@ -56,7 +57,7 @@ export class MarchingCubeApp extends App {
     cursorVisual?: LineArray
 
     // logic data 
-    size = 100;
+    size = 2;
     cellSize = 1;
     map!: IntCube;
 
@@ -69,7 +70,7 @@ export class MarchingCubeApp extends App {
         this.whiteLineRenderer = new SimpleLineRenderer(gl, [1,1,1,1]);
         this.greyLineRenderer = new SimpleLineRenderer(gl, [0.2,0,1,0.5]);
         this.redLineRenderer = new SimpleLineRenderer(gl, [0.8,0,0,1]);
-        this.meshRenderer = new MeshRenderer(gl);
+        this.meshRenderer = new MeshRenderer(gl, [0.9,0.9,0.9,1], [0.7,0.7,0.7,1]);
         this.transMeshRenderer = new MeshRenderer(gl, [1,1,1,0.10], [1,1,1,0.10]);
     }
 
@@ -80,17 +81,29 @@ export class MarchingCubeApp extends App {
         this.map = new IntCube(this.size, this.size, this.size);
         this.map.fill(0);
 
-        // add random blocks in the world
-        this.map.map((value, index) => {
-            if (Math.random() > 0.99) {
+        let perlin = new Perlin();
+        let scale = 0.2;
+        this.map.map((value, i) => {
+
+            let c = this.map.getCoords(i);
+                        
+            let noise = perlin.noise(c.x * scale, c.y * scale, c.z * scale);
+
+            if (noise > 0.60) {
                 return 1;
             } else {
                 return value;
             }
         })
+
         
+        // console.log("done setting")
+
+
         // after change, buffer 
-        this.buffer();
+        this.bufferMap();
+
+        // console.log("done")
 
         this.gridLarge = LineArray.fromGrid(this.plane, this.size, this.cellSize);
         this.gridSmall = LineArray.fromGrid(this.plane, (this.size*10)-1, this.cellSize / 10);
@@ -133,7 +146,7 @@ export class MarchingCubeApp extends App {
     addPreviewCube(point: Vector3) {
         let cubeCenter = this.mapToWorld(point);
         let cube = this.createCube(cubeCenter);
-        this.geo.push(DisplayMesh.fromCube(cube));
+        this.geo.push(Mesh.fromCube(cube).toDisplayMesh());
     }
 
     flushPreviewCubes() {
@@ -163,14 +176,9 @@ export class MarchingCubeApp extends App {
             return;        
         }
 
+        // preview
         let cubeCursor = this.map.getCoords(cubeIDprevious);   
         this.addPreviewCube(cubeCursor);
-        
-
-        // render cube at this position
-        
-        
-        // this.geo.push(Mesh.fromCube(cube));  
         
         // click
         if (state.mouseLeftPressed) {
@@ -179,10 +187,10 @@ export class MarchingCubeApp extends App {
                 if (this.map.data[cubeID] == 0) 
                     return;
                 this.map.data[cubeID] = 0;
-                this.buffer();
+                this.bufferMap();
             } else if (this.map.data[cubeIDprevious] != 1) {
                 this.map.data[cubeIDprevious] = 1;
-                this.buffer();
+                this.bufferMap();
             } 
         }
     }
@@ -253,7 +261,7 @@ export class MarchingCubeApp extends App {
             // this.addPreviewCube(new Vector3(xprev,yprev,zprev));
 
             // if hit, return previous
-            let value = this.map.get(x,y,z);
+            let value = this.map.tryGet(x,y,z);
             if (value == 1) {
                 // console.log("found a cube after " + i + "steps...");
                 // this.addPreviewCube(new Vector3(xprev,yprev,zprev));
@@ -282,22 +290,23 @@ export class MarchingCubeApp extends App {
         return [-1, -1]
     }
 
-
-
-    // flush this.mapGeo
+    // flush this.meshRenderer
     // turn this.map into this.mapGeo
-    buffer() {
-        let mapGeo: DisplayMesh[] = []
+    bufferMap() {
+        console.log("buffering");
+        let mapGeo: Mesh[] = []
         this.map.iter((entry, index) => {
             if (entry == 1) {
                 let mapCoord = this.map.getCoords(index);
                 let coord = this.mapToWorld(mapCoord);
                 let cube = this.createCube(coord);
-                mapGeo.push(DisplayMesh.fromCube(cube));
+                mapGeo.push(Mesh.fromCube(cube));
+
             }
         });
-
-        this.meshRenderer.set(this.gl, DisplayMesh.fromJoin(mapGeo));
+        this.meshRenderer.set(this.gl, 
+            Mesh.fromJoin(mapGeo).toDisplayMesh()
+        );
     }
 
     

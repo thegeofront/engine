@@ -97,7 +97,7 @@ export class TextureMeshRenderer extends Renderer {
 
         // save how many faces need to be drawn
         gl.useProgram(this.program);
-        this.count = mesh.faces.data.length
+        this.count = mesh.links.data.length
 
         // buffer 1
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
@@ -111,7 +111,7 @@ export class TextureMeshRenderer extends Renderer {
 
         // buffer 3
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(mesh.faces.data), this.convertDrawSpeed(speed));
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(mesh.links.data), this.convertDrawSpeed(speed));
 
         // texture 
         gl.activeTexture(gl.TEXTURE0 + this.texture_id);

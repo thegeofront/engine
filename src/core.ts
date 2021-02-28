@@ -4,6 +4,7 @@
 
 import { InputState } from "./system/input-state";
 import { App } from "./app/app";
+import { FpsCounter } from "./system/fpsCounter";
 
 export class Core {
 
@@ -12,21 +13,28 @@ export class Core {
     state: InputState;
     private apps: App[];
     STOP = false;
+    fpsCounter: FpsCounter;
 
     constructor(canvas: HTMLCanvasElement, gl: WebGLRenderingContext) {
         this.canvas = canvas;
         this.gl = gl;
         this.state = new InputState(canvas);
         this.apps = [];
+        this.fpsCounter = new FpsCounter();
     }
 
+    
     addApp(app: App) {
+        
         this.apps.push(app);
         app.start();
     }
 
+
     update() {
+        
         this.state.preUpdate();
+        this.fpsCounter.update(this.state);
         if (this.state.IsKeyPressed("Esc"))
             this.STOP = true;
         this.apps.forEach((app) => {
@@ -35,10 +43,14 @@ export class Core {
         this.state.postUpdate();
     }
 
+
     draw() {
         
         const canvas = this.canvas;
         const gl = this.gl
+
+        // put fps in the titel
+        document.title = "fps: " + this.fpsCounter.getFps();
 
         // pre-gl business
         if (window.innerHeight != canvas.height || 

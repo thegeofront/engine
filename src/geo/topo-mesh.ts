@@ -15,15 +15,15 @@ export class TopoMesh extends DisplayMesh {
     // private -> should only be used with factory methods
     private constructor(vertCount: number, normCount: number, uvCount: number, faceCount: number, texture: ImageData | undefined = undefined) {
         super(vertCount, normCount, uvCount, faceCount, texture);
-        this.neighborMap = new IntMatrix(this.faces.count(), 3);
+        this.neighborMap = new IntMatrix(this.links.count(), 3);
     }
 
     static copyFromMesh(mesh: DisplayMesh) : TopoMesh {
-        let topoMesh = new TopoMesh(mesh.verts.count(), mesh.norms.count(), mesh.uvs.count(), mesh.faces.count());
+        let topoMesh = new TopoMesh(mesh.verts.count(), mesh.norms.count(), mesh.uvs.count(), mesh.links.count());
         topoMesh.verts = mesh.verts.clone();
         topoMesh.norms = mesh.norms.clone();
         topoMesh.uvs = mesh.uvs.clone();
-        topoMesh.faces = mesh.faces.clone();
+        topoMesh.links = mesh.links.clone();
         topoMesh.setNeighborMap();
         return topoMesh;
     }
@@ -37,7 +37,7 @@ export class TopoMesh extends DisplayMesh {
         let pairs = new HashTable<any>();
 
         // 1 | per triangle
-        this.faces.forEachRow((f, faceIndex) => {
+        this.links.forEachRow((f, faceIndex) => {
             let faceEdges = [
                 [f[0], f[1]],
                 [f[1], f[2]],
@@ -107,7 +107,7 @@ export class TopoMesh extends DisplayMesh {
         // make sure we never take more steps than triangles in the triangulation.
         // this would mean something went wrong
         
-        let count = this.faces.count();
+        let count = this.links.count();
         for(let _ = 0 ; _ < count; _++) {
 
             // i dont know how, but if we accidentally landed outside of the mesh
@@ -118,7 +118,7 @@ export class TopoMesh extends DisplayMesh {
             for(let i = 0 ; i < 3; i++) {
                 let j = (i + 1) % 3;
 
-                let face = this.faces.getRow(faceIndex);
+                let face = this.links.getRow(faceIndex);
                 let edge: [number, number] = [face[i], face[j]];
                 
                 let b = this.uvs.getVector(edge[0]);
@@ -156,7 +156,7 @@ export class TopoMesh extends DisplayMesh {
         // get all face ids containing closestVertex, along with their centers
         let closestFaces: number[] = [];  
         //let centers: Vector3[] = []
-        this.faces.forEachRow((tr, i) => {
+        this.links.forEachRow((tr, i) => {
             if (tr.includes(closestVertexId)) {
                 closestFaces.push(i);
                 //let center = Vector3Array.fromList(this.getFacePoints(i, false)).average();
@@ -237,12 +237,12 @@ export class TopoMesh extends DisplayMesh {
     private setNb(faceIndex: number, commonEdge: Int32Array, nbIndex: number) {
         
         for(let j = 0 ; j < 3; j++) {
-            if (!commonEdge.includes(this.faces.get(faceIndex, j))) {
+            if (!commonEdge.includes(this.links.get(faceIndex, j))) {
                 this.neighborMap.set(faceIndex, j, nbIndex);
                 return;
             } 
         }
-        console.log(this.faces.getRow(faceIndex));
+        console.log(this.links.getRow(faceIndex));
         console.log(commonEdge);
         throw "these are not actually neighbors!";
     }
@@ -250,11 +250,11 @@ export class TopoMesh extends DisplayMesh {
 
     private getNb(faceIndex: number, commonEdge: Int32Array | [number, number] ) : number {
         for(let j = 0 ; j < 3; j++) {
-            if (!commonEdge.includes(this.faces.get(faceIndex, j))) {
+            if (!commonEdge.includes(this.links.get(faceIndex, j))) {
                 return this.neighborMap.get(faceIndex, j);
             } 
         }
-        console.log(this.faces.getRow(faceIndex));
+        console.log(this.links.getRow(faceIndex));
         console.log(commonEdge);
         throw "common edge does not match triangle index!";
     }
@@ -262,7 +262,7 @@ export class TopoMesh extends DisplayMesh {
 
     private getFacePoints(tr: number, uv: boolean) : [any, any, any] {
         
-        let pointIds = this.faces.getRow(tr);
+        let pointIds = this.links.getRow(tr);
         if (uv) {
             return [
                 this.uvs.getVector(pointIds[0]),

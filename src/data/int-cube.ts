@@ -27,6 +27,7 @@ export class IntCube {
         return this._width * this._height * this._depth;
     }
 
+
     // shallow copy 
     clone() {
         let clone = new IntCube(this._height, this._width, this._depth);
@@ -52,8 +53,8 @@ export class IntCube {
 
 
     inRange(i: number, j: number, k: number) : boolean {
-        return !(i < 0 || j < 0 || k < 0 || 
-            i > this._width-1 || j > this._height-1 || k > this._depth-1)
+        return (!(i < 0 || j < 0 || k < 0 || 
+            i > this._width-1 || j > this._height-1 || k > this._depth-1))
     }
 
 
@@ -72,14 +73,31 @@ export class IntCube {
     }
 
 
-    get(i: number, j: number, k: number) : number {
+    get(i: number, j: number, k: number) : number | undefined {
         return this.data[this.getIndex(i,j,k)];
+    }
+
+
+    tryGet(i: number, j: number, k: number) : number | undefined {
+        if (this.inRange(i,j,k)) {
+            return this.data[this.getIndex(i,j,k)];
+        } else {
+            return;
+        }
     }
 
 
     set(i: number, j : number, k : number, value: number) {
         this.data[this.getIndex(i,j,k)] = value;
     }
+
+
+    trySet(i: number, j : number, k : number, value: number) {
+        if (this.inRange(i,j,k)) {
+            this.data[this.getIndex(i,j,k)] = value;
+        }
+    }
+
 
     iter(callbackfn: (value: number, index: number) => void) {
         for(let i = 0 ; i < this.data.length; i++) {

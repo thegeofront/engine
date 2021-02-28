@@ -2,6 +2,7 @@
 // author:  Jos Feenstra
 // purpose: Represents a cube in 3d space, in a certain pose. 
 
+import { Vector3Array } from "../data/vector-array";
 import { Domain3 } from "../math/domain";
 import { Vector3 } from "../math/vector";
 import { Geo } from "./geo";
@@ -17,6 +18,7 @@ export class Cube {
         this.domain = domain;
     }
 
+    
     getCorners() : Vector3[] {
         return this.domain.corners(this.plane.matrix);
     }

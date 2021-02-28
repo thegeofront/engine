@@ -5,6 +5,7 @@
 import { norm } from "@tensorflow/tfjs";
 import { LineArray } from "../data/line-array";
 import { Plane } from "../geo/plane";
+import { GMath } from "../math/math";
 import { Matrix4 } from "../math/matrix";
 import { Ray } from "../math/ray";
 import { Vector2, Vector3 } from "../math/vector"
@@ -31,7 +32,13 @@ export class Camera {
     worldMatrix: Matrix4;
     projectMatrix: Matrix4;    
 
-    constructor(canvas: HTMLCanvasElement, z_offset = 1) {
+    // settings
+    canMove: boolean;
+
+    constructor(canvas: HTMLCanvasElement, z_offset = 1, canMove=false) {
+        
+        this.canMove = canMove;
+
         this.pos = new Vector3(0,0,0);
         this.z_offset = -z_offset;
         this.offset = new Vector3(0,0, -z_offset);
@@ -64,7 +71,9 @@ export class Camera {
 
     private updateControls(state: InputState) {
 
-        this.offset.z = this.z_offset - state.scrollValue * 0.5;
+        let deltaScroll = state.scrollValue * 1.2;
+
+        this.offset.z = this.z_offset - deltaScroll;
         if (state.IsKeyPressed("Shift")) {
             this.speed *= 2;
             console.log("speed is now: " + this.speed);
@@ -82,7 +91,7 @@ export class Camera {
         this.getMouseWorldRay(state.canvas.width, state.canvas.height);
 
         if (state.mouseRightDown) {
-            this.angleAlpha += delta.y * 0.01;
+            this.angleAlpha = GMath.clamp(this.angleAlpha + delta.y * 0.01, 0, Math.PI);
             this.angleBeta += delta.x * -0.01;
         }   
 
@@ -94,6 +103,10 @@ export class Camera {
         function relativeUnitX(angle: number) {
             let m = Matrix4.newZRotation(angle);
             return m.multiplyVector(Vector3.unitX());
+        }
+
+        if (!this.canMove) {
+            return;
         }
 
         if (state.IsKeyDown("s"))

@@ -17,6 +17,17 @@ export class IntMatrix {
     }
 
 
+    static fromList(list: number[], width: number) : IntMatrix {
+        
+        let height = list.length / width;
+        let array = new IntMatrix(height, width);
+        for(let i = 0 ; i < list.length; i++) {
+            array.data[i] = list[i];
+        }
+        return array;
+    }
+
+
     clone() {
         let clone = new IntMatrix(this._height, this._width);
         clone.data = this.data;

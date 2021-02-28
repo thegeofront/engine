@@ -39,17 +39,17 @@ export class LineArray {
     static fromMesh(mesh: DisplayMesh, uv=false) : LineArray {
         
         // 3 edges per face, 2 indices per edge
-        let count = mesh.faces.count() * 6;
+        let count = mesh.links.count() * 6;
         let data = new Uint16Array(count);
-        for (let i = 0 ; i < mesh.faces.count(); i++) {
+        for (let i = 0 ; i < mesh.links.count(); i++) {
             
             let iData = i * 6;
-            data[iData]   = mesh.faces.get(i, 0);
-            data[iData+1] = mesh.faces.get(i, 1);
-            data[iData+2] = mesh.faces.get(i, 1);
-            data[iData+3] = mesh.faces.get(i, 2);
-            data[iData+4] = mesh.faces.get(i, 2);
-            data[iData+5] = mesh.faces.get(i, 0);
+            data[iData]   = mesh.links.get(i, 0);
+            data[iData+1] = mesh.links.get(i, 1);
+            data[iData+2] = mesh.links.get(i, 1);
+            data[iData+3] = mesh.links.get(i, 2);
+            data[iData+4] = mesh.links.get(i, 2);
+            data[iData+5] = mesh.links.get(i, 0);
         }
         if (uv) {
             return new LineArray(mesh.uvs, data);

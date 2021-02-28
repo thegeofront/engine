@@ -92,6 +92,7 @@ export class InputState {
         canvas.focus();
     }
 
+
     public preUpdate() {
         // this must be called every tick within whatever context this is used
 
@@ -110,6 +111,7 @@ export class InputState {
         this.mouseMiddlePrev = this.mouseMiddleDown
     }
 
+
     public postUpdate() {
 
         // this also must be called for keyIsPressed to work
@@ -118,15 +120,18 @@ export class InputState {
         this.keysPressed = [];
     }
 
+
     public IsKeyDown(key: string) : boolean
     {
         return this.keysDown[key];  
     }
 
+
     public IsKeyPressed(key: string) : boolean
     {
         return this.keysPressed.includes(key);
     }
+
 
     public onKeyDown(e: KeyboardEvent)
     { 
@@ -136,15 +141,18 @@ export class InputState {
         this.keysPressed.push(e.key);
     }
 
+
     public onKeyUp(e: KeyboardEvent)
     {
         this.keysDown[e.key.toLowerCase()] = false;
     }
 
+
     public onKeyPressed(e: KeyboardEvent)
     {
         // NOTE: i made a different system to handle this, see onKeyDown
     }
+
 
     private setTouch(e: TouchEvent) {
         e.preventDefault();
@@ -153,10 +161,12 @@ export class InputState {
         this.mouseLeftDown = true;
     }
 
+
     private setTouchUp(e: TouchEvent) {
         e.preventDefault();
         this.mouseLeftDown = false;
     }
+
 
     private setMouseScroll(e: WheelEvent) {
         // console.log("we be scrollin' now...")
@@ -170,11 +180,13 @@ export class InputState {
         this.scrollValue = Math.max(0, this.scrollValue + value);
     }
 
+
     private setMousePos(e: MouseEvent)
     {
         // this is a bit messy, BUT, multiply by camera parameters
         this.mousePos = new Vector2(e.clientX, e.clientY);;
     }
+
 
     private setMouseUp(e: MouseEvent)
     {
@@ -192,6 +204,7 @@ export class InputState {
             this.mouseLeftDown = false;
         } 
     }
+
 
     private setMouseDown(e: MouseEvent)
     {
@@ -215,8 +228,4 @@ export class InputState {
         }  
         return false;     
     }
-
-
-
-
 }

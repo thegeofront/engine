@@ -63,7 +63,7 @@ export class SimpleMeshRenderer extends Renderer {
     }
 
     setMesh(gl: WebGLRenderingContext, mesh: DisplayMesh, speed: DrawSpeed = DrawSpeed.StaticDraw) {
-        return this.set(gl, mesh.verts, mesh.faces, speed);
+        return this.set(gl, mesh.verts, mesh.links, speed);
     }
 
     set(gl: WebGLRenderingContext, verts: Vector3Array, faces: IntMatrix, speed: DrawSpeed = DrawSpeed.StaticDraw) {
