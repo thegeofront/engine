@@ -9,6 +9,7 @@ import { Geo } from "./geo";
 import { Plane } from "./plane";
 
 export class Cube {
+
     
     plane: Plane
     domain: Domain3
@@ -16,6 +17,14 @@ export class Cube {
     constructor(plane: Plane, domain: Domain3) {
         this.plane = plane;
         this.domain = domain;
+    }
+
+
+    static fromRadius(point: Vector3, radius: number): Cube {
+        return new Cube(
+            Plane.WorldXY().moveTo(point),
+            Domain3.fromRadius(radius),
+        );
     }
 
     

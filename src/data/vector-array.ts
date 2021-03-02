@@ -17,6 +17,7 @@ export class Vector2Array extends FloatMatrix {
         super(count, 2);
     }
     
+
     static fromList(vecs: Vector2[]) : Vector2Array {
         let length = vecs.length;
         let array = new Vector2Array(length);
@@ -26,6 +27,7 @@ export class Vector2Array extends FloatMatrix {
         }
         return array;
     }
+
 
     forEach(callbackfn: (value: Vector2, index: number) => void) : Vector2Array {
         
@@ -37,10 +39,29 @@ export class Vector2Array extends FloatMatrix {
         return this;
     }
 
+
+    map(callbackfn: (value: Vector2, index: number) => any) : Vector2Array {
+
+        let clone = this.clone();
+
+        for(let i = 0 ; i < this.count(); i++) {
+            let vec = this.getVector(i);
+            let result = callbackfn(vec, i)!;
+            if (result instanceof Vector2) {
+                clone.setVector(i, result);
+            } else {
+                clone.setVector(i, vec);
+            }
+        }
+        return clone;
+    }
+
+
     setVector(i: number, vec: Vector2) {
         this.data[i * this._width + 0] = vec.x;
         this.data[i * this._width + 1] = vec.y;
     }
+
 
     getVector(i: number) : Vector2 {
         return new Vector2(
@@ -48,6 +69,7 @@ export class Vector2Array extends FloatMatrix {
             this.data[i * this._width + 1],
         )
     }
+
 
     toList() : Vector2[] {
 
@@ -58,7 +80,7 @@ export class Vector2Array extends FloatMatrix {
         return vecs;
     }
 
-    toVector3Array() : Vector3Array {
+    to3D() : Vector3Array {
         let array = new Vector3Array(this.count());
         for(let i = 0 ; i < this.count(); i++) {
             let row = this.getRow(i);
@@ -69,7 +91,9 @@ export class Vector2Array extends FloatMatrix {
 
     clone() : Vector2Array {
         let clone = new Vector2Array(this._height);
-        clone.data = this.data;
+        for(let i = 0; i < this.data.length; i++) {
+            clone.data[i] = this.data[i];
+        }
         return clone;  
     }
 }
@@ -125,6 +149,23 @@ export class Vector3Array extends FloatMatrix {
             }
         }
         return this;
+    }
+
+
+    map(callbackfn: (value: Vector3, index: number) => any) : Vector3Array {
+
+        let clone = this.clone();
+
+        for(let i = 0 ; i < this.count(); i++) {
+            let vec = this.getVector(i);
+            let result = callbackfn(vec, i)!;
+            if (result instanceof Vector3) {
+                clone.setVector(i, result);
+            } else {
+                clone.setVector(i, vec);
+            }
+        }
+        return clone;
     }
 
 

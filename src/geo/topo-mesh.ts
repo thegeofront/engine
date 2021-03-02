@@ -186,8 +186,9 @@ export class TopoMesh extends DisplayMesh {
         return tr3.fromBarycentric(bari);
     }
 
-    closestPoint(p: Vector3) : [Vector3, number] {
+    closestFace(p: Vector3) : number {
 
+        // NOTE this doesnt really work all that well...
         let faceIds = this.closestFaces(p);
         let closestPoints = new Vector3Array(faceIds.length);
         faceIds.forEach((id, i) => {
@@ -198,7 +199,7 @@ export class TopoMesh extends DisplayMesh {
 
         // find the closest closest point 
         let id = closestPoints.closestId(p);
-        return [closestPoints.getVector(id), faceIds[id]];
+        return faceIds[id];
     }
 
     // 'flatten' a point in vertex space to uv space using a barycentric remap
@@ -216,8 +217,16 @@ export class TopoMesh extends DisplayMesh {
     // combo
     flattenClosestPoint(p: Vector3) {
 
-        let [cp, face] = this.closestPoint(p);
-        return this.flatten(cp, face);
+        let face = this.closestFace(p);
+        return this.flatten(p, face);
+    }
+
+
+    closestPoint(p: Vector3) {
+        let face = this.closestFace(p);
+        let triangle = this.getTriangle3(face);
+        let bari = triangle.toBarycentric(p);
+        return triangle.fromBarycentric(bari);
     }
 
 

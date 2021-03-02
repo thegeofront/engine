@@ -105,7 +105,7 @@ export class Plane {
         return this;
     }
 
-    move(origin: Vector3) {
+    moveTo(origin: Vector3) {
         this.center = origin;
         return this;
     }

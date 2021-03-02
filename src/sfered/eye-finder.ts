@@ -76,16 +76,15 @@ export class EyeFinder {
         // step 1: get points (vectors) which symbolize pixels in contrasting areas of the image (the iris).
         let eyeImg = image.trimWithDomain(window);
         let contrastEyeImg = this.contrastDetection(eyeImg);
-        let contrastPoints = this.pixelsToPoints(contrastEyeImg, 50);
+        let cps = this.pixelsToPoints(contrastEyeImg, 50);
         
-        if (contrastPoints.count() < 0) {
+        if (cps.count() < 0) {
             return;
         }
-
         let scaleVec = new Vector2(1 / image.width, 1 / image.height);
 
         // convert these points to the same space as the uv points of the mesh
-        contrastPoints.forEach((p) => {
+        cps.forEach((p) => {
            
             // move from eyetrim to original image space
             p.add(new Vector2(window.x.t0, window.y.t0));
@@ -98,23 +97,18 @@ export class EyeFinder {
             p.add(new Vector2(0, 1));
         });
 
-        // debug
-        this.app?.dots2.push(...contrastPoints.toList());
 
         // step 2: elevate from uv space to vertex space of the mesh
-        // HIER GAAT IETS GOED MIS 
-        let cps = new Vector3Array(contrastPoints.count()); 
-        contrastPoints.forEach((p, i) => {
-            cps.setVector(i,  mesh.elevate(p));
-        })
+        let cpsElevated = cps.to3D().map((p, i) => {
+            return mesh.elevate(p.to2D());
+        }) 
+        this.app?.whiteDots.push(...cpsElevated.toList());
 
-        this.app?.whiteDots.push(...cps.toList());   
 
         // step 3: fit a plane through the points, and project to this plane
-        let plane = Plane.fromLeastSquares(cps);
-        cps.forEach((p) => plane.pullToPlane(p));
-        let cpsFixed = cps.to2D();
-        1
+        let plane = Plane.fromLeastSquares(cpsElevated);
+        cpsElevated.forEach((p) => plane.pullToPlane(p));
+        let cpsFixed = cpsElevated.to2D();
         
         // step 4: ransac! 
         let rss = ransacSettings;
@@ -132,7 +126,7 @@ export class EyeFinder {
         }
 
         // debug
-        cps.forEach((p) => {
+        cpsElevated.forEach((p) => {
             p.z = 0;
             return plane.pushToWorld(p);
         })

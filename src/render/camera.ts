@@ -56,6 +56,7 @@ export class Camera {
         if(state.IsKeyPressed("p")) {
             console.log(this.pos);
             console.log(this.offset);
+            console.log("speed is now: " + this.speed);
         }
     }
 
@@ -76,11 +77,9 @@ export class Camera {
         this.offset.z = this.z_offset - deltaScroll;
         if (state.IsKeyPressed("Shift")) {
             this.speed *= 2;
-            console.log("speed is now: " + this.speed);
         }
         if (state.IsKeyPressed("Control")) {
             this.speed = Math.max(this.speed * 0.5, 0.1);
-            console.log("speed is now: " + this.speed);
         }
 
         // deal with mouse

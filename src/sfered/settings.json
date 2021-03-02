@@ -26,10 +26,10 @@
 	},
 	"process_ransac": {
 		"seed": 3474647,
-		"iterations": 1000,
+		"iterations": 10000,
 		"radius": 5.55,
-		"max_radius_deviation": 0.1,
-		"tolerance": 0.2,
+		"max_radius_deviation": 0.2,
+		"tolerance": 0.35,
 		"min_score": 10,
 		"max_deviation_from_guess(i think is is not used anymore)": 6.0,
 

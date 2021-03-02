@@ -142,7 +142,7 @@ export class Mesh {
 
         // faces middle
          // we are at this cursor
-        console.log("faces", faceCount);
+        // console.log("faces", faceCount);
 
         for (let ring = 0; ring < numRings-1; ring++) {
 
@@ -158,7 +158,7 @@ export class Mesh {
 
                 let iFace = numPerRing + (numPerRing * ring * 2) + perRing * 2
                 
-                console.log(iFace);
+                // console.log(iFace);
                 setFace(iFace, [a,c,b]);
                 setFace(iFace+1, [c,d,b]);
             }
@@ -176,8 +176,8 @@ export class Mesh {
             let vertI = zero + i;
             let vertINext = zero + iNext;
 
-            console.log(iFace);
-            console.log("face", last, vertINext, vertI);
+            // console.log(iFace);
+            // console.log("face", last, vertINext, vertI);
 
             setFace(iFace,[
                 last,
@@ -230,6 +230,7 @@ export class Mesh {
         return new Mesh(verts, links);
     }
 
+    // TODO fix this later
     toDisplayMesh() : DisplayMesh {
         let mesh = new DisplayMesh(this.verts.count(), 0, 0, this.links.count());
         mesh.verts.data = this.verts.data;
@@ -282,8 +283,8 @@ export class DisplayMesh {
         mesh.verts.fillFromList(verts);
         mesh.links.setData(faces);
 
-        console.log(mesh.verts);
-        console.log(mesh.links);
+        // console.log(mesh.verts);
+        // console.log(mesh.links);
 
         mesh.setUvs(new Float32Array([
             0.0,  0.0,
@@ -438,10 +439,10 @@ export function meshFromObj(text: string) : DisplayMesh {
                 continue;
         }
     }
-    console.log("number of vertices: " + verts.length / 3);
-    console.log("number of faces: " + faces.length / 3);
-    console.log("number of uvs: " + uvs.length / 2);
-    console.log("number of norms: " + norms.length / 3);
+    // console.log("number of vertices: " + verts.length / 3);
+    // console.log("number of faces: " + faces.length / 3);
+    // console.log("number of uvs: " + uvs.length / 2);
+    // console.log("number of norms: " + norms.length / 3);
 
     let mesh = DisplayMesh.fromData(verts, norms, uvs, faces);
   

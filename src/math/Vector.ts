@@ -233,17 +233,34 @@ export class Vector3
     }
 
 
-    divVector(vector: Vector3) : Vector3
-    {
+    mul(v: Vector3) : Vector3 {
+        this.x *= v.x;
+        this.y *= v.y;
+		this.z *= v.z;
+        return this;
+    }
+
+
+    multiplied(v: Vector3) : Vector3 {
 		return new Vector3(
-			this.x / vector.x, 
-			this.y / vector.y, 
-			this.z / vector.z
+			this.x * v.x, 
+			this.y * v.y, 
+			this.z * v.z
 		);
     }
 
 
-    dived(value: number) : Vector3
+    divVector(v: Vector3) : Vector3
+    {
+		return new Vector3(
+			this.x / v.x, 
+			this.y / v.y, 
+			this.z / v.z
+		);
+    }
+
+
+    divided(value: number) : Vector3
     {
 		return new Vector3(
 			this.x / value, 
@@ -399,7 +416,7 @@ export class Vector3
 
 
 	normalized() : Vector3 {
-		return this.dived(this.length() || 1);
+		return this.divided(this.length() || 1);
 	}
 
 

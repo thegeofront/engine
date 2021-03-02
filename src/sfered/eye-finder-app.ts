@@ -2,7 +2,7 @@
 // author:  Jos Feenstra
 // purpose: environment to test eyefinder functionalities
 
-import { DisplayMesh, meshFromObj } from "../geo/mesh";
+import { DisplayMesh, Mesh, meshFromObj } from "../geo/mesh";
 import { GeonImage } from "../img/Image";
 import { BellusScanData, NextcloudScanData } from "./scan-data";
 import { addDropFileEventListeners, loadTextFromFile } from "../system/domwrappers";
@@ -23,6 +23,9 @@ import { Plane } from "../geo/plane";
 import { TextureMeshRenderer } from "../render/texture-mesh-renderer";
 import { DrawSpeed } from "../render/renderer";
 import { TopoMesh } from "../geo/topo-mesh";
+import { SimpleMeshRenderer } from "../render/simple-mesh-renderer";
+import { MeshRenderer } from "../render/mesh-renderer";
+import { Cube } from "../geo/cube";
 
 const settings = require('../sfered/settings.json'); // note DIFFERENCE BETWEEN "" AND ''. '' WORKS, "" NOT. 
 
@@ -56,7 +59,8 @@ export class EyeFinderApp extends App {
     lines: Vector3[] = [];
     lineRenderables: LineArray[] = [];
 
-    imageMeshes: DisplayMesh[] = [];
+    renderables: DisplayMesh[] = [];
+    debugRenderables: DisplayMesh[] = [];
 
     // rendering 
     blueDotRenderer: DotRenderer3;
@@ -67,10 +71,12 @@ export class EyeFinderApp extends App {
     redLineRenderer: SimpleLineRenderer;
     blueLineRenderer: SimpleLineRenderer;
 
-    meshRenderer: TextureMeshRenderer;
+    faceRenderer: TextureMeshRenderer;
+    imageRenderer: TextureMeshRenderer;
+    debugMeshRenderer: MeshRenderer;
 
     camera: Camera;
-    randomMeshRenderer: TextureMeshRenderer;
+    
 
     
 
@@ -89,9 +95,16 @@ export class EyeFinderApp extends App {
         this.blueLineRenderer = new SimpleLineRenderer(gl, [0,0,1,0.5]);
         this.redLineRenderer = new SimpleLineRenderer(gl, [1,0,0,0.5]);
         
-        this.meshRenderer = new TextureMeshRenderer(gl);
-        this.randomMeshRenderer = new TextureMeshRenderer(gl);
-        this.camera = new Camera(canvas, 0.1);
+        this.faceRenderer = new TextureMeshRenderer(gl);
+        this.imageRenderer = new TextureMeshRenderer(gl);
+        this.debugMeshRenderer = new MeshRenderer(gl, [0,1,1,0.8], [0,1,1,1])
+
+        let zoom = 1;
+        this.camera = new Camera(canvas, zoom, true);
+        this.camera.angleAlpha = 0.25 * Math.PI;
+        this.camera.angleBeta = 0.25 * Math.PI;
+
+
 
         addDropFileEventListeners(canvas, processFiles.bind(this));
     }
@@ -127,7 +140,7 @@ export class EyeFinderApp extends App {
             let landmarks = this.landmarks;
 
             // show the mesh
-            this.meshRenderer.render(gl, matrix);
+            this.faceRenderer.render(gl, matrix);
             this.blueLineRenderer.render(gl, matrix);
             // this.blueLineRenderer.setAndRender(gl, matrix, LineArray.fromMesh(mesh, false))
             if (landmarks)
@@ -142,9 +155,14 @@ export class EyeFinderApp extends App {
 
             this.redLineRenderer.render(gl, matrix);
 
-            // render images
-            this.imageMeshes.forEach((mesh) =>{
-                this.randomMeshRenderer.setAndRender(gl, matrix, mesh);
+            // render meshes with textures
+            this.renderables.forEach((mesh) =>{
+                this.imageRenderer.setAndRender(gl, matrix, mesh);
+            })
+
+            // render textureless meshes 
+            this.debugRenderables.forEach((mesh) =>{
+                this.debugMeshRenderer.setAndRender(gl, matrix, mesh);
             })
 
             // render some dots 
@@ -161,10 +179,7 @@ export class EyeFinderApp extends App {
         // convert the this.images[] list into the this.imageMeshes list. then render that with the normal renderer
         
         let size = 256;
-
         let accHeight = 0;
-
-        this.imageMeshes = [];
         this.images.forEach((image, i) => {
 
             let height = image.height;
@@ -175,7 +190,7 @@ export class EyeFinderApp extends App {
                 Domain2.fromBounds(10,10+width, accHeight, accHeight + height));
             let mesh = DisplayMesh.fromRect(rec);
             mesh.setTexture(image.resize(size, size).toImageData()); // note: webgl can only work with 2^x * 512 images
-            this.imageMeshes.push(mesh);
+            this.renderables.push(mesh);
 
             accHeight += height + 10;
         });
@@ -185,27 +200,46 @@ export class EyeFinderApp extends App {
     addNextcloudData(data: NextcloudScanData) {
 
         // start the eyefinder
+        this.renderables = [];
         let r = this.eyefinder.findPupilsFromNextcloud(data);
         if (r) {
-            console.log("eyepoints found")    
+            console.log("eyepoints found"!)  
+
+            // difference between edited eyepoints in dataset, and this newly found point:
+            let eyepointL = r[0];
+            let eyepointR = r[1];
+
+            let topo = TopoMesh.copyFromMesh(data.mesh);
+            let guesspointL = topo.closestPoint(data.eyePointsEdited.getVector(0));
+            let guesspointR = topo.closestPoint(data.eyePointsEdited.getVector(1));
+
+            console.log("accuracy left: ", eyepointL.disTo(guesspointL).toPrecision(5));
+            console.log("accuracy right: ", eyepointR.disTo(guesspointR).toPrecision(5));
+        
+
+            // create spheres at the center points 
+            let radius = 0.5;
+            let detail = 10;
+            let spheres = Mesh.fromJoin([
+                Mesh.fromSphere(eyepointL, radius, detail, detail),
+                Mesh.fromSphere(eyepointR, radius, detail, detail),
+                Mesh.fromCube(Cube.fromRadius(guesspointL, radius)),
+                Mesh.fromCube(Cube.fromRadius(guesspointR, radius)),
+            ]);
+            this.debugRenderables.push(spheres.toDisplayMesh());
+        
         } else {
             console.log("eyepoints couldnt be found...")
         }
         this.bufferImageMeshes();
 
-        // console.log(left);
-        // console.log(right);
-
         let mesh = data.mesh;        
-        this.meshRenderer.set(this.gl, mesh);
+        this.faceRenderer.set(this.gl, mesh);
         this.blueLineRenderer.set(this.gl, LineArray.fromMesh(mesh), DrawSpeed.StaticDraw);
         this.mesh = mesh;
 
-        console.log(data.eyePointsEdited);
-        this.dots = data.eyePointsEdited;
-        this.dots.forEach((v, n) => {
-            console.log(v);
-        });    
+        let center = this.mesh.verts.average();
+        this.camera.pos.copy(center);  
     }
 
 
@@ -226,7 +260,7 @@ export class EyeFinderApp extends App {
         // put the data into the render buffers.
         let mesh = bsd.mesh;
 
-        this.meshRenderer.set(this.gl, mesh);
+        this.faceRenderer.set(this.gl, mesh);
         this.blueLineRenderer.set(this.gl, LineArray.fromMesh(mesh), DrawSpeed.StaticDraw);
         // this.redLineRenderer.set(this.gl, mesh.uvs.data, mesh.getLineIds(), 2);
 
@@ -255,7 +289,7 @@ export class EyeFinderApp extends App {
             let tr3 = topo.getTriangle3(face);
             let tr2 = topo.getTriangle2(face);
 
-            let triangle2points = tr2.points().toVector3Array().toList();
+            let triangle2points = tr2.points().to3D().toList();
             // console.log(triangle2points);
 
             this.whiteDots.push(test.to3D());    

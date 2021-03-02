@@ -31,10 +31,10 @@ import { LineRenderer } from "../render/line-renderer";
 export class ShapesApp extends App {
 
     // renderinfo
-    dotRenderer: DotRenderer3;
-    meshRenderer: MeshRenderer;
-    lineRenderer: SimpleLineRenderer;
     camera: Camera;
+    dotRenderer: DotRenderer3;
+    lineRenderer: SimpleLineRenderer;
+    meshRenderer: MeshRenderer;
 
     // geo data
     plane: Plane = Plane.WorldXY();
@@ -44,10 +44,9 @@ export class ShapesApp extends App {
     // logic data 
     size = 10;
     cellSize = 0.5;
-
     radius = 0.4;
     sphereRings = 5;
-    spherePerRing = 10;
+    spherePerRing = 12;
 
     constructor(gl: WebGLRenderingContext, canvas: HTMLCanvasElement) {
         
@@ -61,7 +60,7 @@ export class ShapesApp extends App {
         this.camera.angleBeta = 0.5;
         
         this.dotRenderer = new DotRenderer3(gl, 4, [0,1,0,1]);
-        this.meshRenderer = new MeshRenderer(gl, [0,0,1,1], [1,1,0.5,1]);
+        this.meshRenderer = new MeshRenderer(gl, [0,0,1,1], [1,1,0.5,0]);
         this.lineRenderer = new SimpleLineRenderer(gl);
     }
 
@@ -74,9 +73,9 @@ export class ShapesApp extends App {
     start() {
         let grid = LineArray.fromGrid(this.plane, this.size, this.cellSize);
         let mesh = Mesh.fromJoin([
-            Mesh.fromSphere(new Vector3(1,0,0), this.radius, this.sphereRings, this.spherePerRing),
+            Mesh.fromSphere(new Vector3(1.2,0,0), this.radius, this.sphereRings, this.spherePerRing),
             Mesh.fromCube(new Cube(this.plane, Domain3.fromRadius(this.radius))),
-            Mesh.fromCone(new Vector3(-1,0,-this.radius), this.radius, this.radius * 2, this.spherePerRing),
+            Mesh.fromCone(new Vector3(-1.2,0,-this.radius), this.radius, this.radius * 2, this.spherePerRing),
         ]);
         // let mesh = Mesh.fromCube(new Cube(this.plane, Domain3.fromRadius(1)));
 
