@@ -1,15 +1,6 @@
-// name:    obj-loader-app.ts
+// name:    geometry-app.ts
 // author:  Jos Feenstra
-// purpose: test statistic functionalties
-
-// TODO: MAKE IT 3D
-// - 3D matrix (sounds stupid i know)
-// - improve visuals slightly (no surface between cubes)
-// - place at normal 
-// - block ray cast-> pick first
-
-// TODO: MARCHING WAVE FUNCTION COLLAPSE 
-// - how to make interesting prototypes, but still use a bitmap data model?
+// purpose: a 3d voxel environment to toy around in. Uses several features of geon
 
 import { DisplayMesh, meshFromObj, Mesh } from "../geo/mesh";
 import { addDropFileEventListeners, loadTextFromFile } from "../system/domwrappers";
@@ -65,7 +56,7 @@ export class GeometryApp extends App {
         
         // setup render env
         super(gl);
-        this.camera = new Camera(canvas);
+        this.camera = new Camera(canvas, 10, true);
         this.dotRenderer = new DotRenderer3(gl, 4, [1,0,0,1], false);
         this.whiteLineRenderer = new SimpleLineRenderer(gl, [1,1,1,1]);
         this.greyLineRenderer = new SimpleLineRenderer(gl, [0.2,0,1,0.5]);

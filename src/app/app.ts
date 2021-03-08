@@ -1,4 +1,5 @@
 import { InputState } from "../system/input-state"
+import { UI } from "../system/ui";
 
 export class App {
 
@@ -7,6 +8,10 @@ export class App {
     constructor(gl: WebGLRenderingContext) {
         // unique constructor    
         this.gl = gl;
+    }
+
+    ui(ui: UI) {
+        // setup for UI
     }
 
     start() {

@@ -16,28 +16,28 @@ import { MarchingCubeApp } from "./app/marching-cube-app";
 import { ShapesApp } from "./app/shapes-app";
 
 const REALTIME_DEMO = false;
-let core: Core;
+var core: Core;
 
 function main() {
 
     // get references of all items on the canvas
     let canvas = document.getElementById("canvas")! as HTMLCanvasElement;
     let video = document.getElementById("camera")! as HTMLVideoElement;
-    let context = document.getElementById("interface")  as HTMLDivElement;
+    let ui = document.getElementById("interface")  as HTMLDivElement;
     let cameraOn = document.getElementById("camera-on")! as HTMLButtonElement;
     let cameraStop = document.getElementById("camera-off")! as HTMLButtonElement;
     let buttonPredict = document.getElementById("predict")! as HTMLButtonElement;
     
     let gl = initWebglContext(canvas);
-    core = new Core(canvas, gl);
+    core = new Core(canvas, gl, ui);
 
     // the eyefinder app itself
     // core.addApp(new StatApp(gl, canvas));
-    core.addApp(new EyeFinderApp(gl, canvas, context));
+    // core.addApp(new EyeFinderApp(gl, canvas, context));
     
     // fun demo's to test various functionalities 
     // core.addApp(new GeometryApp(gl, canvas));
-    // core.addApp(new ShapesApp(gl, canvas));
+    core.addApp(new ShapesApp(gl, canvas));
     // core.addApp(new RectangleApp(gl)); 
     // core.addApp(new DotApp3(gl, canvas)); 
     // core.addApp(new ObjLoaderApp(gl, canvas));

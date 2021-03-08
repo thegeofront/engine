@@ -27,6 +27,8 @@ import { IntCube } from "../data/int-cube";
 import { Ray } from "../math/ray";
 import { Perlin } from "../algorithms/perlin-noise";
 import { LineRenderer } from "../render/line-renderer";
+import { Core } from "../core";
+import { UI } from "../system/ui";
 
 export class ShapesApp extends App {
 
@@ -42,9 +44,10 @@ export class ShapesApp extends App {
     geo: DisplayMesh[] = [];
 
     // logic data 
+    distance = 3.0;
     size = 10;
     cellSize = 0.5;
-    radius = 0.4;
+    radius = 1.0;
     sphereRings = 5;
     spherePerRing = 12;
 
@@ -55,7 +58,7 @@ export class ShapesApp extends App {
 
         // TODO abstract this to scene
         this.camera = new Camera(canvas);
-        this.camera.z_offset = -5;
+        this.camera.z_offset = -10;
         this.camera.angleAlpha = 0.4;
         this.camera.angleBeta = 0.5;
         
@@ -65,17 +68,26 @@ export class ShapesApp extends App {
     }
 
 
-    ui() {
-         
+    ui(ui: UI) {
+
+        ui.addSlider("distance", 0, 4.0, this.distance, 0.01, (value) => {
+            this.distance = value;
+            this.start();
+        });
+
+        ui.addSlider("radius", 0, 4.0, this.radius, 0.1, (value) => {
+            this.radius = value;
+            this.start();
+        });
     }
 
 
     start() {
         let grid = LineArray.fromGrid(this.plane, this.size, this.cellSize);
         let mesh = Mesh.fromJoin([
-            Mesh.fromSphere(new Vector3(1.2,0,0), this.radius, this.sphereRings, this.spherePerRing),
+            Mesh.fromSphere(new Vector3(this.distance,0,0), this.radius, this.sphereRings, this.spherePerRing),
             Mesh.fromCube(new Cube(this.plane, Domain3.fromRadius(this.radius))),
-            Mesh.fromCone(new Vector3(-1.2,0,-this.radius), this.radius, this.radius * 2, this.spherePerRing),
+            Mesh.fromCone(new Vector3(-this.distance,0,-this.radius), this.radius, this.radius * 2, this.spherePerRing),
         ]);
         // let mesh = Mesh.fromCube(new Cube(this.plane, Domain3.fromRadius(1)));
 

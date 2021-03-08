@@ -5,28 +5,42 @@
 import { InputState } from "./system/input-state";
 import { App } from "./app/app";
 import { FpsCounter } from "./system/fpsCounter";
+import { UI } from "./system/ui";
 
 export class Core {
 
     canvas: HTMLCanvasElement;
     gl: WebGLRenderingContext;
     state: InputState;
-    private apps: App[];
-    STOP = false;
+    ui: UI;
     fpsCounter: FpsCounter;
 
-    constructor(canvas: HTMLCanvasElement, gl: WebGLRenderingContext) {
+    private apps: App[];
+    
+    STOP = false;
+    
+    constructor(canvas: HTMLCanvasElement, gl: WebGLRenderingContext, uiFrame: HTMLDivElement) {
         this.canvas = canvas;
         this.gl = gl;
         this.state = new InputState(canvas);
-        this.apps = [];
         this.fpsCounter = new FpsCounter();
+        this.ui = new UI(uiFrame);
+        this.apps = [];
     }
 
-    
+
+    // todo: cycle through apps
     addApp(app: App) {
         
         this.apps.push(app);
+        this.activateApp(app);
+    }
+
+
+    activateApp(app: App) {
+
+        this.ui.clear();
+        app.ui(this.ui);
         app.start();
     }
 

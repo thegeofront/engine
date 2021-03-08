@@ -97,11 +97,6 @@ export function loadImageFromFile(file: File) : Promise<ImageData> {
     });
 }
 
-export function AddSlider(context: HTMLDivElement, min = 0, max = 1, step = 0.01, start = 0.5, onchangeEvent: Function) {
-    throw "TODO!";
-}
-
-
 
 function loadImageHelper1(fileReader: FileReader) : Promise<ImageData> {
     
@@ -113,6 +108,7 @@ function loadImageHelper1(fileReader: FileReader) : Promise<ImageData> {
         img.onerror = () => reject(new Error(`Script load error for ${img}`));
     });
 }
+
 
 function loadImageHelper2(image: HTMLImageElement) : ImageData
 {
