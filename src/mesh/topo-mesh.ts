@@ -1,13 +1,12 @@
-import { getBinaryCache } from "@tensorflow/tfjs-backend-webgl/dist/backend_webgl";
 import { HashTable } from "../data/hash-table";
 import { IntMatrix } from "../data/int-matrix";
 import { Vector3Array } from "../data/vector-array";
 import { Vector2, Vector3 } from "../math/vector";
-import { DisplayMesh } from "./mesh";
-import { Triangle2, Triangle3 } from "./triangle";
+import { RenderMesh } from "./render-mesh";
+import { Triangle2, Triangle3 } from "../geo/triangle";
 
 // a mesh with topological information
-export class TopoMesh extends DisplayMesh {
+export class TopoMesh extends RenderMesh {
 
     lastTouched = 0; // needed for triangle walk
     neighborMap: IntMatrix;
@@ -18,7 +17,7 @@ export class TopoMesh extends DisplayMesh {
         this.neighborMap = new IntMatrix(this.links.count(), 3);
     }
 
-    static copyFromMesh(mesh: DisplayMesh) : TopoMesh {
+    static copyFromMesh(mesh: RenderMesh) : TopoMesh {
         let topoMesh = new TopoMesh(mesh.verts.count(), mesh.norms.count(), mesh.uvs.count(), mesh.links.count());
         topoMesh.verts = mesh.verts.clone();
         topoMesh.norms = mesh.norms.clone();

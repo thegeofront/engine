@@ -2,8 +2,7 @@
 // author:  Jos Feenstra
 // purpose: drag an obj to the canvas, and view it on the web
 
-import { version_converter } from "@tensorflow/tfjs";
-import { DisplayMesh, meshFromObj } from "../geo/mesh";
+import { RenderMesh, meshFromObj } from "../mesh/render-mesh";
 import { addDropFileEventListeners, loadTextFromFile } from "../system/domwrappers";
 import { Domain3 } from "../math/domain";
 import { Vector3 } from "../math/vector";
@@ -24,7 +23,7 @@ export class ObjLoaderApp extends App {
     lineRenderer: SimpleLineRenderer;
     meshRenderer: SimpleMeshRenderer;
     camera: Camera;
-    obj?: DisplayMesh;
+    obj?: RenderMesh;
     renderable?: LineArray;
 
     constructor(gl: WebGLRenderingContext, canvas: HTMLCanvasElement) {

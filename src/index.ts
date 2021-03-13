@@ -33,7 +33,7 @@ function main() {
 
     // the eyefinder app itself
     // core.addApp(new StatApp(gl, canvas));
-    // core.addApp(new EyeFinderApp(gl, canvas, context));
+    // core.addApp(new EyeFinderApp(gl, canvas, ui));
     
     // fun demo's to test various functionalities 
     // core.addApp(new GeometryApp(gl, canvas));

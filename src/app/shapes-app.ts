@@ -2,7 +2,8 @@
 // author:  Jos Feenstra
 // purpose: test creation of basic mesh shapes. Test UI
 
-import { DisplayMesh, meshFromObj, Mesh } from "../geo/mesh";
+import { PureMesh } from "../mesh/pure-mesh";
+import { RenderMesh, meshFromObj } from "../mesh/render-mesh";
 import { addDropFileEventListeners, loadTextFromFile } from "../system/domwrappers";
 import { Domain3 } from "../math/domain";
 import { Vector2, Vector3 } from "../math/vector";
@@ -28,7 +29,7 @@ import { Ray } from "../math/ray";
 import { Perlin } from "../algorithms/perlin-noise";
 import { LineRenderer } from "../render/line-renderer";
 import { Core } from "../core";
-import { UI } from "../system/ui";
+import { SliderParameter, UI } from "../system/ui";
 
 export class ShapesApp extends App {
 
@@ -41,15 +42,14 @@ export class ShapesApp extends App {
     // geo data
     plane: Plane = Plane.WorldXY();
     grid?: LineArray;
-    geo: DisplayMesh[] = [];
+    geo: RenderMesh[] = [];
 
     // logic data 
-    distance = 3.0;
+    distance = new SliderParameter("distance", 3.0, 0, 4.0, 0.01);
     size = 10;
     cellSize = 0.5;
-    radius = 1.0;
-    sphereRings = 5;
-    spherePerRing = 12;
+    radius = new SliderParameter("radius", 1.0, 0, 4.0, 0.01);
+    detail = new SliderParameter("detail", 5.0, 0, );
 
     constructor(gl: WebGLRenderingContext, canvas: HTMLCanvasElement) {
         
@@ -70,29 +70,31 @@ export class ShapesApp extends App {
 
     ui(ui: UI) {
 
-        ui.addSlider("distance", 0, 4.0, this.distance, 0.01, (value) => {
-            this.distance = value;
+        // TODO : think of a system that ties parameter & slider together fully
+        
+        ui.addSlider(this.radius, (value) => {
             this.start();
         });
 
-        ui.addSlider("radius", 0, 4.0, this.radius, 0.1, (value) => {
-            this.radius = value;
+        ui.addSlider(this.distance, (value) => {
             this.start();
         });
     }
 
 
     start() {
+        
         let grid = LineArray.fromGrid(this.plane, this.size, this.cellSize);
-        let mesh = Mesh.fromJoin([
-            Mesh.fromSphere(new Vector3(this.distance,0,0), this.radius, this.sphereRings, this.spherePerRing),
-            Mesh.fromCube(new Cube(this.plane, Domain3.fromRadius(this.radius))),
-            Mesh.fromCone(new Vector3(-this.distance,0,-this.radius), this.radius, this.radius * 2, this.spherePerRing),
+        let spherePerRing = this.detail.get() * 2;
+        let mesh = PureMesh.fromJoin([
+            PureMesh.fromSphere(new Vector3(this.distance.get(),0,0), this.radius.get(), this.detail.get(), spherePerRing),
+            PureMesh.fromCube(new Cube(this.plane, Domain3.fromRadius(this.radius.get()))),
+            PureMesh.fromCone(new Vector3(-this.distance.get(),0,-this.radius.get()), this.radius.get(), this.radius.get() * 2, spherePerRing),
         ]);
         // let mesh = Mesh.fromCube(new Cube(this.plane, Domain3.fromRadius(1)));
 
-        console.log(mesh.verts);
-        console.log(mesh.links);
+        // console.log(mesh.verts);
+        // console.log(mesh.links);
 
         // TODO abstract this to scene 
         this.meshRenderer.set(this.gl, mesh.toDisplayMesh());

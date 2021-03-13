@@ -5,7 +5,7 @@
 // - wrapper around all data gathered from Bellus3D.
 // - do all file -> object convertions here.         
 
-import { DisplayMesh, meshFromObj } from "../geo/mesh";
+import { RenderMesh, meshFromObj } from "../mesh/render-mesh";
 import { Vector2Array, Vector3Array } from "../data/vector-array";
 import { Domain, Domain2 } from "../math/domain";
 import { Matrix4 } from "../math/matrix";
@@ -17,14 +17,14 @@ export class BellusScanData {
 
     landmarkData: any; // json
     texture: ImageData; 
-    mesh: DisplayMesh;
+    mesh: RenderMesh;
     front: ImageData; 
     settings: any; // local settings file. We want this to extract the right regions.
 
     landmarks: Vector3Array;
 
 
-    constructor(landmarkData: any, texture: ImageData, mesh: DisplayMesh, front: ImageData, settings: any) {
+    constructor(landmarkData: any, texture: ImageData, mesh: RenderMesh, front: ImageData, settings: any) {
 
         this.landmarkData = landmarkData;
         this.texture = texture;
@@ -143,7 +143,7 @@ export class NextcloudScanData {
 
     landmarkData: any; // json
     texture: ImageData; 
-    mesh: DisplayMesh;
+    mesh: RenderMesh;
     settings: any; // local settings file. We want this to extract the right regions.
     json: any;
     eyePointsEdited!: Vector3Array;
@@ -152,7 +152,7 @@ export class NextcloudScanData {
     // data to be found in the json
 
 
-    constructor(landmarkData: any, texture: ImageData, mesh: DisplayMesh, settings: any, json: any) {
+    constructor(landmarkData: any, texture: ImageData, mesh: RenderMesh, settings: any, json: any) {
 
         this.landmarkData = landmarkData;
         this.texture = texture;

@@ -5,7 +5,7 @@
 import { IntMatrix } from "../data/int-matrix";
 import { LineArray } from "../data/line-array";
 import { Vector3Array } from "../data/vector-array";
-import { DisplayMesh } from "../geo/mesh";
+import { RenderMesh } from "../mesh/render-mesh";
 import { Matrix4 } from "../math/matrix";
 import { DrawSpeed, Renderer } from "./renderer";
 import { SimpleLineRenderer } from "./simple-line-renderer";
@@ -29,9 +29,6 @@ export class ShadedMeshRenderer extends Renderer {
     u_texture: WebGLUniformLocation;
     texture_id: number;
     texture: WebGLTexture | null;
-
-
-
     
     constructor(gl: WebGLRenderingContext) {
         const vs = `
@@ -122,12 +119,12 @@ export class ShadedMeshRenderer extends Renderer {
         this.texture = gl.createTexture();
     }
 
-    setAndRender(gl: WebGLRenderingContext, matrix: Matrix4, mesh: DisplayMesh) {
+    setAndRender(gl: WebGLRenderingContext, matrix: Matrix4, mesh: RenderMesh) {
         this.set(gl, mesh, DrawSpeed.DynamicDraw);
         this.render(gl, matrix);
     }
 
-    set(gl: WebGLRenderingContext, mesh: DisplayMesh, speed: DrawSpeed = DrawSpeed.StaticDraw) {
+    set(gl: WebGLRenderingContext, mesh: RenderMesh, speed: DrawSpeed = DrawSpeed.StaticDraw) {
         
         if (!mesh.texture) {
             console.warn("Mesh does not contain a texture!");

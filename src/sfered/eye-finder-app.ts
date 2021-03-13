@@ -2,7 +2,8 @@
 // author:  Jos Feenstra
 // purpose: environment to test eyefinder functionalities
 
-import { DisplayMesh, Mesh, meshFromObj } from "../geo/mesh";
+import { RenderMesh, meshFromObj } from "../mesh/render-mesh";
+import { PureMesh } from "../mesh/pure-mesh";
 import { GeonImage } from "../img/Image";
 import { BellusScanData, NextcloudScanData } from "./scan-data";
 import { addDropFileEventListeners, loadTextFromFile } from "../system/domwrappers";
@@ -22,7 +23,7 @@ import { Circle3 } from "../geo/circle3";
 import { Plane } from "../geo/plane";
 import { TextureMeshRenderer } from "../render/texture-mesh-renderer";
 import { DrawSpeed } from "../render/renderer";
-import { TopoMesh } from "../geo/topo-mesh";
+import { TopoMesh } from "../mesh/topo-mesh";
 import { SimpleMeshRenderer } from "../render/simple-mesh-renderer";
 import { MeshRenderer } from "../render/mesh-renderer";
 import { Cube } from "../geo/cube";
@@ -43,7 +44,7 @@ const settings = require('../sfered/settings.json'); // note DIFFERENCE BETWEEN 
 export class EyeFinderApp extends App {
 
     // data 
-    mesh?: DisplayMesh;
+    mesh?: RenderMesh;
     landmarks?: Vector3Array;
 
     // process
@@ -59,8 +60,8 @@ export class EyeFinderApp extends App {
     lines: Vector3[] = [];
     lineRenderables: LineArray[] = [];
 
-    renderables: DisplayMesh[] = [];
-    debugRenderables: DisplayMesh[] = [];
+    renderables: RenderMesh[] = [];
+    debugRenderables: RenderMesh[] = [];
 
     // rendering 
     blueDotRenderer: DotRenderer3;
@@ -188,7 +189,7 @@ export class EyeFinderApp extends App {
             let rec = new Rectangle3(
                 Plane.fromPVV(new Vector3(0,0,0), new Vector3(1,0,0), new Vector3(0,1,0)),
                 Domain2.fromBounds(10,10+width, accHeight, accHeight + height));
-            let mesh = DisplayMesh.fromRect(rec);
+            let mesh = PureMesh.fromRect(rec);
             mesh.setTexture(image.resize(size, size).toImageData()); // note: webgl can only work with 2^x * 512 images
             this.renderables.push(mesh);
 
@@ -220,11 +221,11 @@ export class EyeFinderApp extends App {
             // create spheres at the center points 
             let radius = 0.5;
             let detail = 10;
-            let spheres = Mesh.fromJoin([
-                Mesh.fromSphere(eyepointL, radius, detail, detail),
-                Mesh.fromSphere(eyepointR, radius, detail, detail),
-                Mesh.fromCube(Cube.fromRadius(guesspointL, radius)),
-                Mesh.fromCube(Cube.fromRadius(guesspointR, radius)),
+            let spheres = PureMesh.fromJoin([
+                PureMesh.fromSphere(eyepointL, radius, detail, detail),
+                PureMesh.fromSphere(eyepointR, radius, detail, detail),
+                PureMesh.fromCube(Cube.fromRadius(guesspointL, radius)),
+                PureMesh.fromCube(Cube.fromRadius(guesspointR, radius)),
             ]);
             this.debugRenderables.push(spheres.toDisplayMesh());
         

@@ -8,7 +8,7 @@ import { getGeneralFloatMatrix, Vector2Array, Vector3Array } from "./vector-arra
 import { Circle2 } from "../geo/circle2";
 import { Circle3 } from "../geo/circle3";
 import { Cube } from "../geo/cube";
-import { DisplayMesh } from "../geo/mesh";
+import { RenderMesh } from "../mesh/render-mesh";
 import { Plane } from "../geo/plane";
 import { Const } from "../math/const";
 import { Matrix4 } from "../math/matrix";
@@ -36,7 +36,7 @@ export class LineArray {
     }
 
     // get all lines from a mesh
-    static fromMesh(mesh: DisplayMesh, uv=false) : LineArray {
+    static fromMesh(mesh: RenderMesh, uv=false) : LineArray {
         
         // 3 edges per face, 2 indices per edge
         let count = mesh.links.count() * 6;

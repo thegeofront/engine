@@ -3,6 +3,7 @@
 // purpose: lets create the UI using html & dom api, because why the hell not
 
 import { valueAndGrad } from "@tensorflow/tfjs-core";
+import { GMath } from "../math/math";
 
 export class UI {
 
@@ -11,9 +12,6 @@ export class UI {
 
     constructor(frame: HTMLDivElement) {
         this.context = frame;
-
-        // test
-        console.log(this.context);
     }
 
     clear() {
@@ -33,22 +31,20 @@ export class UI {
         return el;
     }
 
-    addSlider(name = "", min = 0.0, max = 1.0, defaultValue = 0.5, step=0.1, onInput: (v: number) => void = () => {}) {
+    addSlider(param: SliderParameter, onInput: (v: number) => void = () => {}) {
 
         // a slider looks like this : <input type="range" min="1" max="100" step="1" value="50">
         let slider = this.addElement("input", "slider") as HTMLInputElement;    
         
         slider.type = "range";
-        slider.min = min.toString();
-        slider.max = max.toString();
-
-        console.log(defaultValue)
-        slider.valueAsNumber = defaultValue;
-        slider.step = step.toString();
+        slider.min = param.min.toString();
+        slider.max = param.max.toString();
+        slider.valueAsNumber = param.state;
+        slider.step = param.step.toString();
         slider.oninput = () => {
+            param.set(slider.valueAsNumber);
             onInput(slider.valueAsNumber);
         }
-        console.log(slider);
         return slider;
     }
 
@@ -65,3 +61,30 @@ export class UI {
 
 }
 
+// a slider parameter
+export class SliderParameter {
+
+    name: string;
+    state: number;
+    min: number;
+    max: number;
+    step: number
+
+    constructor(name: string, state: number, min =- Infinity, max = Infinity, step=0.1) {
+        this.name = name;
+        this.state = state;
+
+        this.min = min;
+        this.max = max;
+        this.step = step;
+    }
+
+    get(): number {
+        return this.state;
+    }
+
+    set(state: number) {
+        // TODO ROUND TO NEAREST STEP
+        this.state = GMath.clamp(state, this.min, this.max);
+    }
+}

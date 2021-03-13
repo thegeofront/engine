@@ -11,7 +11,8 @@
 // TODO: MARCHING WAVE FUNCTION COLLAPSE 
 // - how to make interesting prototypes, but still use a bitmap data model?
 
-import { DisplayMesh, meshFromObj, Mesh } from "../geo/mesh";
+import { RenderMesh, meshFromObj } from "../mesh/render-mesh";
+import { PureMesh } from "../mesh/pure-mesh";
 import { addDropFileEventListeners, loadTextFromFile } from "../system/domwrappers";
 import { Domain3 } from "../math/domain";
 import { Vector2, Vector3 } from "../math/vector";
@@ -52,8 +53,8 @@ export class MarchingCubeApp extends App {
     gridLarge!: LineArray;
     gridSmall!: LineArray;
     dots: Vector3[] = [];
-    geo: DisplayMesh[] = [];
-    mapGeo: DisplayMesh[] = [];
+    geo: RenderMesh[] = [];
+    mapGeo: RenderMesh[] = [];
     cursorVisual?: LineArray
 
     // logic data 
@@ -146,7 +147,7 @@ export class MarchingCubeApp extends App {
     addPreviewCube(point: Vector3) {
         let cubeCenter = this.mapToWorld(point);
         let cube = this.createCube(cubeCenter);
-        this.geo.push(Mesh.fromCube(cube).toDisplayMesh());
+        this.geo.push(PureMesh.fromCube(cube).toDisplayMesh());
     }
 
     flushPreviewCubes() {
@@ -294,18 +295,18 @@ export class MarchingCubeApp extends App {
     // turn this.map into this.mapGeo
     bufferMap() {
         console.log("buffering");
-        let mapGeo: Mesh[] = []
+        let mapGeo: PureMesh[] = []
         this.map.iter((entry, index) => {
             if (entry == 1) {
                 let mapCoord = this.map.getCoords(index);
                 let coord = this.mapToWorld(mapCoord);
                 let cube = this.createCube(coord);
-                mapGeo.push(Mesh.fromCube(cube));
+                mapGeo.push(PureMesh.fromCube(cube));
 
             }
         });
         this.meshRenderer.set(this.gl, 
-            Mesh.fromJoin(mapGeo).toDisplayMesh()
+            PureMesh.fromJoin(mapGeo).toDisplayMesh()
         );
     }
 

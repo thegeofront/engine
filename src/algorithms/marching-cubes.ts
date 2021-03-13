@@ -2,7 +2,7 @@
 // author:  Jos Feenstra
 // purpose: a marching cubes implementation useful for converting scalar discrete fields to contours
 
-import { Mesh } from "../geo/mesh";
+import { PureMesh } from "../mesh/pure-mesh";
 import { Vector2, Vector3 } from "../math/vector";
 
 // based upon: 
@@ -355,7 +355,7 @@ const edgeTable = [
     [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
 ];
  
- function polygonise(corners: Vector3[], values: number[], level: number) : Mesh
+ function polygonise(corners: Vector3[], values: number[], level: number) : PureMesh
  {
     let triangles = null;
 
@@ -373,7 +373,7 @@ const edgeTable = [
     /* Cube is entirely in/out of the surface */
     let vertlist: Vector3[] = []; // 12
     if (edgeTable[cubeindex] == 0)
-       return Mesh.fromEmpty();
+       return PureMesh.fromEmpty();
  
     /* Find the vertices where the surface intersects the cube */
     if (edgeTable[cubeindex] & 1)    vertlist[0]  = lerp(level, corners[0], corners[1], values[0], values[1]);
@@ -399,7 +399,7 @@ const edgeTable = [
     // }
  
     // return(ntriang);
-    return Mesh.fromEmpty();
+    return PureMesh.fromEmpty();
  }
  
  /*
