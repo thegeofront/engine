@@ -30,7 +30,7 @@ import { Perlin } from "../algorithms/perlin-noise";
 import { Core } from "../core";
 import { SliderParameter, UI } from "../system/ui";
 
-export class ShapesApp extends App {
+export class MeshInspectorApp extends App {
 
     // renderinfo
     camera: Camera;

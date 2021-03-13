@@ -13,7 +13,7 @@ import { Core } from "./core";
 import { StatApp } from "./app/stat-app";
 import { GeometryApp } from "./app/geometry-app";
 import { MarchingCubeApp } from "./app/marching-cube-app";
-import { ShapesApp } from "./app/shapes-app";
+import { MeshInspectorApp } from "./app/shapes-app";
 
 const REALTIME_DEMO = false;
 var core: Core;
@@ -37,7 +37,7 @@ function main() {
     
     // fun demo's to test various functionalities 
     // core.addApp(new GeometryApp(gl, canvas));
-    core.addApp(new ShapesApp(gl, canvas));
+    core.addApp(new MeshInspectorApp(gl, canvas));
     // core.addApp(new RectangleApp(gl)); 
     // core.addApp(new DotApp3(gl, canvas)); 
     // core.addApp(new ObjLoaderApp(gl, canvas));
