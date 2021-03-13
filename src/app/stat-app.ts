@@ -8,7 +8,7 @@ import { Domain3 } from "../math/domain";
 import { Vector3 } from "../math/vector";
 import { Camera } from "../render/camera";
 import { DotRenderer3 } from "../render/dot-renderer3";
-import { SimpleLineRenderer } from "../render/simple-line-renderer";
+import { LineRenderer } from "../render/line-renderer";
 import { SimpleMeshRenderer } from "../render/simple-mesh-renderer";
 import { InputState } from "../system/input-state";
 import { App } from "./app";
@@ -21,7 +21,7 @@ import { Stat } from "../math/statistics";
 export class StatApp extends App {
 
     dotRenderer: DotRenderer3;
-    lineRenderer: SimpleLineRenderer;
+    lineRenderer: LineRenderer;
     meshRenderer: SimpleMeshRenderer;
 
     camera: Camera;
@@ -34,7 +34,7 @@ export class StatApp extends App {
         
         super(gl);
         this.dotRenderer = new DotRenderer3(gl, 4, [0,0,1,1], false);
-        this.lineRenderer = new SimpleLineRenderer(gl, [0,0,1,0.5]);
+        this.lineRenderer = new LineRenderer(gl, [0,0,1,0.5]);
         this.meshRenderer = new SimpleMeshRenderer(gl, [0,0,1,0.25]);
         this.camera = new Camera(canvas);
     }
@@ -67,7 +67,7 @@ export class StatApp extends App {
 
         // get to-screen matrix
         const canvas = gl.canvas as HTMLCanvasElement;
-        let matrix = this.camera.getTotalMatrix();
+        let matrix = this.camera.totalMatrix;
 
 
 

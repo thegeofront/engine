@@ -9,7 +9,7 @@ import { Domain3 } from "../math/domain";
 import { Vector2, Vector3 } from "../math/vector";
 import { Camera } from "../render/camera";
 import { DotRenderer3 } from "../render/dot-renderer3";
-import { SimpleLineRenderer } from "../render/simple-line-renderer";
+import { LineRenderer } from "../render/line-renderer";
 import { SimpleMeshRenderer } from "../render/simple-mesh-renderer";
 import { InputState } from "../system/input-state";
 import { App } from "./app";
@@ -32,9 +32,9 @@ export class GeometryApp extends App {
 
     // renderinfo
     dotRenderer: DotRenderer3;
-    whiteLineRenderer: SimpleLineRenderer;
-    greyLineRenderer: SimpleLineRenderer;
-    redLineRenderer: SimpleLineRenderer;
+    whiteLineRenderer: LineRenderer;
+    greyLineRenderer: LineRenderer;
+    redLineRenderer: LineRenderer;
     meshRenderer: MeshRenderer;
     transMeshRenderer: MeshRenderer;
     camera: Camera;
@@ -59,9 +59,9 @@ export class GeometryApp extends App {
         super(gl);
         this.camera = new Camera(canvas, 10, true);
         this.dotRenderer = new DotRenderer3(gl, 4, [1,0,0,1], false);
-        this.whiteLineRenderer = new SimpleLineRenderer(gl, [1,1,1,1]);
-        this.greyLineRenderer = new SimpleLineRenderer(gl, [0.2,0,1,0.5]);
-        this.redLineRenderer = new SimpleLineRenderer(gl, [0.8,0,0,1]);
+        this.whiteLineRenderer = new LineRenderer(gl, [1,1,1,1]);
+        this.greyLineRenderer = new LineRenderer(gl, [0.2,0,1,0.5]);
+        this.redLineRenderer = new LineRenderer(gl, [0.8,0,0,1]);
         this.meshRenderer = new MeshRenderer(gl);
         this.transMeshRenderer = new MeshRenderer(gl, [1,1,1,0.10], [1,1,1,0.10]);
     }
@@ -132,7 +132,7 @@ export class GeometryApp extends App {
 
         // get to-screen matrix
         const canvas = gl.canvas as HTMLCanvasElement;
-        let matrix = this.camera.getTotalMatrix();
+        let matrix = this.camera.totalMatrix;
 
         // render the grid
         // this.greyLineRenderer.render(gl, matrix);

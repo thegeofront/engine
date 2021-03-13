@@ -8,7 +8,7 @@ import { Vector3Array } from "../data/vector-array";
 import { RenderMesh } from "../mesh/render-mesh";
 import { Matrix4 } from "../math/matrix";
 import { DrawSpeed, Renderer } from "./renderer";
-import { SimpleLineRenderer } from "./simple-line-renderer";
+import { LineRenderer } from "./line-renderer";
 import { SimpleMeshRenderer } from "./simple-mesh-renderer";
 
 export class ShadedMeshRenderer extends Renderer {

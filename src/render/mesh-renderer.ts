@@ -8,17 +8,20 @@ import { Vector3Array } from "../data/vector-array";
 import { RenderMesh } from "../mesh/render-mesh";
 import { Matrix4 } from "../math/matrix";
 import { DrawSpeed, Renderer } from "./renderer";
-import { SimpleLineRenderer } from "./simple-line-renderer";
+import { LineRenderer } from "./line-renderer";
 import { SimpleMeshRenderer } from "./simple-mesh-renderer";
+import { NormalRenderer } from "./mesh-normals-renderer";
 
 export class MeshRenderer {
 
     faceRend: SimpleMeshRenderer;
-    lineRend: SimpleLineRenderer;
+    lineRend: LineRenderer;
+    normRend: NormalRenderer;
 
     constructor(gl: WebGLRenderingContext, faceColor = [1,0,0,0.25], edgeColor = [1,0,0,0.25]) {
         this.faceRend = new SimpleMeshRenderer(gl, faceColor);
-        this.lineRend = new SimpleLineRenderer(gl, edgeColor);
+        this.lineRend = new LineRenderer(gl, edgeColor);
+        this.normRend = new NormalRenderer(gl);
     }
 
     setAndRender(gl: WebGLRenderingContext, matrix: Matrix4, mesh: RenderMesh) {
@@ -29,11 +32,13 @@ export class MeshRenderer {
     set(gl: WebGLRenderingContext, mesh: RenderMesh) {
         this.faceRend.setMesh(gl, mesh);
         this.lineRend.set(gl, LineArray.fromMesh(mesh), DrawSpeed.StaticDraw);
+        this.normRend.set(gl, mesh, DrawSpeed.StaticDraw);
     }
 
     // render 1 image to the screen
     render(gl: WebGLRenderingContext, matrix: Matrix4) {
         this.faceRend.render(gl, matrix);
         this.lineRend.render(gl, matrix);
+        this.normRend.render(gl, matrix);
     }
 }

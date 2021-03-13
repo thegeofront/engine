@@ -158,8 +158,8 @@ export class PureMesh {
         for (let i = 0; i < numPerRing; i++) {
             setFace(i, [
                 0,
+                (i+1) % numPerRing + 1,
                 i+1,
-                (i+1) % numPerRing + 1
             ]);
         }
 
@@ -182,8 +182,8 @@ export class PureMesh {
                 let iFace = numPerRing + (numPerRing * ring * 2) + perRing * 2
                 
                 // console.log(iFace);
-                setFace(iFace, [a,c,b]);
-                setFace(iFace+1, [c,d,b]);
+                setFace(iFace, [a,b,c]);
+                setFace(iFace+1, [c,b,d]);
             }
         }
 
@@ -204,8 +204,8 @@ export class PureMesh {
 
             setFace(iFace,[
                 last,
-                vertINext,
                 vertI,
+                vertINext,
             ]);
         }
 

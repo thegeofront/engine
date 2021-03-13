@@ -4,23 +4,28 @@
 
 import { FloatMatrix } from "../data/float-matrix";
 import { Vector2Array, Vector3Array } from "../data/vector-array";
-import { RenderMesh } from "../mesh/render-mesh";
+import { NormalKind, RenderMesh } from "../mesh/render-mesh";
 import { Polyline } from "../geo/polyline";
 import { Matrix4 } from "../math/matrix";
 import { Vector3 } from "../math/vector";
-import { LineArray } from "../mesh/line-array";
+import { getDefaultIndices, LineArray } from "../mesh/line-array";
 import { DrawSpeed, Renderer } from "./renderer";
 
-export class SimpleLineRenderer extends Renderer {
+export class NormalRenderer extends Renderer {
 
     a_position: number;
     a_position_buffer: WebGLBuffer;
     index_buffer: WebGLBuffer;
+
     u_transform: WebGLUniformLocation;
-    u_color: WebGLUniformLocation;
+
     count: number;
     vertCount: number;
-    constructor(gl: WebGLRenderingContext, color = [1,0,0,0.5]) {
+    a_color_buffer: WebGLBuffer;
+    a_color: number;
+    scale: number;
+
+    constructor(gl: WebGLRenderingContext) {
 
         // note: I like vertex & fragments to be included in the script itself.
         // when you change vertex or fragment, this class has to deal with it. 
@@ -30,12 +35,16 @@ export class SimpleLineRenderer extends Renderer {
         precision mediump int;
         precision mediump float;
 
-        attribute vec4 a_position;
+        attribute vec4 a_vertex;
+        attribute vec4 a_vertex_color;
+
         uniform mat4 u_transform;
-        uniform vec4 u_color;
+
+        varying vec4 v_color;
 
         void main() {
-            gl_Position = u_transform * a_position;
+            gl_Position = u_transform * a_vertex;
+            v_color = a_vertex_color;
         }
         `;
 
@@ -43,48 +52,90 @@ export class SimpleLineRenderer extends Renderer {
         precision mediump int;
         precision mediump float;
 
-        uniform vec4 u_color;
+        varying vec4 v_color;
 
         void main () {
-            gl_FragColor = u_color;
+            gl_FragColor = v_color;
         }
         `;
 
         // setup program    
         super(gl, vs, fs);
         this.u_transform = gl.getUniformLocation(this.program, "u_transform")!;
-        this.u_color = gl.getUniformLocation(this.program, "u_color")!;
-        
+
         // we need 2 buffers 
-        this.a_position = gl.getAttribLocation(this.program, "a_position");
-  
+        this.a_position = gl.getAttribLocation(this.program, "a_vertex");
+        this.a_color = gl.getAttribLocation(this.program, "a_vertex_color");
+
         this.a_position_buffer = gl.createBuffer()!;
+        this.a_color_buffer = gl.createBuffer()!;
         this.index_buffer = gl.createBuffer()!;    
 
-        // set uniforms which wont change
         gl.useProgram(this.program);
-        gl.uniform4f(this.u_color, color[0], color[1], color[2], color[3]);
         this.count = 0;
         this.vertCount = 0;
+        this.scale = 0.4;
     }
 
-    set(gl: WebGLRenderingContext, data: LineArray, speed = DrawSpeed.StaticDraw) {
+    // take a general render mesh, and extract normals
+    set(gl: WebGLRenderingContext, mesh: RenderMesh, speed = DrawSpeed.StaticDraw) {
         
-        // save how many faces need to be drawn
+        // save how many verts need to be drawn
         gl.useProgram(this.program);
-        this.count = data.ids.length
-        this.vertCount = data.verts._width;
         let drawspeed = this.convertDrawSpeed(speed);
+        this.vertCount = 3;
+
+        let lineverts: Vector3Array;
+        let normals: Vector3Array;
+
+        // different buffer fills based upon normal kind
+        let normalKind = mesh.getNormalType();
+        if (normalKind == NormalKind.Face) {
+
+            let faceCount = mesh.links.count(); 
+            this.count = faceCount * 2;
+
+            lineverts = new Vector3Array(this.count);
+            normals = new Vector3Array(this.count);
+            
+            for (let f = 0 ; f < faceCount; f++) {
+                let center = mesh.getFaceVertices(f).average();
+                let normal = mesh.norms.getVector(f);
+                let i1 = f * 2;
+                let i2 = f * 2 + 1;
+
+                lineverts.setVector(i1, center);
+                lineverts.setVector(i2, center.add(normal.scaled(this.scale)));
+                let color = normal.add(new Vector3(1,1,1).div(2));
+                normals.setVector(i1, color);
+                normals.setVector(i2, color);
+            }
+
+
+        } else if (normalKind == NormalKind.Vertex) {
+
+            console.warn("TODO");
+            return;
+        } else {
+            console.warn("cannot render normals");
+            return;
+        }
 
         // vertices  
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
         gl.enableVertexAttribArray(this.a_position);
         gl.vertexAttribPointer(this.a_position, this.vertCount, gl.FLOAT, false, 0, 0);
-        gl.bufferData(gl.ARRAY_BUFFER, data.verts.data, drawspeed);
+        gl.bufferData(gl.ARRAY_BUFFER, lineverts.data, drawspeed);
+
+        // normals
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.a_color_buffer);
+        gl.enableVertexAttribArray(this.a_color);
+        gl.vertexAttribPointer(this.a_color, this.vertCount, gl.FLOAT, false, 0, 0);
+        gl.bufferData(gl.ARRAY_BUFFER, normals.data, drawspeed);
 
         // indices 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, data.ids.buffer, drawspeed);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, getDefaultIndices(this.count), drawspeed);
     }
 
     render(gl: WebGLRenderingContext, matrix: Matrix4) {
@@ -103,10 +154,5 @@ export class SimpleLineRenderer extends Renderer {
 
         // Draw the point.
         gl.drawElements(gl.LINES, this.count, gl.UNSIGNED_SHORT, 0);
-    }
-
-    setAndRender(gl: WebGLRenderingContext, matrix: Matrix4, data: LineArray) {
-        this.set(gl, data, DrawSpeed.DynamicDraw);
-        this.render(gl, matrix);
     }
 }

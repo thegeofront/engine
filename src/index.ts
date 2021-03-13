@@ -5,7 +5,7 @@ import {addWebcamAppWhenReady, WebcamApp} from "./app/webcam-app";
 import {EyeFinderApp} from "./sfered/eye-finder-app";
 import { InputState } from "./system/input-state";
 import { App } from "./app/app";
-import { initWebglContext, Renderer } from "./render/renderer";
+import { Renderer } from "./render/renderer";
 import { DotApp2 } from "./app-demos/dot-app2";
 import { DotApp3 } from "./app-demos/dot-app3";
 import { ObjLoaderApp } from "./app/obj-loader-app";
@@ -28,7 +28,7 @@ function main() {
     let cameraStop = document.getElementById("camera-off")! as HTMLButtonElement;
     let buttonPredict = document.getElementById("predict")! as HTMLButtonElement;
     
-    let gl = initWebglContext(canvas);
+    let gl = Renderer.initWebglContext(canvas);
     core = new Core(canvas, gl, ui);
 
     // the eyefinder app itself

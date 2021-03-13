@@ -12,7 +12,7 @@ import { Domain2 } from "../math/domain";
 import { Vector2, Vector3 } from "../math/vector";
 import { Camera } from "../render/camera";
 import { DotRenderer3 } from "../render/dot-renderer3";
-import { SimpleLineRenderer } from "../render/simple-line-renderer";
+import { LineRenderer } from "../render/line-renderer";
 import { InputState } from "../system/input-state";
 import { App } from "../app/app";
 import { EyeFinder } from "./eye-finder";
@@ -68,9 +68,9 @@ export class EyeFinderApp extends App {
     redDotRenderer: DotRenderer3;
     whiteDotRenderer: DotRenderer3;
 
-    whiteLineRenderer: SimpleLineRenderer;
-    redLineRenderer: SimpleLineRenderer;
-    blueLineRenderer: SimpleLineRenderer;
+    whiteLineRenderer: LineRenderer;
+    redLineRenderer: LineRenderer;
+    blueLineRenderer: LineRenderer;
 
     faceRenderer: TextureMeshRenderer;
     imageRenderer: TextureMeshRenderer;
@@ -92,9 +92,9 @@ export class EyeFinderApp extends App {
         this.redDotRenderer = new DotRenderer3(gl, 4, [1,0,0,1], false);
         this.whiteDotRenderer = new DotRenderer3(gl, 5, [0.8,0.8,0.8,1], false);
 
-        this.whiteLineRenderer = new SimpleLineRenderer(gl, [0.9,0.9,0.9,0.9]);
-        this.blueLineRenderer = new SimpleLineRenderer(gl, [0,0,1,0.5]);
-        this.redLineRenderer = new SimpleLineRenderer(gl, [1,0,0,0.5]);
+        this.whiteLineRenderer = new LineRenderer(gl, [0.9,0.9,0.9,0.9]);
+        this.blueLineRenderer = new LineRenderer(gl, [0,0,1,0.5]);
+        this.redLineRenderer = new LineRenderer(gl, [1,0,0,0.5]);
         
         this.faceRenderer = new TextureMeshRenderer(gl);
         this.imageRenderer = new TextureMeshRenderer(gl);
@@ -128,7 +128,7 @@ export class EyeFinderApp extends App {
 
         // get to-screen matrix
         const canvas = gl.canvas as HTMLCanvasElement;
-        let matrix = this.camera.getTotalMatrix();
+        let matrix = this.camera.totalMatrix;
 
         this.lineRenderables.forEach((renderable) => {
             this.redLineRenderer.setAndRender(gl, matrix, renderable);

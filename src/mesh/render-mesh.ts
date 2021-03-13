@@ -1,30 +1,52 @@
+// Name: render-mesh.ts 
+// Author: Jos Feenstra 
+// Purpose: 
+// a mesh representation with the sole purpose of to be renderer. 
+// - fixed length attributes 
+// - can represent:
+//   - pointcloud (links = null)
+//   - graph (links.width = 2)
+//   - triangles (links.width = 3)
+//   - quads (links.width = 4. will need to be converted to triangles)
+
 import { IntMatrix } from "../data/int-matrix";
 import { Vector2Array, Vector3Array } from "../data/vector-array";
 import { Vector2, Vector3 } from "../math/vector";
 import { Cube } from "../geo/cube";
 import { Rectangle3 } from "../geo/rectangle";
 
-// a mesh 
-// - with the direct ability to be rendered
-// - with fixed length attributes 
-// - can represent:
-//   - graph (links.width = 2)
-//   - triangles (links.width = 3)
-//   - 
+type vertexID = number;
+type faceID = number;
+
+export enum RenderMeshKind {
+    Invalid = 0,
+    Points = 1,
+    Lines = 2,
+    Triangles = 3,
+    Quads = 4,
+}
+
+export enum NormalKind {
+    None,
+    Vertex,
+    Face,
+    MultiVertex,
+}
+
 export class RenderMesh {
 
-    verts: Vector3Array; // 3 long float
-    norms: Vector3Array; // 3 long float
-    uvs:   Vector2Array; // 2 long float 
-    links: IntMatrix; // 3 width, count height integers
-    texture?: ImageData = undefined;
+    verts: Vector3Array; 
+    norms: Vector3Array; 
+    uvs:   Vector2Array;
+    links: IntMatrix; 
+    texture?: ImageData;
 
     constructor(vertCount: number, normCount: number, uvCount: number, faceCount: number, texture: ImageData | undefined = undefined) {
         this.verts = new Vector3Array(vertCount);
         this.norms = new Vector3Array(normCount);
         this.uvs = new Vector2Array(uvCount);
         this.links = new IntMatrix(faceCount, 3);
-        this.links.fill(-1);
+        this.links?.fill(-1);
         this.texture = texture;
     }
 
@@ -35,9 +57,9 @@ export class RenderMesh {
         // Array class. 
         let mesh = new RenderMesh(verts.length / 3, norms.length / 3, uvs.length / 2, faces.length / 3);
         mesh.verts.fillWith(verts);
-        mesh.norms.fillWith(norms);
-        mesh.uvs.fillWith(uvs);
-        mesh.links.fillWith(faces);
+        mesh.norms!.fillWith(norms);
+        mesh.uvs!.fillWith(uvs);
+        mesh.links!.fillWith(faces);
         return mesh;
     }
 
@@ -50,7 +72,7 @@ export class RenderMesh {
         let faceCount = 0;
         for (let mesh of meshes) {
             vertCount += mesh.verts.count();
-            faceCount += mesh.links.count();
+            if (mesh.links) faceCount += mesh.links.count();
         }
 
         let joined = new RenderMesh(vertCount, 0, 0, faceCount);
@@ -61,12 +83,13 @@ export class RenderMesh {
             for (let i = 0 ; i < mesh.verts.count(); i++) {
                 joined.verts.setVector(accVerts + i, mesh.verts.getVector(i));
             }
+            if (!mesh.links) continue;
             for (let i = 0 ; i < mesh.links.count(); i++) {
                 let face = mesh.links.getRow(i);
                 for (let j = 0 ; j < face.length; j++) {
                     face[j] = face[j] + accVerts;
                 }
-                joined.links.setRow(accFaces + i, face);
+                joined.links!.setRow(accFaces + i, face);
             }
             accVerts += mesh.verts.count();
             accFaces += mesh.links.count();
@@ -76,6 +99,61 @@ export class RenderMesh {
     }
 
 
+    // getters & selectors 
+
+    getAdjacentFaces(v: vertexID) : faceID[] {
+        let faces: faceID[] = []
+        let count = this.links.count()
+        for (let i = 0; i < count; i++) {
+            if (this.links.getRow(i).includes(v)) {
+                faces.push(i);
+            }
+        }
+        return faces;
+    }
+
+
+    getFaceVertices(f: faceID) : Vector3Array {
+        
+        let verts = new Vector3Array(this.links._width);
+        this.links.getRow(f).forEach((v, i) => {
+            verts.setVector(i, (this.verts.getVector(v)));
+        });
+        return verts;
+    }
+
+
+    getKind() : RenderMeshKind {
+
+        if (this.links._width == RenderMeshKind.Points) {
+            return RenderMeshKind.Points;
+        } else if (this.links._width == RenderMeshKind.Lines) {
+            return RenderMeshKind.Lines;
+        } else if (this.links._width == RenderMeshKind.Triangles) {
+            return RenderMeshKind.Triangles;
+        } else if (this.links._width == RenderMeshKind.Quads) {
+            return RenderMeshKind.Quads;
+        } else {
+            return RenderMeshKind.Invalid;
+        }
+    }
+
+    getNormalType() : NormalKind {
+        
+        let count = this.norms.count();
+        if (count == this.verts.count()) {
+            return NormalKind.Vertex;
+        } else if (count == this.links.count()) {
+            return NormalKind.Face;
+        } else if (count == this.links.data.length) {
+            return NormalKind.MultiVertex;
+        } else {
+            return NormalKind.None;
+        }
+    }
+
+    // setters 
+
     setTexture(texture: ImageData) {
         this.texture = texture;
         // recalculate things if needed
@@ -84,25 +162,53 @@ export class RenderMesh {
 
     setUvs(uvs: Vector2Array | Float32Array) {
         if (uvs instanceof Float32Array) {
-            this.uvs.data = uvs;
+            this.uvs!.data = uvs;
         } else {
             this.uvs = uvs;
         }
         
         // recalculate if needed
     }
-    
+
+    // convert
     exportToObj(path: string) {
         throw "todo";
     }
 
+    // normals
+    calculateFaceNormals() {
 
-    calculateNormals() {
+        // calculate a normal per face
+        if (this.getKind() != RenderMeshKind.Triangles) {
+            console.error("can only calculate normals from triangular meshes");
+            this.norms = new Vector3Array(0);
+            return;
+        }
 
-        // if 
+        let faceCount = this.links.count();
+        this.norms = new Vector3Array(faceCount);
+        for (let f = 0 ; f < faceCount; f++) {
+
+            let verts = this.getFaceVertices(f).toList();
+            let normal = verts[2].subbed(verts[0]).cross(verts[1].subbed(verts[0])).normalize();
+            this.norms.setVector(f, normal);
+        }
     }
 
-    
+
+    calculateVertexNormals() {
+        this.calculateFaceNormals();
+        let vertNormals = new Vector3Array(this.verts.count());
+
+        this.verts.forEach((v, i) => {
+            
+            let adjFaces = this.getAdjacentFaces(i);
+            let adjNormals = this.norms.takeRows(adjFaces) as Vector3Array;
+            vertNormals.setVector(i, adjNormals.average());
+        })
+        
+        this.norms = vertNormals;
+    }
 };
 
 

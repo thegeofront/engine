@@ -9,7 +9,7 @@ import { Domain3 } from "../math/domain";
 import { Vector2, Vector3 } from "../math/vector";
 import { Camera } from "../render/camera";
 import { DotRenderer3 } from "../render/dot-renderer3";
-import { SimpleLineRenderer } from "../render/simple-line-renderer";
+import { LineRenderer } from "../render/line-renderer";
 import { SimpleMeshRenderer } from "../render/simple-mesh-renderer";
 import { InputState } from "../system/input-state";
 import { App } from "./app";
@@ -27,7 +27,6 @@ import { IntMatrix } from "../data/int-matrix";
 import { IntCube } from "../data/int-cube";
 import { Ray } from "../math/ray";
 import { Perlin } from "../algorithms/perlin-noise";
-import { LineRenderer } from "../render/line-renderer";
 import { Core } from "../core";
 import { SliderParameter, UI } from "../system/ui";
 
@@ -36,7 +35,7 @@ export class ShapesApp extends App {
     // renderinfo
     camera: Camera;
     dotRenderer: DotRenderer3;
-    lineRenderer: SimpleLineRenderer;
+    lineRenderer: LineRenderer;
     meshRenderer: MeshRenderer;
 
     // geo data
@@ -49,7 +48,7 @@ export class ShapesApp extends App {
     size = 10;
     cellSize = 0.5;
     radius = new SliderParameter("radius", 1.0, 0, 4.0, 0.01);
-    detail = new SliderParameter("detail", 5.0, 0, );
+    detail = new SliderParameter("detail", 5, 0, 100, 1);
 
     constructor(gl: WebGLRenderingContext, canvas: HTMLCanvasElement) {
         
@@ -63,8 +62,8 @@ export class ShapesApp extends App {
         this.camera.angleBeta = 0.5;
         
         this.dotRenderer = new DotRenderer3(gl, 4, [0,1,0,1]);
-        this.meshRenderer = new MeshRenderer(gl, [0,0,1,1], [1,1,0.5,0]);
-        this.lineRenderer = new SimpleLineRenderer(gl);
+        this.meshRenderer = new MeshRenderer(gl, [0,0,1,1], [0,0,0.5,1]);
+        this.lineRenderer = new LineRenderer(gl);
     }
 
 
@@ -79,6 +78,10 @@ export class ShapesApp extends App {
         ui.addSlider(this.distance, (value) => {
             this.start();
         });
+
+        ui.addSlider(this.detail, (value) => {
+            this.start();
+        });
     }
 
 
@@ -91,15 +94,18 @@ export class ShapesApp extends App {
             PureMesh.fromCube(new Cube(this.plane, Domain3.fromRadius(this.radius.get()))),
             PureMesh.fromCone(new Vector3(-this.distance.get(),0,-this.radius.get()), this.radius.get(), this.radius.get() * 2, spherePerRing),
         ]);
+        let dmesh = mesh.toDisplayMesh();
+        dmesh.calculateFaceNormals();
+
         // let mesh = Mesh.fromCube(new Cube(this.plane, Domain3.fromRadius(1)));
 
         // console.log(mesh.verts);
         // console.log(mesh.links);
 
         // TODO abstract this to scene 
-        this.meshRenderer.set(this.gl, mesh.toDisplayMesh());
+        this.meshRenderer.set(this.gl, dmesh);
         // this.lineRenderer.set(this.gl, grid);
-        this.dotRenderer.set(mesh.verts, DrawSpeed.StaticDraw);
+        // this.dotRenderer.set(mesh.verts, DrawSpeed.StaticDraw);
     }
 
 
@@ -113,7 +119,7 @@ export class ShapesApp extends App {
 
     draw(gl: WebGLRenderingContext) {
         // TODO abstract this to 'scene'
-        let matrix = this.camera.getTotalMatrix();
+        let matrix = this.camera.totalMatrix;
 
         this.dotRenderer.render(gl, matrix);
         this.meshRenderer.render(gl, matrix);

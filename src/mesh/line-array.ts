@@ -202,7 +202,7 @@ export class LineArray {
 }
 
 // just get an int sequence from 0 to length. 
-function getDefaultIndices(count: number) : Uint16Array {
+export function getDefaultIndices(count: number) : Uint16Array {
     
     let data = new Uint16Array(count);
     for(let i = 0 ; i < count; i++) {

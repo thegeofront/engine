@@ -79,7 +79,7 @@ export class DotApp3 extends App {
 
         // get to-screen matrix
         const canvas = gl.canvas as HTMLCanvasElement;
-        let matrix = this.camera.getTotalMatrix();
+        let matrix = this.camera.totalMatrix;
 
         // render the corners of the box with the red renderer,
         // and the dots themselves with the white renderer

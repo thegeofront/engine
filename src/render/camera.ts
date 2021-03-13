@@ -29,8 +29,11 @@ export class Camera {
     speed = 1;
 
     worldPlane = Plane.WorldXY();
-    worldMatrix: Matrix4;
-    projectMatrix: Matrix4;    
+    
+    // ! means: dont worry, these will be set in the constructor
+    totalMatrix!: Matrix4;
+    worldMatrix!: Matrix4;
+    projectMatrix!: Matrix4;    
 
     // settings
     canMove: boolean;
@@ -42,15 +45,12 @@ export class Camera {
         this.pos = new Vector3(0,0,0);
         this.z_offset = -z_offset;
         this.offset = new Vector3(0,0, -z_offset);
-
-        this.worldMatrix = this.getWorldMatrix();
-        this.projectMatrix = this.getProjectionMatrix(canvas);
+        this.updateMatrices(canvas);
     }
 
     update(state: InputState) {
         this.updateControls(state);
-        this.worldMatrix = this.getWorldMatrix();
-        this.projectMatrix = this.getProjectionMatrix(state.canvas);
+        this.updateMatrices(state.canvas);
         this.updateClick(state);
 
         if(state.IsKeyPressed("p")) {
@@ -58,6 +58,12 @@ export class Camera {
             console.log(this.offset);
             console.log("speed is now: " + this.speed);
         }
+    }
+
+    updateMatrices(canvas: HTMLCanvasElement) {
+        this.worldMatrix = this.getWorldMatrix();
+        this.projectMatrix = this.getProjectionMatrix(canvas);
+        this.totalMatrix = this.worldMatrix.multiplied(this.projectMatrix)
     }
 
     lookat(position: Vector3, target: Vector3) {
@@ -207,10 +213,5 @@ export class Camera {
         // let projection = Matrix4.newOrthographic(-1, 1, -1, 1, 0.1, 0.1);
         let projection = Matrix4.newPerspective(this.fov, aspect, this.zNear, this.zFar);
         return projection;
-    }
-
-    getTotalMatrix() : Matrix4 {
-
-        return this.worldMatrix.multiply(this.projectMatrix);
     }
 }
