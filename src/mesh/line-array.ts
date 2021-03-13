@@ -3,12 +3,12 @@
 // purpose: represents an object which can be fed directly to a linerenderer.
 //          use it to not continuously have to calculate these aspects if the underlying object is unchanged.
 
-import { FloatMatrix } from "./float-matrix";
-import { getGeneralFloatMatrix, Vector2Array, Vector3Array } from "./vector-array"
+import { FloatMatrix } from "../data/float-matrix";
+import { getGeneralFloatMatrix, Vector2Array, Vector3Array } from "../data/vector-array"
 import { Circle2 } from "../geo/circle2";
 import { Circle3 } from "../geo/circle3";
 import { Cube } from "../geo/cube";
-import { RenderMesh } from "../mesh/render-mesh";
+import { RenderMesh } from "./render-mesh";
 import { Plane } from "../geo/plane";
 import { Const } from "../math/const";
 import { Matrix4 } from "../math/matrix";

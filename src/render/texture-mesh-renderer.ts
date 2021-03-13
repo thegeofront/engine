@@ -3,7 +3,7 @@
 // purpose: WebGL based rendering of a mesh.
 
 import { IntMatrix } from "../data/int-matrix";
-import { LineArray } from "../data/line-array";
+import { LineArray } from "../mesh/line-array";
 import { Vector3Array } from "../data/vector-array";
 import { RenderMesh } from "../mesh/render-mesh";
 import { Matrix4 } from "../math/matrix";

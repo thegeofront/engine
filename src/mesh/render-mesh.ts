@@ -4,14 +4,19 @@ import { Vector2, Vector3 } from "../math/vector";
 import { Cube } from "../geo/cube";
 import { Rectangle3 } from "../geo/rectangle";
 
-// a mesh with the ability to be rendered 
+// a mesh 
+// - with the direct ability to be rendered
+// - with fixed length attributes 
+// - can represent:
+//   - graph (links.width = 2)
+//   - triangles (links.width = 3)
+//   - 
 export class RenderMesh {
 
     verts: Vector3Array; // 3 long float
     norms: Vector3Array; // 3 long float
     uvs:   Vector2Array; // 2 long float 
     links: IntMatrix; // 3 width, count height integers
-
     texture?: ImageData = undefined;
 
     constructor(vertCount: number, normCount: number, uvCount: number, faceCount: number, texture: ImageData | undefined = undefined) {
@@ -91,6 +96,11 @@ export class RenderMesh {
         throw "todo";
     }
 
+
+    calculateNormals() {
+
+        // if 
+    }
 
     
 };

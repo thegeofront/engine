@@ -14,7 +14,7 @@ import { TopoMesh } from "../mesh/topo-mesh";
 import { Plane } from "../geo/plane";
 import { Matrix4 } from "../math/matrix";
 import { RansacCircle2d } from "./ransac";
-import { LineArray } from "../data/line-array";
+import { LineArray } from "../mesh/line-array";
 import { Circle3 } from "../geo/circle3";
 
 

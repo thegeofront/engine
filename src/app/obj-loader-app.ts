@@ -14,7 +14,7 @@ import { InputState } from "../system/input-state";
 import { App } from "./app";
 import { DrawSpeed } from "../render/renderer";
 import { Vector3Array } from "../data/vector-array";
-import { LineArray } from "../data/line-array";
+import { LineArray } from "../mesh/line-array";
 
 
 export class ObjLoaderApp extends App {

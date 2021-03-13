@@ -14,8 +14,6 @@ import { RenderMesh } from "./render-mesh";
 
 
 // TODO make distinctions between
-// - PureMesh (only verts & links)
-// - NavMesh | TopoMesh (mesh which is topologically sound) 
 // - DisplayMesh (PureMesh + uvs, texture, normals, material, etc...)
 
 

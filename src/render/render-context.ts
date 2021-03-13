@@ -3,7 +3,7 @@
 // Purpose: Experiment: a collection of renderers, things to render, and Camera's     
 // NOTE:    Implement this correctly later, this is just a sketch for now
 
-import { LineArray } from "../data/line-array";
+import { LineArray } from "../mesh/line-array";
 import { Plane } from "../geo/plane";
 import { RenderMesh } from "../mesh/render-mesh";
 import { InputState } from "../system/input-state";

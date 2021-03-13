@@ -24,7 +24,7 @@ import { InputState } from "../system/input-state";
 import { App } from "./app";
 import { DrawSpeed } from "../render/renderer";
 import { Vector3Array } from "../data/vector-array";
-import { LineArray } from "../data/line-array";
+import { LineArray } from "../mesh/line-array";
 import { FloatMatrix } from "../data/float-matrix";
 import { Stat } from "../math/statistics";
 import { Plane } from "../geo/plane";

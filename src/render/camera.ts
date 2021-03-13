@@ -3,7 +3,7 @@
 // purpose : contain all logic regarding 
 
 import { norm } from "@tensorflow/tfjs";
-import { LineArray } from "../data/line-array";
+import { LineArray } from "../mesh/line-array";
 import { Plane } from "../geo/plane";
 import { GMath } from "../math/math";
 import { Matrix4 } from "../math/matrix";

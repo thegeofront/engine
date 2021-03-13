@@ -8,7 +8,7 @@ import { RenderMesh } from "../mesh/render-mesh";
 import { Polyline } from "../geo/polyline";
 import { Matrix4 } from "../math/matrix";
 import { Vector3 } from "../math/vector";
-import { LineArray } from "../data/line-array";
+import { LineArray } from "../mesh/line-array";
 import { DrawSpeed, Renderer } from "./renderer";
 
 export class SimpleLineRenderer extends Renderer {

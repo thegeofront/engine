@@ -3,7 +3,7 @@
 // notes:   found some nice examples at https://www.cs.princeton.edu/courses/archive/fall00/cs426/lectures/raycast/sld004.htm
 
 
-import { LineArray } from "../data/line-array";
+import { LineArray } from "../mesh/line-array";
 import { Plane } from "../geo/plane";
 import { Vector3 } from "./vector";
 

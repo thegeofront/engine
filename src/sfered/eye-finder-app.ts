@@ -18,7 +18,7 @@ import { App } from "../app/app";
 import { EyeFinder } from "./eye-finder";
 import { Matrix3, Matrix4 } from "../math/matrix";
 import { Rectangle2, Rectangle3 } from "../geo/rectangle";
-import { LineArray } from "../data/line-array";
+import { LineArray } from "../mesh/line-array";
 import { Circle3 } from "../geo/circle3";
 import { Plane } from "../geo/plane";
 import { TextureMeshRenderer } from "../render/texture-mesh-renderer";
