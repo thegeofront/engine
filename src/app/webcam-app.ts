@@ -19,6 +19,8 @@ import { CtxApp } from "./ctx-app";
 
 // PUBLIC
 
+// TODO rewrite this into the webcam app constructor
+// TODO get rid of ctx
 export function addWebcamAppWhenReady(core: Core, ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, video: HTMLVideoElement) {
         
     let app: CtxApp;

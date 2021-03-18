@@ -20,7 +20,7 @@ import { FloatMatrix } from "../data/float-matrix";
 import { Stat } from "../math/statistics";
 import { Plane } from "../geo/plane";
 import { Cube } from "../geo/cube";
-import { MeshRenderer } from "../render/mesh-renderer";
+import { MeshDebugRenderer } from "../render/mesh-debug-renderer";
 import { Matrix4 } from "../math/matrix";
 import { Circle3 } from "../geo/circle3";
 import { IntMatrix } from "../data/int-matrix";
@@ -35,8 +35,8 @@ export class GeometryApp extends App {
     whiteLineRenderer: LineRenderer;
     greyLineRenderer: LineRenderer;
     redLineRenderer: LineRenderer;
-    meshRenderer: MeshRenderer;
-    transMeshRenderer: MeshRenderer;
+    meshRenderer: MeshDebugRenderer;
+    transMeshRenderer: MeshDebugRenderer;
     camera: Camera;
 
     // geo data
@@ -53,17 +53,17 @@ export class GeometryApp extends App {
     cellSize = 1;
     map!: IntCube;
 
-    constructor(gl: WebGLRenderingContext, canvas: HTMLCanvasElement) {
+    constructor(gl: WebGLRenderingContext) {
         
         // setup render env
         super(gl);
-        this.camera = new Camera(canvas, 10, true);
+        this.camera = new Camera(gl.canvas! as HTMLCanvasElement, 10, true);
         this.dotRenderer = new DotRenderer3(gl, 4, [1,0,0,1], false);
         this.whiteLineRenderer = new LineRenderer(gl, [1,1,1,1]);
         this.greyLineRenderer = new LineRenderer(gl, [0.2,0,1,0.5]);
         this.redLineRenderer = new LineRenderer(gl, [0.8,0,0,1]);
-        this.meshRenderer = new MeshRenderer(gl);
-        this.transMeshRenderer = new MeshRenderer(gl, [1,1,1,0.10], [1,1,1,0.10]);
+        this.meshRenderer = new MeshDebugRenderer(gl);
+        this.transMeshRenderer = new MeshDebugRenderer(gl, [1,1,1,0.10], [1,1,1,0.10]);
     }
 
 

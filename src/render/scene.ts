@@ -10,7 +10,7 @@ import { InputState } from "../system/input-state";
 import { SliderParameter } from "../system/ui";
 import { Camera } from "./camera";
 import { DotRenderer3 } from "./dot-renderer3";
-import { MeshRenderer } from "./mesh-renderer";
+import { MeshDebugRenderer } from "./mesh-debug-renderer";
 import { LineRenderer } from "./line-renderer";
 import { Vector3 } from "../math/vector";
 import { DrawSpeed, Renderer } from "./renderer";

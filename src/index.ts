@@ -1,4 +1,5 @@
-// Author: Jos Feenstra
+// Name:    index.ts
+// Author:  Jos Feenstra
 // Purpose: Entry point
 
 import {addWebcamAppWhenReady, WebcamApp} from "./app/webcam-app";
@@ -13,9 +14,9 @@ import { Core } from "./core";
 import { StatApp } from "./app/stat-app";
 import { GeometryApp } from "./app/geometry-app";
 import { MarchingCubeApp } from "./app/marching-cube-app";
-import { MeshInspectorApp } from "./app/shapes-app";
+import { MeshInspectorApp } from "./app/mesh-inspector-app";
+import { SwapApp } from "./app/swap-app";
 
-const REALTIME_DEMO = false;
 var core: Core;
 
 function main() {
@@ -28,19 +29,25 @@ function main() {
     let cameraStop = document.getElementById("camera-off")! as HTMLButtonElement;
     let buttonPredict = document.getElementById("predict")! as HTMLButtonElement;
     
+    // init core 
     let gl = Renderer.initWebglContext(canvas);
     core = new Core(canvas, gl, ui);
 
-    // the eyefinder app itself
-    // core.addApp(new StatApp(gl, canvas));
-    // core.addApp(new EyeFinderApp(gl, canvas, ui));
-    
-    // fun demo's to test various functionalities 
-    // core.addApp(new GeometryApp(gl, canvas));
-    core.addApp(new MeshInspectorApp(gl, canvas));
-    // core.addApp(new RectangleApp(gl)); 
-    // core.addApp(new DotApp3(gl, canvas)); 
-    // core.addApp(new ObjLoaderApp(gl, canvas));
+    // init swap app
+    let appCollection = [
+        MeshInspectorApp,
+        EyeFinderApp,
+        GeometryApp,
+        DotApp3,
+        ObjLoaderApp,
+        StatApp,
+    ]
+
+    let swapApp = new SwapApp(gl, core, appCollection);
+    core.addApp(swapApp);
+    swapApp.swap(0);
+
+    // a specific app dealing with webcams & other things
     // addWebcamAppWhenReady(core, canvas, video);
 
     // infinite loop
@@ -53,11 +60,8 @@ function main() {
         core.draw();
         requestAnimationFrame(loop);
     }
-    // loop();
     requestAnimationFrame(loop);
 }
-
-// __main__ 
 window.addEventListener("load", function() {
     main();
 }, false);

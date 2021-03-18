@@ -22,8 +22,10 @@ export class DotApp3 extends App {
     redDotRend: DotRenderer3;
     camera: Camera;
 
-    constructor(gl: WebGLRenderingContext, canvas: HTMLCanvasElement) {
+    constructor(gl: WebGLRenderingContext) {
         super(gl);
+
+        let canvas = gl.canvas as HTMLCanvasElement;
         let n = 1;
         this.bounds = Domain3.fromBounds(-n, n, -n, n, -n, n);
         this.whiteDotRend = new DotRenderer3(gl, 10, [1,1,1,1], false);

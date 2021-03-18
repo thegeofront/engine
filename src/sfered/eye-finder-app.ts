@@ -25,7 +25,7 @@ import { TextureMeshRenderer } from "../render/texture-mesh-renderer";
 import { DrawSpeed } from "../render/renderer";
 import { TopoMesh } from "../mesh/topo-mesh";
 import { SimpleMeshRenderer } from "../render/simple-mesh-renderer";
-import { MeshRenderer } from "../render/mesh-renderer";
+import { MeshDebugRenderer } from "../render/mesh-debug-renderer";
 import { Cube } from "../geo/cube";
 
 const settings = require('../sfered/settings.json'); // note DIFFERENCE BETWEEN "" AND ''. '' WORKS, "" NOT. 
@@ -74,16 +74,17 @@ export class EyeFinderApp extends App {
 
     faceRenderer: TextureMeshRenderer;
     imageRenderer: TextureMeshRenderer;
-    debugMeshRenderer: MeshRenderer;
+    debugMeshRenderer: MeshDebugRenderer;
 
     camera: Camera;
     
 
     
 
-    constructor(gl: WebGLRenderingContext, canvas: HTMLCanvasElement, context: HTMLDivElement) {
+    constructor(gl: WebGLRenderingContext) {
         
         super(gl);
+        let canvas = gl.canvas as HTMLCanvasElement;
 
         this.eyefinder = new EyeFinder(this);
 
@@ -98,14 +99,12 @@ export class EyeFinderApp extends App {
         
         this.faceRenderer = new TextureMeshRenderer(gl);
         this.imageRenderer = new TextureMeshRenderer(gl);
-        this.debugMeshRenderer = new MeshRenderer(gl, [0,1,1,0.8], [0,1,1,1])
+        this.debugMeshRenderer = new MeshDebugRenderer(gl, [0,1,1,0.8], [0,1,1,1])
 
         let zoom = 1;
         this.camera = new Camera(canvas, zoom, true);
         this.camera.angleAlpha = 0.25 * Math.PI;
         this.camera.angleBeta = 0.25 * Math.PI;
-
-
 
         addDropFileEventListeners(canvas, processFiles.bind(this));
     }

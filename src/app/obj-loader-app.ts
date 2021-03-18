@@ -26,9 +26,10 @@ export class ObjLoaderApp extends App {
     obj?: RenderMesh;
     renderable?: LineArray;
 
-    constructor(gl: WebGLRenderingContext, canvas: HTMLCanvasElement) {
+    constructor(gl: WebGLRenderingContext) {
         
         super(gl);
+        let canvas = gl.canvas as HTMLCanvasElement;
         this.dotRenderer = new DotRenderer3(gl, 4, [0,0,1,1], false);
         this.lineRenderer = new LineRenderer(gl, [0,0,1,0.5]);
         this.meshRenderer = new SimpleMeshRenderer(gl, [0,0,1,0.25]);

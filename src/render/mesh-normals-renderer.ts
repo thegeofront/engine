@@ -117,7 +117,8 @@ export class NormalRenderer extends Renderer {
             console.warn("TODO");
             return;
         } else {
-            console.warn("cannot render normals");
+            // console.log("no normals");
+            this.count = 0;
             return;
         }
 

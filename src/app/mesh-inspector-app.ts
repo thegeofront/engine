@@ -20,7 +20,7 @@ import { FloatMatrix } from "../data/float-matrix";
 import { Stat } from "../math/statistics";
 import { Plane } from "../geo/plane";
 import { Cube } from "../geo/cube";
-import { MeshRenderer } from "../render/mesh-renderer";
+import { MeshDebugRenderer } from "../render/mesh-debug-renderer";
 import { Matrix4 } from "../math/matrix";
 import { Circle3 } from "../geo/circle3";
 import { IntMatrix } from "../data/int-matrix";
@@ -36,7 +36,7 @@ export class MeshInspectorApp extends App {
     camera: Camera;
     dotRenderer: DotRenderer3;
     lineRenderer: LineRenderer;
-    meshRenderer: MeshRenderer;
+    meshRenderer: MeshDebugRenderer;
 
     // geo data
     plane: Plane = Plane.WorldXY();
@@ -49,11 +49,13 @@ export class MeshInspectorApp extends App {
     cellSize = 0.5;
     radius = new SliderParameter("radius", 1.0, 0, 4.0, 0.01);
     detail = new SliderParameter("detail", 5, 0, 100, 1);
+    renderNormals = new SliderParameter("render normals", 1, 0, 1, 1);
 
-    constructor(gl: WebGLRenderingContext, canvas: HTMLCanvasElement) {
+    constructor(gl: WebGLRenderingContext) {
         
         // setup render env
         super(gl);
+        let canvas = gl.canvas as HTMLCanvasElement;
 
         // TODO abstract this to scene
         this.camera = new Camera(canvas);
@@ -62,7 +64,7 @@ export class MeshInspectorApp extends App {
         this.camera.angleBeta = 0.5;
         
         this.dotRenderer = new DotRenderer3(gl, 4, [0,1,0,1]);
-        this.meshRenderer = new MeshRenderer(gl, [0,0,1,1], [0,0,0.5,1]);
+        this.meshRenderer = new MeshDebugRenderer(gl, [0,0,1,1], [0,0,0.5,1]);
         this.lineRenderer = new LineRenderer(gl);
     }
 
@@ -82,6 +84,10 @@ export class MeshInspectorApp extends App {
         ui.addSlider(this.detail, (value) => {
             this.start();
         });
+
+        ui.addBooleanSlider(this.renderNormals, (b) => {
+            this.start();
+        })
     }
 
 
@@ -95,7 +101,11 @@ export class MeshInspectorApp extends App {
             PureMesh.fromCone(new Vector3(-this.distance.get(),0,-this.radius.get()), this.radius.get(), this.radius.get() * 2, spherePerRing),
         ]);
         let dmesh = mesh.toDisplayMesh();
-        dmesh.calculateFaceNormals();
+
+
+        if (this.renderNormals.get() == 1) {
+            dmesh.calculateFaceNormals();
+        }
 
         // let mesh = Mesh.fromCube(new Cube(this.plane, Domain3.fromRadius(1)));
 

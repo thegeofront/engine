@@ -15,7 +15,7 @@ export class Core {
     ui: UI;
     fpsCounter: FpsCounter;
 
-    private apps: App[];
+    private apps: Map<string, App>;
     
     STOP = false;
     
@@ -25,21 +25,26 @@ export class Core {
         this.state = new InputState(canvas);
         this.fpsCounter = new FpsCounter();
         this.ui = new UI(uiFrame);
-        this.apps = [];
+        this.apps = new Map();
     }
 
 
     // todo: cycle through apps
     addApp(app: App) {
         
-        this.apps.push(app);
+        this.apps.set(app.name, app);
         this.activateApp(app);
+    }
+
+    removeApp(appName: string) {
+        this.ui.removeContext(appName);
+        this.apps.delete(appName);
     }
 
 
     activateApp(app: App) {
 
-        this.ui.clear();
+        this.ui.addContext(app.name);
         app.ui(this.ui);
         app.start();
     }

@@ -12,7 +12,7 @@ import { LineRenderer } from "./line-renderer";
 import { SimpleMeshRenderer } from "./simple-mesh-renderer";
 import { NormalRenderer } from "./mesh-normals-renderer";
 
-export class MeshRenderer {
+export class MeshDebugRenderer {
 
     faceRend: SimpleMeshRenderer;
     lineRend: LineRenderer;

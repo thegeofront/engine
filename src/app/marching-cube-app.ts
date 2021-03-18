@@ -29,7 +29,7 @@ import { FloatMatrix } from "../data/float-matrix";
 import { Stat } from "../math/statistics";
 import { Plane } from "../geo/plane";
 import { Cube } from "../geo/cube";
-import { MeshRenderer } from "../render/mesh-renderer";
+import { MeshDebugRenderer } from "../render/mesh-debug-renderer";
 import { Matrix4 } from "../math/matrix";
 import { Circle3 } from "../geo/circle3";
 import { IntMatrix } from "../data/int-matrix";
@@ -44,8 +44,8 @@ export class MarchingCubeApp extends App {
     whiteLineRenderer: LineRenderer;
     greyLineRenderer: LineRenderer;
     redLineRenderer: LineRenderer;
-    meshRenderer: MeshRenderer;
-    transMeshRenderer: MeshRenderer;
+    meshRenderer: MeshDebugRenderer;
+    transMeshRenderer: MeshDebugRenderer;
     camera: Camera;
 
     // geo data
@@ -71,8 +71,8 @@ export class MarchingCubeApp extends App {
         this.whiteLineRenderer = new LineRenderer(gl, [1,1,1,1]);
         this.greyLineRenderer = new LineRenderer(gl, [0.2,0,1,0.5]);
         this.redLineRenderer = new LineRenderer(gl, [0.8,0,0,1]);
-        this.meshRenderer = new MeshRenderer(gl, [0.9,0.9,0.9,1], [0.7,0.7,0.7,1]);
-        this.transMeshRenderer = new MeshRenderer(gl, [1,1,1,0.10], [1,1,1,0.10]);
+        this.meshRenderer = new MeshDebugRenderer(gl, [0.9,0.9,0.9,1], [0.7,0.7,0.7,1]);
+        this.transMeshRenderer = new MeshDebugRenderer(gl, [1,1,1,0.10], [1,1,1,0.10]);
     }
 
 
