@@ -27,6 +27,7 @@ import { IntMatrix } from "../data/int-matrix";
 import { IntCube } from "../data/int-cube";
 import { Ray } from "../math/ray";
 import { Perlin } from "../algorithms/perlin-noise";
+import { ShadedMeshRenderer } from "../render/shaded-mesh-renderer";
 
 export class GeometryApp extends App {
 
@@ -35,7 +36,7 @@ export class GeometryApp extends App {
     whiteLineRenderer: LineRenderer;
     greyLineRenderer: LineRenderer;
     redLineRenderer: LineRenderer;
-    meshRenderer: MeshDebugRenderer;
+    meshRenderer: ShadedMeshRenderer;
     transMeshRenderer: MeshDebugRenderer;
     camera: Camera;
 
@@ -62,7 +63,7 @@ export class GeometryApp extends App {
         this.whiteLineRenderer = new LineRenderer(gl, [1,1,1,1]);
         this.greyLineRenderer = new LineRenderer(gl, [0.2,0,1,0.5]);
         this.redLineRenderer = new LineRenderer(gl, [0.8,0,0,1]);
-        this.meshRenderer = new MeshDebugRenderer(gl);
+        this.meshRenderer = new ShadedMeshRenderer(gl);
         this.transMeshRenderer = new MeshDebugRenderer(gl, [1,1,1,0.10], [1,1,1,0.10]);
     }
 
@@ -142,7 +143,7 @@ export class GeometryApp extends App {
 
         // render the map
         // TODO create MeshArray
-        this.meshRenderer.render(gl, matrix);
+        this.meshRenderer.render(gl, this.camera);
 
         // render other things
         for (let geo of this.geo) {
@@ -305,16 +306,19 @@ export class GeometryApp extends App {
     // flush this.meshRenderer
     // turn this.map into this.mapGeo
     bufferMap() {
-        let mapGeo: RenderMesh[] = []
+        let mapGeo: PureMesh[] = []
         this.map.iter((entry, index) => {
             if (entry == 1) {
                 let mapCoord = this.map.getCoords(index);
                 let coord = this.mapToWorld(mapCoord);
                 let cube = this.createCube(coord);
-                mapGeo.push(PureMesh.fromCube(cube).toDisplayMesh());
+                mapGeo.push(PureMesh.fromCube(cube));
             }
         });
-        this.meshRenderer.set(this.gl, RenderMesh.fromJoin(mapGeo));
+
+        let m = PureMesh.fromJoin(mapGeo).toDisplayMesh();
+        m.calculateFaceNormals();
+        this.meshRenderer.set(this.gl, m);
     }
 
     
