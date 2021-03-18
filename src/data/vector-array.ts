@@ -152,6 +152,19 @@ export class Vector3Array extends FloatMatrix {
     }
 
 
+    take(indices: number[]) : Vector3Array {
+
+        // create a new floatarray
+        const count = indices.length
+        let array = new Vector3Array(count);
+        for (let i = 0 ; i < count; i++) {
+            let getIndex = indices[i];
+            array.setVector(i, this.getVector(getIndex));
+        }
+        return array;
+    }
+
+
     map(callbackfn: (value: Vector3, index: number) => any) : Vector3Array {
 
         let clone = this.clone();

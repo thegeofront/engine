@@ -18,7 +18,7 @@ export class MeshDebugRenderer {
     lineRend: LineRenderer;
     normRend: NormalRenderer;
 
-    constructor(gl: WebGLRenderingContext, faceColor = [1,0,0,0.25], edgeColor = [1,0,0,0.25]) {
+    constructor(gl: WebGLRenderingContext, faceColor = [1,0,0,0.25], edgeColor = [1,0,0,1]) {
         this.faceRend = new SimpleMeshRenderer(gl, faceColor);
         this.lineRend = new LineRenderer(gl, edgeColor);
         this.normRend = new NormalRenderer(gl);

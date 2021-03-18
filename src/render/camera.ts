@@ -63,7 +63,7 @@ export class Camera {
     updateMatrices(canvas: HTMLCanvasElement) {
         this.worldMatrix = this.getWorldMatrix();
         this.projectMatrix = this.getProjectionMatrix(canvas);
-        this.totalMatrix = this.worldMatrix.multiplied(this.projectMatrix)
+        this.totalMatrix = this.worldMatrix.multiplied(this.projectMatrix);
     }
 
     lookat(position: Vector3, target: Vector3) {

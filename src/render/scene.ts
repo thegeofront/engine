@@ -7,7 +7,7 @@ import { LineArray } from "../mesh/line-array";
 import { Plane } from "../geo/plane";
 import { RenderMesh } from "../mesh/render-mesh";
 import { InputState } from "../system/input-state";
-import { SliderParameter } from "../system/ui";
+import { Parameter } from "../system/ui";
 import { Camera } from "./camera";
 import { DotRenderer3 } from "./dot-renderer3";
 import { MeshDebugRenderer } from "./mesh-debug-renderer";

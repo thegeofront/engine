@@ -6,9 +6,9 @@ import { GMath } from "../math/math";
 
 export class UI {
 
-    
     readonly globalContext: HTMLDivElement;
     currentContext!: HTMLDivElement;
+
 
     constructor(frame: HTMLDivElement) {
         this.globalContext = frame;
@@ -51,9 +51,7 @@ export class UI {
     }
 
 
-    addBooleanSlider(param: SliderParameter, onInput: (v: number) => void = () => {}) {
-
-        
+    addBooleanParameter(param: Parameter, onInput: (v: number) => void = () => {}) {
         let checkbox = this.addElement("input", "checkbox-slider-control") as HTMLInputElement;    
         checkbox.type = "checkbox";
         checkbox.addEventListener('change', () => {
@@ -74,13 +72,11 @@ export class UI {
             checkbox,
         ]);
 
-
-
         return checkbox;
     }
 
 
-    addSlider(param: SliderParameter, onInput: (v: number) => void = () => {}) {
+    addParameter(param: Parameter, onInput: (v: number) => void = () => {}) {
         
         let slider = this.addRangeInput(param, onInput);
         let text1 = this.addElement("p", "slider-text");
@@ -105,7 +101,7 @@ export class UI {
     }
 
 
-    addRangeInput(param: SliderParameter, onInput: (v: number) => void = () => {}) {
+    addRangeInput(param: Parameter, onInput: (v: number) => void = () => {}) {
 
         // a slider looks like this : <input type="range" min="1" max="100" step="1" value="50">
         let slider = this.addElement("input", "slider-control") as HTMLInputElement;    
@@ -164,7 +160,7 @@ export class UI {
 }
 
 // a slider parameter
-export class SliderParameter {
+export class Parameter {
 
     name: string;
     state: number;
@@ -187,6 +183,14 @@ export class SliderParameter {
 
     set(state: number) {
         // TODO ROUND TO NEAREST STEP
-        this.state = GMath.clamp(state, this.min, this.max);
+        let clamped = GMath.clamp(state, this.min, this.max);
+        let rest = this.state - this.min;
+        let times = Math.min(rest / this.step);
+        let stepped = this.min + this.step * times;
+        this.state = GMath.clamp(state, this.min, this.max);     
+    }
+
+    getNPermutations() {
+        return Math.min((this.max - this.min) / this.step + 1);
     }
 }

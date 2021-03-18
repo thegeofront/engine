@@ -76,7 +76,6 @@ export class MarchingCubeApp extends App {
     }
 
 
-    // called after init
     start() {
 
         this.map = new IntCube(this.size, this.size, this.size);
@@ -113,6 +112,7 @@ export class MarchingCubeApp extends App {
         // this.greyLineRenderer.set(this.gl, this.gridSmall, DrawSpeed.StaticDraw);
     }
 
+
     update(state: InputState) {
         
         // move the camera with the mouse
@@ -144,15 +144,18 @@ export class MarchingCubeApp extends App {
         }
     }
 
+
     addPreviewCube(point: Vector3) {
         let cubeCenter = this.mapToWorld(point);
         let cube = this.createCube(cubeCenter);
         this.geo.push(PureMesh.fromCube(cube).toDisplayMesh());
     }
 
+
     flushPreviewCubes() {
         this.geo = [];
     }
+
 
     updateCursor(state: InputState) {
         
@@ -291,6 +294,7 @@ export class MarchingCubeApp extends App {
         return [-1, -1]
     }
 
+    
     // flush this.meshRenderer
     // turn this.map into this.mapGeo
     bufferMap() {

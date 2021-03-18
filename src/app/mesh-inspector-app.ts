@@ -28,7 +28,8 @@ import { IntCube } from "../data/int-cube";
 import { Ray } from "../math/ray";
 import { Perlin } from "../algorithms/perlin-noise";
 import { Core } from "../core";
-import { SliderParameter, UI } from "../system/ui";
+import { Parameter, UI } from "../system/ui";
+import { ShadedMeshRenderer } from "../render/shaded-mesh-renderer";
 
 export class MeshInspectorApp extends App {
 
@@ -37,6 +38,7 @@ export class MeshInspectorApp extends App {
     dotRenderer: DotRenderer3;
     lineRenderer: LineRenderer;
     meshRenderer: MeshDebugRenderer;
+    shadedMeshRenderer: ShadedMeshRenderer;
 
     // geo data
     plane: Plane = Plane.WorldXY();
@@ -44,12 +46,15 @@ export class MeshInspectorApp extends App {
     geo: RenderMesh[] = [];
 
     // logic data 
-    distance = new SliderParameter("distance", 3.0, 0, 4.0, 0.01);
     size = 10;
     cellSize = 0.5;
-    radius = new SliderParameter("radius", 1.0, 0, 4.0, 0.01);
-    detail = new SliderParameter("detail", 5, 0, 100, 1);
-    renderNormals = new SliderParameter("render normals", 1, 0, 1, 1);
+
+    distance = new Parameter("distance", 3.0, 0, 4.0, 0.01);
+    radius = new Parameter("radius", 1.0, 0, 4.0, 0.01);
+    detail = new Parameter("detail", 5, 0, 100, 1);
+
+    renderNormals = new Parameter("render normals", 1, 0, 1, 1); // boolean Param
+    shademethod = 1 // enum Param
 
     constructor(gl: WebGLRenderingContext) {
         
@@ -64,8 +69,9 @@ export class MeshInspectorApp extends App {
         this.camera.angleBeta = 0.5;
         
         this.dotRenderer = new DotRenderer3(gl, 4, [0,1,0,1]);
-        this.meshRenderer = new MeshDebugRenderer(gl, [0,0,1,1], [0,0,0.5,1]);
-        this.lineRenderer = new LineRenderer(gl);
+        this.meshRenderer = new MeshDebugRenderer(gl, [0.6,0,0,1], [1,0,0,1]);
+        this.lineRenderer = new LineRenderer(gl, [0.3,0.3,0.3,1]);
+        this.shadedMeshRenderer = new ShadedMeshRenderer(gl);
     }
 
 
@@ -73,27 +79,33 @@ export class MeshInspectorApp extends App {
 
         // TODO : think of a system that ties parameter & slider together fully
         
-        ui.addSlider(this.radius, (value) => {
+        ui.addParameter(this.radius, (value) => {
             this.start();
         });
 
-        ui.addSlider(this.distance, (value) => {
+        ui.addParameter(this.distance, (value) => {
             this.start();
         });
 
-        ui.addSlider(this.detail, (value) => {
+        ui.addParameter(this.detail, (value) => {
             this.start();
         });
 
-        ui.addBooleanSlider(this.renderNormals, (b) => {
+        ui.addBooleanParameter(this.renderNormals, (b) => {
             this.start();
         })
+
+        // render methods
+        ui.addEnum(["debug", "shaded"], [0,1], (val) => {
+            this.shademethod = val;
+            this.start();
+        });
     }
 
 
     start() {
         
-        let grid = LineArray.fromGrid(this.plane, this.size, this.cellSize);
+        let grid = LineArray.fromGrid(this.plane.clone().moveTo(new Vector3(0,0, -this.radius.get())), 100, 2);
         let spherePerRing = this.detail.get() * 2;
         let mesh = PureMesh.fromJoin([
             PureMesh.fromSphere(new Vector3(this.distance.get(),0,0), this.radius.get(), this.detail.get(), spherePerRing),
@@ -102,10 +114,11 @@ export class MeshInspectorApp extends App {
         ]);
         let dmesh = mesh.toDisplayMesh();
 
-
         if (this.renderNormals.get() == 1) {
-            dmesh.calculateFaceNormals();
+            dmesh.calculateVertexNormals();
         }
+
+        console.log(new Parameter("shadeMethod",0,0,2,0.5).getNPermutations())
 
         // let mesh = Mesh.fromCube(new Cube(this.plane, Domain3.fromRadius(1)));
 
@@ -113,8 +126,13 @@ export class MeshInspectorApp extends App {
         // console.log(mesh.links);
 
         // TODO abstract this to scene 
-        this.meshRenderer.set(this.gl, dmesh);
-        // this.lineRenderer.set(this.gl, grid);
+        if (this.shademethod == 0) {
+            this.meshRenderer.set(this.gl, dmesh);
+        } else {
+            this.shadedMeshRenderer.set(this.gl, dmesh);
+        }
+        
+        this.lineRenderer.set(this.gl, grid);
         // this.dotRenderer.set(mesh.verts, DrawSpeed.StaticDraw);
     }
 
@@ -130,9 +148,15 @@ export class MeshInspectorApp extends App {
     draw(gl: WebGLRenderingContext) {
         // TODO abstract this to 'scene'
         let matrix = this.camera.totalMatrix;
-
         this.dotRenderer.render(gl, matrix);
-        this.meshRenderer.render(gl, matrix);
-        // this.lineRenderer.render(gl, matrix);
+
+
+        if (this.shademethod == 0) {
+            this.meshRenderer.render(gl, matrix);
+        } else if (this.shademethod == 1) {
+            this.shadedMeshRenderer.render(gl, this.camera);
+        }
+        
+        this.lineRenderer.render(gl, matrix);
     }
 }

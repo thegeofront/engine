@@ -158,8 +158,8 @@ export class PureMesh {
         for (let i = 0; i < numPerRing; i++) {
             setFace(i, [
                 0,
-                (i+1) % numPerRing + 1,
                 i+1,
+                (i+1) % numPerRing + 1,
             ]);
         }
 
@@ -182,8 +182,8 @@ export class PureMesh {
                 let iFace = numPerRing + (numPerRing * ring * 2) + perRing * 2
                 
                 // console.log(iFace);
-                setFace(iFace, [a,b,c]);
-                setFace(iFace+1, [c,b,d]);
+                setFace(iFace, [a,c,b]);
+                setFace(iFace+1, [c,d,b]);
             }
         }
 
@@ -204,8 +204,8 @@ export class PureMesh {
 
             setFace(iFace,[
                 last,
-                vertI,
                 vertINext,
+                vertI,
             ]);
         }
 
@@ -245,8 +245,8 @@ export class PureMesh {
             let c = 1 + i;
             let d = 1 + ((i+1) % numPerRing)
             
-            setFace(i*2, [a,c,d]);
-            setFace(i*2+1, [c,b,d]);
+            setFace(i*2, [a,d,c]);
+            setFace(i*2+1, [c,d,b]);
         }
 
 
@@ -283,7 +283,7 @@ const cubeFaces = [
 
 function quadToTri(abcd: number[]) : number[] {
     return [
-        abcd[0], abcd[1], abcd[2], 
-        abcd[0], abcd[2], abcd[3]
+        abcd[0], abcd[2], abcd[1], 
+        abcd[0], abcd[3], abcd[2]
     ]
 }

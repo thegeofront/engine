@@ -203,8 +203,7 @@ export class RenderMesh {
         this.verts.forEach((v, i) => {
             
             let adjFaces = this.getAdjacentFaces(i);
-            let adjNormals = this.norms.takeRows(adjFaces) as Vector3Array;
-            vertNormals.setVector(i, adjNormals.average());
+            vertNormals.setVector(i, this.norms.take(adjFaces).average());
         })
         
         this.norms = vertNormals;
