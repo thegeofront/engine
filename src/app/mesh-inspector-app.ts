@@ -53,8 +53,8 @@ export class MeshInspectorApp extends App {
     radius = new Parameter("radius", 1.0, 0, 4.0, 0.01);
     detail = new Parameter("detail", 5, 0, 100, 1);
 
-    renderNormals = new Parameter("render normals", 1, 0, 1, 1); // boolean Param
-    shademethod = 1 // enum Param
+    renderNormals = new Parameter("render normals", 1, 0, 1, 0); // boolean Param
+    shademethod = 0 // TODO enum Param
 
     constructor(gl: WebGLRenderingContext) {
         
@@ -115,7 +115,7 @@ export class MeshInspectorApp extends App {
         let dmesh = mesh.toDisplayMesh();
 
         if (this.renderNormals.get() == 1) {
-            dmesh.calculateVertexNormals();
+            dmesh.calculateFaceNormals();
         }
 
         console.log(new Parameter("shadeMethod",0,0,2,0.5).getNPermutations())

@@ -5,8 +5,10 @@
 // todo: 	BIJ NADER INZIEN: dont go the copy route. rewrite this in a more functional way creating new classes is expensive, but we really need immutable vectors. 
 // 			these types of consistent vectors are only useful in niche cases, and complitate a lot of common cases. 
 
+import { copyRegisteredKernels } from "@tensorflow/tfjs-core";
 import { Const } from "./const";
 import { Matrix4 } from "./matrix";
+import { Util } from "./util";
 
 
 export class Vector3
@@ -21,6 +23,25 @@ export class Vector3
         this.y = y;
         this.z = z;
     }
+
+
+	static calculateWheelOrder(vectors: Vector3[], ihat: Vector3, jhat: Vector3) : number[] {
+
+		let angles: number[] = []
+		vectors.forEach((v) => {
+			angles.push(new Vector2(
+				v.dot(ihat),
+				v.dot(jhat)
+			).angle())
+		})
+		console.log(angles);
+
+		let ids: number[] = Util.range(vectors.length);
+		ids.sort((a, b) => {
+			return angles[a] - angles[b]
+		})
+		return ids;
+	}
 
 
 	static fromLerp( v1:Vector3, v2:Vector3, alpha:number ) : Vector3 
@@ -112,6 +133,11 @@ export class Vector3
 
 	// #endregion
 	// #region basics
+
+
+	toArray() {
+		return new Float32Array([this.x,this.y,this.z]);
+	}
 
 
 	set(x:number, y:number, z:number) : Vector3
@@ -377,6 +403,15 @@ export class Vector3
 		);
 	}
 
+
+	angle(other: Vector3, normal: Vector3) {
+		let thisProjected = this.subbed(normal.scaled(this.dot(normal)));
+		let otherProjected = other.subbed(normal.scaled(other.dot(normal)))
+
+		console.log(thisProjected);
+		console.log(otherProjected);
+		return 0;
+	}
 
 	dot(v:Vector3) : number {
 		return this.x * v.x + this.y * v.y + this.z * v.z;

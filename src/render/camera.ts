@@ -132,7 +132,7 @@ export class Camera {
         return this.worldMatrix.inverse().multiplyVector(new Vector3(0,0,0));
     }
 
-    getMouseWorldRay(canvasWidth: number, canvasHeight: number) : Ray {
+    getMouseWorldRay(canvasWidth: number, canvasHeight: number, useMouse = true) : Ray {
         
         // get a ray from origin through mousepos 
 
@@ -166,10 +166,14 @@ export class Camera {
         let jhat = jDestiny.sub(origin).normalize();
         let khat = kDestiny.sub(origin).normalize();
 
-        let screenPoint = origin
-            .added(khat.scaled(f))
-            .add(ihat.scaled(mouseUnitX))
-            .add(jhat.scaled(-mouseUnitY));
+        // pardon this insanely ugly statement
+        let screenPoint = useMouse ? 
+            origin
+                .added(khat.scaled(f))
+                .add(ihat.scaled(mouseUnitX))
+                .add(jhat.scaled(-mouseUnitY)) : 
+            origin
+                .added(khat.scaled(f));
           
         return Ray.fromPoints(origin, screenPoint);
     }

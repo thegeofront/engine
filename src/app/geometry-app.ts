@@ -28,6 +28,7 @@ import { IntCube } from "../data/int-cube";
 import { Ray } from "../math/ray";
 import { Perlin } from "../algorithms/perlin-noise";
 import { ShadedMeshRenderer } from "../render/shaded-mesh-renderer";
+import { Parameter, UI } from "../system/ui";
 
 export class GeometryApp extends App {
 
@@ -53,6 +54,8 @@ export class GeometryApp extends App {
     size = 50;
     cellSize = 1;
     map!: IntCube;
+
+    pov = new Parameter("pov", 80, 10, 100, 1);
 
     constructor(gl: WebGLRenderingContext) {
         
@@ -118,6 +121,10 @@ export class GeometryApp extends App {
 
         // this.whiteLineRenderer.set(this.gl, this.gridLarge, DrawSpeed.StaticDraw);
         // this.greyLineRenderer.set(this.gl, this.gridSmall, DrawSpeed.StaticDraw);
+    }
+
+    ui(ui: UI) {
+        ui.addParameter(this.pov);
     }
 
     update(state: InputState) {

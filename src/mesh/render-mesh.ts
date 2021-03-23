@@ -14,6 +14,7 @@ import { Vector2Array, Vector3Array } from "../data/vector-array";
 import { Vector2, Vector3 } from "../math/vector";
 import { Cube } from "../geo/cube";
 import { Rectangle3 } from "../geo/rectangle";
+import { getTextureShapeFromLogicalShape } from "@tensorflow/tfjs-backend-webgl/dist/webgl_util";
 
 type vertexID = number;
 type faceID = number;
@@ -39,12 +40,17 @@ export class RenderMesh {
     norms: Vector3Array; 
     uvs:   Vector2Array;
     links: IntMatrix; 
+
+    ambi: Float32Array;
     texture?: ImageData;
+
+    _normKind: NormalKind = NormalKind.None;
 
     constructor(vertCount: number, normCount: number, uvCount: number, faceCount: number, texture: ImageData | undefined = undefined) {
         this.verts = new Vector3Array(vertCount);
         this.norms = new Vector3Array(normCount);
         this.uvs = new Vector2Array(uvCount);
+        this.ambi = new Float32Array(vertCount);
         this.links = new IntMatrix(faceCount, 3);
         this.links?.fill(-1);
         this.texture = texture;
@@ -60,6 +66,7 @@ export class RenderMesh {
         mesh.norms!.fillWith(norms);
         mesh.uvs!.fillWith(uvs);
         mesh.links!.fillWith(faces);
+        
         return mesh;
     }
 
@@ -124,7 +131,6 @@ export class RenderMesh {
 
 
     getKind() : RenderMeshKind {
-
         if (this.links._width == RenderMeshKind.Points) {
             return RenderMeshKind.Points;
         } else if (this.links._width == RenderMeshKind.Lines) {
@@ -138,18 +144,9 @@ export class RenderMesh {
         }
     }
 
-    getNormalType() : NormalKind {
+    getNormalType() : NormalKind {       
         
-        let count = this.norms.count();
-        if (count == this.verts.count()) {
-            return NormalKind.Vertex;
-        } else if (count == this.links.count()) {
-            return NormalKind.Face;
-        } else if (count == this.links.data.length) {
-            return NormalKind.MultiVertex;
-        } else {
-            return NormalKind.None;
-        }
+        return this._normKind;
     }
 
     // setters 
@@ -175,31 +172,42 @@ export class RenderMesh {
         throw "todo";
     }
 
-    // normals
-    calculateFaceNormals() {
+    // ------ normals ------
 
-        // calculate a normal per face
+
+    // set 1 normal per face 
+    calculateFaceNormals() {
+        
         if (this.getKind() != RenderMeshKind.Triangles) {
             console.error("can only calculate normals from triangular meshes");
             this.norms = new Vector3Array(0);
             return;
         }
 
+        this._normKind = NormalKind.Face;
+
         let faceCount = this.links.count();
         this.norms = new Vector3Array(faceCount);
         for (let f = 0 ; f < faceCount; f++) {
 
             let verts = this.getFaceVertices(f).toList();
-            let normal = verts[2].subbed(verts[0]).cross(verts[1].subbed(verts[0])).normalize();
+            let normal = verts[1].subbed(verts[0]).cross(verts[2].subbed(verts[0])).normalize();
             this.norms.setVector(f, normal);
         }
     }
 
-
     calculateVertexNormals() {
+        this._normKind = NormalKind.Vertex;
+    }
+
+    calculateMultiVertexNormals() {
+
+        // set type 
+        this._normKind = NormalKind.MultiVertex;
+
+        // calculate 
         this.calculateFaceNormals();
         let vertNormals = new Vector3Array(this.verts.count());
-
         this.verts.forEach((v, i) => {
             
             let adjFaces = this.getAdjacentFaces(i);
