@@ -13,6 +13,7 @@ import { Rectangle3 } from "../geo/rectangle";
 import { RenderMesh } from "./render-mesh";
 import { Plane } from "../geo/plane";
 import { Matrix4 } from "../math/matrix";
+import { setDeprecationWarningFn } from "@tensorflow/tfjs-core/dist/tensor";
 
 
 // TODO make distinctions between
@@ -218,24 +219,20 @@ export class PureMesh {
 
         let normal = to.subbed(from);
 
-        let numVerts = numPerRing * 2;
-        let numFaces = numVerts * 4;
+        let numVerts = numPerRing * 2 + 2;
+        let numFaces = (numVerts - 2) * 4;
         let verts = new Vector3Array(numVerts);
 
         // some dumb stuff 
         let setVert = function(i: number, vector: Vector3) {
-            verts.setVector(i, vector.add(from));
-        }
-        let links = new IntMatrix(numFaces, 3);
-        links.fill(-1);
-        let setFace = function(i: number, row: number[]) {
-            links.setRow(i, row);
+            verts.setVector(i, vector);
         }
 
-        // set verts at bottom
-        let plane = new Plane(Matrix4.newIdentity());
-        plane.moveTo(from);
+        // planes to represent top & bottom
+        let planeFrom = Plane.fromPN(from, normal);
+        let planeTo = Plane.fromPN(to, normal);
 
+        // verts 'from ring
         setVert(0, from); 
         for (let i = 0; i < numPerRing; i++) {
             
@@ -244,9 +241,47 @@ export class PureMesh {
                 Math.sin(Math.PI * 2 * i / numPerRing),
             0).scale(radius);
 
-            v = plane.matrix.multiplyVector(v);
-            
+            v = planeFrom.matrix.multiplyVector(v);
             setVert(i+1, v)
+        }
+
+        // verts 'to' ring
+        let numVertsHalf = numVerts / 2;
+        for (let i = 0; i < numPerRing; i++) {
+            
+            let v = new Vector3(
+                Math.cos(Math.PI * 2 * i / numPerRing),
+                Math.sin(Math.PI * 2 * i / numPerRing),
+            0).scale(radius);
+
+            v = planeTo.matrix.multiplyVector(v);
+            setVert(numVertsHalf+i, v)
+        }
+        setVert(numVerts-1, to); 
+
+        // start making links
+        let links = new IntMatrix(numFaces, 3);
+        links.fill(-1);
+        let setFace = function(i: number, row: number[]) {
+            links.setRow(i, row);
+        }
+
+        // set faces 
+        for (let i = 0; i < numPerRing; i++) {
+    
+            let a = 0;
+            let b = 1 + i;
+            let c = 1 + ((i+1) % numPerRing)
+
+            let d = numVerts-1;
+            let e = numVertsHalf + i;
+            let f = numVertsHalf + ((i+1) % numPerRing);
+            
+            setFace(i*4, [a,c,b]);
+            setFace(i*4+1, [b,c,e]);
+            setFace(i*4+2, [c,f,e]);
+            setFace(i*4+3, [d,e,f]);
+
         }
 
         return new PureMesh(verts, links);

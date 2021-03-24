@@ -15,6 +15,7 @@ import { Vector2, Vector3 } from "../math/vector";
 import { Cube } from "../geo/cube";
 import { Rectangle3 } from "../geo/rectangle";
 import { getTextureShapeFromLogicalShape } from "@tensorflow/tfjs-backend-webgl/dist/webgl_util";
+import { Matrix4 } from "../math/matrix";
 
 type vertexID = number;
 type faceID = number;
@@ -105,6 +106,16 @@ export class RenderMesh {
         return joined;
     }
 
+    // geometry trait
+
+    transform(matrix: Matrix4) {
+
+        for (let i = 0 ; i < this.verts.count(); i++) {
+
+            let v = this.verts.getVector(i);
+            this.verts.setVector(i, matrix.multiplyVector(v));
+        }
+    }
 
     // getters & selectors 
 

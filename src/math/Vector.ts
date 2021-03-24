@@ -34,7 +34,7 @@ export class Vector3
 				v.dot(jhat)
 			).angle())
 		})
-		console.log(angles);
+		//console.log(angles);
 
 		let ids: number[] = Util.range(vectors.length);
 		ids.sort((a, b) => {

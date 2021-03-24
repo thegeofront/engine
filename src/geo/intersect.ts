@@ -3,15 +3,7 @@ import { Vector3Array } from "../data/vector-array"
 import { Const } from "../math/const"
 import { Vector3 } from "../math/vector"
 
-/**
- * return true if a is rougly the same value as b. 
- * uses the predefined tolerance
- */
-function IsRoughly(a: number, b: number) : boolean {
-    if (((a - b) < Const.TOLERANCE || (b - a) < Const.TOLERANCE))
-        return true;
-    return false;
-}
+
 
 /**
  * @returns -1 if no intersection, 0 of parallel or touching, 1 if intersection;

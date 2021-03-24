@@ -107,10 +107,20 @@ export class MeshInspectorApp extends App {
         
         let grid = LineArray.fromGrid(this.plane.clone().moveTo(new Vector3(0,0, -this.radius.get())), 100, 2);
         let spherePerRing = this.detail.get() * 2;
+
+        let rad = this.radius.get();
+        let dis = this.distance.get();
+        let det = this.detail.get();
+
         let mesh = PureMesh.fromJoin([
-            PureMesh.fromSphere(new Vector3(this.distance.get(),0,0), this.radius.get(), this.detail.get(), spherePerRing),
-            PureMesh.fromCube(new Cube(this.plane, Domain3.fromRadius(this.radius.get()))),
-            PureMesh.fromCone(new Vector3(-this.distance.get(),0,-this.radius.get()), this.radius.get(), this.radius.get() * 2, spherePerRing),
+            PureMesh.fromSphere(new Vector3(dis,0,0), this.radius.get(), this.detail.get(), spherePerRing),
+            // PureMesh.fromCube(new Cube(this.plane, Domain3.fromRadius(this.radius.get()))),
+            PureMesh.fromCone(new Vector3(-dis, 0, -this.radius.get()), this.radius.get(), this.radius.get() * 2, spherePerRing),
+            PureMesh.fromCylinder(
+                new Vector3(0, 0, -rad), 
+                new Vector3(0, 0,  rad),
+                rad,
+                det),
         ]);
         let dmesh = mesh.toDisplayMesh();
 

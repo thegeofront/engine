@@ -5,6 +5,7 @@
 
 import { Vector3Array } from "../data/vector-array";
 import { Const } from "../math/const";
+import { GMath } from "../math/math";
 import { Matrix4 } from "../math/matrix";
 import { Stat } from "../math/statistics";
 import { Vector2, Vector3 } from "../math/vector";
@@ -17,6 +18,20 @@ export class Plane {
     // NOTE : d is not really needed anymore...
     constructor(m: Matrix4) {
         this._matrix = m;
+    }
+
+    static fromPN(center: Vector3, normal: Vector3) {
+        
+        let cross = normal.cross(Vector3.unitX());
+        if (GMath.isRoughly(cross.length(), 0)) {
+            console.log("lalalala")
+            cross = normal.cross(Vector3.unitY());
+        }
+        let ihat = cross.normalize();
+        let jhat = normal.cross(ihat).normalize();
+
+        let mat = Plane.planeMatrixFromVecs(center, ihat, jhat, normal);
+        return new Plane(mat);
     }
 
     static fromPVV(a: Vector3, v1: Vector3, v2: Vector3) {
@@ -95,6 +110,14 @@ export class Plane {
     public set matrix(m: Matrix4) { this._matrix = m;}
 
     public get inverse() {return this._matrix.inverse()}
+
+    setPosition(vec: Vector3) {
+        this.center = vec;
+    }
+
+    setNormal(vec: Vector3) {
+        this.khat = vec;
+    }
 
     clone() {
         return new Plane(this._matrix.clone());

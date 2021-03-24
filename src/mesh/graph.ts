@@ -3,6 +3,7 @@
 // purpose: HalfEdge Mesh in 3D. 
 // This does mean that the order around a vertex is not staight forward, and must be handled manually. 
 
+import { Matrix4 } from "../math/matrix";
 import { Vector3 } from "../math/vector";
 
 type EdgeIndex = number;
@@ -30,6 +31,17 @@ export class Graph {
     constructor() {
         this._verts = [];
         this._edges = [];
+    }
+
+    // geometry trait 
+
+    transform(matrix: Matrix4) {
+
+        for (let i = 0 ; i < this._verts.length; i++) {
+
+            let v = this._verts[i];
+            v.data = matrix.multiplyVector(v.data);
+        }
     }
 
     // util
@@ -62,9 +74,14 @@ export class Graph {
 
     getEdgeRenderData() : Vector3[] {
         let data: Vector3[] = [];
-        this._edges.forEach((e) => {
+        let edges = new Map<number, number>()
+        this._edges.forEach((e, i) => {
+            if (edges.has(i)) {
+                return;
+            }
             data.push(this.getVert(e.vert).data);
             data.push(this.getVert(this.getEdge(e.twin).vert).data)
+            edges.set(e.twin, e.twin);
         })
         return data;
     }
@@ -198,9 +215,8 @@ export class Graph {
             return;
         } else {
             
-            console.log("Doing complitated things around vertex", vi);
-
             // determine where this edge joins the Disk
+            // console.log("Doing complitated things around vertex", vi);
 
             // get all vectors
             let vectors: Vector3[] = [];
@@ -210,7 +226,7 @@ export class Graph {
        
             // get more vectors by getting all edges currently connected to vertex v
             let edges = this.getVertEdgeFan(vi);
-            console.log("edges", edges);
+            //console.log("edges", edges);
 
             edges.forEach((edge) => {
                 let twin = this.getEdge(edge.twin);
@@ -218,33 +234,23 @@ export class Graph {
                 let neighborVector = v.data.subbed(neighbor.data);
                 vectors.push(neighborVector);
             });
-            console.log("all vectors: ", vectors);
+            //console.log("all vectors: ", vectors);
 
             // order them by 'wheel'		
             let ihat = myVector;
             let jhat = myVector.cross(normal);
             let order = Vector3.calculateWheelOrder(vectors, ihat, jhat);
-            console.log("order", order);
+            //console.log("order", order);
 
             // pick. NOTE: IF CCW / CC OF GRAPH NEEDS TO BE CHANGED, CHANGE THIS ORDER 
             let e_after = edges[order[order.length-1]];
             let e_before = edges[order[0]];
             
-            console.log("ei_before", this.getEdgeIndex(e_before), "ei_after", this.getEdgeIndex(e_after));
+            //console.log("ei_before", this.getEdgeIndex(e_before), "ei_after", this.getEdgeIndex(e_after));
             
             // set 2 pointers: 
             this.getEdge(e_before.twin).next = ei;
             twin.next = this.getEdgeIndex(e_after); 
-
-            // 
-            
-            // console.log(vi_nbs);
-
-            
-            
-            
-
-            // set four pointers: 
         }
     }
 }
