@@ -21,23 +21,16 @@ interface Edge {
     vert: VertIndex,
 }
 
-
-type Face = EdgeIndex;
-
-
 // NOTE: create an interface which hides the Edge, Vert & Face interfaces. 
 // NOTE: half edge is implied
 export class Graph {
 
     private _verts: Vert[];
     private _edges: Edge[]; // NOTE: ALWAYS AN EVEN NUMBER OF EDGES. EDGE TWIN IS EVEN / UNEVEN MATCH
-    private _faces: Face[]; 
-
 
     constructor() {
         this._verts = [];
         this._edges = [];
-        this._faces = [];
     }
 
 
@@ -114,8 +107,31 @@ export class Graph {
     }
 
 
-    allFaces() : VertIndex[][] {
-        throw "nope";
+    allLoops() : VertIndex[][] {
+
+        let loops: VertIndex[][] = [];
+        let unvisited = new Set<number>()
+        this._edges.forEach((e, i) => {
+            unvisited.add(i);
+        })
+
+        while(unvisited.size > 0) {
+            let loop: VertIndex[] = [];
+            
+            let ei = unvisited.entries().next().value[0];
+            let start = ei;
+            do {
+                let e = this.getEdge(ei);
+                ei = e.next;
+                unvisited.delete(ei);
+                loop.push(e.vert);
+
+            } while(ei != start);
+
+            loops.push(loop);
+        }
+
+        return loops;
     }
 
 
@@ -203,9 +219,9 @@ export class Graph {
     }
 
 
-    // setters
+    // public  setters
 
-
+    
     addVert(vector: Vector3) {
         this._verts.push({data: vector, edge: -1});
     }
@@ -238,32 +254,31 @@ export class Graph {
     }
 
 
+    // private setters
+
+
     private addEdgeToDisk(vi: VertIndex, ei: EdgeIndex, normal: Vector3) {
         
         let v = this.getVert(vi)!;
         let twin = this.getEdgeTwin(ei)
         if (v.edge == -1) {
             // set two pointers:
-
-            // I am the vertex's first edge
-            v.edge = ei;
-
-            // that means my twin points back to me 
-            twin.next = ei;
-            return;
+            v.edge = ei; // I am the vertex's first edge
+            twin.next = ei; // that means my twin points back to me 
         } else {
             
-            // determine where this edge joins the Disk
             // console.log("Doing complitated things around vertex", vi);
+
+            // determine where this edge joins the Disk
+            let v_twin = this._verts[twin.vert];
+            let myVector = v.data.subbed(v_twin.data);
 
             // get all vectors
             let vectors: Vector3[] = [];
-
-            let v_twin = this._verts[twin.vert];
-            let myVector = v.data.subbed(v_twin.data);
        
             // get more vectors by getting all edges currently connected to vertex v
             let edges = this.getVertEdgeFan(vi);
+            
             //console.log("edges", edges);
 
             edges.forEach((edge) => {
@@ -272,21 +287,23 @@ export class Graph {
                 let neighborVector = v.data.subbed(neighbor.data);
                 vectors.push(neighborVector);
             });
+            
             //console.log("all vectors: ", vectors);
 
             // order them by 'wheel'		
             let ihat = myVector;
             let jhat = myVector.cross(normal);
             let order = Vector3.calculateWheelOrder(vectors, ihat, jhat);
+            
             //console.log("order", order);
 
             // pick. NOTE: IF CCW / CC OF GRAPH NEEDS TO BE CHANGED, CHANGE THIS ORDER 
-            let e_after = edges[order[order.length-1]];
-            let e_before = edges[order[0]];
+            let e_before = edges[order[order.length-1]];
+            let e_after = edges[order[0]];
             
             //console.log("ei_before", this.getEdgeIndex(e_before), "ei_after", this.getEdgeIndex(e_after));
-            
-            // set 2 pointers: 
+ 
+            // set two pointers: 
             this.getEdge(e_before.twin).next = ei;
             twin.next = this.getEdgeIndex(e_after); 
         }

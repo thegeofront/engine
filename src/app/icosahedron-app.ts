@@ -21,8 +21,9 @@ export class IcosahedronApp extends App {
     meshRend: ShadedMeshRenderer;
     
     rotate!: Parameter;
-    radius!: Parameter;
-    detail!: Parameter;
+    inner!: Parameter;
+    radius = 0.1; // radius!: Parameter;
+    detail = 12; // detail!: Parameter;
 
     graph!: Graph;
     mesh!: RenderMesh;
@@ -108,25 +109,30 @@ export class IcosahedronApp extends App {
     ui(ui: UI) {
 
         this.rotate = new Parameter("rotate", 1, 0, 1, 1)
-        this.radius = new Parameter("radius", 0.1, 0, 0.5, 0.01)
-        this.detail = new Parameter("detail", 6, 3, 20, 1)
+        this.inner = new Parameter("inner", 1, 0, 1, 1)
+        
+        // this.radius = new Parameter("radius", 0.1, 0, 0.5, 0.01)
+        // this.detail = new Parameter("detail", 6, 3, 20, 1)
   
         let reset = () => {
-            this.rotate.set(0);
+            // this.rotate.set(0);
             this.start();
         }
 
         ui.addBooleanParameter(this.rotate);
-        ui.addParameter(this.radius, reset);
-        ui.addParameter(this.detail, reset);
+        ui.addBooleanParameter(this.inner, reset);
+        // ui.addParameter(this.radius, reset);
+        // ui.addParameter(this.detail, reset);
         // ui.addButton(() => {this.start()})
     }
         
     start() {
         this.graph = this.getIcosahedron();
         // this.graph.print();
-        this.mesh = graphToMesh(this.graph, this.radius.get(), this.detail.get());
+        this.mesh = graphToMultiMesh(this.graph, this.radius, this.detail, this.inner.get() == 1);
         this.meshRend.set(this.gl, this.mesh);
+
+        // console.log("all loops: ", this.graph.allLoops());
     }
 
     update(state: InputState) {
@@ -148,7 +154,7 @@ export class IcosahedronApp extends App {
     }
 }
 
-function graphToMesh(graph: Graph, radius: number, detail: number) : RenderMesh {
+function graphToMultiMesh(graph: Graph, radius: number, detail: number, inner: boolean) : RenderMesh {
         
     let meshes: PureMesh[] = [];
 
@@ -164,6 +170,10 @@ function graphToMesh(graph: Graph, radius: number, detail: number) : RenderMesh 
         meshes.push(mesh);
     }
 
+    if (inner) {
+        meshes.push(PureMesh.fromGraph(graph));
+    }
+    
     let rmesh = PureMesh.fromJoin(meshes).toDisplayMesh();
     rmesh.calculateFaceNormals();
     return rmesh;

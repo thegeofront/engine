@@ -14,8 +14,9 @@ import { RenderMesh } from "./render-mesh";
 import { Plane } from "../geo/plane";
 import { Matrix4 } from "../math/matrix";
 import { setDeprecationWarningFn } from "@tensorflow/tfjs-core/dist/tensor";
-import { cosineWindow } from "@tensorflow/tfjs-core";
+import { cosineWindow, linspace } from "@tensorflow/tfjs-core";
 import { Graph } from "./graph";
+import { version_converter } from "@tensorflow/tfjs-converter";
 
 
 // TODO make distinctions between
@@ -32,6 +33,11 @@ export class PureMesh {
     constructor(verts: Vector3Array, links: IntMatrix) {
         this.verts = verts;
         this.links = links;
+    }
+
+
+    static new(verts: Vector3Array, links: IntMatrix) : PureMesh {
+        return new PureMesh(verts, links);
     }
 
 
@@ -385,7 +391,20 @@ export class PureMesh {
 
 
     static fromGraph(graph: Graph) : PureMesh {
-        throw "TODO";
+        
+        let verts = Vector3Array.fromList(graph.allVerts());
+        let loops = graph.allLoops();
+
+        let links = new IntMatrix(loops.length, 3);
+        loops.forEach((loop, i) => {
+            
+            if (loop.length == 3) {
+                links.setRow(i, loop);
+            } else {
+                // console.log("cant convert loop");
+            }
+        })
+        return PureMesh.new(verts, links);
     }
 
     // TODO fix this later
