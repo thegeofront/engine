@@ -66,6 +66,12 @@ export class UI {
 
         let text1 = this.addElement("p", "slider-text");
         text1.innerText = param.name;
+        
+        
+        // TODO update beyond our control
+        param.onset = () => {
+            // console.log("TODO");
+        }
 
         this.addDiv("slider", [
             text1,
@@ -90,6 +96,11 @@ export class UI {
             text2,
             slider,
         ]);
+
+        // on update beyond our control
+        param.onset = () => {
+            // console.log("TODO");
+        }
 
         slider.oninput = () => {
             param.set(slider.valueAsNumber);
@@ -167,6 +178,8 @@ export class Parameter {
     min: number;
     max: number;
     step: number
+    onset?: Function;
+
 
     constructor(name: string, state: number, min =- Infinity, max = Infinity, step=0.1) {
         this.name = name;
@@ -187,7 +200,9 @@ export class Parameter {
         let rest = this.state - this.min;
         let times = Math.min(rest / this.step);
         let stepped = this.min + this.step * times;
-        this.state = GMath.clamp(state, this.min, this.max);     
+        this.state = GMath.clamp(state, this.min, this.max);  
+        if (this.onset) 
+            this.onset(this.state);   
     }
 
     getNPermutations() {

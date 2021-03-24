@@ -26,7 +26,7 @@ export class SwapApp extends App {
         let ids: number[] = [];
         let count = this.possibleApps.length;
         for (let i = 0 ; i < count; i++) {
-            names.push(this.possibleApps[i].name);
+            names.push(this.possibleApps[i].name.replace("App", ""));
             ids.push(i);
         }
 

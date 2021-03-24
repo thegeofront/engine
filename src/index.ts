@@ -16,7 +16,7 @@ import { GeometryApp } from "./app/geometry-app";
 import { MarchingCubeApp } from "./app/marching-cube-app";
 import { MeshInspectorApp } from "./app/mesh-inspector-app";
 import { SwapApp } from "./app/swap-app";
-import { GraphApp } from "./app/graph-app";
+import { IcosahedronApp } from "./app/icosahedron-app";
 
 var core: Core;
 
@@ -36,7 +36,7 @@ function main() {
 
     // init swap app
     let appCollection = [
-        GraphApp,
+        IcosahedronApp,
         MeshInspectorApp,
         GeometryApp,
         EyeFinderApp,

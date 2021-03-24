@@ -9,17 +9,20 @@ import { Graph } from "../mesh/graph";
 import { PureMesh } from "../mesh/pure-mesh";
 import { RenderMesh } from "../mesh/render-mesh";
 import { Camera } from "../render/camera";
+import { DrawSpeed } from "../render/renderer";
 import { ShadedMeshRenderer } from "../render/shaded-mesh-renderer";
 import { InputState } from "../system/input-state";
 import { Parameter, UI } from "../system/ui";
 import { App } from "./app";
 
-export class GraphApp extends App {
+export class IcosahedronApp extends App {
 
     camera: Camera;
     meshRend: ShadedMeshRenderer;
     
     rotate!: Parameter;
+    radius!: Parameter;
+    detail!: Parameter;
 
     graph!: Graph;
     mesh!: RenderMesh;
@@ -35,10 +38,12 @@ export class GraphApp extends App {
     getIcosahedron() : Graph {
         let graph = new Graph();
 
+        // use golden ratio
         let a = 1;
         let phi = (1 + 5**0.5) / 2
         let b = a * phi;
 
+        // build vertices
         graph.addVert(new Vector3(-a,-b, 0)); 
         graph.addVert(new Vector3( a,-b, 0)); 
         graph.addVert(new Vector3(-a, b, 0));
@@ -67,15 +72,15 @@ export class GraphApp extends App {
 
             let inext = (i + 4) % 12;
 
-            // addEdge(i+0, inext+2);
-            // addEdge(i+0, inext+0);
-            // addEdge(i+1, inext+2);
-            // addEdge(i+1, inext+0);
+            addEdge(i+0, inext+2);
+            addEdge(i+0, inext+0);
+            addEdge(i+1, inext+2);
+            addEdge(i+1, inext+0);
 
-            // addEdge(i+2, inext+3);
-            // addEdge(i+2, inext+1);
-            // addEdge(i+3, inext+3);
-            // addEdge(i+3, inext+1);
+            addEdge(i+2, inext+3);
+            addEdge(i+2, inext+1);
+            addEdge(i+3, inext+3);
+            addEdge(i+3, inext+1);
         }        
 
         return graph;
@@ -101,29 +106,40 @@ export class GraphApp extends App {
     }
 
     ui(ui: UI) {
+
         this.rotate = new Parameter("rotate", 1, 0, 1, 1)
+        this.radius = new Parameter("radius", 0.1, 0, 0.5, 0.01)
+        this.detail = new Parameter("detail", 6, 3, 20, 1)
+  
+        let reset = () => {
+            this.rotate.set(0);
+            this.start();
+        }
+
         ui.addBooleanParameter(this.rotate);
+        ui.addParameter(this.radius, reset);
+        ui.addParameter(this.detail, reset);
+        // ui.addButton(() => {this.start()})
     }
         
-
     start() {
         this.graph = this.getIcosahedron();
-        this.graph.print();
-        this.mesh = graphToMesh(this.graph);
+        // this.graph.print();
+        this.mesh = graphToMesh(this.graph, this.radius.get(), this.detail.get());
         this.meshRend.set(this.gl, this.mesh);
     }
 
     update(state: InputState) {
         this.camera.update(state);
 
-        // if (!state.mouseRightDown && this.rotate.get() == 1) {
-        //     let alpha = 0.0002 * state.tick;
-        //     let rot = Matrix4.newXRotation(alpha)
-        //         .multiply(Matrix4.newYRotation(alpha))
-        //         .multiply(Matrix4.newZRotation(alpha));
-        //     this.mesh!.transform(rot);
-        //     this.meshRend.set(this.gl, this.mesh);
-        // }
+        if (!state.mouseRightDown && this.rotate.get() == 1) {
+            let alpha = 0.0002 * state.tick;
+            let rot = Matrix4.newXRotation(alpha)
+                .multiply(Matrix4.newYRotation(alpha))
+                .multiply(Matrix4.newZRotation(alpha));
+            this.mesh!.transform(rot);
+            this.meshRend.set(this.gl, this.mesh, DrawSpeed.DynamicDraw);
+        }
     }
 
     draw(gl: WebGLRenderingContext) {
@@ -132,24 +148,20 @@ export class GraphApp extends App {
     }
 }
 
-function graphToMesh(graph: Graph) : RenderMesh {
+function graphToMesh(graph: Graph, radius: number, detail: number) : RenderMesh {
         
     let meshes: PureMesh[] = [];
-    let radius = 0.05;
-    let detail = 6;
 
-    graph.getVertRenderData().forEach((v) => {
+    graph.allVerts().forEach((v) => {
         meshes.push(PureMesh.fromSphere(v, radius*2, detail, detail*2))
     })
 
-    let edges = graph.getEdgeRenderData()
+    let edges = graph.allEdges()
     for (let i = 0 ; i < edges.length; i+=2) {
-        let from = edges[i];
-        let to = edges[i+1];
-
-        console.log(from, to);
-
-        meshes.push(PureMesh.fromCylinder(from, to, radius, detail))
+        let from = graph.getVertex(edges[i]);
+        let to = graph.getVertex(edges[i+1]);
+        let mesh = PureMesh.fromCylinder(from, to, radius, detail);
+        meshes.push(mesh);
     }
 
     let rmesh = PureMesh.fromJoin(meshes).toDisplayMesh();

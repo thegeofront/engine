@@ -26,14 +26,14 @@ export class GMath {
 		return a + x * (b - a);
 	}
 
-	/**
-	 * return true if a is rougly the same value as b. 
-	 * uses the predefined tolerance
-	 */
-	static isRoughly(a: number, b: number) : boolean {
-		if (((a - b) < Const.TOLERANCE || (b - a) < Const.TOLERANCE))
-			return true;
-		return false;
-	}
+	// /**
+	//  * return true if a is rougly the same value as b. 
+	//  * uses the predefined tolerance
+	//  */
+	// static isRoughly(a: number, b: number) : boolean {
+	// 	if (((a - b) < Const.TOLERANCE || (a - b) < Const.TOLERANCE))
+	// 		return true;
+	// 	return false;
+	// }
 
 }

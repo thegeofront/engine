@@ -4,11 +4,11 @@
 // todo:    turn Center, Ihat, Jhat, Khat construction to an actual matrix
 
 import { Vector3Array } from "../data/vector-array";
-import { Const } from "../math/const";
 import { GMath } from "../math/math";
 import { Matrix4 } from "../math/matrix";
 import { Stat } from "../math/statistics";
 import { Vector2, Vector3 } from "../math/vector";
+import { Const } from "../math/const";
 
 export class Plane {
     
@@ -23,8 +23,7 @@ export class Plane {
     static fromPN(center: Vector3, normal: Vector3) {
         
         let cross = normal.cross(Vector3.unitX());
-        if (GMath.isRoughly(cross.length(), 0)) {
-            console.log("lalalala")
+        if (cross.length() < Const.TOLERANCE) {
             cross = normal.cross(Vector3.unitY());
         }
         let ihat = cross.normalize();

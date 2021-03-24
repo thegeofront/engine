@@ -14,6 +14,8 @@ import { RenderMesh } from "./render-mesh";
 import { Plane } from "../geo/plane";
 import { Matrix4 } from "../math/matrix";
 import { setDeprecationWarningFn } from "@tensorflow/tfjs-core/dist/tensor";
+import { cosineWindow } from "@tensorflow/tfjs-core";
+import { Graph } from "./graph";
 
 
 // TODO make distinctions between
@@ -119,6 +121,56 @@ export class PureMesh {
     }
 
 
+    static fromIcosahedron(scale=1) : PureMesh {
+
+        let graph = new Graph();
+
+        let a = scale;
+        let phi = (1 + 5**0.5) / 2
+        let b = a * phi;
+
+        graph.addVert(new Vector3(-a,-b, 0)); 
+        graph.addVert(new Vector3( a,-b, 0)); 
+        graph.addVert(new Vector3(-a, b, 0));
+        graph.addVert(new Vector3( a, b, 0));
+
+        graph.addVert(new Vector3(0,-a,-b)); 
+        graph.addVert(new Vector3(0, a,-b)); 
+        graph.addVert(new Vector3(0,-a, b));
+        graph.addVert(new Vector3(0, a, b));
+
+        graph.addVert(new Vector3(-b, 0,-a));
+        graph.addVert(new Vector3(-b, 0, a)); 
+        graph.addVert(new Vector3( b, 0,-a));
+        graph.addVert(new Vector3( b, 0, a));
+
+        // build edges
+        let addEdge = (a: number, b: number) => {
+            let norm = graph.getVertex(a).added(graph.getVertex(b)).normalize();
+            graph.addEdge(a, b, norm);
+        }
+        for (let i = 0 ; i < 12; i+=4) {
+
+            addEdge(i+0, i+1);
+            addEdge(i+2, i+3);
+
+            let inext = (i + 4) % 12;
+
+            addEdge(i+0, inext+2);
+            addEdge(i+0, inext+0);
+            addEdge(i+1, inext+2);
+            addEdge(i+1, inext+0);
+
+            addEdge(i+2, inext+3);
+            addEdge(i+2, inext+1);
+            addEdge(i+3, inext+3);
+            addEdge(i+3, inext+1);
+        }        
+
+        return this.fromGraph(graph);
+    }
+
+
     static fromSphere(center: Vector3, radius: number, numRings: number, numPerRing: number) : PureMesh {
  
         // verts
@@ -215,7 +267,7 @@ export class PureMesh {
     }
 
 
-    static fromCylinder(from: Vector3, to: Vector3, radius: number, numPerRing: number) {
+    static fromCylinder(from: Vector3, to: Vector3, radius: number, numPerRing: number) : PureMesh {
 
         let normal = to.subbed(from);
 
@@ -230,7 +282,10 @@ export class PureMesh {
 
         // planes to represent top & bottom
         let planeFrom = Plane.fromPN(from, normal);
+        // console.log(planeFrom);
+
         let planeTo = Plane.fromPN(to, normal);
+        // console.log(planeFrom);
 
         // verts 'from ring
         setVert(0, from); 
@@ -326,6 +381,11 @@ export class PureMesh {
 
 
         return new PureMesh(verts, links);
+    }
+
+
+    static fromGraph(graph: Graph) : PureMesh {
+        throw "TODO";
     }
 
     // TODO fix this later

@@ -1,14 +1,19 @@
 // name: graph.ts
 // author:  Jos Feenstra
 // purpose: HalfEdge Mesh in 3D. 
-// This does mean that the order around a vertex is not staight forward, and must be handled manually. 
+// This does mean that the order around a vertex is not staight forward, and must be handled using normals.
 
 import { Matrix4 } from "../math/matrix";
 import { Vector3 } from "../math/vector";
+import { PureMesh } from "./pure-mesh";
 
 type EdgeIndex = number;
 type VertIndex = number;
-type FaceIndex = number;
+
+type Vert = {
+    data: Vector3,
+    edge: EdgeIndex,
+}
 
 interface Edge {   
     next: EdgeIndex,
@@ -16,24 +21,36 @@ interface Edge {
     vert: VertIndex,
 }
 
-type Vert = {
-    data: Vector3,
-    edge: EdgeIndex,
-}
+
+type Face = EdgeIndex;
+
 
 // NOTE: create an interface which hides the Edge, Vert & Face interfaces. 
 // NOTE: half edge is implied
 export class Graph {
 
     private _verts: Vert[];
-    private _edges: Edge[];
+    private _edges: Edge[]; // NOTE: ALWAYS AN EVEN NUMBER OF EDGES. EDGE TWIN IS EVEN / UNEVEN MATCH
+    private _faces: Face[]; 
+
 
     constructor() {
         this._verts = [];
         this._edges = [];
+        this._faces = [];
     }
 
+
+    static fromMesh() {
+        
+    }
+
+
     // geometry trait 
+
+    clone() {
+        throw new Error("not yet implemented...");
+    }
 
     transform(matrix: Matrix4) {
 
@@ -64,7 +81,16 @@ export class Graph {
         console.log("--------")
     }
 
-    getVertRenderData() : Vector3[] {
+    // conversion
+
+    toMesh() : PureMesh {
+        return PureMesh.fromGraph(this);
+    }
+
+
+    // public getters
+
+    allVerts() : Vector3[] {
         let data: Vector3[] = [];
         this._verts.forEach((v) => {
             data.push(v.data);
@@ -72,34 +98,37 @@ export class Graph {
         return data;
     }
 
-    getEdgeRenderData() : Vector3[] {
-        let data: Vector3[] = [];
+
+    allEdges() : VertIndex[] {
+        let data: VertIndex[] = [];
         let edges = new Map<number, number>()
         this._edges.forEach((e, i) => {
             if (edges.has(i)) {
                 return;
             }
-            data.push(this.getVert(e.vert).data);
-            data.push(this.getVert(this.getEdge(e.twin).vert).data)
+            data.push(e.vert);
+            data.push(this.getEdge(e.twin).vert);
             edges.set(e.twin, e.twin);
         })
         return data;
     }
 
-    GetFaceRenderData() : Vector3[][] {
+
+    allFaces() : VertIndex[][] {
         throw "nope";
     }
 
-    // public getters
 
-    public getVertex(vi: VertIndex) : Vector3 {
+    getVertex(vi: VertIndex) : Vector3 {
         if (vi < 0 || vi >= this._verts.length) {
             throw "out of range";
         }
         return this._verts[vi].data;
     }
 
+
     // getters
+
 
     private getVert(vi: VertIndex) : Vert {
         if (vi < 0 || vi >= this._verts.length) {
@@ -108,12 +137,14 @@ export class Graph {
         return this._verts[vi];
     }
 
+
     private getEdge(ei: EdgeIndex) : Edge {
         if (ei < 0 || ei >= this._edges.length) {
             console.error("out of range");
         }
         return this._edges[ei];
     }
+
 
     private getVertEdgeFan(vi : VertIndex) : Edge[] {
 
@@ -140,6 +171,7 @@ export class Graph {
         return fan;
     }
 
+
     private getVertNeighbors(vi : VertIndex) : VertIndex[] {
         let nbs: VertIndex[] = [];
         let v = this._verts[vi];
@@ -160,19 +192,24 @@ export class Graph {
         return nbs;
     }
 
+
     private getEdgeIndex(e: Edge) {
         return this.getEdge(e.twin).twin
     }
+
 
     private getEdgeTwin(ei: EdgeIndex) : Edge {
         return this._edges[this._edges[ei].twin];
     }
 
+
     // setters
+
 
     addVert(vector: Vector3) {
         this._verts.push({data: vector, edge: -1});
     }
+
 
     addEdge(vi_1: VertIndex, vi_2: VertIndex, normal: Vector3) {
         
@@ -199,6 +236,7 @@ export class Graph {
         this.addEdgeToDisk(vi_1, ei_1, normal);
         this.addEdgeToDisk(vi_2, ei_2, normal);
     }
+
 
     private addEdgeToDisk(vi: VertIndex, ei: EdgeIndex, normal: Vector3) {
         
