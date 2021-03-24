@@ -25,7 +25,7 @@ import { version_converter } from "@tensorflow/tfjs-converter";
 
 // a very pure idea of a mesh : Vertices + links between vertices. 
 // Could be anything with these properties.
-export class PureMesh {
+export class Mesh {
 
     verts: Vector3Array;
     links: IntMatrix; // relationships, can be 2 (lines) | 3 (triangles) | 4 (quads)
@@ -36,25 +36,25 @@ export class PureMesh {
     }
 
 
-    static new(verts: Vector3Array, links: IntMatrix) : PureMesh {
-        return new PureMesh(verts, links);
+    static new(verts: Vector3Array, links: IntMatrix) : Mesh {
+        return new Mesh(verts, links);
     }
 
 
-    static fromLists(verts: Vector3[], faces: number[]) : PureMesh {
-        return new PureMesh(
+    static fromLists(verts: Vector3[], faces: number[]) : Mesh {
+        return new Mesh(
             Vector3Array.fromList(verts), 
             IntMatrix.fromList(faces, 3)
         );
     }
 
 
-    static fromEmpty() : PureMesh {
-        return new PureMesh(new Vector3Array(0), new IntMatrix(0,0));
+    static fromEmpty() : Mesh {
+        return new Mesh(new Vector3Array(0), new IntMatrix(0,0));
     }
 
 
-    static fromJoin(meshes: PureMesh[]) : PureMesh {
+    static fromJoin(meshes: Mesh[]) : Mesh {
 
         // join meshes, dont try to look for duplicate vertices
         // TODO : make this the trouble of Matrices and Arrays
@@ -87,7 +87,7 @@ export class PureMesh {
             accFaces += mesh.links.count();
         }
 
-        return new PureMesh(verts, links);
+        return new Mesh(verts, links);
     }
 
     
@@ -115,7 +115,7 @@ export class PureMesh {
     }
 
 
-    static fromCube(cube: Cube) : PureMesh {
+    static fromCube(cube: Cube) : Mesh {
 
         let verts = cube.getCorners();
         let faces: number[] = []
@@ -127,7 +127,7 @@ export class PureMesh {
     }
 
 
-    static fromIcosahedron(scale=1) : PureMesh {
+    static fromIcosahedron(scale=1) : Mesh {
 
         let graph = new Graph();
 
@@ -177,7 +177,7 @@ export class PureMesh {
     }
 
 
-    static fromSphere(center: Vector3, radius: number, numRings: number, numPerRing: number) : PureMesh {
+    static fromSphere(center: Vector3, radius: number, numRings: number, numPerRing: number) : Mesh {
  
         // verts
         let vertCount = numRings * numPerRing + 2;
@@ -269,11 +269,11 @@ export class PureMesh {
             ]);
         }
 
-        return new PureMesh(verts, links);
+        return new Mesh(verts, links);
     }
 
 
-    static fromCylinder(from: Vector3, to: Vector3, radius: number, numPerRing: number) : PureMesh {
+    static fromCylinder(from: Vector3, to: Vector3, radius: number, numPerRing: number) : Mesh {
 
         let normal = to.subbed(from);
 
@@ -345,7 +345,7 @@ export class PureMesh {
 
         }
 
-        return new PureMesh(verts, links);
+        return new Mesh(verts, links);
     }
 
 
@@ -386,11 +386,11 @@ export class PureMesh {
         }
 
 
-        return new PureMesh(verts, links);
+        return new Mesh(verts, links);
     }
 
 
-    static fromGraph(graph: Graph) : PureMesh {
+    static fromGraph(graph: Graph) : Mesh {
         
         // NOTE : doesnt really work if the loops are not of size 3.
 
@@ -406,7 +406,7 @@ export class PureMesh {
                 // console.log("cant convert loop");
             }
         })
-        return PureMesh.new(verts, links);
+        return Mesh.new(verts, links);
     }
 
     // TODO fix this later

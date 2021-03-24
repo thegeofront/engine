@@ -6,7 +6,7 @@ import { GraphModel } from "@tensorflow/tfjs-converter";
 import { Matrix4 } from "../math/matrix";
 import { Vector3 } from "../math/vector";
 import { Graph } from "../mesh/graph";
-import { PureMesh } from "../mesh/pure-mesh";
+import { Mesh } from "../mesh/mesh";
 import { RenderMesh } from "../mesh/render-mesh";
 import { Camera } from "../render/camera";
 import { DrawSpeed } from "../render/renderer";
@@ -155,25 +155,25 @@ export class IcosahedronApp extends App {
 
 function graphToMultiMesh(graph: Graph, radius: number, detail: number, inner: boolean) : RenderMesh {
         
-    let meshes: PureMesh[] = [];
+    let meshes: Mesh[] = [];
 
     graph.allVerts().forEach((v) => {
-        meshes.push(PureMesh.fromSphere(v, radius*2, detail, detail*2))
+        meshes.push(Mesh.fromSphere(v, radius*2, detail, detail*2))
     })
 
     let edges = graph.allEdges()
     for (let i = 0 ; i < edges.length; i+=2) {
         let from = graph.getVertex(edges[i]);
         let to = graph.getVertex(edges[i+1]);
-        let mesh = PureMesh.fromCylinder(from, to, radius, detail);
+        let mesh = Mesh.fromCylinder(from, to, radius, detail);
         meshes.push(mesh);
     }
 
     if (inner) {
-        meshes.push(PureMesh.fromGraph(graph));
+        meshes.push(Mesh.fromGraph(graph));
     }
     
-    let rmesh = PureMesh.fromJoin(meshes).toDisplayMesh();
+    let rmesh = Mesh.fromJoin(meshes).toDisplayMesh();
     rmesh.calculateFaceNormals();
     return rmesh;
 } 

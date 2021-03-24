@@ -12,7 +12,7 @@
 // - how to make interesting prototypes, but still use a bitmap data model?
 
 import { RenderMesh, meshFromObj } from "../mesh/render-mesh";
-import { PureMesh } from "../mesh/pure-mesh";
+import { Mesh } from "../mesh/mesh";
 import { addDropFileEventListeners, loadTextFromFile } from "../system/domwrappers";
 import { Domain3 } from "../math/domain";
 import { Vector2, Vector3 } from "../math/vector";
@@ -148,7 +148,7 @@ export class MarchingCubeApp extends App {
     addPreviewCube(point: Vector3) {
         let cubeCenter = this.mapToWorld(point);
         let cube = this.createCube(cubeCenter);
-        this.geo.push(PureMesh.fromCube(cube).toDisplayMesh());
+        this.geo.push(Mesh.fromCube(cube).toDisplayMesh());
     }
 
 
@@ -299,18 +299,18 @@ export class MarchingCubeApp extends App {
     // turn this.map into this.mapGeo
     bufferMap() {
         console.log("buffering");
-        let mapGeo: PureMesh[] = []
+        let mapGeo: Mesh[] = []
         this.map.iter((entry, index) => {
             if (entry == 1) {
                 let mapCoord = this.map.getCoords(index);
                 let coord = this.mapToWorld(mapCoord);
                 let cube = this.createCube(coord);
-                mapGeo.push(PureMesh.fromCube(cube));
+                mapGeo.push(Mesh.fromCube(cube));
 
             }
         });
         this.meshRenderer.set(this.gl, 
-            PureMesh.fromJoin(mapGeo).toDisplayMesh()
+            Mesh.fromJoin(mapGeo).toDisplayMesh()
         );
     }
 

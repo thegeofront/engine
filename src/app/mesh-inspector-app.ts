@@ -2,7 +2,7 @@
 // author:  Jos Feenstra
 // purpose: test creation of basic mesh shapes. Test UI
 
-import { PureMesh } from "../mesh/pure-mesh";
+import { Mesh } from "../mesh/mesh";
 import { RenderMesh, meshFromObj } from "../mesh/render-mesh";
 import { addDropFileEventListeners, loadTextFromFile } from "../system/domwrappers";
 import { Domain3 } from "../math/domain";
@@ -112,11 +112,11 @@ export class MeshInspectorApp extends App {
         let dis = this.distance.get();
         let det = this.detail.get();
 
-        let mesh = PureMesh.fromJoin([
-            PureMesh.fromSphere(new Vector3(dis,0,0), this.radius.get(), this.detail.get(), spherePerRing),
+        let mesh = Mesh.fromJoin([
+            Mesh.fromSphere(new Vector3(dis,0,0), this.radius.get(), this.detail.get(), spherePerRing),
             // PureMesh.fromCube(new Cube(this.plane, Domain3.fromRadius(this.radius.get()))),
-            PureMesh.fromCone(new Vector3(-dis, 0, -this.radius.get()), this.radius.get(), this.radius.get() * 2, spherePerRing),
-            PureMesh.fromCylinder(
+            Mesh.fromCone(new Vector3(-dis, 0, -this.radius.get()), this.radius.get(), this.radius.get() * 2, spherePerRing),
+            Mesh.fromCylinder(
                 new Vector3(0, 0, -rad), 
                 new Vector3(0, 0,  rad),
                 rad,

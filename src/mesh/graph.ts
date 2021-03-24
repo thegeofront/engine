@@ -5,7 +5,7 @@
 
 import { Matrix4 } from "../math/matrix";
 import { Vector3 } from "../math/vector";
-import { PureMesh } from "./pure-mesh";
+import { Mesh } from "./mesh";
 
 type EdgeIndex = number;
 type VertIndex = number;
@@ -76,8 +76,8 @@ export class Graph {
 
     // conversion
 
-    toMesh() : PureMesh {
-        return PureMesh.fromGraph(this);
+    toMesh() : Mesh {
+        return Mesh.fromGraph(this);
     }
 
 

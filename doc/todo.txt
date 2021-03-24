@@ -1,5 +1,6 @@
-- Render Cilinder
-- Create HalfMesh
-- Create HalfMeshApp
-- Create HalfMeshRenderer
-- Create Icosahedron as HalfMesh 
+- Render Cilinder DONE 
+- Create HalfMesh DONE
+- Create HalfMeshApp DONE 
+- Create HalfMeshRenderer DONE
+- Create Icosahedron as HalfMesh DONE  
+

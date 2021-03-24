@@ -2,7 +2,7 @@
 // author:  Jos Feenstra
 // purpose: a 3d voxel environment to toy around in. Uses several features of geon
 
-import { PureMesh } from "../mesh/pure-mesh";
+import { Mesh } from "../mesh/mesh";
 import { RenderMesh, meshFromObj,} from "../mesh/render-mesh"
 import { addDropFileEventListeners, loadTextFromFile } from "../system/domwrappers";
 import { Domain3 } from "../math/domain";
@@ -161,7 +161,7 @@ export class GeometryApp extends App {
     addPreviewCube(point: Vector3) {
         let cubeCenter = this.mapToWorld(point);
         let cube = this.createCube(cubeCenter);
-        this.geo.push(PureMesh.fromCube(cube).toDisplayMesh());
+        this.geo.push(Mesh.fromCube(cube).toDisplayMesh());
     }
 
     flushPreviewCubes() {
@@ -313,17 +313,17 @@ export class GeometryApp extends App {
     // flush this.meshRenderer
     // turn this.map into this.mapGeo
     bufferMap() {
-        let mapGeo: PureMesh[] = []
+        let mapGeo: Mesh[] = []
         this.map.iter((entry, index) => {
             if (entry == 1) {
                 let mapCoord = this.map.getCoords(index);
                 let coord = this.mapToWorld(mapCoord);
                 let cube = this.createCube(coord);
-                mapGeo.push(PureMesh.fromCube(cube));
+                mapGeo.push(Mesh.fromCube(cube));
             }
         });
 
-        let m = PureMesh.fromJoin(mapGeo).toDisplayMesh();
+        let m = Mesh.fromJoin(mapGeo).toDisplayMesh();
         m.calculateFaceNormals();
         this.meshRenderer.set(this.gl, m);
     }

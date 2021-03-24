@@ -3,7 +3,7 @@
 // purpose: environment to test eyefinder functionalities
 
 import { RenderMesh, meshFromObj } from "../mesh/render-mesh";
-import { PureMesh } from "../mesh/pure-mesh";
+import { Mesh } from "../mesh/mesh";
 import { GeonImage } from "../img/Image";
 import { BellusScanData, NextcloudScanData } from "./scan-data";
 import { addDropFileEventListeners, loadTextFromFile } from "../system/domwrappers";
@@ -188,7 +188,7 @@ export class EyeFinderApp extends App {
             let rec = new Rectangle3(
                 Plane.fromPVV(new Vector3(0,0,0), new Vector3(1,0,0), new Vector3(0,1,0)),
                 Domain2.fromBounds(10,10+width, accHeight, accHeight + height));
-            let mesh = PureMesh.fromRect(rec);
+            let mesh = Mesh.fromRect(rec);
             mesh.setTexture(image.resize(size, size).toImageData()); // note: webgl can only work with 2^x * 512 images
             this.renderables.push(mesh);
 
@@ -220,11 +220,11 @@ export class EyeFinderApp extends App {
             // create spheres at the center points 
             let radius = 0.5;
             let detail = 10;
-            let spheres = PureMesh.fromJoin([
-                PureMesh.fromSphere(eyepointL, radius, detail, detail),
-                PureMesh.fromSphere(eyepointR, radius, detail, detail),
-                PureMesh.fromCube(Cube.fromRadius(guesspointL, radius)),
-                PureMesh.fromCube(Cube.fromRadius(guesspointR, radius)),
+            let spheres = Mesh.fromJoin([
+                Mesh.fromSphere(eyepointL, radius, detail, detail),
+                Mesh.fromSphere(eyepointR, radius, detail, detail),
+                Mesh.fromCube(Cube.fromRadius(guesspointL, radius)),
+                Mesh.fromCube(Cube.fromRadius(guesspointR, radius)),
             ]);
             this.debugRenderables.push(spheres.toDisplayMesh());
         
