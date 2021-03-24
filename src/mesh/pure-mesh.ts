@@ -392,6 +392,8 @@ export class PureMesh {
 
     static fromGraph(graph: Graph) : PureMesh {
         
+        // NOTE : doesnt really work if the loops are not of size 3.
+
         let verts = Vector3Array.fromList(graph.allVerts());
         let loops = graph.allLoops();
 

@@ -23,7 +23,7 @@ export class IcosahedronApp extends App {
     rotate!: Parameter;
     inner!: Parameter;
     radius = 0.1; // radius!: Parameter;
-    detail = 12; // detail!: Parameter;
+    detail = 6; // detail!: Parameter;
 
     graph!: Graph;
     mesh!: RenderMesh;
@@ -141,8 +141,7 @@ export class IcosahedronApp extends App {
         if (!state.mouseRightDown && this.rotate.get() == 1) {
             let alpha = 0.0002 * state.tick;
             let rot = Matrix4.newXRotation(alpha)
-                .multiply(Matrix4.newYRotation(alpha))
-                .multiply(Matrix4.newZRotation(alpha));
+                .multiply(Matrix4.newYRotation(alpha));
             this.mesh!.transform(rot);
             this.meshRend.set(this.gl, this.mesh, DrawSpeed.DynamicDraw);
         }
