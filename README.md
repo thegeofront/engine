@@ -1,16 +1,16 @@
-# eyefinder-ts
-The Sfered Eyefinder, written in typescript, based upon Geon
+# geon-engine
+A no-dependency 3D engine for delivering interactive 3d experiences on the web. 
+Think barebones three.js, but with a focus on parametric design / procedural generation.
 
-# Geon
-a webgl based environment for creating interactive 3d web applications. Contains features like obj loading, mesh editing, input system, linear algebra goodies and rendering abstractions. 
 
 ## Demo
-http://josfeenstra.nl/geon/
+http://josfeenstra.nl/demo/geon/
+
 
 ## Install 
 ```
 git clone https://github.com/josfeenstra/eyefinder-ts
-cd eyefinder-ts 
+cd geon-engine 
 npm install 
 npm run build
 ```

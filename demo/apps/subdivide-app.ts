@@ -2,7 +2,8 @@
 // author:  Jos Feenstra
 // purpose: test statistic functionalties
 
-import { App, Camera, ShadedMeshRenderer, Parameter, Graph, RenderMesh, Vector3, UI, InputState, Matrix4, DrawSpeed, Mesh, Cube, Plane, Domain3 } from "../../src/lib";
+import { App, Camera, ShadedMeshRenderer, Parameter, Graph, RenderMesh, Vector3, 
+    UI, InputState, Matrix4, DrawSpeed, Mesh, Cube, Plane, Domain3 } from "../../src/lib";
 
 
 
@@ -19,6 +20,7 @@ export class SubdivideApp extends App {
     graph!: Graph;
     mesh!: RenderMesh;
 
+    
     constructor(gl: WebGLRenderingContext) {
         
         super(gl);
@@ -26,6 +28,7 @@ export class SubdivideApp extends App {
         this.camera = new Camera(canvas, 8, true);
         this.meshRend = new ShadedMeshRenderer(gl);
     }
+
 
     ui(ui: UI) {
         this.rotate = new Parameter("rotate", 1, 0, 1, 1)
@@ -37,7 +40,8 @@ export class SubdivideApp extends App {
 
         ui.addBooleanParameter(this.rotate);
     }
-        
+     
+    
     start() {
         this.graph = Mesh.fromCube(Cube.new(Plane.WorldXY(), Domain3.fromRadius(1))).toGraph();
         this.graph.print();
@@ -46,6 +50,7 @@ export class SubdivideApp extends App {
 
         // console.log("all loops: ", this.graph.allLoops());
     }
+
 
     update(state: InputState) {
         this.camera.update(state);
@@ -58,6 +63,7 @@ export class SubdivideApp extends App {
             this.meshRend.set(this.gl, this.mesh, DrawSpeed.DynamicDraw);
         }
     }
+
 
     draw(gl: WebGLRenderingContext) {
         this.camera.updateMatrices(gl.canvas as HTMLCanvasElement);

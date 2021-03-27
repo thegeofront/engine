@@ -1,6 +1,8 @@
 {
   "name": "geon-engine",
   "version": "0.0.6",
+  "author": "Jos Feenstra",
+  "license": "",
   "description": "General purpose 3d geometry library & 3d renderer without external dependencies.",
   "main": "lib.ts",
   "scripts": {
@@ -18,8 +20,6 @@
     "geomatics",
     "game"
   ],
-  "author": "Jos Feenstra",
-  "license": "Copyright (C) Jos Feenstra. me@josfeenstra.nl",
   "devDependencies": {
     "ts-loader": "^8.0.5",
     "typescript": "^4.0.3",
