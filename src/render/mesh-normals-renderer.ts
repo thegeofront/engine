@@ -4,7 +4,7 @@
 
 import { FloatMatrix } from "../data/float-matrix";
 import { Vector2Array, Vector3Array } from "../data/vector-array";
-import { NormalKind, RenderMesh } from "../mesh/render-mesh";
+import { NormalKind, Renderable } from "../mesh/render-mesh";
 import { Polyline } from "../geo/polyline";
 import { Matrix4 } from "../math/matrix";
 import { Vector3 } from "../math/vector";
@@ -78,7 +78,7 @@ export class NormalRenderer extends Renderer {
     }
 
     // take a general render mesh, and extract normals
-    set(gl: WebGLRenderingContext, mesh: RenderMesh, speed = DrawSpeed.StaticDraw) {
+    set(gl: WebGLRenderingContext, rend: Renderable, speed = DrawSpeed.StaticDraw) {
         
         // save how many verts need to be drawn
         gl.useProgram(this.program);
@@ -89,18 +89,18 @@ export class NormalRenderer extends Renderer {
         let normals: Vector3Array;
 
         // different buffer fills based upon normal kind
-        let normalKind = mesh.getNormalType();
+        let normalKind = rend.getNormalType();
         if (normalKind == NormalKind.Face) {
 
-            let faceCount = mesh.links.count(); 
+            let faceCount = rend.mesh.links.count(); 
             this.count = faceCount * 2;
 
             lineverts = new Vector3Array(this.count);
             normals = new Vector3Array(this.count);
             
             for (let f = 0 ; f < faceCount; f++) {
-                let center = mesh.getFaceVertices(f).average();
-                let normal = mesh.norms.getVector(f);
+                let center = rend.getFaceVertices(f).average();
+                let normal = rend.norms.getVector(f);
                 let i1 = f * 2;
                 let i2 = f * 2 + 1;
 

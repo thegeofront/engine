@@ -2,7 +2,7 @@
 // author:  Jos Feenstra
 // purpose: drag an obj to the canvas, and view it on the web
 
-import { App, DotRenderer3, LineRenderer, SimpleMeshRenderer, Camera, RenderMesh, LineArray, addDropFileEventListeners, InputState, Vector3Array, Vector3, loadTextFromFile, meshFromObj, Domain3, DrawSpeed } from "../../src/lib";
+import { App, DotRenderer3, LineRenderer, SimpleMeshRenderer, Camera, Renderable, LineArray, addDropFileEventListeners, InputState, Vector3Array, Vector3, loadTextFromFile, meshFromObj, Domain3, DrawSpeed } from "../../src/lib";
 
 export class ObjLoaderApp extends App {
     
@@ -10,7 +10,8 @@ export class ObjLoaderApp extends App {
     lineRenderer: LineRenderer;
     meshRenderer: SimpleMeshRenderer;
     camera: Camera;
-    obj?: RenderMesh;
+
+    obj?: Renderable;
     renderable?: LineArray;
 
     constructor(gl: WebGLRenderingContext) {
@@ -45,7 +46,7 @@ export class ObjLoaderApp extends App {
         if (this.obj == undefined)
             this.dotRenderer.setAndRender(gl, matrix, Vector3Array.fromList([new Vector3(0,0,0), new Vector3(1,1,1)]));
         else {
-            this.dotRenderer.setAndRender(gl, matrix, this.obj!.verts);
+            this.dotRenderer.setAndRender(gl, matrix, this.obj!.mesh.verts);
             // this.meshRenderer.render(gl, matrix);
             this.lineRenderer.render(gl, matrix);
         }    
@@ -66,16 +67,17 @@ async function processFiles(this: ObjLoaderApp, files: FileList) {
     // NOTE: this could also be done using matrices. Figure that out!
     console.log("scaling...");
 
-    let bounds = Domain3.fromInclude(this.obj.verts);
+    let mesh = this.obj.mesh;
+    let bounds = Domain3.fromInclude(this.obj.mesh.verts);
     let factor = 1 / bounds.size().largestValue();
     
     // TODO : one line these types of operations? 
     // they will be quite common i think...
-    let count = this.obj.verts.count();
+    let count = this.obj.mesh.verts.count();
     for(let i = 0 ; i < count; i++) {
-        let vec = this.obj.verts.getVector(i)
+        let vec = this.obj.mesh.verts.getVector(i)
         vec.scale(factor);
-        this.obj.verts.setVector(i, vec);
+        this.obj.mesh.verts.setVector(i, vec);
     }
     
     

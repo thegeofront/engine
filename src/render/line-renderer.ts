@@ -4,7 +4,7 @@
 
 import { FloatMatrix } from "../data/float-matrix";
 import { Vector2Array, Vector3Array } from "../data/vector-array";
-import { RenderMesh } from "../mesh/render-mesh";
+import { Renderable } from "../mesh/render-mesh";
 import { Polyline } from "../geo/polyline";
 import { Matrix4 } from "../math/matrix";
 import { Vector3 } from "../math/vector";

@@ -8,7 +8,7 @@ import { getGeneralFloatMatrix, Vector2Array, Vector3Array } from "../data/vecto
 import { Circle2 } from "../geo/circle2";
 import { Circle3 } from "../geo/circle3";
 import { Cube } from "../geo/cube";
-import { RenderMesh } from "./render-mesh";
+import { Renderable } from "./render-mesh";
 import { Plane } from "../geo/plane";
 import { Const } from "../math/const";
 import { Matrix4 } from "../math/matrix";
@@ -36,9 +36,10 @@ export class LineArray {
     }
 
     // get all lines from a mesh
-    static fromMesh(mesh: RenderMesh, uv=false) : LineArray {
+    static fromMesh(rend: Renderable, uv=false) : LineArray {
         
         // 3 edges per face, 2 indices per edge
+        let mesh = rend.mesh;
         let count = mesh.links.count() * 6;
         let data = new Uint16Array(count);
         for (let i = 0 ; i < mesh.links.count(); i++) {
@@ -52,7 +53,7 @@ export class LineArray {
             data[iData+5] = mesh.links.get(i, 0);
         }
         if (uv) {
-            return new LineArray(mesh.uvs, data);
+            return new LineArray(rend.uvs, data);
         } else {
             return new LineArray(mesh.verts, data);
         }

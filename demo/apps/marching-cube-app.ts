@@ -2,7 +2,7 @@
 // author:  Jos Feenstra
 // purpose: test statistic functionalties
 
-import { App, DotRenderer3, LineRenderer, MeshDebugRenderer, Camera, Plane, LineArray, Vector3, RenderMesh, IntCube, Perlin, InputState, Mesh, Ray, Matrix4, Cube, Domain3 } from "../../src/lib";
+import { App, DotRenderer3, LineRenderer, MeshDebugRenderer, Camera, Plane, LineArray, Vector3, Renderable, IntCube, Perlin, InputState, Mesh, Ray, Matrix4, Cube, Domain3 } from "../../src/lib";
 
 // TODO: MAKE IT 3D
 // - 3D matrix (sounds stupid i know)
@@ -31,8 +31,8 @@ export class MarchingCubeApp extends App {
     gridLarge!: LineArray;
     gridSmall!: LineArray;
     dots: Vector3[] = [];
-    geo: RenderMesh[] = [];
-    mapGeo: RenderMesh[] = [];
+    geo: Renderable[] = [];
+    mapGeo: Renderable[] = [];
     cursorVisual?: LineArray
 
     // logic data 
@@ -126,7 +126,7 @@ export class MarchingCubeApp extends App {
     addPreviewCube(point: Vector3) {
         let cubeCenter = this.mapToWorld(point);
         let cube = this.createCube(cubeCenter);
-        this.geo.push(Mesh.fromCube(cube).toDisplayMesh());
+        this.geo.push(Mesh.fromCube(cube).toRenderable());
     }
 
 
@@ -288,7 +288,7 @@ export class MarchingCubeApp extends App {
             }
         });
         this.meshRenderer.set(this.gl, 
-            Mesh.fromJoin(mapGeo).toDisplayMesh()
+            Mesh.fromJoin(mapGeo).toRenderable()
         );
     }
 

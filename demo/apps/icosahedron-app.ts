@@ -2,7 +2,7 @@
 // author:  Jos Feenstra
 // purpose: test statistic functionalties
 
-import { App, Camera, ShadedMeshRenderer, Parameter, Graph, RenderMesh, Vector3, UI, InputState, Matrix4, DrawSpeed, Mesh } from "../../src/lib";
+import { App, Camera, ShadedMeshRenderer, Parameter, Graph, Renderable, Vector3, UI, InputState, Matrix4, DrawSpeed, Mesh } from "../../src/lib";
 
 
 
@@ -17,7 +17,7 @@ export class IcosahedronApp extends App {
     detail = 6; // detail!: Parameter;
 
     graph!: Graph;
-    mesh!: RenderMesh;
+    mesh!: Renderable;
 
     constructor(gl: WebGLRenderingContext) {
         
@@ -144,19 +144,19 @@ export class IcosahedronApp extends App {
     }
 }
 
-function graphToMultiMesh(graph: Graph, radius: number, detail: number, inner: boolean) : RenderMesh {
+function graphToMultiMesh(graph: Graph, radius: number, detail: number, inner: boolean) : Renderable {
         
     let meshes: Mesh[] = [];
 
     graph.allVerts().forEach((v) => {
-        meshes.push(Mesh.fromSphere(v, radius*2, detail, detail*2))
+        meshes.push(Mesh.newSphere(v, radius*2, detail, detail*2))
     })
 
     let edges = graph.allEdges()
     for (let i = 0 ; i < edges.length; i+=2) {
         let from = graph.getVertex(edges[i]);
         let to = graph.getVertex(edges[i+1]);
-        let mesh = Mesh.fromCylinder(from, to, radius, detail);
+        let mesh = Mesh.newCylinder(from, to, radius, detail);
         meshes.push(mesh);
     }
 
@@ -164,7 +164,7 @@ function graphToMultiMesh(graph: Graph, radius: number, detail: number, inner: b
         meshes.push(Mesh.fromGraph(graph));
     }
     
-    let rmesh = Mesh.fromJoin(meshes).toDisplayMesh();
+    let rmesh = Mesh.fromJoin(meshes).toRenderable();
     rmesh.calculateFaceNormals();
     return rmesh;
 } 

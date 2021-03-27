@@ -4,7 +4,7 @@
 // credits to : https://webglfundamentals.org/
 // note: im still figuring out how to organize this 
 
-import { Scene } from "./scene";
+// import { Scene } from "./scene";
 
 var nextTextureId = 0;
 var rendercallsperframe = 0; 

@@ -12,6 +12,7 @@ type VertIndex = number;
 
 type Vert = {
     data: Vector3,
+    //normal: Vector3,
     edge: EdgeIndex,
 }
 
@@ -44,7 +45,7 @@ export class Graph {
         let graph = Graph.new();
 
         mesh.verts.forEach((v, i) => {
-
+            graph.addVert(v);
         });
 
         let width = mesh.links._width;

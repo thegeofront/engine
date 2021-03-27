@@ -4,7 +4,7 @@
 
 import { App, Camera, Cube, Domain3, DotRenderer3, InputState, IntCube, LineArray, 
     LineRenderer, Matrix4, Mesh, MeshDebugRenderer, Parameter, Plane, Ray,
-     RenderMesh, ShadedMeshRenderer, UI, Vector3 } from "../../src/lib";
+     Renderable, ShadedMeshRenderer, UI, Vector3 } from "../../src/lib";
 
 export class GeometryApp extends App {
 
@@ -22,8 +22,8 @@ export class GeometryApp extends App {
     gridLarge!: LineArray;
     gridSmall!: LineArray;
     dots: Vector3[] = [];
-    geo: RenderMesh[] = [];
-    mapGeo: RenderMesh[] = [];
+    geo: Renderable[] = [];
+    mapGeo: Renderable[] = [];
     cursorVisual?: LineArray
 
     // logic data 
@@ -137,7 +137,7 @@ export class GeometryApp extends App {
     addPreviewCube(point: Vector3) {
         let cubeCenter = this.mapToWorld(point);
         let cube = this.createCube(cubeCenter);
-        this.geo.push(Mesh.fromCube(cube).toDisplayMesh());
+        this.geo.push(Mesh.fromCube(cube).toRenderable());
     }
 
     flushPreviewCubes() {
@@ -299,7 +299,7 @@ export class GeometryApp extends App {
             }
         });
 
-        let m = Mesh.fromJoin(mapGeo).toDisplayMesh();
+        let m = Mesh.fromJoin(mapGeo).toRenderable();
         m.calculateFaceNormals();
         this.meshRenderer.set(this.gl, m);
     }

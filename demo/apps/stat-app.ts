@@ -2,7 +2,7 @@
 // author:  Jos Feenstra
 // purpose: test statistic functionalties
 
-import { App, DotRenderer3, LineRenderer, SimpleMeshRenderer, Camera, RenderMesh, Vector3, LineArray, FloatMatrix, Stat, InputState } from "../../src/lib";
+import { App, DotRenderer3, LineRenderer, SimpleMeshRenderer, Camera, Renderable, Vector3, LineArray, FloatMatrix, Stat, InputState } from "../../src/lib";
 
 
 
@@ -14,7 +14,7 @@ export class StatApp extends App {
 
     camera: Camera;
 
-    obj?: RenderMesh;
+    obj?: Renderable;
     dots: Vector3[] = [];
     renderable?: LineArray;
 

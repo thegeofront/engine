@@ -51,7 +51,7 @@ export * from "./render/mesh-debug-renderer";
 export * from "./render/mesh-normals-renderer";
 export * from "./render/rectangle-renderer";
 export * from "./render/renderer";
-export * from "./render/scene";
+// export * from "./render/scene";
 export * from "./render/shaded-mesh-renderer";
 export * from "./render/simple-mesh-renderer";
 export * from "./render/texture-mesh-renderer";

@@ -2,7 +2,7 @@
 // author:  Jos Feenstra
 // purpose: test statistic functionalties
 
-import { App, Camera, ShadedMeshRenderer, Parameter, Graph, RenderMesh, Vector3, 
+import { App, Camera, ShadedMeshRenderer, Parameter, Graph, Renderable, Vector3, 
     UI, InputState, Matrix4, DrawSpeed, Mesh, Cube, Plane, Domain3 } from "../../src/lib";
 
 
@@ -18,11 +18,10 @@ export class SubdivideApp extends App {
     detail = 6; // detail!: Parameter;
 
     graph!: Graph;
-    mesh!: RenderMesh;
+    mesh!: Renderable;
 
-    
+
     constructor(gl: WebGLRenderingContext) {
-        
         super(gl);
         let canvas = gl.canvas as HTMLCanvasElement;
         this.camera = new Camera(canvas, 8, true);
@@ -45,7 +44,7 @@ export class SubdivideApp extends App {
     start() {
         this.graph = Mesh.fromCube(Cube.new(Plane.WorldXY(), Domain3.fromRadius(1))).toGraph();
         this.graph.print();
-        this.mesh = this.graph.toMesh().toDisplayMesh();
+        this.mesh = this.graph.toMesh().toRenderable();
         this.meshRend.set(this.gl, this.mesh);
 
         // console.log("all loops: ", this.graph.allLoops());

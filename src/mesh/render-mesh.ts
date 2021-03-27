@@ -15,6 +15,7 @@ import { Vector2, Vector3 } from "../math/vector";
 import { Cube } from "../geo/cube";
 import { Rectangle3 } from "../geo/rectangle";
 import { Matrix4 } from "../math/matrix";
+import { Mesh } from "./mesh";
 
 type vertexID = number;
 type faceID = number;
@@ -34,125 +35,94 @@ export enum NormalKind {
     MultiVertex,
 }
 
-export class RenderMesh {
+export class Renderable {
 
-    verts: Vector3Array; 
+    mesh: Mesh;
+
     norms: Vector3Array; 
     uvs:   Vector2Array;
-    links: IntMatrix; 
-
     ambi: Float32Array;
     texture?: ImageData;
 
     _normKind: NormalKind = NormalKind.None;
 
+    // render speed
+    // shader
+
     constructor(vertCount: number, normCount: number, uvCount: number, faceCount: number, texture: ImageData | undefined = undefined) {
-        this.verts = new Vector3Array(vertCount);
+        let perFaceCount = 3;
+        this.mesh = Mesh.newEmpty(vertCount, faceCount, perFaceCount);
         this.norms = new Vector3Array(normCount);
         this.uvs = new Vector2Array(uvCount);
         this.ambi = new Float32Array(vertCount);
-        this.links = new IntMatrix(faceCount, 3);
-        this.links?.fill(-1);
         this.texture = texture;
     }
 
 
-    static fromData(verts: number[], norms: number[], uvs: number[], faces: number[]) : RenderMesh {
+    static new(vertCount: number, normCount: number, uvCount: number, faceCount: number, texture: ImageData | undefined = undefined) {
+        return new Renderable(vertCount, normCount, uvCount, faceCount, texture);
+    }
+
+
+    static fromMesh(mesh: Mesh) : Renderable {
+        let r = new Renderable(mesh.verts.count(), 0, 0, mesh.links.count());
+        r.mesh.verts.data = mesh.verts.data;
+        r.mesh.links.data = mesh.links.data;
+        return r;
+    }
+
+
+    static fromData(verts: number[], norms: number[], uvs: number[], faces: number[]) : Renderable {
         
         // NOTE : this type of parsing makes my life easy, but is dangerous. This is why i created the 
         // Array class. 
-        let mesh = new RenderMesh(verts.length / 3, norms.length / 3, uvs.length / 2, faces.length / 3);
-        mesh.verts.fillWith(verts);
-        mesh.norms!.fillWith(norms);
-        mesh.uvs!.fillWith(uvs);
-        mesh.links!.fillWith(faces);
+        let r = new Renderable(verts.length / 3, norms.length / 3, uvs.length / 2, faces.length / 3);
+        r.mesh.verts.fillWith(verts);
+        r.mesh.links!.fillWith(faces);
+        r.norms!.fillWith(norms);
+        r.uvs!.fillWith(uvs);
         
-        return mesh;
+        return r;
     }
 
-
-    static fromJoin(meshes: RenderMesh[]) : RenderMesh {
-
-        // join meshes, dont try to look for duplicate vertices
-        // TODO : make this the trouble of Matrices and Arrays
-        let vertCount = 0;
-        let faceCount = 0;
-        for (let mesh of meshes) {
-            vertCount += mesh.verts.count();
-            if (mesh.links) faceCount += mesh.links.count();
-        }
-
-        let joined = new RenderMesh(vertCount, 0, 0, faceCount);
-
-        let accVerts = 0;
-        let accFaces = 0;
-        for (let mesh of meshes) {
-            for (let i = 0 ; i < mesh.verts.count(); i++) {
-                joined.verts.setVector(accVerts + i, mesh.verts.getVector(i));
-            }
-            if (!mesh.links) continue;
-            for (let i = 0 ; i < mesh.links.count(); i++) {
-                let face = mesh.links.getRow(i);
-                for (let j = 0 ; j < face.length; j++) {
-                    face[j] = face[j] + accVerts;
-                }
-                joined.links!.setRow(accFaces + i, face);
-            }
-            accVerts += mesh.verts.count();
-            accFaces += mesh.links.count();
-        }
-
-        return joined;
-    }
 
     // geometry trait
 
+
     transform(matrix: Matrix4) {
 
-        for (let i = 0 ; i < this.verts.count(); i++) {
+        for (let i = 0 ; i < this.mesh.verts.count(); i++) {
 
-            let v = this.verts.getVector(i);
-            this.verts.setVector(i, matrix.multiplyVector(v));
+            let v = this.mesh.verts.getVector(i);
+            this.mesh.verts.setVector(i, matrix.multiplyVector(v));
         }
     }
 
+
     // getters & selectors 
 
+
+    // VERY POORLY OPTIMIZED
     getAdjacentFaces(v: vertexID) : faceID[] {
         let faces: faceID[] = []
-        let count = this.links.count()
+        let count = this.mesh.links.count()
         for (let i = 0; i < count; i++) {
-            if (this.links.getRow(i).includes(v)) {
+            if (this.mesh.links.getRow(i).includes(v)) {
                 faces.push(i);
             }
         }
         return faces;
     }
 
-
     getFaceVertices(f: faceID) : Vector3Array {
-        
-        let verts = new Vector3Array(this.links._width);
-        this.links.getRow(f).forEach((v, i) => {
-            verts.setVector(i, (this.verts.getVector(v)));
-        });
-        return verts;
+        return this.mesh.getLinkVerts(f);
     }
 
 
-    getKind() : RenderMeshKind {
-        if (this.links._width == RenderMeshKind.Points) {
-            return RenderMeshKind.Points;
-        } else if (this.links._width == RenderMeshKind.Lines) {
-            return RenderMeshKind.Lines;
-        } else if (this.links._width == RenderMeshKind.Triangles) {
-            return RenderMeshKind.Triangles;
-        } else if (this.links._width == RenderMeshKind.Quads) {
-            return RenderMeshKind.Quads;
-        } else {
-            return RenderMeshKind.Invalid;
-        }
+    getType() : RenderMeshKind {
+        return this.mesh.getType();
     }
+
 
     getNormalType() : NormalKind {       
         
@@ -188,7 +158,7 @@ export class RenderMesh {
     // set 1 normal per face 
     calculateFaceNormals() {
         
-        if (this.getKind() != RenderMeshKind.Triangles) {
+        if (this.getType() != RenderMeshKind.Triangles) {
             console.error("can only calculate normals from triangular meshes");
             this.norms = new Vector3Array(0);
             return;
@@ -196,7 +166,7 @@ export class RenderMesh {
 
         this._normKind = NormalKind.Face;
 
-        let faceCount = this.links.count();
+        let faceCount = this.mesh.links.count();
         this.norms = new Vector3Array(faceCount);
         for (let f = 0 ; f < faceCount; f++) {
 
@@ -206,9 +176,11 @@ export class RenderMesh {
         }
     }
 
+
     calculateVertexNormals() {
         this._normKind = NormalKind.Vertex;
     }
+
 
     calculateMultiVertexNormals() {
 
@@ -217,8 +189,8 @@ export class RenderMesh {
 
         // calculate 
         this.calculateFaceNormals();
-        let vertNormals = new Vector3Array(this.verts.count());
-        this.verts.forEach((v, i) => {
+        let vertNormals = new Vector3Array(this.mesh.verts.count());
+        this.mesh.verts.forEach((v, i) => {
             
             let adjFaces = this.getAdjacentFaces(i);
             vertNormals.setVector(i, this.norms.take(adjFaces).average());
@@ -231,7 +203,7 @@ export class RenderMesh {
 
 // ================ Obj ===================
 
-export function meshFromObj(text: string) : RenderMesh {
+export function meshFromObj(text: string) : Renderable {
 
     // This is not a full .obj parser.
     // see http://paulbourke.net/dataformats/obj/
@@ -294,10 +266,11 @@ export function meshFromObj(text: string) : RenderMesh {
     // console.log("number of uvs: " + uvs.length / 2);
     // console.log("number of norms: " + norms.length / 3);
 
-    let mesh = RenderMesh.fromData(verts, norms, uvs, faces);
+    let mesh = Renderable.fromData(verts, norms, uvs, faces);
   
     return mesh;
 }
+
 
 // NOTE: for now, uv and normals are completely ignored!!!
 // we assume the indices are the same als the vertices!!!
@@ -322,6 +295,7 @@ function ProcessObjFaceVertex(part: string) : number[] {
     }
     return data;
 }
+
 
 // process a face entry in an obj file
 function ProcessObjFace(parts: string[]) : number[] {
@@ -348,4 +322,3 @@ function ProcessObjFace(parts: string[]) : number[] {
     // data always has length 9 or 18
     return data;
 }
-

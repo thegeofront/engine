@@ -2,7 +2,7 @@
 // author:  Jos Feenstra
 // purpose: test creation of basic mesh shapes. Test UI
 
-import { App, Camera, DotRenderer3, LineRenderer, MeshDebugRenderer, ShadedMeshRenderer, Plane, LineArray, RenderMesh, Parameter, UI, Vector3, Mesh, InputState } from "../../src/lib";
+import { App, Camera, DotRenderer3, LineRenderer, MeshDebugRenderer, ShadedMeshRenderer, Plane, LineArray, Renderable, Parameter, UI, Vector3, Mesh, InputState } from "../../src/lib";
 
 
 export class MeshInspectorApp extends App {
@@ -17,7 +17,7 @@ export class MeshInspectorApp extends App {
     // geo data
     plane: Plane = Plane.WorldXY();
     grid?: LineArray;
-    geo: RenderMesh[] = [];
+    geo: Renderable[] = [];
 
     // logic data 
     size = 10;
@@ -87,16 +87,16 @@ export class MeshInspectorApp extends App {
         let det = this.detail.get();
 
         let mesh = Mesh.fromJoin([
-            Mesh.fromSphere(new Vector3(dis,0,0), this.radius.get(), this.detail.get(), spherePerRing),
+            Mesh.newSphere(new Vector3(dis,0,0), this.radius.get(), this.detail.get(), spherePerRing),
             // PureMesh.fromCube(new Cube(this.plane, Domain3.fromRadius(this.radius.get()))),
-            Mesh.fromCone(new Vector3(-dis, 0, -this.radius.get()), this.radius.get(), this.radius.get() * 2, spherePerRing),
-            Mesh.fromCylinder(
+            Mesh.newCone(new Vector3(-dis, 0, -this.radius.get()), this.radius.get(), this.radius.get() * 2, spherePerRing),
+            Mesh.newCylinder(
                 new Vector3(0, 0, -rad), 
                 new Vector3(0, 0,  rad),
                 rad,
                 det),
         ]);
-        let dmesh = mesh.toDisplayMesh();
+        let dmesh = mesh.toRenderable();
 
         if (this.renderNormals.get() == 1) {
             dmesh.calculateFaceNormals();

@@ -4,7 +4,7 @@
 
 import { IntMatrix } from "../data/int-matrix";
 import { Vector3Array } from "../data/vector-array";
-import { RenderMesh } from "../mesh/render-mesh";
+import { Renderable } from "../mesh/render-mesh";
 import { Matrix4 } from "../math/matrix";
 import { DrawSpeed, Renderer } from "./renderer";
 
@@ -62,8 +62,8 @@ export class SimpleMeshRenderer extends Renderer {
         this.index_buffer = gl.createBuffer()!;  
     }
 
-    setMesh(gl: WebGLRenderingContext, mesh: RenderMesh, speed: DrawSpeed = DrawSpeed.StaticDraw) {
-        return this.set(gl, mesh.verts, mesh.links, speed);
+    setMesh(gl: WebGLRenderingContext, rend: Renderable, speed: DrawSpeed = DrawSpeed.StaticDraw) {
+        return this.set(gl, rend.mesh.verts, rend.mesh.links, speed);
     }
 
     set(gl: WebGLRenderingContext, verts: Vector3Array, faces: IntMatrix, speed: DrawSpeed = DrawSpeed.StaticDraw) {

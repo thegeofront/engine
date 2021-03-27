@@ -5,7 +5,7 @@
 import { IntMatrix } from "../data/int-matrix";
 import { LineArray } from "../mesh/line-array";
 import { Vector3Array } from "../data/vector-array";
-import { NormalKind, RenderMesh } from "../mesh/render-mesh";
+import { NormalKind, Renderable } from "../mesh/render-mesh";
 import { Matrix4 } from "../math/matrix";
 import { DrawSpeed, Renderer } from "./renderer";
 import { LineRenderer } from "./line-renderer";
@@ -118,11 +118,11 @@ export class ShadedMeshRenderer extends Renderer {
         // this.index_buffer = gl.createBuffer()!; 
     }
 
-    set(gl: WebGLRenderingContext, mesh: RenderMesh, speed: DrawSpeed = DrawSpeed.StaticDraw) {
+    set(gl: WebGLRenderingContext, rend: Renderable, speed: DrawSpeed = DrawSpeed.StaticDraw) {
 
         // NOTE: processing time is longer: we use DrawArray instead of DrawElements, to deal with normals & uv data
 
-        if (mesh.getNormalType() != NormalKind.Face) {
+        if (rend.getNormalType() != NormalKind.Face) {
             console.warn("cannot");
             return;
         }
@@ -131,7 +131,7 @@ export class ShadedMeshRenderer extends Renderer {
 
         // save how many verts need to be drawn
         gl.useProgram(this.program);
-        this.count = mesh.links.data.length
+        this.count = rend.mesh.links.data.length
         let ds = this.convertDrawSpeed(speed);
 
         // convert to non-indexed verts & norms 
@@ -139,13 +139,13 @@ export class ShadedMeshRenderer extends Renderer {
         let norms = new Vector3Array(this.count);
         let ambi = new Float32Array(this.count);
 
-        let faceCount = mesh.links.count();
-        for (let i = 0 ; i < mesh.links.count(); i++) {
+        let faceCount = rend.mesh.links.count();
+        for (let i = 0 ; i < rend.mesh.links.count(); i++) {
             
-            let norm = mesh.norms.getVector(i);
-            mesh.links.getRow(i).forEach((v, j) => {
+            let norm = rend.norms.getVector(i);
+            rend.mesh.links.getRow(i).forEach((v, j) => {
                 let id = i * 3 + j;
-                verts.setVector(id, mesh.verts.getVector(v));
+                verts.setVector(id, rend.mesh.verts.getVector(v));
                 norms.setVector(id, norm);
                 ambi[id] = 1;
             });

@@ -2,11 +2,11 @@ import { HashTable } from "../data/hash-table";
 import { IntMatrix } from "../data/int-matrix";
 import { Vector3Array } from "../data/vector-array";
 import { Vector2, Vector3 } from "../math/vector";
-import { RenderMesh } from "./render-mesh";
+import { Renderable } from "./render-mesh";
 import { Triangle2, Triangle3 } from "../geo/triangle";
 
 // a mesh with topological information
-export class TopoMesh extends RenderMesh {
+export class TopoMesh extends Renderable {
 
     lastTouched = 0; // needed for triangle walk
     neighborMap: IntMatrix;
@@ -14,15 +14,15 @@ export class TopoMesh extends RenderMesh {
     // private -> should only be used with factory methods
     private constructor(vertCount: number, normCount: number, uvCount: number, faceCount: number, texture: ImageData | undefined = undefined) {
         super(vertCount, normCount, uvCount, faceCount, texture);
-        this.neighborMap = new IntMatrix(this.links.count(), 3);
+        this.neighborMap = new IntMatrix(this.mesh.links.count(), 3);
     }
 
-    static copyFromMesh(mesh: RenderMesh) : TopoMesh {
-        let topoMesh = new TopoMesh(mesh.verts.count(), mesh.norms.count(), mesh.uvs.count(), mesh.links.count());
-        topoMesh.verts = mesh.verts.clone();
-        topoMesh.norms = mesh.norms.clone();
-        topoMesh.uvs = mesh.uvs.clone();
-        topoMesh.links = mesh.links.clone();
+    static copyFromRenderable(rend: Renderable) : TopoMesh {
+        let topoMesh = new TopoMesh(rend.mesh.verts.count(), rend.norms.count(), rend.uvs.count(), rend.mesh.links.count());
+        topoMesh.mesh.verts = rend.mesh.verts.clone();
+        topoMesh.norms = rend.norms.clone();
+        topoMesh.uvs = rend.uvs.clone();
+        topoMesh.mesh.links = rend.mesh.links.clone();
         topoMesh.setNeighborMap();
         return topoMesh;
     }
@@ -36,7 +36,7 @@ export class TopoMesh extends RenderMesh {
         let pairs = new HashTable<any>();
 
         // 1 | per triangle
-        this.links.forEachRow((f, faceIndex) => {
+        this.mesh.links.forEachRow((f, faceIndex) => {
             let faceEdges = [
                 [f[0], f[1]],
                 [f[1], f[2]],
@@ -106,7 +106,7 @@ export class TopoMesh extends RenderMesh {
         // make sure we never take more steps than triangles in the triangulation.
         // this would mean something went wrong
         
-        let count = this.links.count();
+        let count = this.mesh.links.count();
         for(let _ = 0 ; _ < count; _++) {
 
             // i dont know how, but if we accidentally landed outside of the mesh
@@ -117,7 +117,7 @@ export class TopoMesh extends RenderMesh {
             for(let i = 0 ; i < 3; i++) {
                 let j = (i + 1) % 3;
 
-                let face = this.links.getRow(faceIndex);
+                let face = this.mesh.links.getRow(faceIndex);
                 let edge: [number, number] = [face[i], face[j]];
                 
                 let b = this.uvs.getVector(edge[0]);
@@ -151,11 +151,11 @@ export class TopoMesh extends RenderMesh {
     // -1 if the mesh does not contain triangles
     closestFaces(point: Vector3) : number[] {
 
-        let closestVertexId = this.verts.closestId(point);
+        let closestVertexId = this.mesh.verts.closestId(point);
         // get all face ids containing closestVertex, along with their centers
         let closestFaces: number[] = [];  
         //let centers: Vector3[] = []
-        this.links.forEachRow((tr, i) => {
+        this.mesh.links.forEachRow((tr, i) => {
             if (tr.includes(closestVertexId)) {
                 closestFaces.push(i);
                 //let center = Vector3Array.fromList(this.getFacePoints(i, false)).average();
@@ -245,12 +245,12 @@ export class TopoMesh extends RenderMesh {
     private setNb(faceIndex: number, commonEdge: Int32Array, nbIndex: number) {
         
         for(let j = 0 ; j < 3; j++) {
-            if (!commonEdge.includes(this.links.get(faceIndex, j))) {
+            if (!commonEdge.includes(this.mesh.links.get(faceIndex, j))) {
                 this.neighborMap.set(faceIndex, j, nbIndex);
                 return;
             } 
         }
-        console.log(this.links.getRow(faceIndex));
+        console.log(this.mesh.links.getRow(faceIndex));
         console.log(commonEdge);
         throw "these are not actually neighbors!";
     }
@@ -258,11 +258,11 @@ export class TopoMesh extends RenderMesh {
 
     private getNb(faceIndex: number, commonEdge: Int32Array | [number, number] ) : number {
         for(let j = 0 ; j < 3; j++) {
-            if (!commonEdge.includes(this.links.get(faceIndex, j))) {
+            if (!commonEdge.includes(this.mesh.links.get(faceIndex, j))) {
                 return this.neighborMap.get(faceIndex, j);
             } 
         }
-        console.log(this.links.getRow(faceIndex));
+        console.log(this.mesh.links.getRow(faceIndex));
         console.log(commonEdge);
         throw "common edge does not match triangle index!";
     }
@@ -270,7 +270,7 @@ export class TopoMesh extends RenderMesh {
 
     private getFacePoints(tr: number, uv: boolean) : [any, any, any] {
         
-        let pointIds = this.links.getRow(tr);
+        let pointIds = this.mesh.links.getRow(tr);
         if (uv) {
             return [
                 this.uvs.getVector(pointIds[0]),
@@ -279,9 +279,9 @@ export class TopoMesh extends RenderMesh {
             ];
         } else {
             return [
-                this.verts.getVector(pointIds[0]),
-                this.verts.getVector(pointIds[1]),
-                this.verts.getVector(pointIds[2]),
+                this.mesh.verts.getVector(pointIds[0]),
+                this.mesh.verts.getVector(pointIds[1]),
+                this.mesh.verts.getVector(pointIds[2]),
             ]
         }   
     }

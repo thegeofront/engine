@@ -2,7 +2,7 @@
   "name": "geon-engine",
   "version": "0.0.6",
   "author": "Jos Feenstra",
-  "license": "",
+  "license": "MIT",
   "description": "General purpose 3d geometry library & 3d renderer without external dependencies.",
   "main": "lib.ts",
   "scripts": {

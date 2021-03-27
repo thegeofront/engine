@@ -10,7 +10,7 @@ import { Vector2Array, Vector3Array } from "../data/vector-array";
 import { Vector2, Vector3 } from "../math/vector";
 import { Cube } from "../geo/cube";
 import { Rectangle3 } from "../geo/rectangle";
-import { RenderMesh, RenderMeshKind as MeshType } from "./render-mesh";
+import { Renderable, RenderMeshKind as MeshType } from "./render-mesh";
 import { Plane } from "../geo/plane";
 import { Matrix4 } from "../math/matrix";
 import { Graph } from "./graph";
@@ -38,6 +38,11 @@ export class Mesh {
             Vector3Array.fromList(verts), 
             IntMatrix.fromList(faces, 3)
         );
+    }
+
+
+    static newEmpty(vertCount: number, linkCount: number, perLinkCount: number) : Mesh {
+        return new Mesh(new Vector3Array(vertCount), new IntMatrix(linkCount,perLinkCount));
     }
 
 
@@ -83,27 +88,27 @@ export class Mesh {
     }
 
     
-    static fromRect(rect: Rectangle3) : RenderMesh {
+    static fromRect(rect: Rectangle3) : Renderable {
 
         let verts = rect.getCorners();
 
         // we cant handle quads yet 
         let faces: number[] = []
         faces.push(...quadToTri(cubeFaces[0]));
-        let mesh = new RenderMesh(4, 0, 0, 2);
-        mesh.verts.fillFromList(verts);
-        mesh.links.setData(faces);
+        let rend = new Renderable(4, 0, 0, 2);
+        rend.mesh.verts.fillFromList(verts);
+        rend.mesh.links.setData(faces);
 
         // console.log(mesh.verts);
         // console.log(mesh.links);
 
-        mesh.setUvs(new Float32Array([
+        rend.setUvs(new Float32Array([
             0.0,  0.0,
             0.0,  1.0,
             1.0,  0.0,
             1.0,  1.0])
             );
-        return mesh;
+        return rend;
     }
 
 
@@ -119,7 +124,7 @@ export class Mesh {
     }
 
 
-    static fromIcosahedron(scale=1) : Mesh {
+    static newIcosahedron(scale=1) : Mesh {
 
         let graph = new Graph();
 
@@ -169,7 +174,7 @@ export class Mesh {
     }
 
 
-    static fromSphere(center: Vector3, radius: number, numRings: number, numPerRing: number) : Mesh {
+    static newSphere(center: Vector3, radius: number, numRings: number, numPerRing: number) : Mesh {
  
         // verts
         let vertCount = numRings * numPerRing + 2;
@@ -265,7 +270,7 @@ export class Mesh {
     }
 
 
-    static fromCylinder(from: Vector3, to: Vector3, radius: number, numPerRing: number) : Mesh {
+    static newCylinder(from: Vector3, to: Vector3, radius: number, numPerRing: number) : Mesh {
 
         let normal = to.subbed(from);
 
@@ -341,7 +346,7 @@ export class Mesh {
     }
 
 
-    static fromCone(center: Vector3, radius: number, height: number, numPerRing: number) {
+    static newCone(center: Vector3, radius: number, height: number, numPerRing: number) {
 
         let numVerts = numPerRing + 2;
         let numFaces = numPerRing * 2;
@@ -401,13 +406,12 @@ export class Mesh {
         return Mesh.new(verts, links);
     }
 
+
     // TODO fix this later
 
-    toDisplayMesh() : RenderMesh {
-        let mesh = new RenderMesh(this.verts.count(), 0, 0, this.links.count());
-        mesh.verts.data = this.verts.data;
-        mesh.links.data = this.links.data;
-        return mesh;
+
+    toRenderable() : Renderable {
+        return Renderable.fromMesh(this);
     }
 
 
@@ -417,6 +421,7 @@ export class Mesh {
 
 
     getType() : MeshType {
+
         if (this.links._width == MeshType.Points) {
             return MeshType.Points;
         } else if (this.links._width == MeshType.Lines) {
@@ -428,6 +433,48 @@ export class Mesh {
         } else {
             return MeshType.Invalid;
         }
+    }
+
+
+    getLinkVerts(f: number) {
+
+        let verts = new Vector3Array(this.links._width);
+        this.links.getRow(f).forEach((v, i) => {
+            verts.setVector(i, (this.verts.getVector(v)));
+        });
+        return verts;
+    }
+
+
+    calculateFaceNormals() : Vector3[] {
+        
+        let norms: Vector3[] = [];
+        if (this.getType() != MeshType.Triangles) {
+            console.error("can only calculate normals from triangular meshes");
+            return norms;
+        }
+
+        let faceCount = this.links.count();
+        for (let i = 0 ; i < faceCount; i++) {
+
+            let verts = this.getLinkVerts(i).toList();
+            let normal = verts[1].subbed(verts[0]).cross(verts[2].subbed(verts[0])).normalize();
+            norms.push(normal);
+        }
+        return norms;
+    }
+
+
+    calculateVertexNormals() : Vector3[] {
+
+        let count = this.links.count();
+        let faceNormals = this.calculateFaceNormals();
+
+        for (let i = 0; i < count; i++) {
+            
+        }
+
+        return faceNormals;
     }
 }
 
