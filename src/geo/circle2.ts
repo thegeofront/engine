@@ -1,5 +1,3 @@
-import { norm } from "@tensorflow/tfjs";
-import { randUniform } from "@tensorflow/tfjs-core/dist/util";
 import { Const } from "../math/const";
 import { Vector2 } from "../math/vector";
 

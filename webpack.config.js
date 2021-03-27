@@ -3,14 +3,14 @@ const path = require('path');
 // setup webpack using the ts-loader
 module.exports = {
     devtool: "eval-source-map", // just source-map is slower, but nicer
-    entry: "./src/index.ts", 
+    entry: "./demo/index.ts", 
     mode: 'development',
     module: {
         rules: [
             {
                 test: /\.ts$/,
                 use: 'ts-loader',
-                include: [path.resolve(__dirname, 'src')]
+                include: [path.resolve(__dirname, 'src'), path.resolve(__dirname, 'demo')]
             }
         ]
     },

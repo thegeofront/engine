@@ -1,12 +1,13 @@
-import { unsortedSegmentSum } from "@tensorflow/tfjs-core";
-import { Core } from "../core";
-import { InputState } from "../system/input-state"
-import { UI } from "../system/ui";
-import { App } from "./app";
-
+// name:    swap-app
+// author:  Jos Feenstra
 // purpose: swap between different apps.
 //          - factory for initiazing these apps
 //          - making sure core deletes old apps
+
+import {Core} from "../system/core";
+import {UI} from "../system/ui";
+import { App } from "./app";
+
 export class SwapApp extends App {
 
     possibleApps: any[];

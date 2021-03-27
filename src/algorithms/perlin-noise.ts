@@ -2,7 +2,7 @@
 // author:      Jos Feenstra
 // purpose:     Generate Perin Noise
 
-import { GMath } from "../math/math";
+import { GeonMath } from "../math/math";
 
 // a javascript implementation of:
 // Ref : https://adrianb.io/2014/08/09/perlinnoise.html
@@ -98,29 +98,29 @@ export class Perlin
 		let bab = p[p[p[this.inc(xi)] + yi] + this.inc(zi)];
 		let bbb = p[p[p[this.inc(xi)] + this.inc(yi)] + this.inc(zi)];
 
-		let u = GMath.fade(xf);
-		let v = GMath.fade(yf);
-		let w = GMath.fade(zf);
+		let u = GeonMath.fade(xf);
+		let v = GeonMath.fade(yf);
+		let w = GeonMath.fade(zf);
 
 		let x1, x2, y1, y2;
-		x1 = GMath.lerp(
+		x1 = GeonMath.lerp(
 			this.grad(aaa, xf, yf, zf),           // The gradient function calculates the dot product between a pseudorandom
 			this.grad(baa, xf - 1, yf, zf),             // gradient vector and the vector from the input coordinate to the 8
 			u);                                     // surrounding points in its unit cube.
-		x2 = GMath.lerp(
+		x2 = GeonMath.lerp(
 			this.grad(aba, xf, yf - 1, zf),           // This is all then lerped together as a sort of weighted average based on the faded (u,v,w)
 			this.grad(bba, xf - 1, yf - 1, zf),             // values we made earlier.
 			u);
-		y1 = GMath.lerp(x1, x2, v);
+		y1 = GeonMath.lerp(x1, x2, v);
 
-		x1 = GMath.lerp(this.grad(aab, xf, yf, zf - 1),
+		x1 = GeonMath.lerp(this.grad(aab, xf, yf, zf - 1),
 			this.grad(bab, xf - 1, yf, zf - 1),
 					u);
-		x2 = GMath.lerp(this.grad(abb, xf, yf - 1, zf - 1),
+		x2 = GeonMath.lerp(this.grad(abb, xf, yf - 1, zf - 1),
 			this.grad(bbb, xf - 1, yf - 1, zf - 1),
 					  u);
-		y2 = GMath.lerp(x1, x2, v);
+		y2 = GeonMath.lerp(x1, x2, v);
 
-		return (GMath.lerp(y1, y2, w) + 1) / 2;
+		return (GeonMath.lerp(y1, y2, w) + 1) / 2;
 	}
 }

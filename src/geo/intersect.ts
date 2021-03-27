@@ -1,4 +1,3 @@
-import { ready } from "@tensorflow/tfjs";
 import { Vector3Array } from "../data/vector-array"
 import { Const } from "../math/const"
 import { Vector3 } from "../math/vector"
@@ -12,7 +11,7 @@ function lineXplane(l1: Vector3, l2: Vector3, p1: Vector3, p2: Vector3, p3: Vect
     
     let test1 = signed_volume(p1, p2, p3, l1);
     let test2 = signed_volume(p1, p2, p3, l2);
-    if (IsRoughly(test1, 0) || IsRoughly(test2, 0)) {
+    if (Math.abs(test1) < Const.TOLERANCE || Math.abs(test2) < Const.TOLERANCE) {
         return 0; // triangle touches plane with an edge
     } else if ((test1 < 0 && test2 > 0) || (test1 > 0 && test2 < 0)) {
         return 1 // if 1 test pos and other negative -> line intersects plane! 
@@ -68,3 +67,7 @@ function signed_volume(a: Vector3, b: Vector3, c: Vector3, d: Vector3) {
     return (1/6) * a.clone().sub(d).dot(c.sub(d).cross(b.sub(d)));
 }
     
+function IsRoughly(test1: number, arg1: number) {
+    throw new Error("Function not implemented.");
+}
+

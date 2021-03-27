@@ -5,8 +5,8 @@
 // todo: 	BIJ NADER INZIEN: dont go the copy route. rewrite this in a more functional way creating new classes is expensive, but we really need immutable vectors. 
 // 			these types of consistent vectors are only useful in niche cases, and complitate a lot of common cases. 
 
-import { copyRegisteredKernels } from "@tensorflow/tfjs-core";
 import { Const } from "./const";
+import { GeonMath } from "./math";
 import { Matrix4 } from "./matrix";
 import { Util } from "./util";
 
@@ -337,9 +337,9 @@ export class Vector3
 	clampScalared(min:number, max:number) : Vector3 
 	{
 		return new Vector3(
-			clamp(this.x, min, max),
-			clamp(this.y, min, max),
-			clamp(this.z, min, max),
+			GeonMath.clamp(this.x, min, max),
+			GeonMath.clamp(this.y, min, max),
+			GeonMath.clamp(this.z, min, max),
 		);
 	}
 
@@ -928,17 +928,4 @@ export class Vector2
 		const scalar = other.dot(this) / denominator;
 		return this.copy(other).scale(scalar);
 	}
-}
-
-function clamp(value: number, min: number, max: number) : number {
-	return Math.max(min, Math.min(max, value));
-}
-
-
-export function radToDeg(r: number) {
-	return r * 180 / Math.PI;
-}
-
-export function degToRad(d: number) {
-	return d * Math.PI / 180;
 }

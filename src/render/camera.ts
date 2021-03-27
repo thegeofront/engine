@@ -2,10 +2,9 @@
 // author : Jos Feenstra
 // purpose : contain all logic regarding 
 
-import { norm } from "@tensorflow/tfjs";
 import { LineArray } from "../mesh/line-array";
 import { Plane } from "../geo/plane";
-import { GMath } from "../math/math";
+import { GeonMath } from "../math/math";
 import { Matrix4 } from "../math/matrix";
 import { Ray } from "../math/ray";
 import { Vector2, Vector3 } from "../math/vector"
@@ -96,7 +95,7 @@ export class Camera {
         this.getMouseWorldRay(state.canvas.width, state.canvas.height);
 
         if (state.mouseRightDown) {
-            this.angleAlpha = GMath.clamp(this.angleAlpha + delta.y * 0.01, 0, Math.PI);
+            this.angleAlpha = GeonMath.clamp(this.angleAlpha + delta.y * 0.01, 0, Math.PI);
             this.angleBeta += delta.x * -0.01;
         }   
 

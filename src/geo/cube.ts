@@ -10,13 +10,13 @@ import { Plane } from "./plane";
 
 export class Cube {
 
-    
-    plane: Plane
-    domain: Domain3
+    constructor(
+        public plane: Plane, 
+        public domain: Domain3) {}
 
-    constructor(plane: Plane, domain: Domain3) {
-        this.plane = plane;
-        this.domain = domain;
+
+    static new(plane: Plane, domain: Domain3) {
+        return new Cube(plane, domain);
     }
 
 

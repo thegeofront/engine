@@ -9,8 +9,8 @@ import { Domain2 } from "../math/domain";
 import { FloatMatrix } from "../data/float-matrix";
 
 
-// TODO : x and y are not the same as i and j, and used inconsistently.
-// fix this. 
+// TODO : x and y are not the same as i and j, and used inconsistently. fix this. 
+// TODO : now that GEON is a package, we can use G.Image. the Geon suffix is not needed anymore is not needed anymore! 
 const acceptedKernels : number[] = [3,5,7,9];
 export class GeonImage {
 
@@ -28,16 +28,22 @@ export class GeonImage {
     }
 
     static fromImageData(id: ImageData) : GeonImage {
+
         let image = new GeonImage(id.width, id.height);
         image.setData(id.data);
         return image
+
+
+
     }
+
 
     toImageData() : ImageData {
         // imagedata requires pixelsize of 4.
         if (this.pixelSize != 4) throw "pixelsize must be 4 for toImageData to work";
         return new ImageData(this.data, this.width, this.height);
     }
+
 
     setData(data: Uint8ClampedArray) {
         if (data.length != (this.height * this.width * this.pixelSize))
@@ -46,11 +52,13 @@ export class GeonImage {
         this.data = data;
     }
 
+
     clone() {
         let image = new GeonImage(this.width, this.height, this.pixelSize)
         image.setData(this.data);
         return image;
     }
+
 
     fill(pixel: number[]) : GeonImage {
         for (let i = 0; i < this.height; i++) {
@@ -61,6 +69,7 @@ export class GeonImage {
         return this;
     }
 
+
     fillEvery(filler: Function) {
         for (let i = 0; i < this.height; i++) {
             for (let j = 0; j < this.width; j++) {
@@ -69,10 +78,12 @@ export class GeonImage {
         }
         return this;
     }
+ 
     
     includes(x: number, y: number) : boolean {
         return (x < this.width && x >= 0 && y < this.height && y >= 0);
     }
+
 
     set(i: number, j: number, pixel: number[]) {
 
@@ -81,6 +92,7 @@ export class GeonImage {
         this.data[4 * ((j * this.width + i)) + 2] = pixel[2];
         this.data[4 * ((j * this.width + i)) + 3] = pixel[3];
     }
+
 
     get(i: number, j: number) : number[] {
 
@@ -91,6 +103,7 @@ export class GeonImage {
             this.data[4 * (j * this.width + i) + 3]
         ]
     }
+
 
     flipHor() : GeonImage {
         let image = new GeonImage(this.width, this.height, this.pixelSize)
@@ -103,6 +116,7 @@ export class GeonImage {
         return image;
     }
 
+
     flipVer() : GeonImage {
         let image = new GeonImage(this.width, this.height, this.pixelSize)
         for (let i = 0; i < this.height; i++) {
@@ -113,6 +127,7 @@ export class GeonImage {
         }
         return image;
     }
+
 
     public applyKernel(kernel: FloatMatrix) : GeonImage {
 
@@ -133,6 +148,7 @@ export class GeonImage {
         return image; // succes 
     }
 
+
     getMinMax() : [number, number] {
         // get the minimum and maximum pixel value
         // assumes pixelsize = 1
@@ -151,6 +167,7 @@ export class GeonImage {
         return [ min, max]
     }
 
+
     applyThreshold(lower: number, upper: number) {
         return this.apply((x: number,y: number) => {
             
@@ -165,6 +182,7 @@ export class GeonImage {
             } 
         });
     }
+  
     
     apply(filler: Function) : GeonImage {
         let copy = new GeonImage(this.width, this.height, this.pixelSize);
@@ -176,6 +194,8 @@ export class GeonImage {
         }
         return copy;
     }
+
+
     applyNMS() : GeonImage {
         
         // determine kernel size
@@ -237,6 +257,7 @@ export class GeonImage {
         return sum;
     }
 
+
     setAplha(a: number) {
         for (let y = 0; y < this.height; y++) {
             for (let x = 0; x < this.width; x++) {
@@ -247,6 +268,7 @@ export class GeonImage {
         return this;
     }
 
+
     scale(scaleX: number, scaleY: number) : GeonImage {
 
         // scale the image to a new width and height, using nearest neighbour
@@ -255,6 +277,7 @@ export class GeonImage {
             Math.round(this.height * scaleY)
             );
     }
+
 
     resize(width: number, height: number) : GeonImage {
         
@@ -276,6 +299,7 @@ export class GeonImage {
 
         return image;
     }
+
 
     // add borders till this size is achieved
     buffer(width: number, height: number) : GeonImage {
@@ -312,6 +336,7 @@ export class GeonImage {
         return image;
     }
 
+
     trimWithDomain(dom: Domain2) {
         const x1 = Math.round(dom.x.t0);
         const x2 = Math.round(dom.x.t1);
@@ -320,6 +345,7 @@ export class GeonImage {
 
         return this.trim(x1, y1, x2,y2);
     }
+
 
     trim(x1: number, y1: number, x2: number, y2: number) : GeonImage {
 
@@ -339,6 +365,7 @@ export class GeonImage {
         return image;
     }
 
+
     toGreyscale() : GeonImage {
 
         if (this.pixelSize != 4) throw "please, only use this when pixelsize is 4"
@@ -354,6 +381,7 @@ export class GeonImage {
         return image;
     }
 
+    
     toRGBA() : GeonImage {
         
         // if (this.pixelSize != 1) throw "please, only use this when pixelsize is 1"

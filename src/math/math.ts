@@ -6,7 +6,7 @@ import { Const } from "./const";
 
 
 
-export class GMath {
+export class GeonMath {
     
     // make sure 'value' is more than 'lower', and less than 'upper'
     static clamp(value: number, lower: number, upper: number) {
@@ -24,6 +24,14 @@ export class GMath {
 	static lerp(a: number, b: number, x: number) : number
 	{
 		return a + x * (b - a);
+	}
+	
+	static radToDeg(r: number) {
+		return r * 180 / Math.PI;
+	}
+	
+	static degToRad(d: number) {
+		return d * Math.PI / 180;
 	}
 
 	// /**

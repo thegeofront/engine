@@ -2,7 +2,7 @@
 // author:  Jos Feenstra
 // purpose: lets create the UI using html & dom api, because why the hell not
 
-import { GMath } from "../math/math";
+import { GeonMath } from "../math/math";
 
 export class UI {
 
@@ -196,11 +196,11 @@ export class Parameter {
 
     set(state: number) {
         // TODO ROUND TO NEAREST STEP
-        let clamped = GMath.clamp(state, this.min, this.max);
+        let clamped = GeonMath.clamp(state, this.min, this.max);
         let rest = this.state - this.min;
         let times = Math.min(rest / this.step);
         let stepped = this.min + this.step * times;
-        this.state = GMath.clamp(state, this.min, this.max);  
+        this.state = GeonMath.clamp(state, this.min, this.max);  
         if (this.onset) 
             this.onset(this.state);   
     }

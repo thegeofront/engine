@@ -25,17 +25,42 @@ interface Edge {
 // NOTE: half edge is implied
 export class Graph {
 
-    private _verts: Vert[];
-    private _edges: Edge[]; // NOTE: ALWAYS AN EVEN NUMBER OF EDGES. EDGE TWIN IS EVEN / UNEVEN MATCH
+    private verts: Vert[];
+    private edges: Edge[]; // NOTE: ALWAYS AN EVEN NUMBER OF EDGES. EDGE TWIN IS EVEN / UNEVEN MATCH
 
     constructor() {
-        this._verts = [];
-        this._edges = [];
+        this.verts = [];
+        this.edges = [];
     }
 
 
-    static fromMesh() {
+    static new() {
+        return new Graph();
+    }
+
+
+    static fromMesh(mesh: Mesh) : Graph {
         
+        let graph = Graph.new();
+
+        mesh.verts.forEach((v, i) => {
+
+        });
+
+        let width = mesh.links._width;
+        mesh.links.forEachRow((row, i) => {
+
+            // go through pairs
+            for (let i = 0; i < width; i++) {
+                let iNext = (i + 1) % width;
+
+                if (i < iNext) {
+
+                }
+            }
+        })
+
+        return graph;
     }
 
 
@@ -47,9 +72,9 @@ export class Graph {
 
     transform(matrix: Matrix4) {
 
-        for (let i = 0 ; i < this._verts.length; i++) {
+        for (let i = 0 ; i < this.verts.length; i++) {
 
-            let v = this._verts[i];
+            let v = this.verts[i];
             v.data = matrix.multiplyVector(v.data);
         }
     }
@@ -59,16 +84,16 @@ export class Graph {
     print() {
         console.log("graph")
         console.log("--------")
-        console.log(`${this._verts.length} verts: `)
-        for (let i = 0 ; i < this._verts.length; i++) {
-            let v = this._verts[i];
+        console.log(`${this.verts.length} verts: `)
+        for (let i = 0 ; i < this.verts.length; i++) {
+            let v = this.verts[i];
             console.log(`v(${i}) | edge: ${v.edge}, data: ${v.data.toString()} `);
         }
 
         console.log("--------")
-        console.log(`${this._edges.length} edges:  `)
-        for (let i = 0; i < this._edges.length; i++) {
-            let e = this._edges[i];
+        console.log(`${this.edges.length} edges:  `)
+        for (let i = 0; i < this.edges.length; i++) {
+            let e = this.edges[i];
             console.log(`e(${i}) | vert: ${e.vert} | twin: ${e.twin}, next: ${e.next}`)
         }
         console.log("--------")
@@ -85,7 +110,7 @@ export class Graph {
 
     allVerts() : Vector3[] {
         let data: Vector3[] = [];
-        this._verts.forEach((v) => {
+        this.verts.forEach((v) => {
             data.push(v.data);
         })
         return data;
@@ -95,7 +120,7 @@ export class Graph {
     allEdges() : VertIndex[] {
         let data: VertIndex[] = [];
         let edges = new Map<number, number>()
-        this._edges.forEach((e, i) => {
+        this.edges.forEach((e, i) => {
             if (edges.has(i)) {
                 return;
             }
@@ -111,7 +136,7 @@ export class Graph {
 
         let loops: VertIndex[][] = [];
         let unvisited = new Set<number>()
-        this._edges.forEach((e, i) => {
+        this.edges.forEach((e, i) => {
             unvisited.add(i);
         })
 
@@ -136,10 +161,10 @@ export class Graph {
 
 
     getVertex(vi: VertIndex) : Vector3 {
-        if (vi < 0 || vi >= this._verts.length) {
+        if (vi < 0 || vi >= this.verts.length) {
             throw "out of range";
         }
-        return this._verts[vi].data;
+        return this.verts[vi].data;
     }
 
 
@@ -147,18 +172,18 @@ export class Graph {
 
 
     private getVert(vi: VertIndex) : Vert {
-        if (vi < 0 || vi >= this._verts.length) {
+        if (vi < 0 || vi >= this.verts.length) {
             throw "out of range";
         }
-        return this._verts[vi];
+        return this.verts[vi];
     }
 
 
     private getEdge(ei: EdgeIndex) : Edge {
-        if (ei < 0 || ei >= this._edges.length) {
+        if (ei < 0 || ei >= this.edges.length) {
             console.error("out of range");
         }
-        return this._edges[ei];
+        return this.edges[ei];
     }
 
 
@@ -168,7 +193,7 @@ export class Graph {
         // NOTE: all are outgoing (e.vert == vi)
 
         let fan: Edge[] = [];
-        let v = this._verts[vi];
+        let v = this.verts[vi];
         let ei = v.edge;
         let start = ei;
 
@@ -190,7 +215,7 @@ export class Graph {
 
     private getVertNeighbors(vi : VertIndex) : VertIndex[] {
         let nbs: VertIndex[] = [];
-        let v = this._verts[vi];
+        let v = this.verts[vi];
         let ei = v.edge;
         let start = ei;
 
@@ -215,7 +240,7 @@ export class Graph {
 
 
     private getEdgeTwin(ei: EdgeIndex) : Edge {
-        return this._edges[this._edges[ei].twin];
+        return this.edges[this.edges[ei].twin];
     }
 
 
@@ -223,7 +248,7 @@ export class Graph {
 
     
     addVert(vector: Vector3) {
-        this._verts.push({data: vector, edge: -1});
+        this.verts.push({data: vector, edge: -1});
     }
 
 
@@ -234,15 +259,15 @@ export class Graph {
         // \     / <---------  \     /
         //             ei2
 
-        let ei_1 = this._edges.length;
+        let ei_1 = this.edges.length;
         let ei_2 = ei_1 + 1;
 
-        this._edges.push({
+        this.edges.push({
             next: -1,
             twin: ei_2,
             vert: vi_1,
         });
-        this._edges.push({
+        this.edges.push({
             next: -1,
             twin: ei_1,
             vert: vi_2,
@@ -270,7 +295,7 @@ export class Graph {
             // console.log("Doing complitated things around vertex", vi);
 
             // determine where this edge joins the Disk
-            let v_twin = this._verts[twin.vert];
+            let v_twin = this.verts[twin.vert];
             let myVector = v.data.subbed(v_twin.data);
 
             // get all vectors
@@ -283,7 +308,7 @@ export class Graph {
 
             edges.forEach((edge) => {
                 let twin = this.getEdge(edge.twin);
-                let neighbor = this._verts[twin.vert];
+                let neighbor = this.verts[twin.vert];
                 let neighborVector = v.data.subbed(neighbor.data);
                 vectors.push(neighborVector);
             });

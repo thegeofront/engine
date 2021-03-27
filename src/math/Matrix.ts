@@ -3,7 +3,6 @@
 // TODO: FIX MATRIX4 !!!
 // NOTE: 
 
-import { arrayBufferToBase64String } from "@tensorflow/tfjs-core/dist/io/io_utils";
 import { Vector3Array } from "../data/vector-array";
 import { FloatMatrix } from "../data/float-matrix";
 import { Quaternion } from "./quaternion";

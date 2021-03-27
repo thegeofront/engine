@@ -10,14 +10,10 @@ import { Vector2Array, Vector3Array } from "../data/vector-array";
 import { Vector2, Vector3 } from "../math/vector";
 import { Cube } from "../geo/cube";
 import { Rectangle3 } from "../geo/rectangle";
-import { RenderMesh } from "./render-mesh";
+import { RenderMesh, RenderMeshKind as MeshType } from "./render-mesh";
 import { Plane } from "../geo/plane";
 import { Matrix4 } from "../math/matrix";
-import { setDeprecationWarningFn } from "@tensorflow/tfjs-core/dist/tensor";
-import { cosineWindow, linspace } from "@tensorflow/tfjs-core";
 import { Graph } from "./graph";
-import { version_converter } from "@tensorflow/tfjs-converter";
-
 
 // a very pure idea of a mesh : Vertices + links between vertices. 
 // Could be anything with these properties.
@@ -406,11 +402,32 @@ export class Mesh {
     }
 
     // TODO fix this later
+
     toDisplayMesh() : RenderMesh {
         let mesh = new RenderMesh(this.verts.count(), 0, 0, this.links.count());
         mesh.verts.data = this.verts.data;
         mesh.links.data = this.links.data;
         return mesh;
+    }
+
+
+    toGraph() : Graph {
+        return Graph.fromMesh(this);
+    }
+
+
+    getType() : MeshType {
+        if (this.links._width == MeshType.Points) {
+            return MeshType.Points;
+        } else if (this.links._width == MeshType.Lines) {
+            return MeshType.Lines;
+        } else if (this.links._width == MeshType.Triangles) {
+            return MeshType.Triangles;
+        } else if (this.links._width == MeshType.Quads) {
+            return MeshType.Quads;
+        } else {
+            return MeshType.Invalid;
+        }
     }
 }
 

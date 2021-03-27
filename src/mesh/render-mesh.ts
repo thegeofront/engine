@@ -14,7 +14,6 @@ import { Vector2Array, Vector3Array } from "../data/vector-array";
 import { Vector2, Vector3 } from "../math/vector";
 import { Cube } from "../geo/cube";
 import { Rectangle3 } from "../geo/rectangle";
-import { getTextureShapeFromLogicalShape } from "@tensorflow/tfjs-backend-webgl/dist/webgl_util";
 import { Matrix4 } from "../math/matrix";
 
 type vertexID = number;

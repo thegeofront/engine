@@ -1,5 +1,3 @@
-import { outerProduct } from "@tensorflow/tfjs";
-
 // generic all-pupose matrix of floats
 export class FloatMatrix {
 

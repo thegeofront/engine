@@ -6,7 +6,6 @@
 // NOTE:    all these small wrappers might not be good pratice, but I 
 //          like to extract simple logic like this to not clutter the code too much
 
-import { isDownloadFloatTextureEnabled } from "@tensorflow/tfjs-backend-webgl/dist/webgl_util";
 import { Matrix4 } from "../math/matrix";
 import { Vector3, Vector2 } from "../math/vector";
 import { FloatMatrix } from "./float-matrix";
@@ -300,6 +299,8 @@ export class Vector3Array extends FloatMatrix {
     }
 }
 
+
+// TODO : to FloatMatrix
 export function getGeneralFloatMatrix(vectors: Vector2Array | Vector3Array | Vector2[] | Vector3[]): FloatMatrix {
 
     if(vectors instanceof Vector2Array) {

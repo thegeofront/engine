@@ -4,7 +4,7 @@
 // todo:    turn Center, Ihat, Jhat, Khat construction to an actual matrix
 
 import { Vector3Array } from "../data/vector-array";
-import { GMath } from "../math/math";
+import { GeonMath } from "../math/math";
 import { Matrix4 } from "../math/matrix";
 import { Stat } from "../math/statistics";
 import { Vector2, Vector3 } from "../math/vector";
