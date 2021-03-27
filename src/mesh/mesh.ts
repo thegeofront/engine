@@ -19,10 +19,6 @@ import { Graph } from "./graph";
 import { version_converter } from "@tensorflow/tfjs-converter";
 
 
-// TODO make distinctions between
-// - DisplayMesh (PureMesh + uvs, texture, normals, material, etc...)
-
-
 // a very pure idea of a mesh : Vertices + links between vertices. 
 // Could be anything with these properties.
 export class Mesh {
