@@ -4,10 +4,11 @@
   "description": "General purpose 3d geometry library & 3d renderer without external dependencies.",
   "main": "lib.ts",
   "scripts": {
-    "build": "webpack --mode=development",
-    "production": "webpack --mode=production",
+    "build": "webpack --mode=development --config-name demo",
+    "lib": "webpack --mode=development --config-name lib",
+    "production": "webpack --mode=production --config-name demo",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "webpack --watch"
+    "watch": "webpack --watch --config-name demo"
   },
   "keywords": [
     "geon",

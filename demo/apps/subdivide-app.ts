@@ -28,7 +28,14 @@ export class SubdivideApp extends App {
     }
 
     ui(ui: UI) {
+        this.rotate = new Parameter("rotate", 1, 0, 1, 1)
+  
+        let reset = () => {
+            // this.rotate.set(0);
+            this.start();
+        }
 
+        ui.addBooleanParameter(this.rotate);
     }
         
     start() {
