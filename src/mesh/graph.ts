@@ -98,6 +98,7 @@ export class Graph {
         throw new Error("not yet implemented...");
     }
 
+
     transform(matrix: Matrix4) {
 
         for (let i = 0 ; i < this.verts.length; i++) {
@@ -107,8 +108,10 @@ export class Graph {
         }
     }
 
+
     // UTILITY
 
+    
     print() {
         console.log("graph")
         console.log("--------")

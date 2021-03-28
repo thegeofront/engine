@@ -20,6 +20,7 @@ export class IcosahedronApp extends App {
     graph!: Graph;
     mesh!: Renderable;
 
+    
     constructor(gl: WebGLRenderingContext) {
         
         super(gl);
@@ -29,13 +30,15 @@ export class IcosahedronApp extends App {
         this.normalRend = new NormalRenderer(gl);
     }
 
+
     getIcosahedron() : Graph {
-        // let graph = Mesh.newIcosahedron(1).toGraph();
+        let graph = Mesh.newIcosahedron(1).toGraph();
         // let graph = Mesh.newCylinder(Vector3.new(0,0,-1), Vector3.new(0,0,1), 1, 4).toGraph();
-        let graph = Mesh.newSphere(Vector3.new(0,0,0), 1, 5, 10).toGraph().toMesh().toGraph();
+        // let graph = Mesh.newSphere(Vector3.new(0,0,0), 1, 5, 10).toGraph().toMesh().toGraph();
         // graph.print();
         return graph;
     }
+
 
     getDemoShape() : Graph {
         let graph = Graph.new();
@@ -71,6 +74,7 @@ export class IcosahedronApp extends App {
         return graph;
     }
 
+
     demo() : Graph {
 
         let graph = new Graph();
@@ -89,6 +93,7 @@ export class IcosahedronApp extends App {
 
         return graph
     }
+
 
     ui(ui: UI) {
 
@@ -109,39 +114,36 @@ export class IcosahedronApp extends App {
         // ui.addParameter(this.detail, reset);
         // ui.addButton(() => {this.start()})
     }
-        
+     
+    
     start() {
         this.graph = this.getIcosahedron();
-        // this.graph.print();
         this.mesh = graphToMultiMesh(this.graph, this.radius, this.detail, this.inner.get() == 1);
         this.meshRend.set(this.gl, this.mesh);
+        // this.normalRend.set(this.graph.toRenderable(), DrawSpeed.DynamicDraw);
 
-        this.normalRend.set(this.graph.toRenderable(), DrawSpeed.DynamicDraw);
-
-        console.log("all loops: ", this.graph.allLoops());
+        // console.log("all loops: ", this.graph.allLoops());
     }
+
 
     update(state: InputState) {
         this.camera.update(state);
 
-        // if (!state.mouseRightDown && this.rotate.get() == 1) {
-        //     let alpha = 0.0002 * state.tick;
-        //     let rot = Matrix4.newXRotation(alpha)
-        //         .multiply(Matrix4.newYRotation(alpha));
-        //     this.mesh!.transform(rot);
+        if (!state.mouseRightDown && this.rotate.get() == 1) {
+            let alpha = 0.0002 * state.tick;
+            let rot = Matrix4.newXRotation(alpha)
+                .multiply(Matrix4.newYRotation(alpha));
+            this.mesh!.transform(rot);
 
-        //     this.meshRend.set(this.gl, this.mesh, DrawSpeed.DynamicDraw);
-
-        //     let normals = this.graph.toRenderable();
-        //     console.log(normals)
-        //     this.normalRend.set(normals, DrawSpeed.DynamicDraw);
-        // }
+            this.meshRend.set(this.gl, this.mesh, DrawSpeed.DynamicDraw);
+        }
     }
+
 
     draw(gl: WebGLRenderingContext) {
         this.camera.updateMatrices(gl.canvas as HTMLCanvasElement);
         this.meshRend.render(gl, this.camera);
-        this.normalRend.render(gl, this.camera);
+        // this.normalRend.render(gl, this.camera);
     }
 }
 
