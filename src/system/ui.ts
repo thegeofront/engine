@@ -149,7 +149,7 @@ export class UI {
             o.innerText = keys[i];
             e.appendChild(o);
         }
-        console.log(e);
+        // console.log(e);
 
         e.addEventListener("change", (e: Event) => {
             let target = e.target as HTMLSelectElement;

@@ -129,9 +129,9 @@ export class GeometryApp extends App {
         this.meshRenderer.render(gl, this.camera);
 
         // render other things
-        for (let geo of this.geo) {
-            this.transMeshRenderer.setAndRender(gl, matrix, geo);
-        }
+        // for (let geo of this.geo) {
+        //     this.transMeshRenderer.setAndRender(gl, matrix, geo);
+        // }
     }
 
     addPreviewCube(point: Vector3) {

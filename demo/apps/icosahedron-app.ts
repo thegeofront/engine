@@ -2,7 +2,7 @@
 // author:  Jos Feenstra
 // purpose: test statistic functionalties
 
-import { App, Camera, ShadedMeshRenderer, Parameter, Graph, Renderable, Vector3, UI, InputState, Matrix4, DrawSpeed, Mesh } from "../../src/lib";
+import { App, Camera, ShadedMeshRenderer, Parameter, Graph, Renderable, Vector3, UI, InputState, Matrix4, DrawSpeed, Mesh, NormalRenderer } from "../../src/lib";
 
 
 
@@ -10,7 +10,8 @@ export class IcosahedronApp extends App {
 
     camera: Camera;
     meshRend: ShadedMeshRenderer;
-    
+    normalRend: NormalRenderer;
+
     rotate!: Parameter;
     inner!: Parameter;
     radius = 0.1; // radius!: Parameter;
@@ -25,55 +26,47 @@ export class IcosahedronApp extends App {
         let canvas = gl.canvas as HTMLCanvasElement;
         this.camera = new Camera(canvas, 8, true);
         this.meshRend = new ShadedMeshRenderer(gl);
+        this.normalRend = new NormalRenderer(gl);
     }
 
     getIcosahedron() : Graph {
-        let graph = new Graph();
+        // let graph = Mesh.newIcosahedron(1).toGraph();
+        // let graph = Mesh.newCylinder(Vector3.new(0,0,-1), Vector3.new(0,0,1), 1, 4).toGraph();
+        let graph = Mesh.newSphere(Vector3.new(0,0,0), 1, 5, 10).toGraph().toMesh().toGraph();
+        // graph.print();
+        return graph;
+    }
 
-        // use golden ratio
-        let a = 1;
-        let phi = (1 + 5**0.5) / 2
-        let b = a * phi;
+    getDemoShape() : Graph {
+        let graph = Graph.new();
 
-        // build vertices
-        graph.addVert(new Vector3(-a,-b, 0)); 
-        graph.addVert(new Vector3( a,-b, 0)); 
-        graph.addVert(new Vector3(-a, b, 0));
-        graph.addVert(new Vector3( a, b, 0));
-
-        graph.addVert(new Vector3(0,-a,-b)); 
-        graph.addVert(new Vector3(0, a,-b)); 
-        graph.addVert(new Vector3(0,-a, b));
-        graph.addVert(new Vector3(0, a, b));
-
-        graph.addVert(new Vector3(-b, 0,-a));
-        graph.addVert(new Vector3(-b, 0, a)); 
-        graph.addVert(new Vector3( b, 0,-a));
-        graph.addVert(new Vector3( b, 0, a));
-
-        // build edges
-        let addEdge = (a: number, b: number) => {
-            let norm = graph.getVertex(a).added(graph.getVertex(b)).scale(0.5);
-            graph.addEdge(a, b, norm);
+        function addVert(v: Vector3) {
+            graph.addVert(v, v);
         }
 
-        for (let i = 0 ; i < 12; i+=4) {
+        addVert(new Vector3(-1,0,-1)); // 0
+        addVert(new Vector3(0,1,-1)); // 1
+        addVert(new Vector3(1,0,-1)); // 2
+        addVert(new Vector3(0,-1,-1)); // 3
+        addVert(new Vector3(0,0,1)); // 4
 
-            addEdge(i+0, i+1);
-            addEdge(i+2, i+3);
 
-            let inext = (i + 4) % 12;
+        addVert(new Vector3(-1,1,0)); // 5 (should be inserted between 0 and 1)
 
-            addEdge(i+0, inext+2);
-            addEdge(i+0, inext+0);
-            addEdge(i+1, inext+2);
-            addEdge(i+1, inext+0);
 
-            addEdge(i+2, inext+3);
-            addEdge(i+2, inext+1);
-            addEdge(i+3, inext+3);
-            addEdge(i+3, inext+1);
-        }        
+        graph.addEdge(4,0);
+        graph.addEdge(4,1);
+        graph.addEdge(4,2);
+        graph.addEdge(4,3);
+        // graph.addEdge(4,5);
+
+        graph.addEdge(0,1);
+        graph.addEdge(1,2);
+        graph.addEdge(2,3);
+        graph.addEdge(3,0);
+        graph.addEdge(1,3);
+
+        graph.print();
 
         return graph;
     }
@@ -81,18 +74,18 @@ export class IcosahedronApp extends App {
     demo() : Graph {
 
         let graph = new Graph();
-        graph.addVert(new Vector3(0,0,0)); // 0
-        graph.addVert(new Vector3(1,0,0)); // 1
-        graph.addVert(new Vector3(0,1,0));
-        graph.addVert(new Vector3(-1,0,0));
-        graph.addVert(new Vector3(0,-1,0));
-
         let normal = new Vector3(0,0,1);
-        graph.addEdge(0,1, normal);
-        graph.addEdge(0,2, normal);
-        graph.addEdge(0,3, normal);
-        graph.addEdge(0,4, normal);
-        graph.addEdge(1,2, normal);
+        graph.addVert(new Vector3(0,0,0) , normal); // 0
+        graph.addVert(new Vector3(1,0,0) , normal); // 1
+        graph.addVert(new Vector3(0,1,0) , normal); //
+        graph.addVert(new Vector3(-1,0,0), normal); // 
+        graph.addVert(new Vector3(0,-1,0), normal); // 
+
+        graph.addEdge(0,1);
+        graph.addEdge(0,2);
+        graph.addEdge(0,3);
+        graph.addEdge(0,4);
+        graph.addEdge(1,2);
 
         return graph
     }
@@ -123,34 +116,45 @@ export class IcosahedronApp extends App {
         this.mesh = graphToMultiMesh(this.graph, this.radius, this.detail, this.inner.get() == 1);
         this.meshRend.set(this.gl, this.mesh);
 
-        // console.log("all loops: ", this.graph.allLoops());
+        this.normalRend.set(this.graph.toRenderable(), DrawSpeed.DynamicDraw);
+
+        console.log("all loops: ", this.graph.allLoops());
     }
 
     update(state: InputState) {
         this.camera.update(state);
 
-        if (!state.mouseRightDown && this.rotate.get() == 1) {
-            let alpha = 0.0002 * state.tick;
-            let rot = Matrix4.newXRotation(alpha)
-                .multiply(Matrix4.newYRotation(alpha));
-            this.mesh!.transform(rot);
-            this.meshRend.set(this.gl, this.mesh, DrawSpeed.DynamicDraw);
-        }
+        // if (!state.mouseRightDown && this.rotate.get() == 1) {
+        //     let alpha = 0.0002 * state.tick;
+        //     let rot = Matrix4.newXRotation(alpha)
+        //         .multiply(Matrix4.newYRotation(alpha));
+        //     this.mesh!.transform(rot);
+
+        //     this.meshRend.set(this.gl, this.mesh, DrawSpeed.DynamicDraw);
+
+        //     let normals = this.graph.toRenderable();
+        //     console.log(normals)
+        //     this.normalRend.set(normals, DrawSpeed.DynamicDraw);
+        // }
     }
 
     draw(gl: WebGLRenderingContext) {
         this.camera.updateMatrices(gl.canvas as HTMLCanvasElement);
         this.meshRend.render(gl, this.camera);
+        this.normalRend.render(gl, this.camera);
     }
 }
+
+
+
 
 function graphToMultiMesh(graph: Graph, radius: number, detail: number, inner: boolean) : Renderable {
         
     let meshes: Mesh[] = [];
 
-    graph.allVerts().forEach((v) => {
-        meshes.push(Mesh.newSphere(v, radius*2, detail, detail*2))
-    })
+    // graph.allVerts().forEach((v) => {
+    //     meshes.push(Mesh.newSphere(v, radius*2, detail, detail*2))
+    // })
 
     let edges = graph.allEdges()
     for (let i = 0 ; i < edges.length; i+=2) {

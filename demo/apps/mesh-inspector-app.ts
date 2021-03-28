@@ -90,19 +90,16 @@ export class MeshInspectorApp extends App {
             Mesh.newSphere(new Vector3(dis,0,0), this.radius.get(), this.detail.get(), spherePerRing),
             // PureMesh.fromCube(new Cube(this.plane, Domain3.fromRadius(this.radius.get()))),
             Mesh.newCone(new Vector3(-dis, 0, -this.radius.get()), this.radius.get(), this.radius.get() * 2, spherePerRing),
-            Mesh.newCylinder(
-                new Vector3(0, 0, -rad), 
-                new Vector3(0, 0,  rad),
-                rad,
-                det),
+            Mesh.newCylinder(new Vector3(0, 0, -rad), new Vector3(0, 0,  rad), rad, det),
         ]);
         let dmesh = mesh.toRenderable();
 
         if (this.renderNormals.get() == 1) {
-            dmesh.calculateFaceNormals();
+            // dmesh.calculateFaceNormals();
+            dmesh.calculateVertexNormals();
         }
 
-        console.log(new Parameter("shadeMethod",0,0,2,0.5).getNPermutations())
+        // console.log(new Parameter("shadeMethod",0,0,2,0.5).getNPermutations())
 
         // let mesh = Mesh.fromCube(new Cube(this.plane, Domain3.fromRadius(1)));
 
@@ -136,7 +133,7 @@ export class MeshInspectorApp extends App {
 
 
         if (this.shademethod == 0) {
-            this.meshRenderer.render(gl, matrix);
+            this.meshRenderer.render(gl, this.camera);
         } else if (this.shademethod == 1) {
             this.shadedMeshRenderer.render(gl, this.camera);
         }

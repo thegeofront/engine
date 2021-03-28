@@ -1,31 +1,30 @@
 
-// Mesh.Ts
-// Purpose: obj class for dealing with that specific filetype, and meshes in general
+// mesh.ts
 // Author: Jos Feenstra
+// Purpose: 
 
-// import { createUnsignedBytesMatrixTexture } from "@tensorflow/tfjs-backend-webgl/dist/gpgpu_util";
-// import { browserLocalStorage } from "@tensorflow/tfjs-core/dist/io/local_storage";
+// a very pure idea of a mesh : Vertices + links between vertices. 
+// Could be anything with these properties: lines, triangle-mesh, quads
+// idea: should normals be part of the Mesh? 
+
 import { IntMatrix } from "../data/int-matrix";
 import { Vector2Array, Vector3Array } from "../data/vector-array";
 import { Vector2, Vector3 } from "../math/vector";
 import { Cube } from "../geo/cube";
 import { Rectangle3 } from "../geo/rectangle";
-import { Renderable, RenderMeshKind as MeshType } from "./render-mesh";
+import { Renderable, MeshType as MeshType } from "./render-mesh";
 import { Plane } from "../geo/plane";
 import { Matrix4 } from "../math/matrix";
 import { Graph } from "./graph";
 
-// a very pure idea of a mesh : Vertices + links between vertices. 
-// Could be anything with these properties.
 export class Mesh {
 
-    verts: Vector3Array;
-    links: IntMatrix; // relationships, can be 2 (lines) | 3 (triangles) | 4 (quads)
+    // CONSTRUCTORS
 
-    constructor(verts: Vector3Array, links: IntMatrix) {
-        this.verts = verts;
-        this.links = links;
-    }
+    constructor(
+        public verts: Vector3Array, 
+        public links: IntMatrix // relationships, can be 2 (lines) | 3 (triangles) | 4 (quads)
+    ) {}
 
 
     static new(verts: Vector3Array, links: IntMatrix) : Mesh {
@@ -46,7 +45,7 @@ export class Mesh {
     }
 
 
-    static fromEmpty() : Mesh {
+    static zero() : Mesh {
         return new Mesh(new Vector3Array(0), new IntMatrix(0,0));
     }
 
@@ -132,25 +131,27 @@ export class Mesh {
         let phi = (1 + 5**0.5) / 2
         let b = a * phi;
 
-        graph.addVert(new Vector3(-a,-b, 0)); 
-        graph.addVert(new Vector3( a,-b, 0)); 
-        graph.addVert(new Vector3(-a, b, 0));
-        graph.addVert(new Vector3( a, b, 0));
+        let addVert = (v: Vector3) => {
+            graph.addVert(v, v);
+        }
 
-        graph.addVert(new Vector3(0,-a,-b)); 
-        graph.addVert(new Vector3(0, a,-b)); 
-        graph.addVert(new Vector3(0,-a, b));
-        graph.addVert(new Vector3(0, a, b));
-
-        graph.addVert(new Vector3(-b, 0,-a));
-        graph.addVert(new Vector3(-b, 0, a)); 
-        graph.addVert(new Vector3( b, 0,-a));
-        graph.addVert(new Vector3( b, 0, a));
+        addVert(new Vector3(-a,-b, 0)); 
+        addVert(new Vector3( a,-b, 0)); 
+        addVert(new Vector3(-a, b, 0));
+        addVert(new Vector3( a, b, 0));
+        addVert(new Vector3(0,-a,-b)); 
+        addVert(new Vector3(0, a,-b)); 
+        addVert(new Vector3(0,-a, b));
+        addVert(new Vector3(0, a, b));
+        addVert(new Vector3(-b, 0,-a));
+        addVert(new Vector3(-b, 0, a)); 
+        addVert(new Vector3( b, 0,-a));
+        addVert(new Vector3( b, 0, a));
 
         // build edges
         let addEdge = (a: number, b: number) => {
             let norm = graph.getVertex(a).added(graph.getVertex(b)).normalize();
-            graph.addEdge(a, b, norm);
+            graph.addEdgeWithCustomNormal(a, b, norm);
         }
         for (let i = 0 ; i < 12; i+=4) {
 
@@ -275,7 +276,7 @@ export class Mesh {
         let normal = to.subbed(from);
 
         let numVerts = numPerRing * 2 + 2;
-        let numFaces = (numVerts - 2) * 4;
+        let numFaces = (numVerts - 2) * 2;
         let verts = new Vector3Array(numVerts);
 
         // some dumb stuff 
@@ -400,14 +401,14 @@ export class Mesh {
             if (loop.length == 3) {
                 links.setRow(i, loop);
             } else {
-                // console.log("cant convert loop");
+                console.log("cant convert loop");
             }
         })
         return Mesh.new(verts, links);
     }
 
 
-    // TODO fix this later
+    // CONVERTERS
 
 
     toRenderable() : Renderable {
@@ -418,6 +419,9 @@ export class Mesh {
     toGraph() : Graph {
         return Graph.fromMesh(this);
     }
+
+
+    // GETTERS
 
 
     getType() : MeshType {
@@ -446,6 +450,9 @@ export class Mesh {
     }
 
 
+    // MISC
+
+
     calculateFaceNormals() : Vector3[] {
         
         let norms: Vector3[] = [];
@@ -467,14 +474,25 @@ export class Mesh {
 
     calculateVertexNormals() : Vector3[] {
 
-        let count = this.links.count();
+        let faceCount = this.links.count();
         let faceNormals = this.calculateFaceNormals();
-
-        for (let i = 0; i < count; i++) {
-            
+        
+        // stack all face normals per vertex
+        let array = new Vector3Array(this.verts.count());
+        for (let i = 0; i < faceCount; i++) {
+            let normal = faceNormals[i];
+            this.links.getRow(i).forEach((vertexIndex) => {
+                let v = array.getVector(vertexIndex);
+                array.setVector(vertexIndex, v.add(normal));
+            })
         }
 
-        return faceNormals;
+        // normalize all
+        let normals = array.toList();
+        for (let i = 0; i < normals.length; i++) {
+            normals[i].normalize();
+        }
+        return normals;
     }
 }
 

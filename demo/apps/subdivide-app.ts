@@ -18,7 +18,7 @@ export class SubdivideApp extends App {
     detail = 6; // detail!: Parameter;
 
     graph!: Graph;
-    mesh!: Renderable;
+    rend!: Renderable;
 
 
     constructor(gl: WebGLRenderingContext) {
@@ -42,10 +42,25 @@ export class SubdivideApp extends App {
      
     
     start() {
-        this.graph = Mesh.fromCube(Cube.new(Plane.WorldXY(), Domain3.fromRadius(1))).toGraph();
+
+        let graph = new Graph();
+
+        graph.addEdgeIfNew(0, 1);
+        graph.addEdgeIfNew(0, 2);
+        graph.addEdgeIfNew(1, 2);
+        graph.addEdgeIfNew(0, 3);
+        graph.addEdgeIfNew(2, 3);
+        graph.addEdgeIfNew(1, 3);
+
+        graph.addEdgeIfNew(1, 4);
+        graph.addEdgeIfNew(2, 4);
+        graph.addEdgeIfNew(3, 4);
+
+        this.graph = graph;
         this.graph.print();
-        this.mesh = this.graph.toMesh().toRenderable();
-        this.meshRend.set(this.gl, this.mesh);
+        this.rend = this.graph.toMesh().toRenderable();
+        this.rend.calculateFaceNormals();
+        this.meshRend.set(this.gl, this.rend);
 
         // console.log("all loops: ", this.graph.allLoops());
     }
@@ -58,8 +73,8 @@ export class SubdivideApp extends App {
             let alpha = 0.0002 * state.tick;
             let rot = Matrix4.newXRotation(alpha)
                 .multiply(Matrix4.newYRotation(alpha));
-            this.mesh!.transform(rot);
-            this.meshRend.set(this.gl, this.mesh, DrawSpeed.DynamicDraw);
+            this.rend!.transform(rot);
+            this.meshRend.set(this.gl, this.rend, DrawSpeed.DynamicDraw);
         }
     }
 

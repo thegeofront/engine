@@ -14,18 +14,22 @@ import { Util } from "./util";
 export class Vector3
 {
     // #region constructors
-    x: number;
-    y: number;
-    z: number;
-    constructor(x : number, y : number, z : number)
-    {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
+    constructor(
+		public x : number, 
+		public y : number, 
+		public z : number)
+    {}
+
+
+	static new(x: number, y: number, z: number) {
+		return new Vector3(x,y,z);
+	}
 
 
 	static calculateWheelOrder(vectors: Vector3[], ihat: Vector3, jhat: Vector3) : number[] {
+
+		// console.log("wheel order");
+		// console.log("hats", ihat, jhat)
 
 		let angles: number[] = []
 		vectors.forEach((v) => {
@@ -34,7 +38,7 @@ export class Vector3
 				v.dot(jhat)
 			).angle())
 		})
-		//console.log(angles);
+		// console.log("angles", angles);
 
 		let ids: number[] = Util.range(vectors.length);
 		ids.sort((a, b) => {

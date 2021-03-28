@@ -10,6 +10,7 @@ import { Matrix4 } from "../math/matrix";
 import { Vector3 } from "../math/vector";
 import { getDefaultIndices, LineArray } from "../mesh/line-array";
 import { DrawSpeed, Renderer } from "./renderer";
+import { Camera } from "./camera";
 
 export class NormalRenderer extends Renderer {
 
@@ -78,9 +79,10 @@ export class NormalRenderer extends Renderer {
     }
 
     // take a general render mesh, and extract normals
-    set(gl: WebGLRenderingContext, rend: Renderable, speed = DrawSpeed.StaticDraw) {
+    set(rend: Renderable, speed = DrawSpeed.StaticDraw) {
         
         // save how many verts need to be drawn
+        let gl = this.gl;
         gl.useProgram(this.program);
         let drawspeed = this.convertDrawSpeed(speed);
         this.vertCount = 3;
@@ -114,10 +116,30 @@ export class NormalRenderer extends Renderer {
 
         } else if (normalKind == NormalKind.Vertex) {
 
-            console.warn("TODO");
-            return;
+            let vertCount = rend.mesh.verts.count(); 
+            this.count = vertCount * 2;
+
+            lineverts = new Vector3Array(this.count);
+            normals = new Vector3Array(this.count);
+            
+            for (let i = 0 ; i < vertCount; i++) {
+                let center = rend.mesh.verts.getVector(i);
+                let normal = rend.norms.getVector(i);
+                let i1 = i * 2;
+                let i2 = i * 2 + 1;
+
+                lineverts.setVector(i1, center);
+                lineverts.setVector(i2, center.add(normal.scaled(this.scale)));
+                
+                
+                let color = normal.add(new Vector3(1,1,1)).div(2);
+                normals.setVector(i1, color);
+                normals.setVector(i2, color);
+            }
+            console.log(normals);
+
         } else {
-            // console.log("no normals");
+            console.warn("no normals for type", normalKind);
             this.count = 0;
             return;
         }
@@ -139,15 +161,25 @@ export class NormalRenderer extends Renderer {
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, getDefaultIndices(this.count), drawspeed);
     }
 
-    render(gl: WebGLRenderingContext, matrix: Matrix4) {
+    render(gl: WebGLRenderingContext, camera: Camera) {
         
+        let matrix = camera.totalMatrix;
+
         // Tell it to use our program (pair of shaders)
         // POINTERS MUST ALSO BE SET, DO EVERYTHING EXCEPT GL.BUFFERDATA
         gl.useProgram(this.program);
         
-        gl.enableVertexAttribArray(this.a_position);
+        // buffer 1
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
+        gl.enableVertexAttribArray(this.a_position);
         gl.vertexAttribPointer(this.a_position, this.vertCount, gl.FLOAT, false, 0, 0); 
+
+        // buffer 2
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.a_color_buffer);
+        gl.enableVertexAttribArray(this.a_color);
+        gl.vertexAttribPointer(this.a_color, this.vertCount, gl.FLOAT, false, 0, 0);
+
+        // index buffer
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
 
         // set uniforms

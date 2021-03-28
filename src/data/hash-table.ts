@@ -9,20 +9,23 @@ export class HashTable<V> {
         this.data = new Map<string, V>();
     }
 
+
     private stringify(key: any) : string {
         return key.toString();
     }
+
 
     set(key: any, value: V) {
         return this.data.set(this.stringify(key), value);
     }
 
+
     has(key: any) : boolean {
         return this.data.has(this.stringify(key));
     }
 
+
     get(key: any) {
         return this.data.get(this.stringify(key));
     }
-
 }

@@ -11,6 +11,7 @@ import { DrawSpeed, Renderer } from "./renderer";
 import { LineRenderer } from "./line-renderer";
 import { SimpleMeshRenderer } from "./simple-mesh-renderer";
 import { NormalRenderer } from "./mesh-normals-renderer";
+import { Camera } from "./camera";
 
 export class MeshDebugRenderer {
 
@@ -24,21 +25,16 @@ export class MeshDebugRenderer {
         this.normRend = new NormalRenderer(gl);
     }
 
-    setAndRender(gl: WebGLRenderingContext, matrix: Matrix4, mesh: Renderable) {
-        this.set(gl, mesh);
-        this.render(gl, matrix);
-    }
-
     set(gl: WebGLRenderingContext, mesh: Renderable) {
         this.faceRend.setMesh(gl, mesh);
         this.lineRend.set(gl, LineArray.fromMesh(mesh), DrawSpeed.StaticDraw);
-        this.normRend.set(gl, mesh, DrawSpeed.StaticDraw);
+        this.normRend.set(mesh, DrawSpeed.StaticDraw);
     }
 
     // render 1 image to the screen
-    render(gl: WebGLRenderingContext, matrix: Matrix4) {
-        this.faceRend.render(gl, matrix);
-        this.lineRend.render(gl, matrix);
-        this.normRend.render(gl, matrix);
+    render(gl: WebGLRenderingContext, camera: Camera) {
+        this.faceRend.render(gl, camera.totalMatrix);
+        this.lineRend.render(gl, camera.totalMatrix);
+        this.normRend.render(gl, camera);
     }
 }

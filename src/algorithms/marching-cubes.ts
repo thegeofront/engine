@@ -373,7 +373,7 @@ const edgeTable = [
     /* Cube is entirely in/out of the surface */
     let vertlist: Vector3[] = []; // 12
     if (edgeTable[cubeindex] == 0)
-       return Mesh.fromEmpty();
+       return Mesh.zero();
  
     /* Find the vertices where the surface intersects the cube */
     if (edgeTable[cubeindex] & 1)    vertlist[0]  = lerp(level, corners[0], corners[1], values[0], values[1]);
@@ -399,7 +399,7 @@ const edgeTable = [
     // }
  
     // return(ntriang);
-    return Mesh.fromEmpty();
+    return Mesh.zero();
  }
  
  /*

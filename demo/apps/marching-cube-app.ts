@@ -114,12 +114,12 @@ export class MarchingCubeApp extends App {
 
         // render the map
         // TODO create MeshArray
-        this.meshRenderer.render(gl, matrix);
+        this.meshRenderer.render(gl, this.camera);
 
         // render other things
-        for (let geo of this.geo) {
-            this.transMeshRenderer.setAndRender(gl, matrix, geo);
-        }
+        // for (let geo of this.geo) {
+        //     this.transMeshRenderer.setAndRender(gl, matrix, geo);
+        // }
     }
 
 

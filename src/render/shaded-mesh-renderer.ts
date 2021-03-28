@@ -162,9 +162,9 @@ export class ShadedMeshRenderer extends Renderer {
         gl.bufferData(gl.ARRAY_BUFFER, norms.data, ds);
 
         // buffer 3
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_ambi_buffer);
-        gl.vertexAttribPointer(this.a_vertex_ambi, 1, gl.FLOAT, false, 0, 0);
-        gl.bufferData(gl.ARRAY_BUFFER, ambi, ds);
+        // gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_ambi_buffer);
+        // gl.vertexAttribPointer(this.a_vertex_ambi, 1, gl.FLOAT, false, 0, 0);
+        // gl.bufferData(gl.ARRAY_BUFFER, ambi, ds);
     }
 
     // render 1 image to the screen

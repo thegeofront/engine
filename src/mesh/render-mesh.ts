@@ -16,11 +16,12 @@ import { Cube } from "../geo/cube";
 import { Rectangle3 } from "../geo/rectangle";
 import { Matrix4 } from "../math/matrix";
 import { Mesh } from "./mesh";
+import { Graph } from "./graph";
 
 type vertexID = number;
 type faceID = number;
 
-export enum RenderMeshKind {
+export enum MeshType {
     Invalid = 0,
     Points = 1,
     Lines = 2,
@@ -86,6 +87,14 @@ export class Renderable {
     }
 
 
+    static fromGraph(graph: Graph) {
+        let mesh = graph.toMesh();
+        let r = Renderable.fromMesh(mesh);
+        r.norms = Vector3Array.fromList(graph.allNorms());
+        r._normKind = NormalKind.Vertex; // fix this!!
+        return r;
+    }
+
     // geometry trait
 
 
@@ -119,7 +128,7 @@ export class Renderable {
     }
 
 
-    getType() : RenderMeshKind {
+    getType() : MeshType {
         return this.mesh.getType();
     }
 
@@ -158,26 +167,20 @@ export class Renderable {
     // set 1 normal per face 
     calculateFaceNormals() {
         
-        if (this.getType() != RenderMeshKind.Triangles) {
+        if (this.getType() != MeshType.Triangles) {
             console.error("can only calculate normals from triangular meshes");
             this.norms = new Vector3Array(0);
             return;
         }
-
+        let norms = this.mesh.calculateFaceNormals();
+        this.norms = Vector3Array.fromList(norms);
         this._normKind = NormalKind.Face;
-
-        let faceCount = this.mesh.links.count();
-        this.norms = new Vector3Array(faceCount);
-        for (let f = 0 ; f < faceCount; f++) {
-
-            let verts = this.getFaceVertices(f).toList();
-            let normal = verts[1].subbed(verts[0]).cross(verts[2].subbed(verts[0])).normalize();
-            this.norms.setVector(f, normal);
-        }
     }
 
 
     calculateVertexNormals() {
+        let norms = this.mesh.calculateVertexNormals();
+        this.norms = Vector3Array.fromList(norms);
         this._normKind = NormalKind.Vertex;
     }
 

@@ -35,9 +35,9 @@ function main() {
 
     // init swap app
     let appCollection = [
-        SubdivideApp,
         IcosahedronApp,
         MeshInspectorApp,
+        SubdivideApp,
         GeometryApp,
         ObjLoaderApp,
         DotApp3,
