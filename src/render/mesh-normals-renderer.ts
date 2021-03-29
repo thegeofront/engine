@@ -136,7 +136,7 @@ export class NormalRenderer extends Renderer {
                 normals.setVector(i1, color);
                 normals.setVector(i2, color);
             }
-            console.log(normals);
+            // console.log(normals);
 
         } else {
             console.warn("no normals for type", normalKind);

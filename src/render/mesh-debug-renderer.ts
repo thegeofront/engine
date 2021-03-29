@@ -17,24 +17,25 @@ export class MeshDebugRenderer {
 
     faceRend: SimpleMeshRenderer;
     lineRend: LineRenderer;
-    normRend: NormalRenderer;
+    normRend?: NormalRenderer;
 
-    constructor(gl: WebGLRenderingContext, faceColor = [1,0,0,0.25], edgeColor = [1,0,0,1]) {
+    constructor(gl: WebGLRenderingContext, faceColor = [1,0,0,0.25], edgeColor = [1,0,0,1], renderNormal=true) {
         this.faceRend = new SimpleMeshRenderer(gl, faceColor);
         this.lineRend = new LineRenderer(gl, edgeColor);
-        this.normRend = new NormalRenderer(gl);
+        if (renderNormal)
+            this.normRend = new NormalRenderer(gl);
     }
 
-    set(gl: WebGLRenderingContext, mesh: Renderable) {
+    set(gl: WebGLRenderingContext, mesh: Renderable, speed: DrawSpeed=DrawSpeed.StaticDraw) {
         this.faceRend.setMesh(gl, mesh);
-        this.lineRend.set(gl, LineArray.fromMesh(mesh), DrawSpeed.StaticDraw);
-        this.normRend.set(mesh, DrawSpeed.StaticDraw);
+        this.lineRend.set(gl, LineArray.fromMesh(mesh), speed);
+        this.normRend?.set(mesh, speed);
     }
 
     // render 1 image to the screen
     render(gl: WebGLRenderingContext, camera: Camera) {
         this.faceRend.render(gl, camera.totalMatrix);
         this.lineRend.render(gl, camera.totalMatrix);
-        this.normRend.render(gl, camera);
+        this.normRend?.render(gl, camera);
     }
 }

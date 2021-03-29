@@ -103,7 +103,9 @@ export class Renderable {
         for (let i = 0 ; i < this.mesh.verts.count(); i++) {
 
             let v = this.mesh.verts.getVector(i);
+            let n = this.norms.getVector(i);
             this.mesh.verts.setVector(i, matrix.multiplyVector(v));
+            this.norms.setVector(i, matrix.multiplyVector(n)); // TODO, EXTRACT ONLY ROTATION PART FROM THE MATRIX
         }
     }
 

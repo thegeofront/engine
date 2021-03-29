@@ -150,18 +150,21 @@ export class IcosahedronApp extends App {
 
 
 
-function graphToMultiMesh(graph: Graph, radius: number, detail: number, inner: boolean) : Renderable {
+export function graphToMultiMesh(graph: Graph, radius: number, detail: number, inner: boolean, balls = false) : Renderable {
         
     let meshes: Mesh[] = [];
 
-    // graph.allVerts().forEach((v) => {
-    //     meshes.push(Mesh.newSphere(v, radius*2, detail, detail*2))
-    // })
+    if (balls) {
+        graph.allVerts().forEach((v) => {
+        meshes.push(Mesh.newSphere(v, radius*2, detail, detail*2))
+        })
+    }
+
 
     let edges = graph.allEdges()
     for (let i = 0 ; i < edges.length; i+=2) {
-        let from = graph.getVertex(edges[i]);
-        let to = graph.getVertex(edges[i+1]);
+        let from = graph.getVertexPos(edges[i]);
+        let to = graph.getVertexPos(edges[i+1]);
         let mesh = Mesh.newCylinder(from, to, radius, detail);
         meshes.push(mesh);
     }

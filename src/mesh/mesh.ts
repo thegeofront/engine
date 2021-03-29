@@ -150,8 +150,7 @@ export class Mesh {
 
         // build edges
         let addEdge = (a: number, b: number) => {
-            let norm = graph.getVertex(a).added(graph.getVertex(b)).normalize();
-            graph.addEdgeWithCustomNormal(a, b, norm);
+            graph.addEdge(a, b);
         }
         for (let i = 0 ; i < 12; i+=4) {
 
@@ -393,7 +392,7 @@ export class Mesh {
         // NOTE : doesnt really work if the loops are not of size 3.
 
         let verts = Vector3Array.fromList(graph.allVerts());
-        let loops = graph.allLoops();
+        let loops = graph.allVertLoops();
 
         let links = new IntMatrix(loops.length, 3);
         loops.forEach((loop, i) => {
