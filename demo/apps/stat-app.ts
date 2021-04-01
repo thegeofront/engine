@@ -1,7 +1,3 @@
-// name:    obj-loader-app.ts
-// author:  Jos Feenstra
-// purpose: test statistic functionalties
-
 import { App, DotRenderer3, LineRenderer, SimpleMeshRenderer, Camera, Renderable, Vector3, LineArray, FloatMatrix, Stat, InputState } from "../../src/lib";
 
 

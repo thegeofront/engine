@@ -3,14 +3,25 @@
 // purpose: HalfEdge Mesh in 3D. 
 // This does mean that the order around a vertex is not staight forward, and must be handled using normals.
 
+// TODO
+// - graph clean 
+// - graph delete vert 
+// - to line renderable
+// - keep track of faces, for quick meshification
+//   - THIS WILL SPEED UP 'GET ALL FACES THREMENDOUSLY, WHICH WILL SPEED UP SUBDIVISONS'
+// - remove ambiguity of halfedges & edges
+//   - fix the fact that we 'dont' realllly use halfedges, we consistently use pairs of two. 
+//   - aka, twins are implicit: 0 -> 1 & 1 -> 0 OR 21 -> 20 & 20 -> 21 
+
 import { HashTable } from "../data/hash-table";
 import { Vector3Array } from "../data/vector-array";
 import { Plane } from "../geo/plane";
+import { Const } from "../math/const";
 import { Matrix4 } from "../math/matrix";
 import { Vector3 } from "../math/vector";
 import { Stopwatch } from "../system/stopwatch";
 import { Mesh } from "./mesh";
-import { MeshType, Renderable } from "./render-mesh";
+import { MeshType, NormalKind, Renderable } from "./render-mesh";
 
 type EdgeIndex = number;
 type VertIndex = number;
@@ -28,6 +39,11 @@ interface Edge {
     vert: VertIndex,
     dead: boolean;
 }
+
+// FACES MUST BE CONVEX, OR BUGS MIGHT OCCUR!!!!
+// interface Face {
+//    edge: EdgeIndex,
+// }
 
 // NOTE: create an interface which hides the Edge, Vert & Face interfaces. 
 // NOTE: half edge is implied
@@ -635,6 +651,78 @@ export class Graph {
 
 
     subdivideQuad() {
+        // 1. get all edges
+        let edges = this.allEdges();
+        let faces = this.allVertLoops();
 
+        // this maps old edges to new vertices
+        let deadEdgeMap = new HashTable<VertIndex>() // this 
+
+        // 2. split all edges, map 
+        let count = edges.length / 2;
+        for (let i = 0 ; i < count; i++) {
+            let vai = edges[i*2];
+            let vbi = edges[i*2+1];
+
+            // let edgeI = this.getEdgeIndexBetween(vai, vbi)!;
+            // let edgeII = this.getEdgeIndexBetween(vbi, vai)!;
+
+            let vci = this.splitEdge(vai, vbi, 0.5);
+            deadEdgeMap.set([vai, vbi], vci);
+            deadEdgeMap.set([vbi, vai], vci);
+        }
+
+        // 3. per old face: connect the dots 
+        for (let i = 0 ; i < faces.length; i++) {
+            let face = faces[i];
+
+            // get center point 
+            let pos = Vector3.zero()
+            for (let j = 0 ; j < face.length; j++) {
+                pos.add(this.getVertexPos(face[j]));
+            }
+            pos.scale(1 / face.length);
+
+            let norm = calcPlanarFaceNormal(face.map((v)=> this.getVertexPos(v)));
+            let si = this.addVert(pos, norm);
+
+            // per middle point, connect the dots
+            for (let j = 0 ; j < face.length; j++) {
+                let jNext = (j + 1) % face.length;
+                let via = face[j];
+                let vib = face[jNext];
+                // console.log(via, vib);
+                let c = deadEdgeMap.get([via, vib])!; 
+                this.addEdge(si, c);
+            }
+        }
     }
+}
+
+function calcPlanarFaceNormal(face: Vector3[]) : Vector3 {
+
+    // ASSUMES : FACE = PLANAR & FACE = NOT SLIVER POLYGON (AREA > 0)
+    let count = face.length;
+    if (count < 3) {
+        throw "cannot get face planar with 2 or less edges";
+    }
+
+    // get the normal of a planar face 
+    let normal = Vector3.zero();
+
+    // two edges could be parallel, but there will be two edges in the face that are different.
+    let ihat = face[1].subbed(face[0]);
+    let jhat = face[2].subbed(face[1]);
+
+    for (let i = 1 ; i < count; i++) {
+        if (Math.abs(ihat.dot(jhat)) > Const.TOLERANCE) {
+            return ihat.cross(jhat);
+        } else {
+            // try again with next pair of 
+            let i2 = (i+1) % count;
+            let i3 = (i+2) % count;
+            jhat = face[i3].subbed(face[i2]);
+        }
+    }
+    throw "get planar face failed...";
 }

@@ -82,7 +82,7 @@ export class SimpleMeshRenderer extends Renderer {
 
         // indices 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(faces.data), this.convertDrawSpeed(speed));
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, faces.data, this.convertDrawSpeed(speed));
     }
 
     // render 1 image to the screen

@@ -2,7 +2,7 @@
 // author:  Jos Feenstra
 // purpose: a 3d voxel environment to toy around in. Uses several features of geon
 
-import { App, Camera, Cube, Domain3, DotRenderer3, InputState, IntCube, LineArray, 
+import { App, Camera, Cube, Domain3, DotRenderer3, DrawSpeed, InputState, IntCube, LineArray, 
     LineRenderer, Matrix4, Mesh, MeshDebugRenderer, Parameter, Plane, Ray,
      Renderable, ShadedMeshRenderer, UI, Vector3 } from "../../src/lib";
 
@@ -43,7 +43,7 @@ export class GeometryApp extends App {
         this.greyLineRenderer = new LineRenderer(gl, [0.2,0,1,0.5]);
         this.redLineRenderer = new LineRenderer(gl, [0.8,0,0,1]);
         this.meshRenderer = new ShadedMeshRenderer(gl);
-        this.transMeshRenderer = new MeshDebugRenderer(gl, [1,1,1,0.10], [1,1,1,0.10]);
+        this.transMeshRenderer = new MeshDebugRenderer(gl, [1,1,1,0.25], [1,1,1,0.25]);
     }
 
 
@@ -129,9 +129,10 @@ export class GeometryApp extends App {
         this.meshRenderer.render(gl, this.camera);
 
         // render other things
-        // for (let geo of this.geo) {
-        //     this.transMeshRenderer.setAndRender(gl, matrix, geo);
-        // }
+        for (let geo of this.geo) {
+            this.transMeshRenderer.set(gl, geo, DrawSpeed.DynamicDraw);
+            this.transMeshRenderer.render(gl, this.camera);
+        }
     }
 
     addPreviewCube(point: Vector3) {

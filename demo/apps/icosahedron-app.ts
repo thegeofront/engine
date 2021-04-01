@@ -150,7 +150,7 @@ export class IcosahedronApp extends App {
 
 
 
-export function graphToMultiMesh(graph: Graph, radius: number, detail: number, inner: boolean, balls = false) : Renderable {
+export function graphToMultiMesh(graph: Graph, radius: number, detail: number, inner: boolean, balls = true) : Renderable {
         
     let meshes: Mesh[] = [];
 

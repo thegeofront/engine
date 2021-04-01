@@ -19,7 +19,7 @@ export class UI {
     addContext(appName: string) {
 
         this.currentContext = this.globalContext;
-        let appDiv = this.addDiv(appName);
+        let appDiv = this.addDiv(appName + " app-interface");
         this.currentContext = appDiv;
     }
 
@@ -52,7 +52,7 @@ export class UI {
 
 
     addBooleanParameter(param: Parameter, onInput: (v: number) => void = () => {}) {
-        let checkbox = this.addElement("input", "checkbox-slider-control") as HTMLInputElement;    
+        let checkbox = this.addElement("input", "checkbox-slider-control checkbox-example") as HTMLInputElement;    
         checkbox.type = "checkbox";
         checkbox.addEventListener('change', () => {
 
@@ -93,8 +93,8 @@ export class UI {
 
         this.addDiv("slider", [
             text1,
-            text2,
             slider,
+            text2,
         ]);
 
         // on update beyond our control
@@ -143,20 +143,25 @@ export class UI {
         }
         let count = keys.length;
 
-        let e = this.addElement("select", "enum-selector") as HTMLSelectElement;
+        let select = this.addElement("select", "enum-selector dropdown-select") as HTMLSelectElement;
         for (let i = 0 ; i < count; i++) {
             let o = this.addElement("option", "enum-item");
             o.innerText = keys[i];
-            e.appendChild(o);
+            select.appendChild(o);
         }
         // console.log(e);
 
-        e.addEventListener("change", (e: Event) => {
+        select.addEventListener("change", (e: Event) => {
             let target = e.target as HTMLSelectElement;
             let i = keys.indexOf(target.value);
             onchange(values[i]);
         });
-        return e;
+
+        this.addDiv("dropdown-dark", [
+            select,
+        ]);
+
+        return select;
     }
 
 

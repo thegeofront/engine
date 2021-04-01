@@ -2,6 +2,9 @@
 A no-dependency 3D engine for delivering interactive 3d experiences on the web. 
 Think barebones three.js, but with a focus on parametric design / procedural generation.
 
+## Current Project within Geon
+- Irregular quadrilateral partition of space
+
 
 ## Demo
 http://josfeenstra.nl/demo/geon/

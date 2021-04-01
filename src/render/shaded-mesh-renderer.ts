@@ -3,7 +3,7 @@
 // purpose: A shader wrapper for rendering shaded, textured, meshes
 
 import { IntMatrix } from "../data/int-matrix";
-import { LineArray } from "../mesh/line-array";
+import { getDefaultIndices, LineArray } from "../mesh/line-array";
 import { Vector3Array } from "../data/vector-array";
 import { NormalKind, Renderable } from "../mesh/render-mesh";
 import { Matrix4 } from "../math/matrix";
@@ -12,6 +12,7 @@ import { LineRenderer } from "./line-renderer";
 import { SimpleMeshRenderer } from "./simple-mesh-renderer";
 import { Camera } from "./camera";
 import { Vector3 } from "../math/vector";
+import { Const } from "../lib";
 
 export class ShadedMeshRenderer extends Renderer {
     
@@ -33,6 +34,8 @@ export class ShadedMeshRenderer extends Renderer {
     u_dir_light_vector: WebGLUniformLocation;
     a_vertex_ambi: number;
     a_vertex_ambi_buffer: WebGLBuffer;
+
+    index_buffer: WebGLBuffer;
     
     constructor(gl: WebGLRenderingContext) {
         const vs = `
@@ -115,56 +118,96 @@ export class ShadedMeshRenderer extends Renderer {
         this.a_vertex_ambi = gl.getAttribLocation(this.program, "a_vertex_ambi");
         this.a_vertex_ambi_buffer = gl.createBuffer()!;
 
-        // this.index_buffer = gl.createBuffer()!; 
+        this.index_buffer = gl.createBuffer()!; 
     }
 
     set(gl: WebGLRenderingContext, rend: Renderable, speed: DrawSpeed = DrawSpeed.StaticDraw) {
 
         // NOTE: processing time is longer: we use DrawArray instead of DrawElements, to deal with normals & uv data
+        let normalType = rend.getNormalType();
+        if (normalType == NormalKind.Face) {
+            // save how many verts need to be drawn
+            gl.useProgram(this.program);
+            this.count = rend.mesh.links.data.length
+            let ds = this.convertDrawSpeed(speed);
 
-        if (rend.getNormalType() != NormalKind.Face) {
-            console.warn("cannot");
-            return;
-        }
+            // convert to non-indexed verts & norms 
+            let verts = new Vector3Array(this.count);
+            let norms = new Vector3Array(this.count);
+            let ambi = new Float32Array(this.count);
 
-        const T = 3;
+            let faceCount = rend.mesh.links.count();
+            for (let i = 0 ; i < rend.mesh.links.count(); i++) {
+                
+                let norm = rend.norms.getVector(i);
+                rend.mesh.links.getRow(i).forEach((v, j) => {
+                    let id = i * 3 + j;
+                    verts.setVector(id, rend.mesh.verts.getVector(v));
+                    norms.setVector(id, norm);
+                    ambi[id] = 1;
+                });
+            }
 
-        // save how many verts need to be drawn
-        gl.useProgram(this.program);
-        this.count = rend.mesh.links.data.length
-        let ds = this.convertDrawSpeed(speed);
+            // buffer 1
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_postition_buffer);
+            gl.vertexAttribPointer(this.a_vertex_position, 3, gl.FLOAT, false, 0, 0);
+            gl.bufferData(gl.ARRAY_BUFFER, verts.data, ds);
 
-        // convert to non-indexed verts & norms 
-        let verts = new Vector3Array(this.count);
-        let norms = new Vector3Array(this.count);
-        let ambi = new Float32Array(this.count);
+            // buffer 2 
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_normal_buffer);
+            gl.vertexAttribPointer(this.a_vertex_normal, 3, gl.FLOAT, false, 0, 0);
+            gl.bufferData(gl.ARRAY_BUFFER, norms.data, ds);
 
-        let faceCount = rend.mesh.links.count();
-        for (let i = 0 ; i < rend.mesh.links.count(); i++) {
+            // buffer 3
+            // gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_ambi_buffer);
+            // gl.vertexAttribPointer(this.a_vertex_ambi, 1, gl.FLOAT, false, 0, 0);
+            // gl.bufferData(gl.ARRAY_BUFFER, ambi, ds);
+
+            // index 
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, getDefaultIndices(this.count), this.convertDrawSpeed(speed));
+
+        } else if (normalType == NormalKind.Vertex){
+
+            // save how many verts need to be drawn
+            gl.useProgram(this.program);
             
-            let norm = rend.norms.getVector(i);
-            rend.mesh.links.getRow(i).forEach((v, j) => {
-                let id = i * 3 + j;
-                verts.setVector(id, rend.mesh.verts.getVector(v));
-                norms.setVector(id, norm);
-                ambi[id] = 1;
-            });
+            let ds = this.convertDrawSpeed(speed);
+
+            // convert to non-indexed verts & norms 
+            let ambi = rend.ambi;
+
+            let faceCount = rend.mesh.links.count();
+            this.count = rend.mesh.links.data.length;
+            // console.log(rend.mesh.links);
+
+            // buffer 1
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_postition_buffer);
+            gl.vertexAttribPointer(this.a_vertex_position, 3, gl.FLOAT, false, 0, 0);
+            gl.bufferData(gl.ARRAY_BUFFER, rend.mesh.verts.data, ds);
+
+            // buffer 2 
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_normal_buffer);
+            gl.vertexAttribPointer(this.a_vertex_normal, 3, gl.FLOAT, false, 0, 0);
+            gl.bufferData(gl.ARRAY_BUFFER, rend.norms.data, ds);
+
+            // buffer 3
+            // gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_ambi_buffer);
+            // gl.vertexAttribPointer(this.a_vertex_ambi, 1, gl.FLOAT, false, 0, 0);
+            // gl.bufferData(gl.ARRAY_BUFFER, ambi, ds);
+
+            // index 
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, rend.mesh.links.data, ds);
+
+        } else if (normalType == NormalKind.MultiVertex) {
+            console.log("cannot render multi vertex normals");
+        } else {
+            console.log("cannot render with this normal data");
         }
-
-        // buffer 1
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_postition_buffer);
-        gl.vertexAttribPointer(this.a_vertex_position, 3, gl.FLOAT, false, 0, 0);
-        gl.bufferData(gl.ARRAY_BUFFER, verts.data, ds);
-
-        // buffer 2 
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_normal_buffer);
-        gl.vertexAttribPointer(this.a_vertex_normal, 3, gl.FLOAT, false, 0, 0);
-        gl.bufferData(gl.ARRAY_BUFFER, norms.data, ds);
-
-        // buffer 3
-        // gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_ambi_buffer);
-        // gl.vertexAttribPointer(this.a_vertex_ambi, 1, gl.FLOAT, false, 0, 0);
-        // gl.bufferData(gl.ARRAY_BUFFER, ambi, ds);
+        if (this.count > Const.MAX_U16) {
+            this.count = Const.MAX_U16;
+        }
     }
 
     // render 1 image to the screen
@@ -200,7 +243,10 @@ export class ShadedMeshRenderer extends Renderer {
         // gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_ambi_buffer);
         // gl.vertexAttribPointer(this.a_vertex_normal, 3, gl.FLOAT, false, 0, 0);
 
+        // indices 
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
+
         // draw!
-        gl.drawArrays(gl.TRIANGLES, 0, this.count);
+        gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
     }
 }

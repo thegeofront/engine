@@ -1,7 +1,7 @@
 // generic all-pupose matrix of ints
 export class IntMatrix {
 
-    data: Int32Array;
+    data: Uint16Array; //  change
     _width: number;
     _height: number;
 
@@ -9,7 +9,7 @@ export class IntMatrix {
         
         this._height = height;
         this._width = width;
-        this.data = new Int32Array(this._width * this._height);
+        this.data = new Uint16Array(this._width * this._height);
         if (data == [] || data.length == 0)
             this.fill(0);
         else
@@ -92,9 +92,9 @@ export class IntMatrix {
     }
 
     
-    getRow(i: number) : Int32Array {
+    getRow(i: number) : Uint16Array {
         // if (i < 0 || i > this.height) throw "column is out of bounds for Array"
-        let data = new Int32Array(this._width);
+        let data = new Uint16Array(this._width);
         for (let j = 0; j < this._width; j++) {
             data[j] = this.get(i, j);
         }
@@ -102,9 +102,9 @@ export class IntMatrix {
     }
 
     
-    getColumn(j: number) : Int32Array {
+    getColumn(j: number) : Uint16Array {
         // if (j < 0 || j > this.width) throw "column is out of bounds for Array"
-        let data = new Int32Array(this._height);
+        let data = new Uint16Array(this._height);
         for (let i = 0; i < this._height; i++) {
             let index = i * this._width + j;
             data[i] = this.data[index];       
@@ -122,7 +122,7 @@ export class IntMatrix {
     }
 
     
-    setRow(rowIndex: number, row: number[] | Int32Array) {
+    setRow(rowIndex: number, row: number[] | Uint16Array) {
         // if (this.width != row.length) throw "dimention of floatarray is not " + row.length;
         for(let j = 0; j < this._width; j++) {
             this.set(rowIndex, j, row[j]);
@@ -144,8 +144,8 @@ export class IntMatrix {
     }
 
     
-    toUInt16Array() : Uint16Array {
-        return new Uint16Array(this.data);
+    getData() : Uint16Array {
+        return this.data;
     }
 
     
@@ -158,7 +158,7 @@ export class IntMatrix {
     }
 
     
-    forEachRow(callbackfn: (value: Int32Array, index: number) => void) : IntMatrix {
+    forEachRow(callbackfn: (value: Uint16Array, index: number) => void) : IntMatrix {
         
         for(let i = 0 ; i < this._height; i++) {
             let row = this.getRow(i);

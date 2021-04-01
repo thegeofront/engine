@@ -7,6 +7,8 @@ export class Const {
     static TOLERANCE = 0.0001; // tolerance used for determining if 1 value is the same as some other value, relatively speaking
     static TOL_SQUARED = Const.TOLERANCE ** 2;
 
+    static MAX_U16 = 65536;
+
     // ----- Line Render Settings ----- 
     static PLANE_RENDER_LINECOUNT = 9;
     static PLANE_RENDER_LINEDISTANCE = .3;
