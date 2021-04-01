@@ -78,6 +78,10 @@ export class NormalRenderer extends Renderer {
         this.scale = 0.4;
     }
 
+    setWithLists(pos: Vector3[], norms: Vector3[], speed = DrawSpeed.StaticDraw) {
+
+    }
+
     // take a general render mesh, and extract normals
     set(rend: Renderable, speed = DrawSpeed.StaticDraw) {
         

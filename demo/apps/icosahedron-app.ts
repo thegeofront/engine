@@ -155,13 +155,13 @@ export function graphToMultiMesh(graph: Graph, radius: number, detail: number, i
     let meshes: Mesh[] = [];
 
     if (balls) {
-        graph.allVerts().forEach((v) => {
+        graph.allVertPositions().forEach((v) => {
         meshes.push(Mesh.newSphere(v, radius*2, detail, detail*2))
         })
     }
 
 
-    let edges = graph.allEdges()
+    let edges = graph.allEdgeVerts()
     for (let i = 0 ; i < edges.length; i+=2) {
         let from = graph.getVertexPos(edges[i]);
         let to = graph.getVertexPos(edges[i+1]);

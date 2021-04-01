@@ -10,6 +10,7 @@ import { Matrix4 } from "../math/matrix";
 import { Vector3 } from "../math/vector";
 import { LineArray } from "../mesh/line-array";
 import { DrawSpeed, Renderer } from "./renderer";
+import { Mesh } from "../mesh/mesh";
 
 export class LineRenderer extends Renderer {
 
@@ -68,23 +69,35 @@ export class LineRenderer extends Renderer {
         this.vertCount = 0;
     }
 
-    set(gl: WebGLRenderingContext, data: LineArray, speed = DrawSpeed.StaticDraw) {
+    set(gl: WebGLRenderingContext, data: LineArray | Mesh, speed = DrawSpeed.StaticDraw) {
         
         // save how many faces need to be drawn
+        let links;
+        let verts;
+        if (data instanceof Mesh) {
+            verts = data.verts;
+            links = data.links.getData();
+        } else {
+            verts = data.verts;
+            links = data.links;
+        }
+
+        // console.log(links);
+
         gl.useProgram(this.program);
-        this.count = data.ids.length
-        this.vertCount = data.verts._width;
+        this.count = links.length;
+        this.vertCount = verts._width;
         let drawspeed = this.convertDrawSpeed(speed);
 
         // vertices  
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
         gl.enableVertexAttribArray(this.a_position);
         gl.vertexAttribPointer(this.a_position, this.vertCount, gl.FLOAT, false, 0, 0);
-        gl.bufferData(gl.ARRAY_BUFFER, data.verts.data, drawspeed);
+        gl.bufferData(gl.ARRAY_BUFFER, verts.data, drawspeed);
 
         // indices 
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, data.ids.buffer, drawspeed);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, links.buffer, drawspeed);
     }
 
     render(gl: WebGLRenderingContext, matrix: Matrix4) {

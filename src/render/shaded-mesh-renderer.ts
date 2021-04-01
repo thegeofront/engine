@@ -151,12 +151,12 @@ export class ShadedMeshRenderer extends Renderer {
             // buffer 1
             gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_postition_buffer);
             gl.vertexAttribPointer(this.a_vertex_position, 3, gl.FLOAT, false, 0, 0);
-            gl.bufferData(gl.ARRAY_BUFFER, verts.data, ds);
+            gl.bufferData(gl.ARRAY_BUFFER, verts.data.buffer, ds);
 
             // buffer 2 
             gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_normal_buffer);
             gl.vertexAttribPointer(this.a_vertex_normal, 3, gl.FLOAT, false, 0, 0);
-            gl.bufferData(gl.ARRAY_BUFFER, norms.data, ds);
+            gl.bufferData(gl.ARRAY_BUFFER, norms.data.buffer, ds);
 
             // buffer 3
             // gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_ambi_buffer);
@@ -165,7 +165,7 @@ export class ShadedMeshRenderer extends Renderer {
 
             // index 
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
-            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, getDefaultIndices(this.count), this.convertDrawSpeed(speed));
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, getDefaultIndices(this.count).buffer, this.convertDrawSpeed(speed));
 
         } else if (normalType == NormalKind.Vertex){
 

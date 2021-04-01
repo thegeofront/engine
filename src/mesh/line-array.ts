@@ -18,14 +18,14 @@ import { Vector2, Vector3 } from "../math/vector";
 export class LineArray {
     
     verts: FloatMatrix;
-    ids: Uint16Array;
+    links: Uint16Array;
 
     private constructor(verts: FloatMatrix, ids?: Uint16Array) {
         this.verts = verts;
         if (ids == undefined) {
-            this.ids = getDefaultIndices(verts.count());
+            this.links = getDefaultIndices(verts.count());
         } else {
-            this.ids = ids;
+            this.links = ids;
         }
     }
 
@@ -178,7 +178,7 @@ export class LineArray {
         let idsCount = 0;
         let vertCount = 0;
         for (let line of lines) {
-            idsCount += line.ids.length;
+            idsCount += line.links.length;
             vertCount += line.verts.count();
         }
 
@@ -191,11 +191,11 @@ export class LineArray {
             for (let i = 0 ; i < lineset.verts.count(); i++) {
                 verts.setRow(accVerts + i, lineset.verts.getRow(i));
             }
-            for (let i = 0 ; i < lineset.ids.length; i++) {
-                ids[accFaces+i] = lineset.ids[i] + accVerts;
+            for (let i = 0 ; i < lineset.links.length; i++) {
+                ids[accFaces+i] = lineset.links[i] + accVerts;
             }
             accVerts += lineset.verts.count();
-            accFaces += lineset.ids.length;
+            accFaces += lineset.links.length;
         }
 
         return new LineArray(verts, ids);

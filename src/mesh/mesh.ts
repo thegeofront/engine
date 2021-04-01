@@ -45,6 +45,15 @@ export class Mesh {
     }
 
 
+    static newLines(positions: Vector3[], edges: number[]) {
+
+        let verts = Vector3Array.fromList(positions);
+        let links = IntMatrix.fromList(edges, 2);
+
+        return new Mesh(verts, links);
+    }
+
+
     static zero() : Mesh {
         return new Mesh(new Vector3Array(0), new IntMatrix(0,0));
     }
@@ -391,8 +400,8 @@ export class Mesh {
         
         // NOTE : doesnt really work if the loops are not of size 3.
 
-        let verts = Vector3Array.fromList(graph.allVerts());
-        let loops = graph.allVertLoops();
+        let verts = Vector3Array.fromList(graph.allVertPositions());
+        let loops = graph.allVertLoopsAsInts();
 
         let links = new IntMatrix(loops.length, 3);
         loops.forEach((loop, i) => {
