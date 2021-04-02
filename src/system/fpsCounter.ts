@@ -1,15 +1,12 @@
 import { InputState } from "./input-state";
 
 export class FpsCounter {
-
     fps = 0;
     updateEveryXTicks = 100;
     elapsed = 0;
     frames = 0;
 
-    constructor() {
-        
-    }
+    constructor() {}
 
     update(state: InputState) {
         this.frames += 1;
@@ -19,13 +16,13 @@ export class FpsCounter {
             this.elapsed = 0;
             this.frames = 0;
         }
-    }    
-    
+    }
+
     setFps() {
-        this.fps = Math.round(this.frames / this.elapsed * 1000);
+        this.fps = Math.round((this.frames / this.elapsed) * 1000);
     }
 
     getFps() {
-        return this.fps;   
+        return this.fps;
     }
 }

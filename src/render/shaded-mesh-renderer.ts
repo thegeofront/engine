@@ -15,7 +15,6 @@ import { Vector3 } from "../math/vector";
 import { Const } from "../lib";
 
 export class ShadedMeshRenderer extends Renderer {
-    
     // attribute & uniform locations
     a_vertex_position: number;
     a_vertex_postition_buffer: WebGLBuffer;
@@ -36,7 +35,7 @@ export class ShadedMeshRenderer extends Renderer {
     a_vertex_ambi_buffer: WebGLBuffer;
 
     index_buffer: WebGLBuffer;
-    
+
     constructor(gl: WebGLRenderingContext) {
         const vs = `
 
@@ -91,14 +90,14 @@ export class ShadedMeshRenderer extends Renderer {
         }
         `;
 
-        // setup program    
+        // setup program
         super(gl, vs, fs);
 
         gl.useProgram(this.program);
         this.count = 0;
         this.size = 0;
 
-        // init uniforms 
+        // init uniforms
         this.u_normal_matrix = gl.getUniformLocation(this.program, "u_normal_matrix")!;
         this.u_model_view_matrix = gl.getUniformLocation(this.program, "u_model_view_matrix")!;
         this.u_projection_matrix = gl.getUniformLocation(this.program, "u_projection_matrix")!;
@@ -106,7 +105,7 @@ export class ShadedMeshRenderer extends Renderer {
         // light uniforms
         this.u_ambient_light = gl.getUniformLocation(this.program, "u_ambient_light")!;
         this.u_dir_light_color = gl.getUniformLocation(this.program, "u_dir_light_color")!;
-        this.u_dir_light_vector = gl.getUniformLocation(this.program, "u_dir_light_vector")!;  
+        this.u_dir_light_vector = gl.getUniformLocation(this.program, "u_dir_light_vector")!;
 
         // init attributes: verts | normals | ambi
         this.a_vertex_position = gl.getAttribLocation(this.program, "a_vertex_position");
@@ -118,27 +117,25 @@ export class ShadedMeshRenderer extends Renderer {
         this.a_vertex_ambi = gl.getAttribLocation(this.program, "a_vertex_ambi");
         this.a_vertex_ambi_buffer = gl.createBuffer()!;
 
-        this.index_buffer = gl.createBuffer()!; 
+        this.index_buffer = gl.createBuffer()!;
     }
 
     set(gl: WebGLRenderingContext, rend: Renderable, speed: DrawSpeed = DrawSpeed.StaticDraw) {
-
         // NOTE: processing time is longer: we use DrawArray instead of DrawElements, to deal with normals & uv data
         let normalType = rend.getNormalType();
         if (normalType == NormalKind.Face) {
             // save how many verts need to be drawn
             gl.useProgram(this.program);
-            this.count = rend.mesh.links.data.length
+            this.count = rend.mesh.links.data.length;
             let ds = this.convertDrawSpeed(speed);
 
-            // convert to non-indexed verts & norms 
+            // convert to non-indexed verts & norms
             let verts = new Vector3Array(this.count);
             let norms = new Vector3Array(this.count);
             let ambi = new Float32Array(this.count);
 
             let faceCount = rend.mesh.links.count();
-            for (let i = 0 ; i < rend.mesh.links.count(); i++) {
-                
+            for (let i = 0; i < rend.mesh.links.count(); i++) {
                 let norm = rend.norms.getVector(i);
                 rend.mesh.links.getRow(i).forEach((v, j) => {
                     let id = i * 3 + j;
@@ -153,7 +150,7 @@ export class ShadedMeshRenderer extends Renderer {
             gl.vertexAttribPointer(this.a_vertex_position, 3, gl.FLOAT, false, 0, 0);
             gl.bufferData(gl.ARRAY_BUFFER, verts.data.buffer, ds);
 
-            // buffer 2 
+            // buffer 2
             gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_normal_buffer);
             gl.vertexAttribPointer(this.a_vertex_normal, 3, gl.FLOAT, false, 0, 0);
             gl.bufferData(gl.ARRAY_BUFFER, norms.data.buffer, ds);
@@ -163,18 +160,16 @@ export class ShadedMeshRenderer extends Renderer {
             // gl.vertexAttribPointer(this.a_vertex_ambi, 1, gl.FLOAT, false, 0, 0);
             // gl.bufferData(gl.ARRAY_BUFFER, ambi, ds);
 
-            // index 
+            // index
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, getDefaultIndices(this.count).buffer, this.convertDrawSpeed(speed));
-
-        } else if (normalType == NormalKind.Vertex){
-
+        } else if (normalType == NormalKind.Vertex) {
             // save how many verts need to be drawn
             gl.useProgram(this.program);
-            
+
             let ds = this.convertDrawSpeed(speed);
 
-            // convert to non-indexed verts & norms 
+            // convert to non-indexed verts & norms
             let ambi = rend.ambi;
 
             let faceCount = rend.mesh.links.count();
@@ -186,7 +181,7 @@ export class ShadedMeshRenderer extends Renderer {
             gl.vertexAttribPointer(this.a_vertex_position, 3, gl.FLOAT, false, 0, 0);
             gl.bufferData(gl.ARRAY_BUFFER, rend.mesh.verts.data, ds);
 
-            // buffer 2 
+            // buffer 2
             gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_normal_buffer);
             gl.vertexAttribPointer(this.a_vertex_normal, 3, gl.FLOAT, false, 0, 0);
             gl.bufferData(gl.ARRAY_BUFFER, rend.norms.data, ds);
@@ -196,10 +191,9 @@ export class ShadedMeshRenderer extends Renderer {
             // gl.vertexAttribPointer(this.a_vertex_ambi, 1, gl.FLOAT, false, 0, 0);
             // gl.bufferData(gl.ARRAY_BUFFER, ambi, ds);
 
-            // index 
+            // index
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, rend.mesh.links.data, ds);
-
         } else if (normalType == NormalKind.MultiVertex) {
             console.log("cannot render multi vertex normals");
         } else {
@@ -212,20 +206,19 @@ export class ShadedMeshRenderer extends Renderer {
 
     // render 1 image to the screen
     render(gl: WebGLRenderingContext, camera: Camera) {
-        
         // console.log("rendering..");
 
         // use the program
         gl.useProgram(this.program);
-        
+
         // set uniforms
         gl.uniformMatrix4fv(this.u_normal_matrix, false, Matrix4.newIdentity().data);
         gl.uniformMatrix4fv(this.u_model_view_matrix, false, camera.worldMatrix.data);
         gl.uniformMatrix4fv(this.u_projection_matrix, false, camera.projectMatrix.data);
 
         let vec = camera.getMouseWorldRay(gl.canvas.width, gl.canvas.height, false).normal;
-        gl.uniform3fv(this.u_ambient_light, new Vector3(0.2,0.2,0.2).toArray());
-        gl.uniform3fv(this.u_dir_light_color, new Vector3(1,1,1.0).toArray());
+        gl.uniform3fv(this.u_ambient_light, new Vector3(0.2, 0.2, 0.2).toArray());
+        gl.uniform3fv(this.u_dir_light_color, new Vector3(1, 1, 1.0).toArray());
         gl.uniform3fv(this.u_dir_light_vector, vec.scale(-1).toArray());
 
         // buffer 1
@@ -237,13 +230,13 @@ export class ShadedMeshRenderer extends Renderer {
         gl.enableVertexAttribArray(this.a_vertex_normal);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_normal_buffer);
         gl.vertexAttribPointer(this.a_vertex_normal, 3, gl.FLOAT, false, 0, 0);
-        
+
         // buffer 3
         // gl.enableVertexAttribArray(this.a_vertex_ambi);
         // gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_ambi_buffer);
         // gl.vertexAttribPointer(this.a_vertex_normal, 3, gl.FLOAT, false, 0, 0);
 
-        // indices 
+        // indices
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
 
         // draw!

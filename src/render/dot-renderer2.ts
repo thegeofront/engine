@@ -4,7 +4,6 @@ import { Vector2 } from "../math/vector";
 import { Renderer } from "./renderer";
 
 export class DotRenderer2 extends Renderer {
-
     // attribute & uniform locations
     a_position: number;
     a_position_buffer: WebGLBuffer;
@@ -16,14 +15,10 @@ export class DotRenderer2 extends Renderer {
     color: number[];
     size: number;
 
-    constructor(gl: WebGLRenderingContext, 
-        size: number =5, 
-        color: number[] = [1,1,1,1], 
-        square: boolean= true ) {
-
+    constructor(gl: WebGLRenderingContext, size: number = 5, color: number[] = [1, 1, 1, 1], square: boolean = true) {
         // note: I like vertex & fragments to be included in the script itself.
-        // when you change vertex or fragment, this class has to deal with it. 
-        // putting them somewhere else doesnt make sense to me, 
+        // when you change vertex or fragment, this class has to deal with it.
+        // putting them somewhere else doesnt make sense to me,
         // they are coupled 1 to 1.
         let vertexSource: string = `
         attribute vec2 a_position;
@@ -67,7 +62,7 @@ export class DotRenderer2 extends Renderer {
         `;
 
         // setup program
-        if (square) {    
+        if (square) {
             super(gl, vertexSource, fragmentSourceSquare);
         } else {
             super(gl, vertexSource, fragmentSourceRound);
@@ -84,12 +79,11 @@ export class DotRenderer2 extends Renderer {
         // look up where the vertex data needs to go.
         this.a_position = gl.getAttribLocation(this.program, "a_position");
         this.a_position_buffer = gl.createBuffer()!;
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);     
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
     }
 
     // render 1 image to the screen
     render(gl: WebGLRenderingContext, dots: Vector2[]) {
-
         // Tell it to use our program (pair of shaders)
         gl.useProgram(this.program);
 
@@ -103,35 +97,35 @@ export class DotRenderer2 extends Renderer {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
 
         // // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-        var size = 2;          // 2 components per iteration
-        var type = gl.FLOAT;   // the data is 32bit floats
+        var size = 2; // 2 components per iteration
+        var type = gl.FLOAT; // the data is 32bit floats
         var normalize = false; // don't normalize the data
-        var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-        var offset = 0;        // start at the beginning of the buffer
+        var stride = 0; // 0 = move forward size * sizeof(type) each iteration to get the next position
+        var offset = 0; // start at the beginning of the buffer
         gl.vertexAttribPointer(this.a_position, size, type, normalize, stride, offset);
-        
+
         // fill with data;
         let data = this.toFloat32Array(dots);
         gl.bufferData(gl.ARRAY_BUFFER, data, gl.DYNAMIC_DRAW);
-        
+
         // Draw the point.
         var primitiveType = gl.POINTS;
         var offset = 0;
-        var count = dots.length
+        var count = dots.length;
         gl.drawArrays(primitiveType, offset, count);
     }
 
     // Fill the buffer with the values that define a rectangle.
-    toFloat32Array(dots: Vector2[]) : Float32Array{
+    toFloat32Array(dots: Vector2[]): Float32Array {
         let data = new Float32Array(dots.length * 2);
-        for(let i = 0 ; i < dots.length; i++) {
-            data[i*2]     = dots[i].x;
-            data[i*2 + 1] = dots[i].y;
+        for (let i = 0; i < dots.length; i++) {
+            data[i * 2] = dots[i].x;
+            data[i * 2 + 1] = dots[i].y;
         }
         return data;
     }
 
-    randomInt(range: number) : number {
+    randomInt(range: number): number {
         return Math.floor(Math.random() * range);
     }
 }

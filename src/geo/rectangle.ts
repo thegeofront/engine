@@ -3,18 +3,17 @@ import { Matrix3, Matrix4 } from "../math/matrix";
 import { Vector2 } from "../math/vector";
 
 // basic 2d rectangle
-// a Matrix3 and Domain2 is used. 
+// a Matrix3 and Domain2 is used.
 // this way, a rectangle can be rotated around an arbirtary point it regards as its center.
 // name:    cube.ts
 // author:  Jos Feenstra
-// purpose: Represents a cube in 3d space, in a certain pose. 
+// purpose: Represents a cube in 3d space, in a certain pose.
 
 import { Vector3 } from "../math/vector";
 import { Geo } from "./geo";
 import { Plane } from "./plane";
 
 export class Rectangle2 {
-
     pose: Matrix3;
     domain: Domain2;
 
@@ -23,12 +22,11 @@ export class Rectangle2 {
         this.domain = domain;
     }
 
-    center() : Vector2 {
+    center(): Vector2 {
         return this.pose.transformVector(new Vector2(0, 0));
     }
 
-    getVertices() : Vector2[] {
-
+    getVertices(): Vector2[] {
         let verts = [
             new Vector2(this.domain.x.t0, this.domain.y.t0),
             new Vector2(this.domain.x.t1, this.domain.y.t0),
@@ -47,16 +45,15 @@ export class Rectangle2 {
 }
 
 export class Rectangle3 {
-    
-    plane: Plane
-    domain: Domain2
+    plane: Plane;
+    domain: Domain2;
 
     constructor(plane: Plane, domain: Domain2) {
         this.plane = plane;
         this.domain = domain;
     }
 
-    getCorners() : Vector3[] {
+    getCorners(): Vector3[] {
         let corners = this.domain.corners();
         let corners3 = corners.map((c) => this.plane.pushToWorld(c.to3D()));
         return corners3;

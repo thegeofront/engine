@@ -4,18 +4,13 @@
 // note:    TODO
 
 import { Matrix4 } from "../math/matrix";
-import { Vector3 } from "../math/vector";    
+import { Vector3 } from "../math/vector";
 
 // i want traits....
 export class Geo {
-    
-    constructor() {
+    constructor() {}
 
-    }
-
-    clone() {
-
-    }
+    clone() {}
 
     transform(m: Matrix4) {
         return this;
@@ -40,14 +35,13 @@ export class Geo {
         let rotater = Matrix4.newAxisRotation(axis, radians);
         // etc...
     }
-    
+
     move(m: Vector3) {
         let mover = Matrix4.newScaler(m.x, m.y, m.z);
-        // etc... 
+        // etc...
     }
 
     scale(s: Vector3) {
-
         let scaler = Matrix4.newScaler(s.x, s.y, s.z);
         // etc..
     }

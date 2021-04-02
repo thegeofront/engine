@@ -21,16 +21,15 @@ import { RequestApp } from "./apps/req-app";
 var core: Core;
 
 function main() {
-
     // get references of all items on the canvas
     let canvas = document.getElementById("canvas")! as HTMLCanvasElement;
     let video = document.getElementById("camera")! as HTMLVideoElement;
-    let ui = document.getElementById("interface")  as HTMLDivElement;
+    let ui = document.getElementById("interface") as HTMLDivElement;
     let cameraOn = document.getElementById("camera-on")! as HTMLButtonElement;
     let cameraStop = document.getElementById("camera-off")! as HTMLButtonElement;
     let buttonPredict = document.getElementById("predict")! as HTMLButtonElement;
-    
-    // init core 
+
+    // init core
     let gl = Renderer.initWebglContext(canvas);
     core = new Core(canvas, gl, ui);
 
@@ -44,7 +43,7 @@ function main() {
         ObjLoaderApp,
         DotApp3,
         StatApp,
-    ]
+    ];
 
     let swapApp = new SwapApp(gl, core, appCollection);
     core.addApp(swapApp);
@@ -65,6 +64,10 @@ function main() {
     }
     requestAnimationFrame(loop);
 }
-window.addEventListener("load", function() {
-    main();
-}, false);
+window.addEventListener(
+    "load",
+    function () {
+        main();
+    },
+    false,
+);

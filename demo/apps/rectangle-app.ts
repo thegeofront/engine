@@ -32,7 +32,7 @@
 //         let normrange = 5;
 //         let count = 10;
 //         const normSpace = Domain3.fromBounds(-normrange, normrange, -normrange, normrange, -normrange, normrange);
-        
+
 //         for (let i = 0 ; i < count; i++) {
 
 //             let loc = this.bounds.elevate(Vector3.fromRandom());
@@ -63,12 +63,12 @@
 //             // move & rotate
 //             rec.pose = rec.pose.rotate(0.01);
 //             rec.pose = Matrix3.newTranslation(dir.x, dir.y).multiply(rec.pose);
-            
+
 //             if (state.IsKeyPressed("q"))
 //             {
 //                 console.log(rec.center().toString());
 //             }
-//         }  
+//         }
 //     }
 
 //     draw(gl: WebGLRenderingContext) {
@@ -79,11 +79,11 @@
 //     }
 // }
 
-function randomPixelColor(alpha: number = 255) : number[] {
+function randomPixelColor(alpha: number = 255): number[] {
     let pixel: number[] = [];
     pixel.push(Math.round(Math.random() * 255));
     pixel.push(Math.round(Math.random() * 255));
     pixel.push(Math.round(Math.random() * 255));
-    pixel.push(alpha)
+    pixel.push(alpha);
     return pixel;
 }

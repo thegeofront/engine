@@ -7,18 +7,28 @@ import { Triangle2, Triangle3 } from "../geo/triangle";
 
 // a mesh with topological information
 export class TopoMesh extends Renderable {
-
     lastTouched = 0; // needed for triangle walk
     neighborMap: IntMatrix;
 
     // private -> should only be used with factory methods
-    private constructor(vertCount: number, normCount: number, uvCount: number, faceCount: number, texture: ImageData | undefined = undefined) {
+    private constructor(
+        vertCount: number,
+        normCount: number,
+        uvCount: number,
+        faceCount: number,
+        texture: ImageData | undefined = undefined,
+    ) {
         super(vertCount, normCount, uvCount, faceCount, texture);
         this.neighborMap = new IntMatrix(this.mesh.links.count(), 3);
     }
 
-    static copyFromRenderable(rend: Renderable) : TopoMesh {
-        let topoMesh = new TopoMesh(rend.mesh.verts.count(), rend.norms.count(), rend.uvs.count(), rend.mesh.links.count());
+    static copyFromRenderable(rend: Renderable): TopoMesh {
+        let topoMesh = new TopoMesh(
+            rend.mesh.verts.count(),
+            rend.norms.count(),
+            rend.uvs.count(),
+            rend.mesh.links.count(),
+        );
         topoMesh.mesh.verts = rend.mesh.verts.clone();
         topoMesh.norms = rend.norms.clone();
         topoMesh.uvs = rend.uvs.clone();
@@ -28,10 +38,9 @@ export class TopoMesh extends Renderable {
     }
 
     setNeighborMap() {
-
         // this method fills this.neighborMap after data is loaded
 
-        // 
+        //
         let edges = new HashTable<[boolean, number, number]>();
         let pairs = new HashTable<any>();
 
@@ -40,12 +49,11 @@ export class TopoMesh extends Renderable {
             let faceEdges = [
                 [f[0], f[1]],
                 [f[1], f[2]],
-                [f[2], f[0]]
+                [f[2], f[0]],
             ];
-            faceEdges.forEach(e => {
-
+            faceEdges.forEach((e) => {
                 // if (4, 1), orientation is True | if (1, 4), orientation is False
-                let orientation = e[0] > e[1]
+                let orientation = e[0] > e[1];
 
                 // use this min max construction to only store one edge per triangle pair
                 // let edge: [number, number] = e.sort();
@@ -54,9 +62,8 @@ export class TopoMesh extends Renderable {
 
                 if (!edges.has(edge)) {
                     // orientation, first tr ID, second tr ID
-                    edges.set(edge, [orientation, faceIndex, -1]); 
+                    edges.set(edge, [orientation, faceIndex, -1]);
                 } else {
-
                     // an edge match is made!
                     // console.log("matched!");
                     let other = edges.get(edge)!;
@@ -75,10 +82,8 @@ export class TopoMesh extends Renderable {
                     let pair = [nbIndex, faceIndex];
                     pair.sort();
                     // pair = (Math.min(...pair), Math.max(...pair))
-                    if (orientation != nbOrientation)
-                        pairs.set(pair, false);
-                    else
-                        pairs.set(pair, true);
+                    if (orientation != nbOrientation) pairs.set(pair, false);
+                    else pairs.set(pair, true);
                 }
             });
         });
@@ -87,50 +92,46 @@ export class TopoMesh extends Renderable {
         let count = 0;
         // for pair in pairs.items():
         //     if not pair: count +=1;
-        console.log("number of 'wrong' face neighbours: ", count)
+        console.log("number of 'wrong' face neighbours: ", count);
         return;
     }
 
-    
     /**
      * Get the triangle based on a UV point somewhere on the mesh.
      * Returns -1 if the point is not on the mesh TODO OR IF THE PATH HAS HOLES IN IT TODO FIX THIS!
      * @param  {Vector2} point
      * @returns triangleIndex, or -1 if failure
      */
-    walkUV(point: Vector2) : number {
-
+    walkUV(point: Vector2): number {
         // start where we last stopped
         let faceIndex = this.lastTouched;
 
         // make sure we never take more steps than triangles in the triangulation.
         // this would mean something went wrong
-        
-        let count = this.mesh.links.count();
-        for(let _ = 0 ; _ < count; _++) {
 
+        let count = this.mesh.links.count();
+        for (let _ = 0; _ < count; _++) {
             // i dont know how, but if we accidentally landed outside of the mesh
             if (faceIndex == -1) {
                 return -1;
             }
 
-            for(let i = 0 ; i < 3; i++) {
+            for (let i = 0; i < 3; i++) {
                 let j = (i + 1) % 3;
 
                 let face = this.mesh.links.getRow(faceIndex);
                 let edge: [number, number] = [face[i], face[j]];
-                
+
                 let b = this.uvs.getVector(edge[0]);
                 let c = this.uvs.getVector(edge[1]);
-                
+
                 let sign = point.sign(b, c);
 
                 if (sign < 0) {
                     faceIndex = this.getNb(faceIndex, edge);
 
                     // if its ouside, return -1
-                    if (faceIndex == -1) 
-                        return -1;
+                    if (faceIndex == -1) return -1;
 
                     // else: go there immidiately
                     this.lastTouched = faceIndex;
@@ -138,8 +139,7 @@ export class TopoMesh extends Renderable {
                 }
 
                 // if this ran 3 times, the point must be within the triangle
-                if (i == 2) 
-                    return faceIndex;
+                if (i == 2) return faceIndex;
             }
         }
 
@@ -147,13 +147,12 @@ export class TopoMesh extends Renderable {
         return -1;
     }
 
-    // find the faces closest to the point 
+    // find the faces closest to the point
     // -1 if the mesh does not contain triangles
-    closestFaces(point: Vector3) : number[] {
-
+    closestFaces(point: Vector3): number[] {
         let closestVertexId = this.mesh.verts.closestId(point);
         // get all face ids containing closestVertex, along with their centers
-        let closestFaces: number[] = [];  
+        let closestFaces: number[] = [];
         //let centers: Vector3[] = []
         this.mesh.links.forEachRow((tr, i) => {
             if (tr.includes(closestVertexId)) {
@@ -167,26 +166,24 @@ export class TopoMesh extends Renderable {
         return closestFaces;
     }
 
-    elevate(p: Vector2) : Vector3 {
-
-        // 'elevate' a point in UV space to vertex space using a barycentric remap   
+    elevate(p: Vector2): Vector3 {
+        // 'elevate' a point in UV space to vertex space using a barycentric remap
         // figure out where this point is located on the mesh
         let face = this.walkUV(p);
-        
+
         if (face == -1) {
             console.warn("got a point not on triangle...");
-            return new Vector3(0,0,0);
-        } 
+            return new Vector3(0, 0, 0);
+        }
 
         let tr3 = this.getTriangle3(face);
         let tr2 = this.getTriangle2(face);
-        
+
         let bari = tr2.toBarycentric(p);
         return tr3.fromBarycentric(bari);
     }
 
-    closestFace(p: Vector3) : number {
-
+    closestFace(p: Vector3): number {
         // NOTE this doesnt really work all that well...
         let faceIds = this.closestFaces(p);
         let closestPoints = new Vector3Array(faceIds.length);
@@ -194,17 +191,16 @@ export class TopoMesh extends Renderable {
             let tr = this.getTriangle3(id);
             let cp = tr.closestPoint(p);
             closestPoints.setVector(i, cp);
-        })
+        });
 
-        // find the closest closest point 
+        // find the closest closest point
         let id = closestPoints.closestId(p);
         return faceIds[id];
     }
 
     // 'flatten' a point in vertex space to uv space using a barycentric remap
     // NOTE : this is not exactly a 'project to closest triangle', something like that wouldnt always work
-    flatten(p: Vector3, face: number) : Vector2 {
-        
+    flatten(p: Vector3, face: number): Vector2 {
         let tr3 = this.getTriangle3(face);
         let tr2 = this.getTriangle2(face);
 
@@ -212,14 +208,11 @@ export class TopoMesh extends Renderable {
         return tr2.fromBarycentric(bari);
     }
 
-
     // combo
     flattenClosestPoint(p: Vector3) {
-
         let face = this.closestFace(p);
         return this.flatten(p, face);
     }
-
 
     closestPoint(p: Vector3) {
         let face = this.closestFace(p);
@@ -228,61 +221,49 @@ export class TopoMesh extends Renderable {
         return triangle.fromBarycentric(bari);
     }
 
-
-    public getTriangle2(id: number) : Triangle2 {
-
+    public getTriangle2(id: number): Triangle2 {
         let p = this.getFacePoints(id, true);
         return new Triangle2(p[0], p[1], p[2]);
     }
 
-    public getTriangle3(id: number) : Triangle3 {
-
+    public getTriangle3(id: number): Triangle3 {
         let p = this.getFacePoints(id, false);
         return new Triangle3(p[0], p[1], p[2]);
     }
 
-
     private setNb(faceIndex: number, commonEdge: Int32Array, nbIndex: number) {
-        
-        for(let j = 0 ; j < 3; j++) {
+        for (let j = 0; j < 3; j++) {
             if (!commonEdge.includes(this.mesh.links.get(faceIndex, j))) {
                 this.neighborMap.set(faceIndex, j, nbIndex);
                 return;
-            } 
+            }
         }
         console.log(this.mesh.links.getRow(faceIndex));
         console.log(commonEdge);
         throw "these are not actually neighbors!";
     }
 
-
-    private getNb(faceIndex: number, commonEdge: Int32Array | [number, number] ) : number {
-        for(let j = 0 ; j < 3; j++) {
+    private getNb(faceIndex: number, commonEdge: Int32Array | [number, number]): number {
+        for (let j = 0; j < 3; j++) {
             if (!commonEdge.includes(this.mesh.links.get(faceIndex, j))) {
                 return this.neighborMap.get(faceIndex, j);
-            } 
+            }
         }
         console.log(this.mesh.links.getRow(faceIndex));
         console.log(commonEdge);
         throw "common edge does not match triangle index!";
     }
 
-
-    private getFacePoints(tr: number, uv: boolean) : [any, any, any] {
-        
+    private getFacePoints(tr: number, uv: boolean): [any, any, any] {
         let pointIds = this.mesh.links.getRow(tr);
         if (uv) {
-            return [
-                this.uvs.getVector(pointIds[0]),
-                this.uvs.getVector(pointIds[1]),
-                this.uvs.getVector(pointIds[2]),
-            ];
+            return [this.uvs.getVector(pointIds[0]), this.uvs.getVector(pointIds[1]), this.uvs.getVector(pointIds[2])];
         } else {
             return [
                 this.mesh.verts.getVector(pointIds[0]),
                 this.mesh.verts.getVector(pointIds[1]),
                 this.mesh.verts.getVector(pointIds[2]),
-            ]
-        }   
+            ];
+        }
     }
 }

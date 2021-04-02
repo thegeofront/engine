@@ -2,10 +2,25 @@
 // author:  Jos Feenstra
 // purpose: drag an obj to the canvas, and view it on the web
 
-import { App, DotRenderer3, LineRenderer, SimpleMeshRenderer, Camera, Renderable, LineArray, addDropFileEventListeners, InputState, Vector3Array, Vector3, loadTextFromFile, meshFromObj, Domain3, DrawSpeed } from "../../src/lib";
+import {
+    App,
+    DotRenderer3,
+    LineRenderer,
+    SimpleMeshRenderer,
+    Camera,
+    Renderable,
+    LineArray,
+    addDropFileEventListeners,
+    InputState,
+    Vector3Array,
+    Vector3,
+    loadTextFromFile,
+    meshFromObj,
+    Domain3,
+    DrawSpeed,
+} from "../../src/lib";
 
 export class ObjLoaderApp extends App {
-    
     dotRenderer: DotRenderer3;
     lineRenderer: LineRenderer;
     meshRenderer: SimpleMeshRenderer;
@@ -15,12 +30,11 @@ export class ObjLoaderApp extends App {
     renderable?: LineArray;
 
     constructor(gl: WebGLRenderingContext) {
-        
         super(gl);
         let canvas = gl.canvas as HTMLCanvasElement;
-        this.dotRenderer = new DotRenderer3(gl, 4, [0,0,1,1], false);
-        this.lineRenderer = new LineRenderer(gl, [0,0,1,0.5]);
-        this.meshRenderer = new SimpleMeshRenderer(gl, [0,0,1,0.25]);
+        this.dotRenderer = new DotRenderer3(gl, 4, [0, 0, 1, 1], false);
+        this.lineRenderer = new LineRenderer(gl, [0, 0, 1, 0.5]);
+        this.meshRenderer = new SimpleMeshRenderer(gl, [0, 0, 1, 0.25]);
         this.camera = new Camera(canvas);
 
         addDropFileEventListeners(canvas, processFiles.bind(this));
@@ -31,30 +45,30 @@ export class ObjLoaderApp extends App {
     }
 
     update(state: InputState) {
-        
         // move the camera with the mouse
-        this.camera.update(state); 
+        this.camera.update(state);
     }
 
     draw(gl: WebGLRenderingContext) {
-
         // get to-screen matrix
         const canvas = gl.canvas as HTMLCanvasElement;
         let matrix = this.camera.totalMatrix;
 
-     
         if (this.obj == undefined)
-            this.dotRenderer.setAndRender(gl, matrix, Vector3Array.fromList([new Vector3(0,0,0), new Vector3(1,1,1)]));
+            this.dotRenderer.setAndRender(
+                gl,
+                matrix,
+                Vector3Array.fromList([new Vector3(0, 0, 0), new Vector3(1, 1, 1)]),
+            );
         else {
             this.dotRenderer.setAndRender(gl, matrix, this.obj!.mesh.verts);
             // this.meshRenderer.render(gl, matrix);
             this.lineRenderer.render(gl, matrix);
-        }    
+        }
     }
 }
 
 async function processFiles(this: ObjLoaderApp, files: FileList) {
-
     // assume its 1 file, the obj file.
     let file = files[0];
 
@@ -70,17 +84,16 @@ async function processFiles(this: ObjLoaderApp, files: FileList) {
     let mesh = this.obj.mesh;
     let bounds = Domain3.fromInclude(this.obj.mesh.verts);
     let factor = 1 / bounds.size().largestValue();
-    
-    // TODO : one line these types of operations? 
+
+    // TODO : one line these types of operations?
     // they will be quite common i think...
     let count = this.obj.mesh.verts.count();
-    for(let i = 0 ; i < count; i++) {
-        let vec = this.obj.mesh.verts.getVector(i)
+    for (let i = 0; i < count; i++) {
+        let vec = this.obj.mesh.verts.getVector(i);
         vec.scale(factor);
         this.obj.mesh.verts.setVector(i, vec);
     }
-    
-    
+
     // let objBounds = Domain3.fromInclude(this.obj.verts);
     // console.log(objBounds);
 

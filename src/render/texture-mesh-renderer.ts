@@ -12,7 +12,6 @@ import { LineRenderer } from "./line-renderer";
 import { SimpleMeshRenderer } from "./simple-mesh-renderer";
 
 export class TextureMeshRenderer extends Renderer {
-    
     // attribute & uniform locations
     a_position: number;
     a_position_buffer: WebGLBuffer;
@@ -59,13 +58,13 @@ export class TextureMeshRenderer extends Renderer {
         }
         `;
 
-        // setup program    
+        // setup program
         super(gl, vs, fs);
         gl.useProgram(this.program);
         this.count = 0;
         this.size = 0;
 
-        // init uniforms 
+        // init uniforms
         this.u_transform = gl.getUniformLocation(this.program, "u_transform")!;
         this.u_texture = gl.getUniformLocation(this.program, "u_texture")!;
 
@@ -76,7 +75,7 @@ export class TextureMeshRenderer extends Renderer {
         this.a_texcoord = gl.getAttribLocation(this.program, "a_texcoord");
         this.a_texcoord_buffer = gl.createBuffer()!;
 
-        this.index_buffer = gl.createBuffer()!; 
+        this.index_buffer = gl.createBuffer()!;
 
         // init texture
         this.texture_id = Renderer.getNextTextureID();
@@ -89,7 +88,6 @@ export class TextureMeshRenderer extends Renderer {
     }
 
     set(gl: WebGLRenderingContext, r: Renderable, speed: DrawSpeed = DrawSpeed.StaticDraw) {
-        
         if (!r.texture) {
             console.warn("Mesh does not contain a texture!");
             return;
@@ -97,14 +95,14 @@ export class TextureMeshRenderer extends Renderer {
 
         // save how many faces need to be drawn
         gl.useProgram(this.program);
-        this.count = r.mesh.links.data.length
+        this.count = r.mesh.links.data.length;
 
         // buffer 1
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
         gl.vertexAttribPointer(this.a_position, 3, gl.FLOAT, false, 0, 0);
         gl.bufferData(gl.ARRAY_BUFFER, r.mesh.verts.data, this.convertDrawSpeed(speed));
 
-        // buffer 2 
+        // buffer 2
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_texcoord_buffer);
         gl.vertexAttribPointer(this.a_texcoord, 2, gl.FLOAT, false, 0, 0);
         gl.bufferData(gl.ARRAY_BUFFER, r.uvs.data, this.convertDrawSpeed(speed));
@@ -113,7 +111,7 @@ export class TextureMeshRenderer extends Renderer {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(r.mesh.links.data), this.convertDrawSpeed(speed));
 
-        // texture 
+        // texture
         gl.activeTexture(gl.TEXTURE0 + this.texture_id);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, r.texture);
@@ -126,16 +124,15 @@ export class TextureMeshRenderer extends Renderer {
 
     // render 1 image to the screen
     render(gl: WebGLRenderingContext, matrix: Matrix4) {
-        
         // console.log("rendering..");
 
         // use the program
         gl.useProgram(this.program);
-        
+
         // set uniforms
         gl.uniformMatrix4fv(this.u_transform, false, matrix.data);
-        
-        // set texture 
+
+        // set texture
         gl.uniform1i(this.u_texture, this.texture_id);
         gl.activeTexture(gl.TEXTURE0 + this.texture_id);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
@@ -152,7 +149,7 @@ export class TextureMeshRenderer extends Renderer {
 
         // buffer 3
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
-        
+
         // draw!
         gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
     }

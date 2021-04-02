@@ -13,13 +13,12 @@
 // // import { model } from "@tensorflow/tfjs";
 // require("@tensorflow/tfjs-backend-webgl");
 
-
 // // PUBLIC
 
 // // TODO rewrite this into the webcam app constructor
 // // TODO get rid of ctx
 // export function addWebcamAppWhenReady(core: Core, ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, video: HTMLVideoElement) {
-        
+
 //     let app: CtxApp;
 //     var constraints = {audio:false, video:true};
 
@@ -27,7 +26,7 @@
 
 //     p.then(function(stream) {
 //         video.srcObject = stream;
-        
+
 //         video.play();
 //         draw.resize(canvas, video);
 //     })
@@ -38,14 +37,14 @@
 
 //     tffl.load(tffl.SupportedPackages.mediapipeFacemesh).then((model) => {
 //         app = new WebcamApp(ctx, canvas, video, model);
-//         // 
+//         //
 //     });
 // }
 
 // export class WebcamApp extends CtxApp {
 
 //     video: HTMLVideoElement;
-    
+
 //     points: Array<Vector2>;
 //     triangles: Array<Triangle2>;
 
@@ -65,7 +64,6 @@
 //         let video = this.video;
 
 //         // load the tensorflow face mesh predictor
-        
 
 //         // canvas.addEventListener("click", this.clickEvent.bind(this));
 //         video.addEventListener("loadeddata", (ev: Event) => {
@@ -76,18 +74,18 @@
 //     }
 
 //     update(state: InputState) {
-        
+
 //     }
 
 //     drawCtx(ctx: CanvasRenderingContext2D) {
 //         ctx.canvas.width = 1000;
 //         ctx.canvas.height = 800;
-        
+
 //         ctx.canvas.style.width = "1000";
 //         ctx.canvas.style.height = "800";
 
 //         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-        
+
 //         if (this.drawVideo)
 //         {
 //             ctx.drawImage(this.video, 0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -109,18 +107,18 @@
 //         this.model.estimateFaces({
 //             input: this.video
 //         }).then((predictions) => {
-            
+
 //             console.log("drawing...");
-    
+
 //             // just draw 1 face
 //             if (predictions.length == 1) {
-                
+
 //                 // draw.drawPrediction(ctx, predictions[0]);
 //                 this.visualizePrediction(predictions[0]);
 //             } else {
 //                 console.log("not 1 face");
-//             }  
-//             console.log("done!"); 
+//             }
+//             console.log("done!");
 //         });
 //     }
 
@@ -160,14 +158,12 @@
 //         this.addPoints([a, b, c, d]);
 //     }
 
-
-
 //     // ------- events -------
 
 //     clickEvent(e: MouseEvent) {
 //         let x = e.x;
 //         let y = e.y;
-    
+
 //         console.log("click at {}, {}", x, y);
 //         this.points.push(new Vector2(x, y))
 //     }
@@ -177,11 +173,11 @@
 // // ----- pure utils -----
 // // TODO move this to draw utils
 // function drawPoint(ctx: CanvasRenderingContext2D, p: Vector2) {
-        
+
 //     ctx.strokeStyle = "white";
 //     ctx.fillStyle = "white";
 //     // ctx.moveTo(x, y);
 //     ctx.beginPath();
 //     ctx.arc(p.x, p.y, 3, 0, 7, false);
 //     ctx.fill();
-// } 
+// }

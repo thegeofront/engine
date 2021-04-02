@@ -1,13 +1,12 @@
-import { InputState } from "../system/input-state"
+import { InputState } from "../system/input-state";
 import { UI } from "../system/ui";
 
 export class App {
-
     gl: WebGLRenderingContext;
     name: string;
 
     constructor(gl: WebGLRenderingContext) {
-        // unique constructor    
+        // unique constructor
         this.gl = gl;
         this.name = this.constructor.name;
     }

@@ -3,12 +3,9 @@
 import { Mesh } from "../mesh/mesh";
 
 export class MeshPickRenderer {
+    constructor() {}
 
-    constructor() {
-        
-    }
-
-    pickMesh(meshes: Mesh[]) : number {
+    pickMesh(meshes: Mesh[]): number {
         return 0;
     }
 

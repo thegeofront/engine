@@ -9,7 +9,6 @@ import { Matrix4 } from "../math/matrix";
 import { DrawSpeed, Renderer } from "./renderer";
 
 export class SimpleMeshRenderer extends Renderer {
-
     // attribute & uniform locations
     a_position: number;
     a_position_buffer: WebGLBuffer;
@@ -18,8 +17,7 @@ export class SimpleMeshRenderer extends Renderer {
     u_color: WebGLUniformLocation;
     count: number;
     size: number;
-    constructor(gl: WebGLRenderingContext, color = [1,0,0,0.25]) {
-
+    constructor(gl: WebGLRenderingContext, color = [1, 0, 0, 0.25]) {
         const vs = `
         precision mediump int;
         precision mediump float;
@@ -44,7 +42,7 @@ export class SimpleMeshRenderer extends Renderer {
         }
         `;
 
-        // setup program    
+        // setup program
         super(gl, vs, fs);
 
         this.u_transform = gl.getUniformLocation(this.program, "u_transform")!;
@@ -54,12 +52,12 @@ export class SimpleMeshRenderer extends Renderer {
         this.count = 0;
         this.size = 0;
 
-        // we need 2 buffers 
+        // we need 2 buffers
         // -> 1 float buffer for the positions of all vertices.
         // -> 1 int buffer for the index of all triangles
         this.a_position = gl.getAttribLocation(this.program, "a_position");
         this.a_position_buffer = gl.createBuffer()!;
-        this.index_buffer = gl.createBuffer()!;  
+        this.index_buffer = gl.createBuffer()!;
     }
 
     setMesh(gl: WebGLRenderingContext, rend: Renderable, speed: DrawSpeed = DrawSpeed.StaticDraw) {
@@ -67,34 +65,32 @@ export class SimpleMeshRenderer extends Renderer {
     }
 
     set(gl: WebGLRenderingContext, verts: Vector3Array, faces: IntMatrix, speed: DrawSpeed = DrawSpeed.StaticDraw) {
-        
         // save how many faces need to be drawn
         gl.useProgram(this.program);
-        this.count = faces.data.length
+        this.count = faces.data.length;
 
-        // vertices 
+        // vertices
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
         this.size = 3;
         var type = gl.FLOAT;
-        var normalize = false; 
+        var normalize = false;
         gl.vertexAttribPointer(this.a_position, this.size, gl.FLOAT, false, 0, 0);
         gl.bufferData(gl.ARRAY_BUFFER, verts.data, this.convertDrawSpeed(speed));
 
-        // indices 
+        // indices
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, faces.data, this.convertDrawSpeed(speed));
     }
 
     // render 1 image to the screen
     render(gl: WebGLRenderingContext, matrix: Matrix4) {
-        
         // Tell it to use our program (pair of shaders)
         gl.useProgram(this.program);
         gl.enableVertexAttribArray(this.a_position);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
         gl.vertexAttribPointer(this.a_position, this.size, gl.FLOAT, false, 0, 0);
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
-        
+
         // set uniforms
         gl.uniformMatrix4fv(this.u_transform, false, matrix.data);
 

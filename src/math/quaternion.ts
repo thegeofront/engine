@@ -1,7 +1,6 @@
 // author: Jos Feenstra
 // purpose: Quaternion to be used for rotation
 
-
 export class Quaternion {
     x: number;
     y: number;

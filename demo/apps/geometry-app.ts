@@ -2,12 +2,30 @@
 // author:  Jos Feenstra
 // purpose: a 3d voxel environment to toy around in. Uses several features of geon
 
-import { App, Camera, Cube, Domain3, DotRenderer3, DrawSpeed, InputState, IntCube, LineArray, 
-    LineRenderer, Matrix4, Mesh, MeshDebugRenderer, Parameter, Plane, Ray,
-     Renderable, ShadedMeshRenderer, UI, Vector3 } from "../../src/lib";
+import {
+    App,
+    Camera,
+    Cube,
+    Domain3,
+    DotRenderer3,
+    DrawSpeed,
+    InputState,
+    IntCube,
+    LineArray,
+    LineRenderer,
+    Matrix4,
+    Mesh,
+    MeshDebugRenderer,
+    Parameter,
+    Plane,
+    Ray,
+    Renderable,
+    ShadedMeshRenderer,
+    UI,
+    Vector3,
+} from "../../src/lib";
 
 export class GeometryApp extends App {
-
     // renderinfo
     dotRenderer: DotRenderer3;
     whiteLineRenderer: LineRenderer;
@@ -24,9 +42,9 @@ export class GeometryApp extends App {
     dots: Vector3[] = [];
     geo: Renderable[] = [];
     mapGeo: Renderable[] = [];
-    cursorVisual?: LineArray
+    cursorVisual?: LineArray;
 
-    // logic data 
+    // logic data
     size = 50;
     cellSize = 1;
     map!: IntCube;
@@ -34,22 +52,19 @@ export class GeometryApp extends App {
     pov = new Parameter("pov", 80, 10, 100, 1);
 
     constructor(gl: WebGLRenderingContext) {
-        
         // setup render env
         super(gl);
         this.camera = new Camera(gl.canvas! as HTMLCanvasElement, 10, true);
-        this.dotRenderer = new DotRenderer3(gl, 4, [1,0,0,1], false);
-        this.whiteLineRenderer = new LineRenderer(gl, [1,1,1,1]);
-        this.greyLineRenderer = new LineRenderer(gl, [0.2,0,1,0.5]);
-        this.redLineRenderer = new LineRenderer(gl, [0.8,0,0,1]);
+        this.dotRenderer = new DotRenderer3(gl, 4, [1, 0, 0, 1], false);
+        this.whiteLineRenderer = new LineRenderer(gl, [1, 1, 1, 1]);
+        this.greyLineRenderer = new LineRenderer(gl, [0.2, 0, 1, 0.5]);
+        this.redLineRenderer = new LineRenderer(gl, [0.8, 0, 0, 1]);
         this.meshRenderer = new ShadedMeshRenderer(gl);
-        this.transMeshRenderer = new MeshDebugRenderer(gl, [1,1,1,0.25], [1,1,1,0.25]);
+        this.transMeshRenderer = new MeshDebugRenderer(gl, [1, 1, 1, 0.25], [1, 1, 1, 0.25]);
     }
-
 
     // called after init
     start() {
-
         this.map = new IntCube(this.size, this.size, this.size);
         this.map.fill(0);
 
@@ -60,13 +75,13 @@ export class GeometryApp extends App {
             } else {
                 return value;
             }
-        })
-        
+        });
+
         // let perlin = new Perlin();
         // this.map.map((value, i) => {
 
         //     let c = this.map.getCoords(i);
-            
+
         //     let scale = 0.05;
         //     let noise = perlin.noise(c.x * scale, c.y * scale, c.z * scale);
 
@@ -74,7 +89,6 @@ export class GeometryApp extends App {
         //         console.log(c);
         //         console.log(noise);
         //     }
-            
 
         //     if (noise > 0.60) {
         //         return 1;
@@ -83,17 +97,15 @@ export class GeometryApp extends App {
         //     }
         // })
 
-        
         // console.log("done setting")
 
-
-        // after change, buffer 
+        // after change, buffer
         this.bufferMap();
 
         // console.log("done")
 
         this.gridLarge = LineArray.fromGrid(this.plane, this.size, this.cellSize);
-        this.gridSmall = LineArray.fromGrid(this.plane, (this.size*10)-1, this.cellSize / 10);
+        this.gridSmall = LineArray.fromGrid(this.plane, this.size * 10 - 1, this.cellSize / 10);
 
         // this.whiteLineRenderer.set(this.gl, this.gridLarge, DrawSpeed.StaticDraw);
         // this.greyLineRenderer.set(this.gl, this.gridSmall, DrawSpeed.StaticDraw);
@@ -104,16 +116,13 @@ export class GeometryApp extends App {
     }
 
     update(state: InputState) {
-        
         // move the camera with the mouse
-        this.camera.update(state); 
+        this.camera.update(state);
 
         this.updateCursor(state);
     }
-    
 
     draw(gl: WebGLRenderingContext) {
-
         // get to-screen matrix
         const canvas = gl.canvas as HTMLCanvasElement;
         let matrix = this.camera.totalMatrix;
@@ -146,10 +155,9 @@ export class GeometryApp extends App {
     }
 
     updateCursor(state: InputState) {
-        
-        // render mouse to world line 
+        // render mouse to world line
         let mouseRay = this.camera.getMouseWorldRay(state.canvas.width, state.canvas.height);
-        
+
         // snap to world
         // let cursor = mouseRay.at(mouseRay.xPlane(this.plane));
         // let mapCursor = this.worldToMap(cursor);
@@ -159,46 +167,41 @@ export class GeometryApp extends App {
         // let plane = this.plane.clone();
         // plane.matrix = plane.matrix.multiply(Matrix4.newTranslation(cursor.x, cursor.y, cursor.z));
         // this.cursorVisual = LineArray.fromCircle(new Circle3(plane, 0.1));
-        
+
         // figure out which cube we are pointing to
         this.flushPreviewCubes();
         let [cubeID, cubeIDprevious] = this.voxelRaycast(mouseRay, 40);
         if (cubeID == -1) {
             // nothing else to do
-            return;        
+            return;
         }
 
-        let cubeCursor = this.map.getCoords(cubeIDprevious);   
+        let cubeCursor = this.map.getCoords(cubeIDprevious);
         this.addPreviewCube(cubeCursor);
-        
 
         // render cube at this position
-        
-        
-        // this.geo.push(Mesh.fromCube(cube));  
-        
+
+        // this.geo.push(Mesh.fromCube(cube));
+
         // click
         if (state.mouseLeftPressed) {
-            console.log("click")
+            console.log("click");
             if (state.IsKeyDown(" ")) {
-                if (this.map.data[cubeID] == 0) 
-                    return;
+                if (this.map.data[cubeID] == 0) return;
                 this.map.data[cubeID] = 0;
                 this.bufferMap();
             } else if (this.map.data[cubeIDprevious] != 1) {
                 this.map.data[cubeIDprevious] = 1;
                 this.bufferMap();
-            } 
+            }
         }
     }
 
-    
-    // return the ID of the 
+    // return the ID of the
     // A Fast Voxel Traversal Algorithm for Ray Tracing
     // Amanatides, Woo
     // Dept. of Computer Science
-    voxelRaycast(ray: Ray, range: number) : [number, number] {
-
+    voxelRaycast(ray: Ray, range: number): [number, number] {
         let startPoint = this.worldToMap(ray.origin);
         let voxelCenter = this.mapToWorld(startPoint);
 
@@ -222,7 +225,7 @@ export class GeometryApp extends App {
         let deltaz = voxelsize / Math.abs(ray.normal.z);
 
         // intit tx, ty, and tz, at their first intersection with corresponding plane
-        voxelCenter.add(new Vector3(voxelsize/2 * stepX, voxelsize/2 * stepY, voxelsize/2 * stepZ));
+        voxelCenter.add(new Vector3((voxelsize / 2) * stepX, (voxelsize / 2) * stepY, (voxelsize / 2) * stepZ));
 
         let move = Matrix4.newTranslation(voxelCenter.x, voxelCenter.y, voxelCenter.z);
         let xy = Plane.WorldXY();
@@ -253,16 +256,15 @@ export class GeometryApp extends App {
         // console.log("cast away!");
         // this.addPreviewCube(new Vector3(x,y,z));
         // console.log(x,y,z);
-        for(let i = 0 ; i < range; i++) {
-
+        for (let i = 0; i < range; i++) {
             // this.addPreviewCube(new Vector3(xprev,yprev,zprev));
 
             // if hit, return previous
-            let value = this.map.tryGet(x,y,z);
+            let value = this.map.tryGet(x, y, z);
             if (value == 1) {
                 // console.log("found a cube after " + i + "steps...");
                 // this.addPreviewCube(new Vector3(xprev,yprev,zprev));
-                return [this.map.getIndex(x,y,z), this.map.getIndex(xprev, yprev, zprev)];
+                return [this.map.getIndex(x, y, z), this.map.getIndex(xprev, yprev, zprev)];
             } else {
                 xprev = x;
                 yprev = y;
@@ -271,7 +273,7 @@ export class GeometryApp extends App {
 
             // to the next cube!
             if (tx < ty && tx < tz) {
-                // x 
+                // x
                 tx += deltax;
                 x += stepX;
             } else if (ty < tz) {
@@ -284,13 +286,13 @@ export class GeometryApp extends App {
                 z += stepZ;
             }
         }
-        return [-1, -1]
+        return [-1, -1];
     }
 
     // flush this.meshRenderer
     // turn this.map into this.mapGeo
     bufferMap() {
-        let mapGeo: Mesh[] = []
+        let mapGeo: Mesh[] = [];
         this.map.iter((entry, index) => {
             if (entry == 1) {
                 let mapCoord = this.map.getCoords(index);
@@ -305,23 +307,20 @@ export class GeometryApp extends App {
         this.meshRenderer.set(this.gl, m);
     }
 
-    
-    worldToMap(coord: Vector3) : Vector3 {
-        let halfsize = (this.size / 2) + (this.cellSize / 2);
+    worldToMap(coord: Vector3): Vector3 {
+        let halfsize = this.size / 2 + this.cellSize / 2;
         return coord.added(new Vector3(halfsize, halfsize, halfsize)).floored();
     }
 
-
-    mapToWorld(point: Vector3) : Vector3 {
+    mapToWorld(point: Vector3): Vector3 {
         let halfsize = this.size / 2;
         return point.added(new Vector3(-halfsize, -halfsize, -halfsize));
     }
 
-
     createCube(center: Vector3) {
         let hs = this.cellSize / 2;
         let move = Matrix4.newTranslation(center.x, center.y, center.z);
-        let cube = new Cube(Plane.WorldXY().transform(move), Domain3.fromBounds(-hs, hs, -hs, hs,-hs, hs));
+        let cube = new Cube(Plane.WorldXY().transform(move), Domain3.fromBounds(-hs, hs, -hs, hs, -hs, hs));
         return cube;
     }
 }

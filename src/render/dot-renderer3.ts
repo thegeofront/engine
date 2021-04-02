@@ -7,7 +7,6 @@ import { Vector2, Vector3 } from "../math/vector";
 import { DrawSpeed, Renderer } from "./renderer";
 
 export class DotRenderer3 extends Renderer {
-
     // attribute & uniform locations
     a_position: number;
     a_position_buffer: WebGLBuffer;
@@ -20,14 +19,10 @@ export class DotRenderer3 extends Renderer {
     size: number;
     count: number;
 
-    constructor(gl: WebGLRenderingContext, 
-        radius: number =5, 
-        color: number[] = [1,1,1,1], 
-        square: boolean= true ) {
-
+    constructor(gl: WebGLRenderingContext, radius: number = 5, color: number[] = [1, 1, 1, 1], square: boolean = true) {
         // note: I like vertex & fragments to be included in the script itself.
-        // when you change vertex or fragment, this class has to deal with it. 
-        // putting them somewhere else doesnt make sense to me, 
+        // when you change vertex or fragment, this class has to deal with it.
+        // putting them somewhere else doesnt make sense to me,
         // they are coupled 1 to 1.
         let vertexSource: string = `
         precision mediump int;
@@ -76,7 +71,7 @@ export class DotRenderer3 extends Renderer {
         `;
 
         // setup program
-        if (square) {    
+        if (square) {
             super(gl, vertexSource, fragmentSourceSquare);
         } else {
             super(gl, vertexSource, fragmentSourceRound);
@@ -94,7 +89,7 @@ export class DotRenderer3 extends Renderer {
         // look up where the vertex data needs to go.
         this.a_position = gl.getAttribLocation(this.program, "a_vertex");
         this.a_position_buffer = gl.createBuffer()!;
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);     
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
     }
 
     set(vectors: Vector2Array | Vector3Array | Vector2[] | Vector3[], speed: DrawSpeed) {
@@ -109,12 +104,11 @@ export class DotRenderer3 extends Renderer {
 
         // // Bind the position buffer.
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
-        gl.vertexAttribPointer(this.a_position, array._width,  gl.FLOAT, false, 0, 0);
+        gl.vertexAttribPointer(this.a_position, array._width, gl.FLOAT, false, 0, 0);
         gl.bufferData(gl.ARRAY_BUFFER, array.data, super.convertDrawSpeed(speed));
     }
 
     render(gl: WebGLRenderingContext, matrix: Matrix4) {
-
         // Tell it to use our program (pair of shaders)
         gl.useProgram(this.program);
 
@@ -127,12 +121,16 @@ export class DotRenderer3 extends Renderer {
         // // Bind the position buffer.
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
         gl.enableVertexAttribArray(this.a_position);
-        
+
         // Draw the point.
-        gl.drawArrays( gl.POINTS, 0, this.count);
+        gl.drawArrays(gl.POINTS, 0, this.count);
     }
 
-    setAndRender(gl: WebGLRenderingContext, matrix: Matrix4, vectors: Vector2Array | Vector3Array | Vector2[] | Vector3[]) {
+    setAndRender(
+        gl: WebGLRenderingContext,
+        matrix: Matrix4,
+        vectors: Vector2Array | Vector3Array | Vector2[] | Vector3[],
+    ) {
         this.set(vectors, DrawSpeed.DynamicDraw);
         this.render(gl, matrix);
     }

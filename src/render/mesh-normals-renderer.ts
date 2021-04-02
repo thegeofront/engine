@@ -13,7 +13,6 @@ import { DrawSpeed, Renderer } from "./renderer";
 import { Camera } from "./camera";
 
 export class NormalRenderer extends Renderer {
-
     a_position: number;
     a_position_buffer: WebGLBuffer;
     index_buffer: WebGLBuffer;
@@ -27,10 +26,9 @@ export class NormalRenderer extends Renderer {
     scale: number;
 
     constructor(gl: WebGLRenderingContext) {
-
         // note: I like vertex & fragments to be included in the script itself.
-        // when you change vertex or fragment, this class has to deal with it. 
-        // putting them somewhere else doesnt make sense to me, 
+        // when you change vertex or fragment, this class has to deal with it.
+        // putting them somewhere else doesnt make sense to me,
         // they are coupled 1 to 1.
         const vs = `
         precision mediump int;
@@ -60,17 +58,17 @@ export class NormalRenderer extends Renderer {
         }
         `;
 
-        // setup program    
+        // setup program
         super(gl, vs, fs);
         this.u_transform = gl.getUniformLocation(this.program, "u_transform")!;
 
-        // we need 2 buffers 
+        // we need 2 buffers
         this.a_position = gl.getAttribLocation(this.program, "a_vertex");
         this.a_color = gl.getAttribLocation(this.program, "a_vertex_color");
 
         this.a_position_buffer = gl.createBuffer()!;
         this.a_color_buffer = gl.createBuffer()!;
-        this.index_buffer = gl.createBuffer()!;    
+        this.index_buffer = gl.createBuffer()!;
 
         gl.useProgram(this.program);
         this.count = 0;
@@ -78,13 +76,10 @@ export class NormalRenderer extends Renderer {
         this.scale = 0.4;
     }
 
-    setWithLists(pos: Vector3[], norms: Vector3[], speed = DrawSpeed.StaticDraw) {
-
-    }
+    setWithLists(pos: Vector3[], norms: Vector3[], speed = DrawSpeed.StaticDraw) {}
 
     // take a general render mesh, and extract normals
     set(rend: Renderable, speed = DrawSpeed.StaticDraw) {
-        
         // save how many verts need to be drawn
         let gl = this.gl;
         gl.useProgram(this.program);
@@ -97,14 +92,13 @@ export class NormalRenderer extends Renderer {
         // different buffer fills based upon normal kind
         let normalKind = rend.getNormalType();
         if (normalKind == NormalKind.Face) {
-
-            let faceCount = rend.mesh.links.count(); 
+            let faceCount = rend.mesh.links.count();
             this.count = faceCount * 2;
 
             lineverts = new Vector3Array(this.count);
             normals = new Vector3Array(this.count);
-            
-            for (let f = 0 ; f < faceCount; f++) {
+
+            for (let f = 0; f < faceCount; f++) {
                 let center = rend.getFaceVertices(f).average();
                 let normal = rend.norms.getVector(f);
                 let i1 = f * 2;
@@ -112,21 +106,18 @@ export class NormalRenderer extends Renderer {
 
                 lineverts.setVector(i1, center);
                 lineverts.setVector(i2, center.add(normal.scaled(this.scale)));
-                let color = normal.add(new Vector3(1,1,1).div(2));
+                let color = normal.add(new Vector3(1, 1, 1).div(2));
                 normals.setVector(i1, color);
                 normals.setVector(i2, color);
             }
-
-
         } else if (normalKind == NormalKind.Vertex) {
-
-            let vertCount = rend.mesh.verts.count(); 
+            let vertCount = rend.mesh.verts.count();
             this.count = vertCount * 2;
 
             lineverts = new Vector3Array(this.count);
             normals = new Vector3Array(this.count);
-            
-            for (let i = 0 ; i < vertCount; i++) {
+
+            for (let i = 0; i < vertCount; i++) {
                 let center = rend.mesh.verts.getVector(i);
                 let normal = rend.norms.getVector(i);
                 let i1 = i * 2;
@@ -134,21 +125,19 @@ export class NormalRenderer extends Renderer {
 
                 lineverts.setVector(i1, center);
                 lineverts.setVector(i2, center.add(normal.scaled(this.scale)));
-                
-                
-                let color = normal.add(new Vector3(1,1,1)).div(2);
+
+                let color = normal.add(new Vector3(1, 1, 1)).div(2);
                 normals.setVector(i1, color);
                 normals.setVector(i2, color);
             }
             // console.log(normals);
-
         } else {
             console.warn("no normals for type", normalKind);
             this.count = 0;
             return;
         }
 
-        // vertices  
+        // vertices
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
         gl.enableVertexAttribArray(this.a_position);
         gl.vertexAttribPointer(this.a_position, this.vertCount, gl.FLOAT, false, 0, 0);
@@ -160,23 +149,22 @@ export class NormalRenderer extends Renderer {
         gl.vertexAttribPointer(this.a_color, this.vertCount, gl.FLOAT, false, 0, 0);
         gl.bufferData(gl.ARRAY_BUFFER, normals.data, drawspeed);
 
-        // indices 
+        // indices
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, getDefaultIndices(this.count), drawspeed);
     }
 
     render(gl: WebGLRenderingContext, camera: Camera) {
-        
         let matrix = camera.totalMatrix;
 
         // Tell it to use our program (pair of shaders)
         // POINTERS MUST ALSO BE SET, DO EVERYTHING EXCEPT GL.BUFFERDATA
         gl.useProgram(this.program);
-        
+
         // buffer 1
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
         gl.enableVertexAttribArray(this.a_position);
-        gl.vertexAttribPointer(this.a_position, this.vertCount, gl.FLOAT, false, 0, 0); 
+        gl.vertexAttribPointer(this.a_position, this.vertCount, gl.FLOAT, false, 0, 0);
 
         // buffer 2
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_color_buffer);

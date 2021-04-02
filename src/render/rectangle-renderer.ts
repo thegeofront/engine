@@ -4,7 +4,6 @@ import { Rectangle2 } from "../geo/rectangle";
 import { Renderer } from "./renderer";
 
 export class RectangleRenderer extends Renderer {
-
     // attribute & uniform locations
     a_position: number;
     a_position_buffer: WebGLBuffer;
@@ -12,10 +11,9 @@ export class RectangleRenderer extends Renderer {
     u_color: WebGLUniformLocation;
 
     constructor(gl: WebGLRenderingContext) {
-
         // note: I like vertex & fragments to be included in the script itself.
-        // when you change vertex or fragment, this class has to deal with it. 
-        // putting them somewhere else doesnt make sense to me, 
+        // when you change vertex or fragment, this class has to deal with it.
+        // putting them somewhere else doesnt make sense to me,
         // they are coupled 1 to 1.
         let vertexSource: string = `
         attribute vec2 a_position;
@@ -53,18 +51,14 @@ export class RectangleRenderer extends Renderer {
         this.a_position_buffer = gl.createBuffer()!;
         this.u_resolution = gl.getUniformLocation(this.program, "u_resolution")!;
         this.u_color = gl.getUniformLocation(this.program, "u_color")!;
-   
+
         // Create a buffer to put three 2d clip space points in
-        
 
         // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);        
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
     }
 
     render(gl: WebGLRenderingContext, rs: Rectangle2[]) {
-        
-        
-
         // Clear the canvas
         gl.clearColor(0, 0, 0, 0);
         gl.clear(gl.COLOR_BUFFER_BIT);
@@ -81,13 +75,12 @@ export class RectangleRenderer extends Renderer {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
 
         // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-        var size = 2;          // 2 components per iteration
-        var type = gl.FLOAT;   // the data is 32bit floats
+        var size = 2; // 2 components per iteration
+        var type = gl.FLOAT; // the data is 32bit floats
         var normalize = false; // don't normalize the data
-        var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-        var offset = 0;        // start at the beginning of the buffer
+        var stride = 0; // 0 = move forward size * sizeof(type) each iteration to get the next position
+        var offset = 0; // start at the beginning of the buffer
         gl.vertexAttribPointer(this.a_position, size, type, normalize, stride, offset);
-
 
         // draw 50 random rectangles in random colors
         for (let r of rs) {
@@ -111,17 +104,27 @@ export class RectangleRenderer extends Renderer {
     // Fill the buffer with the values that define a rectangle.
     setRectangle(gl: WebGLRenderingContext, r: Rectangle2) {
         let verts = r.getVertices();
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-        verts[0].x, verts[0].y,
-        verts[1].x, verts[1].y,
-        verts[2].x, verts[2].y,
-        verts[2].x, verts[2].y,
-        verts[1].x, verts[1].y,
-        verts[3].x, verts[3].y,
-        ]), gl.STATIC_DRAW);
+        gl.bufferData(
+            gl.ARRAY_BUFFER,
+            new Float32Array([
+                verts[0].x,
+                verts[0].y,
+                verts[1].x,
+                verts[1].y,
+                verts[2].x,
+                verts[2].y,
+                verts[2].x,
+                verts[2].y,
+                verts[1].x,
+                verts[1].y,
+                verts[3].x,
+                verts[3].y,
+            ]),
+            gl.STATIC_DRAW,
+        );
     }
 
-    randomInt(range: number) : number {
+    randomInt(range: number): number {
         return Math.floor(Math.random() * range);
     }
 }

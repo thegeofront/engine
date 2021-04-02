@@ -30,20 +30,9 @@ export class RequestApp extends App {
         // image.src = URL.createObjectURL(blob);
     }
 
+    start() {}
 
-    start() {
+    update() {}
 
-    }
-
-
-    update() {
-
-    }
-
-
-    draw() {
-
-    }
+    draw() {}
 }
-
-
