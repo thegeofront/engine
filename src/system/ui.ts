@@ -17,7 +17,6 @@ export class UI {
 
 
     addContext(appName: string) {
-
         this.currentContext = this.globalContext;
         let appDiv = this.addDiv(appName + " app-interface");
         this.currentContext = appDiv;
@@ -39,6 +38,14 @@ export class UI {
         let temp = this.currentContext;
         this.currentContext = this.globalContext;
         this.currentContext.removeChild(temp);
+    }
+
+
+    addElement(element: string, className: string = "") : HTMLElement { 
+        let el = document.createElement(element)
+        el.className = className;
+        this.currentContext.appendChild(el);
+        return el;
     }
 
 
@@ -82,8 +89,7 @@ export class UI {
     }
 
 
-    addParameter(param: Parameter, onInput: (v: number) => void = () => {}) {
-        
+    addParameter(param: Parameter, onInput: (v: number) => void = () => {}) {  
         let slider = this.addRangeInput(param, onInput);
         let text1 = this.addElement("p", "slider-text");
         text1.innerText = param.name;
@@ -113,7 +119,6 @@ export class UI {
 
 
     addRangeInput(param: Parameter, onInput: (v: number) => void = () => {}) {
-
         // a slider looks like this : <input type="range" min="1" max="100" step="1" value="50">
         let slider = this.addElement("input", "slider-control") as HTMLInputElement;    
         
@@ -127,11 +132,19 @@ export class UI {
     }
 
 
-    addText() {
-        this.addElement("")
+    addText(text: string) {
+        let p = this.addElement("p", "ui-text");
+        p.innerText = text;
     }
 
     
+    addButton(name: string, callback: () => void) {
+        let b = this.addElement("button", "ui-button");
+        b.innerText = name;
+        b.addEventListener("click", callback);
+    }
+
+
     addEnum<T>(keys: string[], values: T[], onchange: (selection: T) => void) : HTMLSelectElement {
         // <select>
         //  <option>Cappuccino</option>
@@ -163,16 +176,6 @@ export class UI {
 
         return select;
     }
-
-
-    private addElement(element: string, className: string = "") {
-        
-        let el = document.createElement(element)
-
-        el.className = className;
-        this.currentContext.appendChild(el);
-        return el;
-    }
 }
 
 // a slider parameter
@@ -195,11 +198,14 @@ export class Parameter {
         this.step = step;
     }
 
+
     get(): number {
         return this.state;
     }
 
+
     set(state: number) {
+
         // TODO ROUND TO NEAREST STEP
         let clamped = GeonMath.clamp(state, this.min, this.max);
         let rest = this.state - this.min;
@@ -209,6 +215,7 @@ export class Parameter {
         if (this.onset) 
             this.onset(this.state);   
     }
+
 
     getNPermutations() {
         return Math.min((this.max - this.min) / this.step + 1);
