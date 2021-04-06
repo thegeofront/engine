@@ -15,7 +15,7 @@ import { MarchingCubeApp } from "./apps/marching-cube-app";
 import { MeshInspectorApp } from "./apps/mesh-inspector-app";
 import { SwapApp } from "../src/app/swap-app";
 import { IcosahedronApp } from "./apps/icosahedron-app";
-import { SubdivideApp } from "./apps/subdivide-app";
+import { StalbergApp } from "./apps/subdivide-app";
 import { RequestApp } from "./apps/req-app";
 
 var core: Core;
@@ -35,8 +35,8 @@ function main() {
 
     // init swap app
     let appCollection = [
-        RequestApp,
-        SubdivideApp,
+        StalbergApp,
+        // RequestApp,
         GeometryApp,
         MeshInspectorApp,
         IcosahedronApp,

@@ -123,6 +123,7 @@ export class Plane {
     }
 
     public get inverse() {
+        // TODO CACHE INVERSE MATRIX
         return this._matrix.inverse();
     }
 
@@ -163,6 +164,13 @@ export class Plane {
         pulled.z = 0;
         let vec = this.pushToWorld(pulled);
         return [vec, distance];
+    }
+
+    rotateVector(v: Vector3, radians: number) {
+        let pulled = this.pullToPlane(v);
+        let rotation = Matrix4.newAxisRotation(this.normal, radians);
+        pulled = rotation.multiplyVector(pulled);
+        return this.pushToWorld(pulled);
     }
 
     // closestPoint(p: Vector3) : [Vector3, number] {

@@ -26,22 +26,22 @@ import { LineArray } from "./line-array";
 import { Mesh } from "./mesh";
 import { MeshType, NormalKind, Renderable } from "./render-mesh";
 
-type EdgeIndex = number;
-type VertIndex = number;
+export type EdgeIndex = number;
+export type VertIndex = number;
 
-type Vert = {
+export type Vert = {
     pos: Vector3;
     normal: Vector3;
     edge: EdgeIndex;
     dead: boolean;
 };
 
-interface Edge {
+export type Edge = {
     next: EdgeIndex;
     twin: EdgeIndex;
     vert: VertIndex;
     dead: boolean;
-}
+};
 
 // FACES MUST BE CONVEX, OR BUGS MIGHT OCCUR!!!!
 // interface Face {
@@ -51,8 +51,8 @@ interface Edge {
 // NOTE: create an interface which hides the Edge, Vert & Face interfaces.
 // NOTE: half edge is implied
 export class Graph {
-    private verts: Vert[]; // TODO: SUPPORT REMOVAL (DEAL WITH UNEVEN MOVEMENTS IN THE LIST)
-    private edges: Edge[]; // NOTE: ALWAYS AN EVEN NUMBER OF EDGES. EDGE TWIN IS EVEN / UNEVEN MATCH
+    verts: Vert[]; // TODO: SUPPORT REMOVAL (DEAL WITH UNEVEN MOVEMENTS IN THE LIST)
+    edges: Edge[]; // NOTE: ALWAYS AN EVEN NUMBER OF EDGES. EDGE TWIN IS EVEN / UNEVEN MATCH
 
     constructor() {
         this.verts = [];
@@ -127,14 +127,20 @@ export class Graph {
         console.log(`${this.verts.length} verts: `);
         for (let i = 0; i < this.verts.length; i++) {
             let v = this.verts[i];
-            console.log(`v(${i}) | edge: ${v.edge}, data: ${v.pos.toString()} normal: ${v.normal.toString()}`);
+            console.log(
+                `v(${i}) | edge: ${
+                    v.edge
+                }, data: ${v.pos.toString()} normal: ${v.normal.toString()}`,
+            );
         }
 
         console.log("--------");
         console.log(`${this.edges.length} edges:  `);
         for (let i = 0; i < this.edges.length; i++) {
             let e = this.edges[i];
-            console.log(`e(${i}) | vert: ${e.vert}, twin: ${e.twin}, next: ${e.next}, dead ${e.dead}`);
+            console.log(
+                `e(${i}) | vert: ${e.vert}, twin: ${e.twin}, next: ${e.next}, dead ${e.dead}`,
+            );
         }
         console.log("--------");
     }
@@ -258,7 +264,7 @@ export class Graph {
         return loops;
     }
 
-    private getLoop(ei: EdgeIndex): EdgeIndex[] {
+    getLoop(ei: EdgeIndex): EdgeIndex[] {
         let loop: EdgeIndex[] = [];
         let i = 0;
         const limit = this.edges.length;
@@ -306,27 +312,27 @@ export class Graph {
         v.normal = norm;
     }
 
-    private getVert(vi: VertIndex): Vert {
+    getVert(vi: VertIndex): Vert {
         if (vi < 0 || vi >= this.verts.length) {
             throw "out of range";
         }
         return this.verts[vi];
     }
 
-    private getEdge(ei: EdgeIndex): Edge {
+    getEdge(ei: EdgeIndex): Edge {
         if (ei < 0 || ei >= this.edges.length) {
             console.error("out of range");
         }
         return this.edges[ei];
     }
 
-    private getEdgeIndexBetween(ai: VertIndex, bi: VertIndex): EdgeIndex | undefined {
+    getEdgeIndexBetween(ai: VertIndex, bi: VertIndex): EdgeIndex | undefined {
         let res = this.getEdgeBetween(ai, bi);
         if (res) return this.getEdgeIndex(res);
         return undefined;
     }
 
-    private getEdgeBetween(ai: VertIndex, bi: VertIndex): Edge | undefined {
+    getEdgeBetween(ai: VertIndex, bi: VertIndex): Edge | undefined {
         let edges = this.getVertEdgeFan(ai);
         for (let i = 0; i < edges.length; i++) {
             if (this.getEdge(edges[i].twin).vert == bi) {
@@ -337,7 +343,7 @@ export class Graph {
         return undefined;
     }
 
-    private getVertEdgeFan(vi: VertIndex): Edge[] {
+    getVertEdgeFan(vi: VertIndex): Edge[] {
         // get all edges connected to this vertex.
         // NOTE: all are outgoing (e.vert == vi)
 
@@ -385,7 +391,7 @@ export class Graph {
         return loops;
     }
 
-    private getVertNeighbors(vi: VertIndex): VertIndex[] {
+    getVertNeighbors(vi: VertIndex): VertIndex[] {
         let ids: VertIndex[] = [];
         this.getVertEdgeFan(vi).forEach((e: Edge) => {
             ids.push(this.getEdge(e.twin).vert);
@@ -393,11 +399,11 @@ export class Graph {
         return ids;
     }
 
-    private getEdgeIndex(e: Edge) {
+    getEdgeIndex(e: Edge) {
         return this.getEdge(e.twin).twin;
     }
 
-    private getEdgeTwin(ei: EdgeIndex): Edge {
+    getEdgeTwin(ei: EdgeIndex): Edge {
         return this.edges[this.edges[ei].twin];
     }
 
@@ -469,7 +475,7 @@ export class Graph {
 
     // SETTERS
 
-    private getDiskPositions(ei: EdgeIndex): [EdgeIndex, EdgeIndex] {
+    getDiskPositions(ei: EdgeIndex): [EdgeIndex, EdgeIndex] {
         // returns edgeIndex before, edgeIndex after
         let e = this.getEdge(ei);
         let v = this.getVert(e.vert)!;
@@ -545,7 +551,7 @@ export class Graph {
         return [this.getEdgeIndex(e_before), this.getEdgeIndex(e_after)];
     }
 
-    private addEdgeToDisk(vi: VertIndex, ei: EdgeIndex) {
+    addEdgeToDisk(vi: VertIndex, ei: EdgeIndex) {
         let v = this.getVert(vi)!;
         let twin = this.getEdgeTwin(ei);
         if (v.edge == -1) {
@@ -562,7 +568,7 @@ export class Graph {
         }
     }
 
-    private deleteEdgeFromDisk(edge: Edge) {
+    deleteEdgeFromDisk(edge: Edge) {
         let ei = this.getEdgeIndex(edge);
         // console.log("deleting...", ei);
 
@@ -719,46 +725,6 @@ export class Graph {
         }
     }
 
-    _deleteRandomEdges() {
-        // TODO speed this up
-        let unvisited = new Set<number>();
-        this.edges.forEach((e, i) => {
-            if (e.dead) {
-                return;
-            }
-            unvisited.add(i);
-        });
-
-        let i = 0;
-        const limit = this.edges.length; // we will never visit an edge twice if all is according to plan
-
-        console.log(unvisited.size);
-
-        while (unvisited.size > 0) {
-            // get a 'random' unvisited
-            let loop: VertIndex[] = [];
-            let ei = unvisited.entries().next().value[0] as EdgeIndex;
-            unvisited.delete(ei);
-
-            // get the two connected faces & delete all edges from both loops
-            let loops = this.getLoopsAdjacentToEdge(ei);
-            for (let loop of loops) {
-                for (let edgeIndex of loop) {
-                    if (unvisited.has(edgeIndex)) {
-                        unvisited.delete(edgeIndex);
-                    }
-                    let twin = this.getEdge(edgeIndex).twin;
-                    if (unvisited.has(twin)) {
-                        unvisited.delete(twin);
-                    }
-                }
-            }
-
-            // now remove this edge itself
-            this.deleteEdgeByIndex(ei);
-        }
-    }
-
     forEveryEdgeVerts(callback: (a: Vector3, b: Vector3) => void) {
         let edges = this.allUniqueEdgeVerts();
         let edgeCount = edges.length / 2;
@@ -766,54 +732,6 @@ export class Graph {
             let a = this.getVert(edges[i * 2]);
             let b = this.getVert(edges[i * 2 + 1]);
             callback(a.pos, b.pos);
-        }
-    }
-
-    // niche, weird functions
-
-    _averageEdgeLength(): number {
-        let count = 0;
-        let sum = 0;
-        this.forEveryEdgeVerts((a, b) => {
-            sum += a.disTo(b);
-            count += 1;
-        });
-
-        let average = sum / count;
-        return average;
-    }
-
-    _edgeSmooth(average: number, scale: number) {
-        this.forEveryEdgeVerts((a, b) => {
-            let distance = a.disTo(b);
-            let diff = average - distance;
-            let vector = b.subbed(a);
-            a.add(vector.scaled(-diff * scale));
-            b.add(vector.scaled(diff * scale));
-        });
-    }
-
-    _laPlacian() {
-        let count = this.getVertexCount();
-        let news: Vector3[] = [];
-
-        // get center of nbs
-        for (let vi = 0; vi < count; vi++) {
-            let v = this.getVert(vi);
-            if (v.dead) continue;
-
-            let sum = Vector3.zero();
-            let nbs = this.getVertNeighbors(vi);
-            for (let nb of nbs) {
-                sum.add(this.getVertexPos(nb));
-            }
-            sum.scale(1 / nbs.length);
-            news.push(sum);
-        }
-
-        // set
-        for (let vi = 0; vi < count; vi++) {
-            this.getVertexPos(vi).copy(news[vi]);
         }
     }
 }
