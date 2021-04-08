@@ -2,21 +2,15 @@
 // Author:  Jos Feenstra
 // Purpose: Entry point
 
-// import {addWebcamAppWhenReady, WebcamApp} from "./apps/webcam-app";
-import { InputState } from "../src/system/input-state";
-import { App } from "../src/app/app";
-import { Renderer } from "../src/render/renderer";
+import { Core, Renderer, SwapApp } from "../src/lib";
+
 import { DotApp3 } from "./apps/dot-app3";
-import { ObjLoaderApp } from "./apps/obj-loader-app";
-import { Core } from "../src/system/core";
-import { StatApp } from "./apps/stat-app";
 import { GeometryApp } from "./apps/geometry-app";
-import { MarchingCubeApp } from "./apps/marching-cube-app";
-import { MeshInspectorApp } from "./apps/mesh-inspector-app";
-import { SwapApp } from "../src/app/swap-app";
 import { IcosahedronApp } from "./apps/icosahedron-app";
+import { MeshInspectorApp } from "./apps/mesh-inspector-app";
+import { ObjLoaderApp } from "./apps/obj-loader-app";
+import { StatApp } from "./apps/stat-app";
 import { StalbergApp } from "./apps/subdivide-app";
-import { RequestApp } from "./apps/req-app";
 
 var core: Core;
 

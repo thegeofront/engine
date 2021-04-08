@@ -4,6 +4,7 @@ export * from "./algorithms/marching-cubes";
 export * from "./algorithms/perlin-noise";
 
 export * from "./app/app";
+export * from "./app/swap-app";
 
 export * from "./data/float-matrix";
 export * from "./data/hash-table";
@@ -60,3 +61,4 @@ export * from "./system/domwrappers";
 export * from "./system/fpsCounter";
 export * from "./system/input-state";
 export * from "./system/ui";
+export * from "./system/core";
