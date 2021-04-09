@@ -40,9 +40,8 @@ export class MeshInspectorApp extends App {
     distance = new Parameter("distance", 3.0, 0, 4.0, 0.01);
     radius = new Parameter("radius", 1.0, 0, 4.0, 0.01);
     detail = new Parameter("detail", 5, 0, 100, 1);
-
     renderNormals = new Parameter("render normals", 1, 0, 1, 0); // boolean Param
-    shademethod = EnumParameter.new("renderMethods", 0, ["debug", "shaded"]);
+    shademethod = EnumParameter.new("render method", 0, ["debug", "shaded"]);
 
     constructor(gl: WebGLRenderingContext) {
         // setup render env
@@ -81,7 +80,7 @@ export class MeshInspectorApp extends App {
         });
 
         // render methods
-        ui.addDropdown(this.shademethod, (val) => {
+        ui.addParameter(this.shademethod, (val) => {
             this.start();
         });
     }

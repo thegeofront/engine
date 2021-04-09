@@ -82,7 +82,7 @@ export class StalbergApp extends App {
         ui.addParameter(this.subCount, reset);
         ui.addParameter(this.quadSubCount, reset);
         ui.addParameter(this.liftType, reset);
-        ui.addButton("reset", reset);
+        ui.addButton("recalculate", reset);
     }
 
     start() {

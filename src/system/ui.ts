@@ -51,10 +51,13 @@ export class UI {
     }
 
     addBooleanParameter(param: Parameter, onInput: (v: number) => void = () => {}) {
-        let checkbox = this.addElement(
-            "input",
-            "checkbox-control-slider checkbox-example",
-        ) as HTMLInputElement;
+        // create hacky button
+        // <label class="check-container">
+        //   <input type="checkbox" checked="checked">
+        //   <span class="checkmark"></span>
+        // </label>
+
+        let checkbox = this.addElement("input", "checkbox") as HTMLInputElement;
         checkbox.type = "checkbox";
         checkbox.addEventListener("change", () => {
             let state = checkbox.checked;
@@ -65,6 +68,13 @@ export class UI {
         });
         checkbox.checked = param.get() == 1;
 
+        // this needs to be done to make css happy
+        let checkcontainer = this.addElement("label", "check-container");
+        let checkmark = this.addElement("span", "checkmark");
+        checkcontainer.appendChild(checkbox);
+        checkcontainer.appendChild(checkmark);
+
+        // text
         let text1 = this.addElement("p", "control-text");
         text1.innerText = param.name;
 
@@ -73,7 +83,7 @@ export class UI {
             // console.log("TODO");
         };
 
-        this.addDiv("control", [text1, checkbox]);
+        this.addDiv("control", [text1, checkcontainer]);
 
         return checkbox;
     }

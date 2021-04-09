@@ -9,13 +9,14 @@ body {
 #interface {
     position: absolute;
     height: auto;
-    width: auto;
+    width: max(auto, 1000px);
     color: white;
     left: 0px;
     bottom: 0px;
     padding-bottom: 30px;
     
     background-color: rgba(0, 0, 0, 0.584);
+    border-radius: 3px;
     /* padding: 10px; */
     /* display: block; */
 }
@@ -80,25 +81,13 @@ body {
     /* border-radius: 5px; */
 }
 
-.checkbox-example label {
-    /* display: block; */
-    /* width: 20px; */
-    /* height: 20px; */
-    /* border-radius: 50%; */
-    /* transition: all .5s ease; */
-    /* cursor: pointer; */
-    /* position: absolute; */
-    /* top: -2px; */
-    /* left: -3px; */
-    /* background: #ccc; */
-}
-
-/* .checkbox-example input[type=checkbox]:checked + label {
-    left: 27px;
-} */
-
-.control:hover {
-    opacity: 1;   
+.control-slider {
+    width: 160px;
+    height: 30px;
+    -webkit-appearance: none;
+    height: 1px;
+    background: #444;
+    outline: none;
 }
 
 .control-slider::-webkit-control-thumb {
@@ -115,6 +104,7 @@ body {
     height: 25px;
     background: #020007;
     cursor: pointer;
+    border-radius: 8px;
 }
 
 .control {
@@ -128,8 +118,9 @@ body {
 
     /* transition */
     opacity: 0.7;
+/*     
     -webkit-transition: .2s;
-    transition: opacity .2s;
+    transition: opacity .2s; */
 }
 
 /* all things within a control */
@@ -151,15 +142,6 @@ body {
     text-align: left;
 }
 
-.control-slider {
-    width: 160px;
-    height: 30px;
-    -webkit-appearance: none;
-    height: 1px;
-    background: #444;
-    outline: none;
-}
-
 .control-button {
     background-color: #444;
     font-size: 16px;
@@ -168,10 +150,7 @@ body {
     /* padding: 5px 80px; */
     border: none;
     cursor: pointer;
-    border-radius: 5px;
-    text-align: center;;
+    border-radius: 3px;
+    text-align: center;
     color: white;
-}
-
-.control-button:hover {
 }
