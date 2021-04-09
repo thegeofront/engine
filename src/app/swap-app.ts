@@ -5,7 +5,7 @@
 //          - making sure core deletes old apps
 
 import { Core } from "../system/core";
-import { UI } from "../system/ui";
+import { EnumParameter, UI } from "../system/ui";
 import { App } from "./app";
 
 export class SwapApp extends App {
@@ -21,21 +21,19 @@ export class SwapApp extends App {
 
     ui(ui: UI) {
         let names: string[] = [];
-        let ids: number[] = [];
         let count = this.possibleApps.length;
         for (let i = 0; i < count; i++) {
             names.push(this.possibleApps[i].name.replace("App", ""));
-            ids.push(i);
         }
 
-        ui.addEnum(names, ids, (i) => {
+        let p = EnumParameter.new("apps", 0, names);
+        ui.addDropdown(p, (i) => {
             this.swap(i);
         });
     }
 
     swap(index: number) {
         // todo do some range checking
-
         let AppType = this.possibleApps[index];
         if (this.currentAppIndex > -1) {
             let PreviousType = this.possibleApps[this.currentAppIndex];

@@ -51,7 +51,10 @@ export class UI {
     }
 
     addBooleanParameter(param: Parameter, onInput: (v: number) => void = () => {}) {
-        let checkbox = this.addElement("input", "checkbox-slider-control checkbox-example") as HTMLInputElement;
+        let checkbox = this.addElement(
+            "input",
+            "checkbox-slider-control checkbox-example",
+        ) as HTMLInputElement;
         checkbox.type = "checkbox";
         checkbox.addEventListener("change", () => {
             let state = checkbox.checked;
@@ -75,26 +78,46 @@ export class UI {
         return checkbox;
     }
 
-    addParameter(param: Parameter, onInput: (v: number) => void = () => {}) {
-        let slider = this.addRangeInput(param, onInput);
+    addParameter(param: Parameter | EnumParameter, onInput: (v: number) => void = () => {}) {
+        let p: Parameter;
+        if (param instanceof EnumParameter) {
+            p = param.p;
+        } else {
+            p = param;
+        }
+
+        // create slider itself
+        let slider = this.addRangeInput(p, onInput);
+
+        // create slider title
         let text1 = this.addElement("p", "slider-text");
-        text1.innerText = param.name;
+        text1.innerText = p.name;
 
+        // create slider value indicator
         let text2 = this.addElement("p", "slider-value");
-        text2.innerText = slider.value;
+        if (param instanceof EnumParameter) {
+            text2.innerText = param.getName();
+        } else {
+            text2.innerText = slider.value;
+        }
 
+        // put them all together
         this.addDiv("slider", [text1, slider, text2]);
 
-        // on update beyond our control
-        param.onset = () => {
+        // on update in code
+        p.onset = () => {
             // console.log("TODO");
         };
 
+        // on update by user
         slider.oninput = () => {
-            param.set(slider.valueAsNumber);
+            p.set(slider.valueAsNumber);
             onInput(slider.valueAsNumber);
-            text1.innerText = param.name;
-            text2.innerText = slider.value;
+            if (param instanceof EnumParameter) {
+                text2.innerText = param.getName();
+            } else {
+                text2.innerText = slider.value;
+            }
         };
         return slider;
     }
@@ -123,34 +146,35 @@ export class UI {
         b.addEventListener("click", callback);
     }
 
-    addEnum<T>(keys: string[], values: T[], onchange: (selection: T) => void): HTMLSelectElement {
+    addDropdown(enumParam: EnumParameter, onchange: (v: number) => void): HTMLSelectElement {
         // <select>
         //  <option>Cappuccino</option>
         //  <option>Mocha</option>
         // </select>
 
-        if (keys.length != values.length) {
-            console.error("need same amount of keys & values");
-        }
-        let count = keys.length;
+        let count = enumParam.values.length;
 
-        let select = this.addElement("select", "enum-selector dropdown-select") as HTMLSelectElement;
+        let dropdownSelector = this.addElement(
+            "select",
+            "enum-selector dropdown-select",
+        ) as HTMLSelectElement;
         for (let i = 0; i < count; i++) {
             let o = this.addElement("option", "enum-item");
-            o.innerText = keys[i];
-            select.appendChild(o);
+            o.innerText = enumParam.values[i];
+            dropdownSelector.appendChild(o);
         }
         // console.log(e);
 
-        select.addEventListener("change", (e: Event) => {
+        dropdownSelector.addEventListener("change", (e: Event) => {
             let target = e.target as HTMLSelectElement;
-            let i = keys.indexOf(target.value);
-            onchange(values[i]);
+            let i = target.selectedIndex;
+            enumParam.set(i);
+            onchange(i);
         });
 
-        this.addDiv("dropdown-dark", [select]);
+        this.addDiv("dropdown-dark", [dropdownSelector]);
 
-        return select;
+        return dropdownSelector;
     }
 }
 
@@ -172,6 +196,10 @@ export class Parameter {
         this.step = step;
     }
 
+    static new(name: string, state: number, min = -Infinity, max = Infinity, step = 0.1) {
+        return new Parameter(name, state, min, max, step);
+    }
+
     get(): number {
         return this.state;
     }
@@ -188,5 +216,35 @@ export class Parameter {
 
     getNPermutations() {
         return Math.min((this.max - this.min) / this.step + 1);
+    }
+}
+
+// a parameter representing distinct states
+export class EnumParameter {
+    private constructor(public p: Parameter, public values: string[]) {}
+
+    static new<T>(name: string, state: number, descriptions: string[]) {
+        return new EnumParameter(
+            new Parameter(name, state, 0, descriptions.length - 1, 1),
+            descriptions,
+        );
+    }
+
+    getName(): string {
+        return this.values[this.get()];
+    }
+
+    // passthroughs
+
+    get(): number {
+        return this.p.get();
+    }
+
+    set(state: number) {
+        return this.p.set(state);
+    }
+
+    getNPermutations() {
+        return this.p.getNPermutations();
     }
 }

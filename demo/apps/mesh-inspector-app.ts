@@ -17,6 +17,7 @@ import {
     Vector3,
     Mesh,
     InputState,
+    EnumParameter,
 } from "../../src/lib";
 
 export class MeshInspectorApp extends App {
@@ -41,7 +42,7 @@ export class MeshInspectorApp extends App {
     detail = new Parameter("detail", 5, 0, 100, 1);
 
     renderNormals = new Parameter("render normals", 1, 0, 1, 0); // boolean Param
-    shademethod = 0; // TODO enum Param
+    shademethod = EnumParameter.new("renderMethods", 0, ["debug", "shaded"]);
 
     constructor(gl: WebGLRenderingContext) {
         // setup render env
@@ -80,14 +81,17 @@ export class MeshInspectorApp extends App {
         });
 
         // render methods
-        ui.addEnum(["debug", "shaded"], [0, 1], (val) => {
-            this.shademethod = val;
+        ui.addDropdown(this.shademethod, (val) => {
             this.start();
         });
     }
 
     start() {
-        let grid = LineArray.fromGrid(this.plane.clone().moveTo(new Vector3(0, 0, -this.radius.get())), 100, 2);
+        let grid = LineArray.fromGrid(
+            this.plane.clone().moveTo(new Vector3(0, 0, -this.radius.get())),
+            100,
+            2,
+        );
         let spherePerRing = this.detail.get() * 2;
 
         let rad = this.radius.get();
@@ -95,7 +99,12 @@ export class MeshInspectorApp extends App {
         let det = this.detail.get();
 
         let mesh = Mesh.fromJoin([
-            Mesh.newSphere(new Vector3(dis, 0, 0), this.radius.get(), this.detail.get(), spherePerRing),
+            Mesh.newSphere(
+                new Vector3(dis, 0, 0),
+                this.radius.get(),
+                this.detail.get(),
+                spherePerRing,
+            ),
             // PureMesh.fromCube(new Cube(this.plane, Domain3.fromRadius(this.radius.get()))),
             Mesh.newCone(
                 new Vector3(-dis, 0, -this.radius.get()),
@@ -120,7 +129,7 @@ export class MeshInspectorApp extends App {
         // console.log(mesh.links);
 
         // TODO abstract this to scene
-        if (this.shademethod == 0) {
+        if (this.shademethod.get() == 0) {
             this.meshRenderer.set(this.gl, dmesh);
         } else {
             this.shadedMeshRenderer.set(this.gl, dmesh);
@@ -140,9 +149,9 @@ export class MeshInspectorApp extends App {
         let matrix = this.camera.totalMatrix;
         this.dotRenderer.render(gl, matrix);
 
-        if (this.shademethod == 0) {
+        if (this.shademethod.get() == 0) {
             this.meshRenderer.render(gl, this.camera);
-        } else if (this.shademethod == 1) {
+        } else if (this.shademethod.get() == 1) {
             this.shadedMeshRenderer.render(gl, this.camera);
         }
 

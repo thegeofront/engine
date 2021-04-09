@@ -21,6 +21,7 @@ import {
     MeshDebugRenderer,
     VertIndex,
     EdgeIndex,
+    EnumParameter,
 } from "../../src/lib";
 
 import { GraphDebugRenderer } from "../../src/render/graph-debug-renderer";
@@ -41,7 +42,7 @@ export class StalbergApp extends App {
     inner!: Parameter;
     subCount!: Parameter;
     quadSubCount!: Parameter;
-    liftType!: Parameter;
+    liftType!: EnumParameter;
     randomEdges!: Parameter;
 
     radius = 0.1;
@@ -58,17 +59,8 @@ export class StalbergApp extends App {
         let canvas = gl.canvas as HTMLCanvasElement;
         this.camera = new Camera(canvas, 1, true);
         this.meshRend = new ShadedMeshRenderer(gl);
-        this.debugRend = new MeshDebugRenderer(
-            gl,
-            [0.5, 0, 0, 1],
-            [1, 0, 0, 1],
-            false,
-        );
-        this.graphRend = new GraphDebugRenderer(
-            gl,
-            [0.5, 0, 0, 1],
-            [1, 0, 0, 1],
-        );
+        this.debugRend = new MeshDebugRenderer(gl, [0.5, 0, 0, 1], [1, 0, 0, 1], false);
+        this.graphRend = new GraphDebugRenderer(gl, [0.5, 0, 0, 1], [1, 0, 0, 1]);
     }
 
     ui(ui: UI) {
@@ -82,7 +74,7 @@ export class StalbergApp extends App {
         this.smooth = new Parameter("smooth", 0, 0, 1, 1);
         this.subCount = new Parameter("sub count", 2, 0, 4, 1);
         this.quadSubCount = new Parameter("sub count quad", 1, 0, 2, 1);
-        this.liftType = new Parameter("lift type", 1, 0, 2, 1);
+        this.liftType = EnumParameter.new("lift type", 1, ["none", "sphere", "buggy"]);
 
         ui.addBooleanParameter(this.rotate);
         ui.addBooleanParameter(this.randomEdges, reset);
@@ -237,9 +229,7 @@ export class StalbergApp extends App {
         if (!state.mouseRightDown && this.rotate.get() == 1) {
             // rotate
             let alpha = 0.0001 * state.tick;
-            let rot = Matrix4.newXRotation(alpha).multiply(
-                Matrix4.newYRotation(alpha),
-            );
+            let rot = Matrix4.newXRotation(alpha).multiply(Matrix4.newYRotation(alpha));
             this.graph.transform(rot);
         }
 
@@ -385,10 +375,7 @@ function squarification(graph: Graph, centerCornerAverage?: number) {
         let normedCenter = Vector3.new(0, 0, 0);
         let delta = 2 / faceCount;
         for (let j = 0; j < faceCount; j++) {
-            normedCorners[j] = plane.rotateVector(
-                corners[j],
-                j * Math.PI * delta,
-            );
+            normedCorners[j] = plane.rotateVector(corners[j], j * Math.PI * delta);
             normedCenter.add(normedCorners[j]);
         }
 
