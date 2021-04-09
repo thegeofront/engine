@@ -53,7 +53,7 @@ export class UI {
     addBooleanParameter(param: Parameter, onInput: (v: number) => void = () => {}) {
         let checkbox = this.addElement(
             "input",
-            "checkbox-slider-control checkbox-example",
+            "checkbox-control-slider checkbox-example",
         ) as HTMLInputElement;
         checkbox.type = "checkbox";
         checkbox.addEventListener("change", () => {
@@ -65,7 +65,7 @@ export class UI {
         });
         checkbox.checked = param.get() == 1;
 
-        let text1 = this.addElement("p", "slider-text");
+        let text1 = this.addElement("p", "control-text");
         text1.innerText = param.name;
 
         // TODO update beyond our control
@@ -73,7 +73,7 @@ export class UI {
             // console.log("TODO");
         };
 
-        this.addDiv("slider", [text1, checkbox]);
+        this.addDiv("control", [text1, checkbox]);
 
         return checkbox;
     }
@@ -90,11 +90,11 @@ export class UI {
         let slider = this.addRangeInput(p, onInput);
 
         // create slider title
-        let text1 = this.addElement("p", "slider-text");
+        let text1 = this.addElement("p", "control-text");
         text1.innerText = p.name;
 
         // create slider value indicator
-        let text2 = this.addElement("p", "slider-value");
+        let text2 = this.addElement("p", "control-value");
         if (param instanceof EnumParameter) {
             text2.innerText = param.getName();
         } else {
@@ -102,7 +102,7 @@ export class UI {
         }
 
         // put them all together
-        this.addDiv("slider", [text1, slider, text2]);
+        this.addDiv("control", [text1, slider, text2]);
 
         // on update in code
         p.onset = () => {
@@ -124,7 +124,7 @@ export class UI {
 
     addRangeInput(param: Parameter, onInput: (v: number) => void = () => {}) {
         // a slider looks like this : <input type="range" min="1" max="100" step="1" value="50">
-        let slider = this.addElement("input", "slider-control") as HTMLInputElement;
+        let slider = this.addElement("input", "control-slider") as HTMLInputElement;
 
         slider.type = "range";
         slider.min = param.min.toString();
@@ -141,9 +141,13 @@ export class UI {
     }
 
     addButton(name: string, callback: () => void) {
-        let b = this.addElement("button", "ui-button");
-        b.innerText = name;
-        b.addEventListener("click", callback);
+        let button = this.addElement("button", "control-button");
+        button.innerText = name;
+        button.addEventListener("click", callback);
+
+        let text1 = this.addElement("p", "control-text");
+        let control = this.addDiv("control", [text1, button]);
+        return control;
     }
 
     addDropdown(enumParam: EnumParameter, onchange: (v: number) => void): HTMLSelectElement {

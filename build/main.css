@@ -97,11 +97,11 @@ body {
     left: 27px;
 } */
 
-.slider:hover {
+.control:hover {
     opacity: 1;   
 }
 
-.slider-control::-webkit-slider-thumb {
+.control-slider::-webkit-control-thumb {
     -webkit-appearance: none;
     appearance: none;
     width: 25px;
@@ -110,15 +110,14 @@ body {
     cursor: pointer;
 }
 
-.slider-control::-moz-range-thumb {
+.control-slider::-moz-range-thumb {
     width: 25px;
     height: 25px;
     background: #020007;
     cursor: pointer;
 }
 
-
-.slider {
+.control {
     /* display: table-row; */
     align-items: left;
     padding-left: 10px;
@@ -133,8 +132,8 @@ body {
     transition: opacity .2s;
 }
 
-/* all things within a slider */
-.slider * {
+/* all things within a control */
+.control * {
     display: inline-block;
     margin-left: 2px;
     margin-right: 2px;
@@ -142,21 +141,37 @@ body {
     background-color: red; */
 }
 
-.slider-text {
+.control-text {
     width: 150px;
     text-align: left;
 }
 
-.slider-value {
+.control-value {
     padding-left: 10px;
     text-align: left;
 }
 
-.slider-control {
-    padding: 10px;
-
+.control-slider {
+    width: 160px;
+    height: 30px;
     -webkit-appearance: none;
     height: 1px;
     background: #444;
     outline: none;
+}
+
+.control-button {
+    background-color: #444;
+    font-size: 16px;
+    width: 160px;
+    height: 30px;
+    /* padding: 5px 80px; */
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    text-align: center;;
+    color: white;
+}
+
+.control-button:hover {
 }
