@@ -40,6 +40,7 @@ export class Core {
 
     activateApp(app: App) {
         this.ui.addContext(app.name);
+        this.ui.addText(app.description);
         app.ui(this.ui);
         app.start();
     }

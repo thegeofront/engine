@@ -13,6 +13,17 @@ export class UI {
         this.currentContext = frame;
     }
 
+    // the context system makes sure that ui additions appear under the currently active,
+    // selected app, and that these ui elements are removed when switching to another app.
+
+    hide() {
+        this.globalContext.hidden = true;
+    }
+
+    show() {
+        this.globalContext.hidden = false;
+    }
+
     addContext(appName: string) {
         this.currentContext = this.globalContext;
         let appDiv = this.addDiv(appName + " app-interface");

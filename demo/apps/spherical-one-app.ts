@@ -28,11 +28,7 @@ import { GraphDebugRenderer } from "../../src/render/graph-debug-renderer";
 import { Stopwatch } from "../../src/system/stopwatch";
 import { graphToMultiMesh } from "./icosahedron-app";
 
-export class StalbergApp extends App {
-    description =
-        "Setup for trying out different partitions of a sphere." +
-        "Based on Oskar Stalberg's irregular quad grid";
-
+export class SphericalOneApp extends App {
     camera: Camera;
     meshRend: ShadedMeshRenderer;
     debugRend: MeshDebugRenderer;
@@ -55,12 +51,15 @@ export class StalbergApp extends App {
     cca?: number;
 
     constructor(gl: WebGLRenderingContext) {
-        super(gl);
+        super(
+            gl,
+            "setup for trying out different partitions of a sphere. Based on Oskar Stalberg's irregular quad grid",
+        );
         let canvas = gl.canvas as HTMLCanvasElement;
         this.camera = new Camera(canvas, 1, true);
         this.meshRend = new ShadedMeshRenderer(gl);
         this.debugRend = new MeshDebugRenderer(gl, [0.5, 0, 0, 1], [1, 0, 0, 1], false);
-        this.graphRend = new GraphDebugRenderer(gl, [0.5, 0, 0, 1], [1, 0, 0, 1]);
+        this.graphRend = new GraphDebugRenderer(gl, [0.5, 0, 0, 1], [255 / 255, 69 / 255, 0, 1]);
     }
 
     ui(ui: UI) {
@@ -219,7 +218,7 @@ export class StalbergApp extends App {
         }
 
         this.graphRend.set(this.graph, DrawSpeed.DynamicDraw);
-        this.average = _averageEdgeLength(this.graph);
+        this.average = averageEdgeLength(this.graph);
         // console.log("edges: ", this.graph.allEdges());
         // console.log("loops: ", this.graph.allVertLoops());
     }
@@ -242,7 +241,7 @@ export class StalbergApp extends App {
                 this.cca = squarification(this.graph, this.cca);
                 // this.cca = this.squarification(this.graph);
                 // console.log(this.cca);
-                _laPlacian(this.graph);
+                laPlacian(this.graph);
 
                 // project back to sphere
                 this.graph.verts.forEach((v) => {
@@ -264,11 +263,9 @@ export class StalbergApp extends App {
         this.meshRend.render(gl, this.camera);
         this.graphRend.render(gl, this.camera);
     }
-
-    // --------------------
 }
 
-function _averageEdgeLength(graph: Graph): number {
+export function averageEdgeLength(graph: Graph): number {
     let count = 0;
     let sum = 0;
     graph.forEveryEdgeVerts((a, b) => {
@@ -280,7 +277,7 @@ function _averageEdgeLength(graph: Graph): number {
     return average;
 }
 
-function _edgeSmooth(graph: Graph, average: number, scale: number) {
+export function edgeSmooth(graph: Graph, average: number, scale: number) {
     graph.forEveryEdgeVerts((a, b) => {
         let distance = a.disTo(b);
         let diff = average - distance;
@@ -290,7 +287,7 @@ function _edgeSmooth(graph: Graph, average: number, scale: number) {
     });
 }
 
-function _laPlacian(graph: Graph) {
+export function laPlacian(graph: Graph) {
     let count = graph.getVertexCount();
     let news: Vector3[] = [];
 
@@ -314,7 +311,7 @@ function _laPlacian(graph: Graph) {
     }
 }
 
-function squarification(graph: Graph, centerCornerAverage?: number) {
+export function squarification(graph: Graph, centerCornerAverage?: number) {
     // make the quad graph as 'square' as possible
 
     // prepare
@@ -417,7 +414,7 @@ function squarification(graph: Graph, centerCornerAverage?: number) {
     return cca;
 }
 
-function quadification(graph: Graph) {
+export function quadification(graph: Graph) {
     // edge deletion heuristic:
     // remove edges between two triangles to create a quad.
     // keep removing edges until no triangle neighbors another triangle.
@@ -466,6 +463,6 @@ function quadification(graph: Graph) {
     }
 }
 
-function randomInt(max: number) {
+export function randomInt(max: number) {
     return Math.floor(Math.random() * max);
 }

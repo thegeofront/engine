@@ -155,7 +155,8 @@ export class InputState {
         // update mouse
         this.mouseLeftPressed = this.mouseLeftPrev != this.mouseLeftDown && this.mouseLeftDown;
         this.mouseRightPressed = this.mouseRightPrev != this.mouseRightDown && this.mouseRightDown;
-        this.mouseMiddlePressed = this.mouseMiddlePrev != this.mouseMiddleDown && this.mouseMiddleDown;
+        this.mouseMiddlePressed =
+            this.mouseMiddlePrev != this.mouseMiddleDown && this.mouseMiddleDown;
 
         this.mouseLeftPrev = this.mouseLeftDown;
         this.mouseRightPrev = this.mouseRightDown;
@@ -236,6 +237,7 @@ export class InputState {
     private setMouseDown(e: MouseEvent) {
         e.preventDefault();
         e.stopPropagation();
+        this.canvas.focus();
         let code = e.buttons;
         if (code >= 4) {
             code -= 4;

@@ -70,7 +70,7 @@
     z-index: 3;
     width: 100%;
     color: #394349;
-    outline: 2px solid #49aff2;
+    outline: 2px solid rgb(255, 69, 0);
     outline: 2px solid -webkit-focus-ring-color;
     outline-offset: -2px;
 }
@@ -128,7 +128,9 @@
 .dropdown-dark .dropdown-select {
     color: #aaa;
     text-shadow: 0 1px black;
-    background: #444; /* Fallback for IE 8 */
+    background: black; /* Fallback for IE 8 */
+    /* border: white; */
+    border: 5px white;
 }
 
 .dropdown-dark .dropdown-select:focus {

@@ -74,7 +74,7 @@ export class Camera {
     private updateControls(state: InputState) {
         let deltaScroll = state.scrollValue * 1.2;
 
-        this.offset.z = this.z_offset - deltaScroll;
+        this.offset.z = Math.min(-0.001, this.z_offset - deltaScroll);
         if (state.IsKeyPressed("Shift")) {
             this.speed *= 2;
         }
@@ -108,10 +108,14 @@ export class Camera {
             return;
         }
 
-        if (state.IsKeyDown("s")) this.pos.add(relativeUnitY(-this.angleBeta).scale(0.01 * this.speed));
-        if (state.IsKeyDown("w")) this.pos.add(relativeUnitY(-this.angleBeta).scale(-0.01 * this.speed));
-        if (state.IsKeyDown("a")) this.pos.add(relativeUnitX(-this.angleBeta).scale(0.01 * this.speed));
-        if (state.IsKeyDown("d")) this.pos.add(relativeUnitX(-this.angleBeta).scale(-0.01 * this.speed));
+        if (state.IsKeyDown("s"))
+            this.pos.add(relativeUnitY(-this.angleBeta).scale(0.01 * this.speed));
+        if (state.IsKeyDown("w"))
+            this.pos.add(relativeUnitY(-this.angleBeta).scale(-0.01 * this.speed));
+        if (state.IsKeyDown("a"))
+            this.pos.add(relativeUnitX(-this.angleBeta).scale(0.01 * this.speed));
+        if (state.IsKeyDown("d"))
+            this.pos.add(relativeUnitX(-this.angleBeta).scale(-0.01 * this.speed));
         if (state.IsKeyDown("q")) this.pos.z += 0.01 * this.speed;
         if (state.IsKeyDown("e")) this.pos.z -= 0.01 * this.speed;
     }
@@ -155,7 +159,10 @@ export class Camera {
 
         // pardon this insanely ugly statement
         let screenPoint = useMouse
-            ? origin.added(khat.scaled(f)).add(ihat.scaled(mouseUnitX)).add(jhat.scaled(-mouseUnitY))
+            ? origin
+                  .added(khat.scaled(f))
+                  .add(ihat.scaled(mouseUnitX))
+                  .add(jhat.scaled(-mouseUnitY))
             : origin.added(khat.scaled(f));
 
         return Ray.fromPoints(origin, screenPoint);

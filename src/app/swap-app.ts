@@ -5,6 +5,7 @@
 //          - making sure core deletes old apps
 
 import { Core } from "../system/core";
+import { InputState } from "../system/input-state";
 import { EnumParameter, UI } from "../system/ui";
 import { App } from "./app";
 
@@ -12,6 +13,7 @@ export class SwapApp extends App {
     possibleApps: any[];
     core: Core;
     currentAppIndex: number = -1;
+    isuihidden = false;
 
     constructor(gl: WebGLRenderingContext, core: Core, possibleApps: any[]) {
         super(gl);
@@ -45,5 +47,18 @@ export class SwapApp extends App {
 
         let app = new AppType(this.gl);
         this.core.addApp(app);
+    }
+
+    update(state: InputState) {
+        if (state.IsKeyPressed("m")) {
+            // simple toggle
+            if (this.isuihidden) {
+                this.core.ui.show();
+                this.isuihidden = false;
+            } else {
+                this.core.ui.hide();
+                this.isuihidden = true;
+            }
+        }
     }
 }

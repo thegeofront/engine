@@ -99,14 +99,17 @@ export class Mesh {
         return rend;
     }
 
-    static fromCube(cube: Cube): Mesh {
-        let verts = cube.getCorners();
+    static newQuad(corners: Vector3[]): Mesh {
         let faces: number[] = [];
         for (let face of cubeFaces) {
             faces.push(...quadToTri(face));
         }
+        return this.fromLists(corners, faces);
+    }
 
-        return this.fromLists(verts, faces);
+    static fromCube(cube: Cube): Mesh {
+        let verts = cube.getCorners();
+        return Mesh.newQuad(verts);
     }
 
     static newIcosahedron(scale = 1): Mesh {
