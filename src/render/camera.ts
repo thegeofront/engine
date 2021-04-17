@@ -44,6 +44,10 @@ export class Camera {
         this.updateMatrices(canvas);
     }
 
+    new(canvas: HTMLCanvasElement, zOffset = 1, canMove = false) {
+        return new Camera(canvas, zOffset, canMove);
+    }
+
     update(state: InputState) {
         this.updateControls(state);
         this.updateMatrices(state.canvas);

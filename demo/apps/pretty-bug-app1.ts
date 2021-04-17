@@ -126,7 +126,7 @@ export class PrettyBugApp1 extends App {
         // console.log("allVertLoops in ", stopwatch.time(), "ms");
 
         if (this.renderMode.get() == 1) {
-            this.debugRend.set(this.gl, this.rend);
+            this.debugRend.buffer(this.gl, this.rend);
         } else {
             this.meshRend.set(this.gl, this.rend);
         }
@@ -153,7 +153,7 @@ export class PrettyBugApp1 extends App {
             }
 
             if (this.renderMode.get() == 1) {
-                this.debugRend.set(this.gl, this.rend, DrawSpeed.DynamicDraw);
+                this.debugRend.buffer(this.gl, this.rend, DrawSpeed.DynamicDraw);
             } else {
                 this.meshRend.set(this.gl, this.rend, DrawSpeed.DynamicDraw);
             }

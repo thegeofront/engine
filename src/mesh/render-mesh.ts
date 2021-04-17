@@ -48,6 +48,7 @@ export class Renderable {
 
     // render speed
     // shader
+    color = [1, 1, 1, 1];
 
     constructor(
         vertCount: number,
@@ -84,7 +85,12 @@ export class Renderable {
     static fromData(verts: number[], norms: number[], uvs: number[], faces: number[]): Renderable {
         // NOTE : this type of parsing makes my life easy, but is dangerous. This is why i created the
         // Array class.
-        let r = new Renderable(verts.length / 3, norms.length / 3, uvs.length / 2, faces.length / 3);
+        let r = new Renderable(
+            verts.length / 3,
+            norms.length / 3,
+            uvs.length / 2,
+            faces.length / 3,
+        );
         r.mesh.verts.fillWith(verts);
         r.mesh.links!.fillWith(faces);
         r.norms!.fillWith(norms);

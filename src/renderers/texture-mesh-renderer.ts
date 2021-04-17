@@ -7,7 +7,7 @@ import { LineArray } from "../mesh/line-array";
 import { Vector3Array } from "../data/vector-array";
 import { Renderable } from "../mesh/render-mesh";
 import { Matrix4 } from "../math/matrix";
-import { DrawSpeed, Renderer } from "./renderer";
+import { DrawSpeed, Renderer } from "../render/renderer";
 import { LineRenderer } from "./line-renderer";
 import { SimpleMeshRenderer } from "./simple-mesh-renderer";
 
@@ -109,7 +109,11 @@ export class TextureMeshRenderer extends Renderer {
 
         // buffer 3
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(r.mesh.links.data), this.convertDrawSpeed(speed));
+        gl.bufferData(
+            gl.ELEMENT_ARRAY_BUFFER,
+            new Uint16Array(r.mesh.links.data),
+            this.convertDrawSpeed(speed),
+        );
 
         // texture
         gl.activeTexture(gl.TEXTURE0 + this.texture_id);

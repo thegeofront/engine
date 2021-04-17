@@ -1,7 +1,7 @@
 // jos feenstra
 
 import { Rectangle2 } from "../geo/rectangle";
-import { Renderer } from "./renderer";
+import { Renderer } from "../render/renderer";
 
 export class RectangleRenderer extends Renderer {
     // attribute & uniform locations

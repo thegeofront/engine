@@ -9,7 +9,7 @@ import { Polyline } from "../geo/polyline";
 import { Matrix4 } from "../math/matrix";
 import { Vector3 } from "../math/vector";
 import { LineArray } from "../mesh/line-array";
-import { DrawSpeed, Renderer } from "./renderer";
+import { DrawSpeed, Renderer } from "../render/renderer";
 import { Mesh } from "../mesh/mesh";
 
 export class LineRenderer extends Renderer {
@@ -102,9 +102,12 @@ export class LineRenderer extends Renderer {
         // POINTERS MUST ALSO BE SET, DO EVERYTHING EXCEPT GL.BUFFERDATA
         gl.useProgram(this.program);
 
-        gl.enableVertexAttribArray(this.a_position);
+        //
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
+        gl.enableVertexAttribArray(this.a_position);
         gl.vertexAttribPointer(this.a_position, this.vertCount, gl.FLOAT, false, 0, 0);
+
+        //
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
 
         // set uniforms

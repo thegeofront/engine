@@ -157,6 +157,10 @@ export class Vector3Array extends FloatMatrix {
         return clone;
     }
 
+    mapWith(other: Vector3Array, callback: (a: number, b: number) => number) {
+        return super.mapWith(other, callback) as Vector3Array;
+    }
+
     setVector(i: number, vec: Vector3) {
         this.data[i * this._width + 0] = vec.x;
         this.data[i * this._width + 1] = vec.y;
@@ -180,6 +184,7 @@ export class Vector3Array extends FloatMatrix {
     }
 
     transform(m: Matrix4): Vector3Array {
+        // THIS CAN BE SPEED UP: BOTH MATRIX 4 & VECTOR3ARRAY ARE JUST FLOAT-MATRICES
         for (let i = 0; i < this._height; i++) {
             let vec = this.getVector(i);
             vec = m.multiplyVector(vec);
@@ -262,7 +267,9 @@ export class Vector3Array extends FloatMatrix {
 }
 
 // TODO : to FloatMatrix
-export function getGeneralFloatMatrix(vectors: Vector2Array | Vector3Array | Vector2[] | Vector3[]): FloatMatrix {
+export function getGeneralFloatMatrix(
+    vectors: Vector2Array | Vector3Array | Vector2[] | Vector3[],
+): FloatMatrix {
     if (vectors instanceof Vector2Array) {
         return vectors;
     } else if (vectors instanceof Vector3Array) {

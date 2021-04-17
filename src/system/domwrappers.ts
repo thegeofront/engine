@@ -4,7 +4,10 @@
 
 // set any to document to add drop functionality to the entire document, or use any other div.
 type FuncGenericReturn = <T>() => T;
-export function addDropFileEventListeners(canvas: HTMLCanvasElement, filesCallback: CallbackOneParam<FileList>) {
+export function addDropFileEventListeners(
+    canvas: HTMLCanvasElement,
+    filesCallback: CallbackOneParam<FileList>,
+) {
     console.log("setting up drag events...");
     canvas.addEventListener(
         "dragenter",
@@ -95,6 +98,18 @@ export function loadImageFromFile(file: File): Promise<ImageData> {
     return new Promise((resolve, reject) => {
         let reader = new FileReader();
         reader.readAsDataURL(file);
+        reader.onload = () =>
+            loadImageHelper1(reader).then(
+                (imageData) => resolve(imageData),
+                (error) => reject(error),
+            );
+    });
+}
+
+export function loadImageFromBlob(blob: Blob): Promise<ImageData> {
+    return new Promise((resolve, reject) => {
+        let reader = new FileReader();
+        reader.readAsDataURL(blob);
         reader.onload = () =>
             loadImageHelper1(reader).then(
                 (imageData) => resolve(imageData),

@@ -4,7 +4,7 @@
 
 import { Vector2Array, Vector3Array } from "../data/vector-array";
 import { GeonImage } from "../img/Image";
-import { DrawSpeed, Renderer } from "./renderer";
+import { DrawSpeed, Renderer } from "../render/renderer";
 
 // mooi font om te gebruiken
 // https://datagoblin.itch.io/monogram
@@ -29,7 +29,12 @@ export class BillBoardRenderer extends Renderer {
         // TODO
     }
 
-    setAndRender(texture: GeonImage, dots: Vector3Array, textureDots: Vector2Array, speed: DrawSpeed) {
+    setAndRender(
+        texture: GeonImage,
+        dots: Vector3Array,
+        textureDots: Vector2Array,
+        speed: DrawSpeed,
+    ) {
         this.set(texture, dots, textureDots, speed);
         this.render();
     }

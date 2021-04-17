@@ -15,16 +15,12 @@
 
 import { HashTable } from "../data/hash-table";
 import { IntMatrix } from "../data/int-matrix";
-import { Vector3Array } from "../data/vector-array";
 import { Plane } from "../geo/plane";
 import { Const } from "../math/const";
 import { Matrix4 } from "../math/matrix";
 import { Vector3 } from "../math/vector";
-import { SimpleMeshRenderer } from "../render/simple-mesh-renderer";
-import { Stopwatch } from "../system/stopwatch";
-import { LineArray } from "./line-array";
 import { Mesh } from "./mesh";
-import { MeshType, NormalKind, Renderable } from "./render-mesh";
+import { MeshType, Renderable } from "./render-mesh";
 
 export type EdgeIndex = number;
 export type VertIndex = number;

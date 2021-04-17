@@ -129,7 +129,7 @@ export class MeshInspectorApp extends App {
 
         // TODO abstract this to scene
         if (this.shademethod.get() == 0) {
-            this.meshRenderer.set(this.gl, dmesh);
+            this.meshRenderer.buffer(this.gl, dmesh);
         } else {
             this.shadedMeshRenderer.set(this.gl, dmesh);
         }

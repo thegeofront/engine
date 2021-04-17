@@ -9,8 +9,8 @@ import { Polyline } from "../geo/polyline";
 import { Matrix4 } from "../math/matrix";
 import { Vector3 } from "../math/vector";
 import { getDefaultIndices, LineArray } from "../mesh/line-array";
-import { DrawSpeed, Renderer } from "./renderer";
-import { Camera } from "./camera";
+import { DrawSpeed, Renderer } from "../render/renderer";
+import { Camera } from "../render/camera";
 
 export class NormalRenderer extends Renderer {
     a_position: number;

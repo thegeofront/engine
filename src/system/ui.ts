@@ -214,15 +214,20 @@ export class Parameter {
 
     constructor(name: string, state: number, min = -Infinity, max = Infinity, step = 0.1) {
         this.name = name;
-        this.state = state;
-
         this.min = min;
         this.max = max;
         this.step = step;
+
+        this.state = state;
+        this.set(this.state);
     }
 
     static new(name: string, state: number, min = -Infinity, max = Infinity, step = 0.1) {
         return new Parameter(name, state, min, max, step);
+    }
+
+    static newBoolean(name: string, state: boolean) {
+        return new Parameter(name, state ? 1 : 0, 0, 1, 1);
     }
 
     get(): number {
@@ -230,12 +235,12 @@ export class Parameter {
     }
 
     set(state: number) {
-        // TODO ROUND TO NEAREST STEP
+        // something is still wrong here...
         let clamped = GeonMath.clamp(state, this.min, this.max);
-        let rest = this.state - this.min;
-        let times = Math.min(rest / this.step);
+        let rest = state - this.min;
+        let times = Math.round(rest / this.step);
         let stepped = this.min + this.step * times;
-        this.state = GeonMath.clamp(state, this.min, this.max);
+        this.state = GeonMath.clamp(stepped, this.min, this.max);
         if (this.onset) this.onset(this.state);
     }
 

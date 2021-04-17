@@ -1,7 +1,7 @@
 // jos feenstra
 
 import { Vector2 } from "../math/vector";
-import { Renderer } from "./renderer";
+import { Renderer } from "../render/renderer";
 
 export class DotRenderer2 extends Renderer {
     // attribute & uniform locations
@@ -15,7 +15,12 @@ export class DotRenderer2 extends Renderer {
     color: number[];
     size: number;
 
-    constructor(gl: WebGLRenderingContext, size: number = 5, color: number[] = [1, 1, 1, 1], square: boolean = true) {
+    constructor(
+        gl: WebGLRenderingContext,
+        size: number = 5,
+        color: number[] = [1, 1, 1, 1],
+        square: boolean = true,
+    ) {
         // note: I like vertex & fragments to be included in the script itself.
         // when you change vertex or fragment, this class has to deal with it.
         // putting them somewhere else doesnt make sense to me,

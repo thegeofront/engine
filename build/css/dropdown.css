@@ -56,13 +56,13 @@
     padding: 6px 8px 6px 10px;
     height: 28px;
     line-height: 14px;
-    font-size: 12px;
-    color: #62717a;
+    font-size: 16px;
+    color: white;
     text-shadow: 0 1px white;
     background: #f2f2f2; /* Fallback for IE 8 */
     /* /background: rgba(0, 0, 0, 0) !important; "transparent" doesn't work with Opera */
     border: 0;
-    border-radius: 0;
+    border-radius: 3;
     -webkit-appearance: none;
 }
 
@@ -71,7 +71,7 @@
     width: 100%;
     color: #394349;
     outline: 2px solid rgb(255, 69, 0);
-    outline: 2px solid -webkit-focus-ring-color;
+    outline: 2px solid rgb(255, 69, 0);;
     outline-offset: -2px;
 }
 

@@ -35,9 +35,12 @@ import {
     squarification,
 } from "../functions/spherical-function";
 
-export class SphericalTwoApp extends App {
+//
+//
+//
+export class SphericalThreeApp extends App {
     camera: Camera;
-    meshRend: MeshDebugRenderer;
+    meshRend: ShadedMeshRenderer;
     debugRend: MeshDebugRenderer;
     graphRend: GraphDebugRenderer;
 
@@ -58,16 +61,14 @@ export class SphericalTwoApp extends App {
     cca?: number;
 
     world!: Renderable;
-    world2!: Renderable;
-    world3!: Renderable;
 
     constructor(gl: WebGLRenderingContext) {
         super(gl, "Multiple Layers of spherical geometry");
 
         let canvas = gl.canvas as HTMLCanvasElement;
         this.camera = new Camera(canvas, 1, true);
-        // this.meshRend = new ShadedMeshRenderer(gl);
-        this.meshRend = new MeshDebugRenderer(gl, [0, 0, 0, 1], [0.3, 0.3, 0.3, 1], false);
+        this.meshRend = new ShadedMeshRenderer(gl);
+        // this.meshRend = new MeshDebugRenderer(gl, [0, 0, 0, 1], [0.3, 0.3, 0.3, 1], false);
         this.debugRend = new MeshDebugRenderer(gl, [0.5, 0, 0, 1], [0, 0, 0, 1], false);
         this.graphRend = new GraphDebugRenderer(gl, [0.5, 0.5, 0.5, 1], [1, 1, 1, 1]);
     }
@@ -170,27 +171,13 @@ export class SphericalTwoApp extends App {
 
     bufferWorld() {
         this.world = constructRenderableFromSphereGraph(this.graph, this.radius, 0, 0.1, 0.6);
-        this.world2 = constructRenderableFromSphereGraph(this.graph, this.radius, 0.1, 0.2, 0.4);
-        this.world3 = constructRenderableFromSphereGraph(this.graph, this.radius, 0.2, 0.3, 0.2);
+        this.world.calculateFaceNormals();
     }
 
     update(state: InputState) {
         this.camera.update(state);
 
         let pulse = Math.sin(state.newTime);
-
-        // rotate mesh
-        if (this.rotate.get() == 1) {
-            // rotate
-            let alpha = 0.0001 * state.tick;
-            let rotx = Matrix4.newXRotation(alpha);
-            let roty = Matrix4.newYRotation(alpha);
-            let rot = rotx.multiply(roty);
-            this.graph.transform(rot);
-            this.world.transform(rot);
-            this.world2.transform(Matrix4.newXRotation(-alpha));
-            this.world3.transform(Matrix4.newZRotation(-alpha));
-        }
 
         // sucessive over relaxation
         if (this.smooth.get() == 1) {
@@ -221,10 +208,8 @@ export class SphericalTwoApp extends App {
     draw(gl: WebGLRenderingContext) {
         this.camera.updateMatrices(gl.canvas as HTMLCanvasElement);
 
-        for (let world of [this.world, this.world2, this.world3]) {
-            this.meshRend.buffer(this.gl, world, DrawSpeed.DynamicDraw);
-            this.meshRend.render(gl, this.camera);
-        }
+        this.meshRend.set(this.gl, this.world, DrawSpeed.DynamicDraw);
+        this.meshRend.render(gl, this.camera);
 
         // this.graphRend.render(gl, this.camera);
     }

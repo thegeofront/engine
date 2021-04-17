@@ -7,10 +7,10 @@ import { getDefaultIndices, LineArray } from "../mesh/line-array";
 import { Vector3Array } from "../data/vector-array";
 import { NormalKind, Renderable } from "../mesh/render-mesh";
 import { Matrix4 } from "../math/matrix";
-import { DrawSpeed, Renderer } from "./renderer";
+import { DrawSpeed, Renderer } from "../render/renderer";
 import { LineRenderer } from "./line-renderer";
 import { SimpleMeshRenderer } from "./simple-mesh-renderer";
-import { Camera } from "./camera";
+import { Camera } from "../render/camera";
 import { Vector3 } from "../math/vector";
 import { Const } from "../lib";
 
@@ -162,7 +162,11 @@ export class ShadedMeshRenderer extends Renderer {
 
             // index
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
-            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, getDefaultIndices(this.count).buffer, this.convertDrawSpeed(speed));
+            gl.bufferData(
+                gl.ELEMENT_ARRAY_BUFFER,
+                getDefaultIndices(this.count).buffer,
+                this.convertDrawSpeed(speed),
+            );
         } else if (normalType == NormalKind.Vertex) {
             // save how many verts need to be drawn
             gl.useProgram(this.program);

@@ -1,39 +1,31 @@
 // purpose: test request functionalities in combination with GEON
 
-import { App, Parameter, UI } from "../../src/lib";
+import { App, Camera, Mesh, MeshDebugRenderer, Parameter, UI, Vector3 } from "../../src/lib";
+import { MultiRenderer } from "../../src/render/auto-renderer";
+import { Light, RenderInfo } from "../../src/render/render-info";
 
-export class RequestApp extends App {
+export class RenderContextApp extends App {
     index!: Parameter;
     interface!: UI;
 
+    info: RenderInfo;
+    // debugger: Debugger;
+
     constructor(gl: WebGLRenderingContext) {
         super(gl);
+        let canvas = gl.canvas as HTMLCanvasElement;
+        this.info = RenderInfo.new(new Camera(canvas, 1, true));
+        // this.debugger = MultiRenderer.new(
+        //     100,
+        //     new MeshDebugRenderer(gl, [0.5, 0, 0, 1], [1, 0, 0, 1], false),
+        // );
     }
 
-    ui(ui: UI) {
-        this.interface = ui;
-        this.index = new Parameter("value", 0, 0, 6, 1);
+    ui(ui: UI) {}
 
-        ui.addText("Hoi dit is een test om fetch requests te sturen");
-        ui.addParameter(this.index);
-        ui.addButton("a button", this.fetchISS.bind(this));
+    start() {
+        // this.debugger.add(Mesh.newCone(Vector3.new(0, 0, 0), 5, 5, 5).toRenderable());
     }
-
-    async fetchISS() {
-        const path = "http://localhost:9000/findeyes/";
-        // ASYNC BLOCKS THE ENTIRE FUNCTION UNTILL THAT THING PASSES
-        console.log("lets fetch something from the internet");
-        let res = await fetch(path);
-        let data = await res.json();
-
-        console.log(data);
-
-        // this.interface.addText(data);
-        // let image = this.interface.addElement("image") as HTMLImageElement;
-        // image.src = URL.createObjectURL(blob);
-    }
-
-    start() {}
 
     update() {}
 

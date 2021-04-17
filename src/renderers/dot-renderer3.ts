@@ -4,7 +4,7 @@ import { FloatMatrix } from "../data/float-matrix";
 import { getGeneralFloatMatrix, Vector2Array, Vector3Array } from "../data/vector-array";
 import { Matrix4 } from "../math/matrix";
 import { Vector2, Vector3 } from "../math/vector";
-import { DrawSpeed, Renderer } from "./renderer";
+import { DrawSpeed, Renderer } from "../render/renderer";
 
 export class DotRenderer3 extends Renderer {
     // attribute & uniform locations
@@ -19,7 +19,12 @@ export class DotRenderer3 extends Renderer {
     size: number;
     count: number;
 
-    constructor(gl: WebGLRenderingContext, radius: number = 5, color: number[] = [1, 1, 1, 1], square: boolean = true) {
+    constructor(
+        gl: WebGLRenderingContext,
+        radius: number = 5,
+        color: number[] = [1, 1, 1, 1],
+        square: boolean = true,
+    ) {
         // note: I like vertex & fragments to be included in the script itself.
         // when you change vertex or fragment, this class has to deal with it.
         // putting them somewhere else doesnt make sense to me,
@@ -103,6 +108,7 @@ export class DotRenderer3 extends Renderer {
         this.count = array.count();
 
         // // Bind the position buffer.
+        gl.enableVertexAttribArray(this.a_position);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
         gl.vertexAttribPointer(this.a_position, array._width, gl.FLOAT, false, 0, 0);
         gl.bufferData(gl.ARRAY_BUFFER, array.data, super.convertDrawSpeed(speed));

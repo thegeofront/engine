@@ -17,20 +17,15 @@ export enum DrawSpeed {
 export class Renderer {
     gl: WebGLRenderingContext;
     program: WebGLProgram;
-    static rendercallsperframe = 0;
 
     constructor(gl: WebGLRenderingContext, vertexScript: string, fragmentScript: string) {
         this.gl = gl;
         this.program = Renderer.createProgramFromScripts(gl, vertexScript, fragmentScript);
     }
 
-    buffer(...vars: any) {
-        rendercallsperframe += 1;
-    }
+    buffer(...vars: any) {}
 
-    render(...vars: any) {
-        rendercallsperframe += 1;
-    }
+    render(...vars: any) {}
 
     static getNextTextureID() {
         let id = nextTextureId;
@@ -86,7 +81,11 @@ export class Renderer {
         return gl;
     }
 
-    static compileShader(gl: WebGLRenderingContext, shaderSource: string, shaderType: number): WebGLShader {
+    static compileShader(
+        gl: WebGLRenderingContext,
+        shaderSource: string,
+        shaderType: number,
+    ): WebGLShader {
         let shader = gl.createShader(shaderType)!;
         gl.shaderSource(shader, shaderSource);
         gl.compileShader(shader);
@@ -97,7 +96,11 @@ export class Renderer {
         return shader;
     }
 
-    static createProgram(gl: WebGLRenderingContext, vertexShader: WebGLShader, fragmentShader: WebGLShader) {
+    static createProgram(
+        gl: WebGLRenderingContext,
+        vertexShader: WebGLShader,
+        fragmentShader: WebGLShader,
+    ) {
         let program = gl.createProgram()!;
         gl.attachShader(program, vertexShader);
         gl.attachShader(program, fragmentShader);

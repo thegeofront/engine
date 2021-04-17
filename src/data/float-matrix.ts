@@ -12,6 +12,25 @@ export class FloatMatrix {
         else this.setData(data);
     }
 
+    print() {
+        let strings: string[] = [];
+        const WIDTH = 8;
+        for (var i = 0; i < this._height; i++) {
+            strings.push("|");
+            for (var j = 0; j < this._width; j++) {
+                let str = this.get(i, j).toFixed(2);
+                str = str.padStart(WIDTH, " ");
+                strings.push(str);
+
+                if (j < this._width - 2) {
+                    strings.push("  ");
+                }
+            }
+            strings.push("  |\n");
+        }
+        console.log(strings.join(""));
+    }
+
     clone(): FloatMatrix {
         let clone = new FloatMatrix(this._height, this._width);
         for (let i = 0; i < this.data.length; i++) {
@@ -46,7 +65,8 @@ export class FloatMatrix {
     fillWith(data: number[], valuesPerEntry: number = this._width) {
         // values per entry can be used to setData which is not of the same shape.
         let vpe = valuesPerEntry;
-        if (vpe > this._width) throw "values per entry is larger than this._width. This will spill over.";
+        if (vpe > this._width)
+            throw "values per entry is larger than this._width. This will spill over.";
         for (let i = 0; i < this._height; i++) {
             for (let j = 0; j < vpe; j++) {
                 this.set(i, j, data[i * vpe + j]);
@@ -104,6 +124,22 @@ export class FloatMatrix {
             array.setRow(i, this.getRow(getIndex));
         }
         return array;
+    }
+
+    // create a new floatmatrix, processed by iterating
+    mapWith(other: FloatMatrix, callback: (self: number, other: number) => number): FloatMatrix {
+        let result = this.clone();
+
+        let width = Math.min(this._width, other._height);
+        let height = Math.min(this._height, other._height);
+
+        for (var i = 0; i < height; i++) {
+            for (var j = 0; j < width; j++) {
+                result.set(i, j, callback(this.get(i, j), other.get(i, j)));
+            }
+        }
+
+        return result;
     }
 
     // generalized multiplication

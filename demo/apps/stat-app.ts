@@ -12,6 +12,10 @@ import {
     InputState,
 } from "../../src/lib";
 
+// good sites explaining the power of least squares
+// https://courses.physics.illinois.edu/cs357/sp2020/notes/ref-17-least-squares.html
+// http://textbooks.math.gatech.edu/ila/least-squares.html
+
 export class StatApp extends App {
     dotRenderer: DotRenderer3;
     lineRenderer: LineRenderer;
@@ -35,7 +39,6 @@ export class StatApp extends App {
     }
 
     start() {
-        // test things
         let a = FloatMatrix.fromNative([
             [22, 10, 2, 3, 7],
             [14, 7, 10, 0, 8],

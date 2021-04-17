@@ -12,6 +12,8 @@ import { MeshInspectorApp } from "./apps/mesh-inspector-app";
 import { ObjLoaderApp } from "./apps/obj-loader-app";
 import { StatApp } from "./apps/stat-app";
 import { SphericalOneApp } from "./apps/spherical-one-app";
+import { SphericalThreeApp } from "./apps/spherical-three-app";
+import { LeastSquaresApp } from "./apps/least-squares-app";
 
 var core: Core;
 
@@ -30,20 +32,21 @@ function main() {
 
     // init swap app
     let appCollection = [
+        LeastSquaresApp,
+        SphericalThreeApp,
         SphericalTwoApp,
         SphericalOneApp,
-        // RequestApp,
         GeometryApp,
         MeshInspectorApp,
         IcosahedronApp,
-        ObjLoaderApp,
         DotApp3,
-        StatApp,
+        ObjLoaderApp,
     ];
 
     let swapApp = new SwapApp(gl, core, appCollection);
     core.addApp(swapApp);
-    swapApp.swap(0);
+    // swapApp.swap(0);
+    swapApp.swapFromUrl(location.hash, 2);
 
     // a specific app dealing with webcams & other things
     // addWebcamAppWhenReady(core, canvas, video);

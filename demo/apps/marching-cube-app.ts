@@ -205,7 +205,9 @@ export class MarchingCubeApp extends App {
         let deltaz = voxelsize / Math.abs(ray.normal.z);
 
         // intit tx, ty, and tz, at their first intersection with corresponding plane
-        voxelCenter.add(new Vector3((voxelsize / 2) * stepX, (voxelsize / 2) * stepY, (voxelsize / 2) * stepZ));
+        voxelCenter.add(
+            new Vector3((voxelsize / 2) * stepX, (voxelsize / 2) * stepY, (voxelsize / 2) * stepZ),
+        );
 
         let move = Matrix4.newTranslation(voxelCenter.x, voxelCenter.y, voxelCenter.z);
         let xy = Plane.WorldXY();
@@ -282,7 +284,7 @@ export class MarchingCubeApp extends App {
                 mapGeo.push(Mesh.fromCube(cube));
             }
         });
-        this.meshRenderer.set(this.gl, Mesh.fromJoin(mapGeo).toRenderable());
+        this.meshRenderer.buffer(this.gl, Mesh.fromJoin(mapGeo).toRenderable());
     }
 
     worldToMap(coord: Vector3): Vector3 {
@@ -298,7 +300,10 @@ export class MarchingCubeApp extends App {
     createCube(center: Vector3) {
         let hs = this.cellSize / 2;
         let move = Matrix4.newTranslation(center.x, center.y, center.z);
-        let cube = new Cube(Plane.WorldXY().transform(move), Domain3.fromBounds(-hs, hs, -hs, hs, -hs, hs));
+        let cube = new Cube(
+            Plane.WorldXY().transform(move),
+            Domain3.fromBounds(-hs, hs, -hs, hs, -hs, hs),
+        );
         return cube;
     }
 }
