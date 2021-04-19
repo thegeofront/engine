@@ -35,6 +35,7 @@ export class ShadedMeshRenderer extends Renderer {
     a_vertex_ambi_buffer: WebGLBuffer;
 
     index_buffer: WebGLBuffer;
+    u_personal_matrix: WebGLUniformLocation;
 
     constructor(gl: WebGLRenderingContext) {
         const vs = `
@@ -44,6 +45,7 @@ export class ShadedMeshRenderer extends Renderer {
         attribute float a_vertex_ambi;
     
         uniform mat4 u_normal_matrix;
+        uniform mat4 u_personal_matrix;
         uniform mat4 u_model_view_matrix;
         uniform mat4 u_projection_matrix;
 
@@ -57,7 +59,7 @@ export class ShadedMeshRenderer extends Renderer {
     
         void main(void) {
 
-            gl_Position = u_projection_matrix * u_model_view_matrix * a_vertex_position;
+            gl_Position = u_projection_matrix * u_model_view_matrix * u_personal_matrix * a_vertex_position;
             // v_texture_coord = a_texture_coord;
         
             // Apply lighting effect
@@ -101,6 +103,7 @@ export class ShadedMeshRenderer extends Renderer {
         this.u_normal_matrix = gl.getUniformLocation(this.program, "u_normal_matrix")!;
         this.u_model_view_matrix = gl.getUniformLocation(this.program, "u_model_view_matrix")!;
         this.u_projection_matrix = gl.getUniformLocation(this.program, "u_projection_matrix")!;
+        this.u_personal_matrix = gl.getUniformLocation(this.program, "u_personal_matrix")!;
 
         // light uniforms
         this.u_ambient_light = gl.getUniformLocation(this.program, "u_ambient_light")!;
@@ -122,6 +125,8 @@ export class ShadedMeshRenderer extends Renderer {
 
     set(gl: WebGLRenderingContext, rend: Renderable, speed: DrawSpeed = DrawSpeed.StaticDraw) {
         // NOTE: processing time is longer: we use DrawArray instead of DrawElements, to deal with normals & uv data
+        this.setShallow(gl, rend);
+
         let normalType = rend.getNormalType();
         if (normalType == NormalKind.Face) {
             // save how many verts need to be drawn
@@ -203,12 +208,42 @@ export class ShadedMeshRenderer extends Renderer {
         } else {
             console.log("cannot render with this normal data");
         }
+
+        // never render more than possible
         if (this.count > Const.MAX_U16) {
             this.count = Const.MAX_U16;
+            console.warn("mesh max reached.");
         }
     }
 
-    // render 1 image to the screen
+    // set only the basic elements.
+    // use this to dynamicly alter things like position and color,
+    // without refilling all buffers with it
+    setShallow(gl: WebGLRenderingContext, rend: Renderable) {
+        // use the program
+        gl.useProgram(this.program);
+
+        // position
+        gl.uniformMatrix4fv(this.u_personal_matrix, false, rend.position.data);
+
+        // color
+        let color = rend.color;
+
+        // shift shadow to darker, slightly to blue
+        let shadowColor = color.map((x) => x * 0.25);
+        shadowColor[2] = Math.min(1, shadowColor[2] * 1.05);
+
+        // shift bright color slightly to yellow
+        let brightColor = color.map((x) => x);
+        brightColor[0] = Math.min(1, brightColor[0] * 1.05);
+        brightColor[1] = Math.min(1, brightColor[1] * 1.05);
+        brightColor[2] = Math.min(1, brightColor[2] * 1);
+
+        gl.uniform3fv(this.u_ambient_light, shadowColor.slice(0, 3));
+        gl.uniform3fv(this.u_dir_light_color, brightColor.slice(0, 3));
+    }
+
+    // render the previous set data to the screen
     render(gl: WebGLRenderingContext, camera: Camera) {
         // console.log("rendering..");
 
@@ -220,10 +255,12 @@ export class ShadedMeshRenderer extends Renderer {
         gl.uniformMatrix4fv(this.u_model_view_matrix, false, camera.worldMatrix.data);
         gl.uniformMatrix4fv(this.u_projection_matrix, false, camera.projectMatrix.data);
 
+        // set light direction
         let vec = camera.getMouseWorldRay(gl.canvas.width, gl.canvas.height, false).normal;
-        gl.uniform3fv(this.u_ambient_light, new Vector3(0.2, 0.2, 0.2).toArray());
-        gl.uniform3fv(this.u_dir_light_color, new Vector3(1, 1, 1.0).toArray());
-        gl.uniform3fv(this.u_dir_light_vector, vec.scale(-1).toArray());
+        gl.uniform3fv(
+            this.u_dir_light_vector,
+            Vector3.unitX().add(Vector3.unitY()).add(Vector3.unitZ()).normalize().toArray(),
+        );
 
         // buffer 1
         gl.enableVertexAttribArray(this.a_vertex_position);

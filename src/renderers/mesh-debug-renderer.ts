@@ -17,6 +17,7 @@ export class MeshDebugRenderer {
     faceRend: SimpleMeshRenderer;
     lineRend: LineRenderer;
     normRend?: NormalRenderer;
+    personal: Matrix4;
 
     constructor(
         gl: WebGLRenderingContext,
@@ -26,19 +27,20 @@ export class MeshDebugRenderer {
     ) {
         this.faceRend = new SimpleMeshRenderer(gl, faceColor);
         this.lineRend = new LineRenderer(gl, edgeColor);
+        this.personal = Matrix4.newIdentity();
         if (renderNormal) this.normRend = new NormalRenderer(gl);
     }
 
     buffer(gl: WebGLRenderingContext, mesh: Renderable, speed: DrawSpeed = DrawSpeed.StaticDraw) {
+        this.personal = mesh.position;
         this.faceRend.setMesh(gl, mesh);
         this.lineRend.set(gl, LineArray.fromMesh(mesh), speed);
         this.normRend?.set(mesh, speed);
     }
 
-    // render 1 image to the screen
     render(gl: WebGLRenderingContext, camera: Camera) {
-        this.faceRend.render(gl, camera.totalMatrix);
-        this.lineRend.render(gl, camera.totalMatrix);
+        this.faceRend.render(gl, this.personal.multiplied(camera.totalMatrix));
+        this.lineRend.render(gl, this.personal.multiplied(camera.totalMatrix));
         this.normRend?.render(gl, camera);
     }
 }

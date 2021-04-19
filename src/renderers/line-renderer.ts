@@ -67,7 +67,12 @@ export class LineRenderer extends Renderer {
         this.vertCount = 0;
     }
 
-    set(gl: WebGLRenderingContext, data: LineArray | Mesh, speed = DrawSpeed.StaticDraw) {
+    set(
+        gl: WebGLRenderingContext,
+        data: LineArray | Mesh,
+        speed = DrawSpeed.StaticDraw,
+        personal = Matrix4.newIdentity(),
+    ) {
         // save how many faces need to be drawn
         let links;
         let verts;

@@ -18,7 +18,7 @@ import {
     DrawSpeed,
     Plane,
     Matrix3,
-} from "../../src/lib";
+} from "../../../src/lib";
 
 // good sites explaining the power of least squares
 // https://courses.physics.illinois.edu/cs357/sp2020/notes/ref-17-least-squares.html

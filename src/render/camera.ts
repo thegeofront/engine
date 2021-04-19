@@ -54,10 +54,23 @@ export class Camera {
         this.updateClick(state);
 
         if (state.IsKeyPressed("p")) {
-            console.log(this.pos);
-            console.log(this.offset);
+            console.log(
+                `printing camera status. 
+                pos: ${this.pos}, 
+                offset: ${this.offset}, 
+                speed: ${this.speed}, 
+                alpha ${this.angleAlpha},
+                beta: ${this.angleBeta}`,
+            );
+
             console.log("speed is now: " + this.speed);
         }
+    }
+
+    set(offset: number, alpha: number, beta: number) {
+        this.z_offset = offset;
+        this.angleAlpha = alpha;
+        this.angleBeta = beta;
     }
 
     updateMatrices(canvas: HTMLCanvasElement) {

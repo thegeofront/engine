@@ -21,6 +21,25 @@ export class IntMatrix {
         return array;
     }
 
+    print() {
+        let strings: string[] = [];
+        const WIDTH = 8;
+        for (var i = 0; i < this._height; i++) {
+            strings.push("|");
+            for (var j = 0; j < this._width; j++) {
+                let str = this.get(i, j).toFixed(2);
+                str = str.padStart(WIDTH, " ");
+                strings.push(str);
+
+                if (j < this._width - 2) {
+                    strings.push("  ");
+                }
+            }
+            strings.push("  |\n");
+        }
+        console.log(strings.join(""));
+    }
+
     clone() {
         let clone = new IntMatrix(this._height, this._width);
         clone.data = this.data;
@@ -57,7 +76,8 @@ export class IntMatrix {
     fillWith(data: number[], valuesPerEntry: number = this._width) {
         // values per entry can be used to setData which is not of the same shape.
         let vpe = valuesPerEntry;
-        if (vpe > this._width) throw "values per entry is larger than this._width. This will spill over.";
+        if (vpe > this._width)
+            throw "values per entry is larger than this._width. This will spill over.";
         for (let i = 0; i < this._height; i++) {
             for (let j = 0; j < vpe; j++) {
                 this.set(i, j, data[i * vpe + j]);

@@ -1,37 +1,152 @@
-import { EdgeIndex, Graph, IntMatrix, Mesh, Plane, Renderable, Vector3 } from "../../src/lib";
+import { EdgeIndex, Graph, IntMatrix, Mesh, Plane, Renderable, Vector3 } from "../../../src/lib";
 
-export function constructWorldFromSphereGraph(
-    graph: Graph,
-    radius: number, // to project back
-    liftBot: number, //
-    liftTop: number, //
-    worldData: IntMatrix,
-): Renderable {
-    // recalculate world mesh
-    let scaler1 = 1 + liftBot / radius;
-    let scaler2 = 1 + liftTop / radius;
+export function createGraph(
+    liftType: number,
+    subcount: number,
+    quadsubcount: number,
+    randomEdges: number,
+): Graph {
+    // 0 | setup
+    const mesh = Mesh.newIcosahedron(0.5);
+    let graph = mesh.toGraph();
+    let center = new Vector3(0, 0, 0);
+    let radius = 1;
 
+    // 1 | subdivide
+    for (let i = 0; i < subcount; i++) {
+        graph.subdivide();
+
+        // lift to sphere after every subdivision
+        if (liftType > 0) {
+            let count = graph.getVertexCount();
+            for (let i = 0; i < count; i++) {
+                let pos = graph.getVertexPos(i);
+                let normal = pos;
+
+                let dis = center.disTo(pos);
+                let lift = radius - dis;
+                if (liftType > 1) {
+                    pos.add(normal.scaled(lift));
+                } else {
+                    pos.add(normal.normalized().scaled(lift));
+                }
+            }
+        }
+    }
+
+    // 2 | remove random edges
+    if (randomEdges == 1) {
+        quadification(graph);
+    }
+
+    // 3 | subdivide quad
+    for (let i = 0; i < quadsubcount; i++) {
+        graph.subdivideQuad();
+    }
+
+    // lift to sphere after every subdivision
+    if (liftType > 0) {
+        let count = graph.getVertexCount();
+        for (let i = 0; i < count; i++) {
+            let pos = graph.getVertexPos(i);
+            let normal = graph.getVertexNormal(i);
+
+            let dis = center.disTo(pos);
+            let lift = radius - dis;
+            if (liftType > 1) {
+                pos.add(normal.scaled(lift));
+            } else {
+                pos.add(normal.normalized().scaled(lift));
+            }
+        }
+    }
+
+    // quad relaxation from beginning?
+    return graph;
+}
+
+export function createTileWorld(count: number, height: number): IntMatrix {
+    let m = new IntMatrix(count, height);
+    for (let i = 0; i < m._height; i++) {
+        let val = randomInt(m._width + 1);
+
+        for (let j = 0; j < m._width; j++) {
+            if (j < val) {
+                m.set(i, j, 1);
+            } else {
+                m.set(i, j, 0);
+            }
+        }
+    }
+
+    return m;
+}
+
+export function meshifyGraphSurface(graph: Graph): Renderable {
+    // init result
     let meshes: Mesh[] = [];
+
+    // per quad
     let loops = graph.allVertLoopsAsInts();
-    for (let loop of loops) {
+    for (let i = 0; i < loops.length; i++) {
+        const loop = loops[i];
         if (loop.length < 4) {
+            console.log("invalids");
             continue;
         }
 
         let vecs = loop.map((j) => graph.getVertexPos(j));
-
-        let m = Mesh.newQuad([
-            vecs[0].scaled(scaler1),
-            vecs[1].scaled(scaler1),
-            vecs[3].scaled(scaler1),
-            vecs[2].scaled(scaler1),
-            vecs[0].scaled(scaler2),
-            vecs[1].scaled(scaler2),
-            vecs[3].scaled(scaler2),
-            vecs[2].scaled(scaler2),
-        ]);
-
+        let m = Mesh.newQuad([vecs[0], vecs[3], vecs[1], vecs[2]]);
         meshes.push(m);
+    }
+
+    let rend = Mesh.fromJoin(meshes).toRenderable();
+    rend.calculateVertexNormals();
+    return rend;
+}
+
+export function meshifyTileWorld(
+    graph: Graph,
+    tiles: IntMatrix,
+    radius: number, // base
+    storeyHeight: number, //
+): Renderable {
+    // init result
+    let meshes: Mesh[] = [];
+
+    // per quad
+    let loops = graph.allVertLoopsAsInts();
+    for (let i = 0; i < loops.length; i++) {
+        const loop = loops[i];
+        if (loop.length < 4) {
+            console.log("invalids");
+            continue;
+        }
+
+        let vecs = loop.map((j) => graph.getVertexPos(j));
+        let row = tiles.getRow(i);
+
+        // fill row
+        for (let j = 0; j < tiles._width; j++) {
+            let tileType = row[j];
+            if (tileType == 0) {
+                continue;
+            }
+
+            let level = radius + j * storeyHeight;
+            let level2 = radius + (j + 1) * storeyHeight;
+            let m = Mesh.newOct([
+                vecs[0].scaled(level),
+                vecs[1].scaled(level),
+                vecs[3].scaled(level),
+                vecs[2].scaled(level),
+                vecs[0].scaled(level2),
+                vecs[1].scaled(level2),
+                vecs[3].scaled(level2),
+                vecs[2].scaled(level2),
+            ]);
+            meshes.push(m);
+        }
     }
 
     let rend = Mesh.fromJoin(meshes).toRenderable();
@@ -63,7 +178,7 @@ export function constructRenderableFromSphereGraph(
 
         let vecs = loop.map((j) => graph.getVertexPos(j));
 
-        let m = Mesh.newQuad([
+        let m = Mesh.newOct([
             vecs[0].scaled(scaler1),
             vecs[1].scaled(scaler1),
             vecs[3].scaled(scaler1),

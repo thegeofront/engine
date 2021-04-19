@@ -46,6 +46,8 @@ export class Renderable {
 
     _normKind: NormalKind = NormalKind.None;
 
+    position: Matrix4;
+
     // render speed
     // shader
     color = [1, 1, 1, 1];
@@ -63,6 +65,7 @@ export class Renderable {
         this.uvs = new Vector2Array(uvCount);
         this.ambi = new Float32Array(vertCount);
         this.texture = texture;
+        this.position = Matrix4.newIdentity();
     }
 
     static new(

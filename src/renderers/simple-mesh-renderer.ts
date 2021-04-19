@@ -47,6 +47,7 @@ export class SimpleMeshRenderer extends Renderer {
 
         this.u_transform = gl.getUniformLocation(this.program, "u_transform")!;
         this.u_color = gl.getUniformLocation(this.program, "u_color")!;
+
         gl.useProgram(this.program);
         gl.uniform4f(this.u_color, color[0], color[1], color[2], color[3]);
         this.count = 0;

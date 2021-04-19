@@ -23,17 +23,12 @@ import {
     EdgeIndex,
     EnumParameter,
     GraphDebugRenderer,
-} from "../../src/lib";
+} from "../../../src/lib";
 
-import { Stopwatch } from "../../src/system/stopwatch";
-import { constructRenderableFromSphereGraph } from "../functions/spherical-function";
-import { graphToMultiMesh } from "./icosahedron-app";
-import {
-    averageEdgeLength,
-    laPlacian,
-    quadification,
-    squarification,
-} from "../functions/spherical-function";
+import { Stopwatch } from "../../../src/system/stopwatch";
+import { constructRenderableFromSphereGraph } from "./spherical";
+import { graphToMultiMesh } from "../icosahedron-app";
+import { averageEdgeLength, laPlacian, quadification, squarification } from "./spherical";
 
 export class SphericalTwoApp extends App {
     camera: Camera;
@@ -66,6 +61,7 @@ export class SphericalTwoApp extends App {
 
         let canvas = gl.canvas as HTMLCanvasElement;
         this.camera = new Camera(canvas, 1, true);
+        this.camera.set(-4.08, 1.24, -0.71);
         // this.meshRend = new ShadedMeshRenderer(gl);
         this.meshRend = new MeshDebugRenderer(gl, [0, 0, 0, 1], [0.3, 0.3, 0.3, 1], false);
         this.debugRend = new MeshDebugRenderer(gl, [0.5, 0, 0, 1], [0, 0, 0, 1], false);
@@ -79,7 +75,7 @@ export class SphericalTwoApp extends App {
         };
 
         this.rotate = new Parameter("rotate", 1, 0, 1, 1);
-        this.randomEdges = new Parameter("randomEdges", 1, 0, 1, 1);
+        this.randomEdges = new Parameter("delete random edges", 1, 0, 1, 1);
         this.smooth = new Parameter("smooth", 0, 0, 1, 1);
         this.subCount = new Parameter("sub count", 2, 0, 4, 1);
         this.quadSubCount = new Parameter("sub count quad", 1, 0, 2, 1);
@@ -187,9 +183,9 @@ export class SphericalTwoApp extends App {
             let roty = Matrix4.newYRotation(alpha);
             let rot = rotx.multiply(roty);
             this.graph.transform(rot);
-            this.world.transform(rot);
-            this.world2.transform(Matrix4.newXRotation(-alpha));
-            this.world3.transform(Matrix4.newZRotation(-alpha));
+            this.world.position.multiply(rot);
+            this.world2.position.multiply(Matrix4.newXRotation(-alpha));
+            this.world3.position.multiply(Matrix4.newZRotation(-alpha));
         }
 
         // sucessive over relaxation
@@ -215,7 +211,7 @@ export class SphericalTwoApp extends App {
             this.smoothlimit = 0;
         }
 
-        this.graphRend.set(this.graph, DrawSpeed.DynamicDraw);
+        // this.graphRend.set(this.graph, DrawSpeed.DynamicDraw);
     }
 
     draw(gl: WebGLRenderingContext) {

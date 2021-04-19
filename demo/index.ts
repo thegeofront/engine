@@ -5,15 +5,16 @@
 import { Core, Renderer, SwapApp } from "../src/lib";
 
 import { DotApp3 } from "./apps/dot-app3";
-import { SphericalTwoApp } from "./apps/spherical-two-app";
+import { SphericalTwoApp } from "./apps/spherical/spherical-two-app";
 import { GeometryApp } from "./apps/geometry-app";
 import { IcosahedronApp } from "./apps/icosahedron-app";
 import { MeshInspectorApp } from "./apps/mesh-inspector-app";
 import { ObjLoaderApp } from "./apps/obj-loader-app";
-import { StatApp } from "./apps/stat-app";
-import { SphericalOneApp } from "./apps/spherical-one-app";
-import { SphericalThreeApp } from "./apps/spherical-three-app";
-import { LeastSquaresApp } from "./apps/least-squares-app";
+import { StatApp } from "./apps/old/stat-app";
+
+import { SphericalOneApp } from "./apps/spherical/spherical-one-app";
+import { SphericalThreeApp } from "./apps/spherical/spherical-three-app";
+import { LeastSquaresApp } from "./apps/math/least-squares-app";
 
 var core: Core;
 

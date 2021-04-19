@@ -1,8 +1,6 @@
-// purpose: test request functionalities in combination with GEON
-
-import { App, Camera, Mesh, MeshDebugRenderer, Parameter, UI, Vector3 } from "../../src/lib";
-import { MultiRenderer } from "../../src/render/auto-renderer";
-import { Light, RenderInfo } from "../../src/render/render-info";
+import { App, Camera, Mesh, MeshDebugRenderer, Parameter, UI, Vector3 } from "../../../src/lib";
+import { MultiRenderer } from "../../../src/render/auto-renderer";
+import { Light, RenderInfo } from "../../../src/render/render-info";
 
 export class RenderContextApp extends App {
     index!: Parameter;

@@ -5,5 +5,13 @@
 - use ```calculate``` to signify something happening to the entire structure of the object
 
 
+# renderers
+- All Renderers should not ask for anything interesting in the constructors: they should be factory-able.
+- All renderers must have different 'setState' functions, to be called separately from 'render' function.
+
+
+
 # shortcomings
 - figure out how to do a proper library build, with one lib.js and one lib.d.ts
+
+

@@ -1,7 +1,7 @@
 // author : Jos Feenstra
 // purpose : test with Renderers, Domains & Vectors
 
-import { App, Vector2, Domain2, DotRenderer2, InputState } from "../../src/lib";
+import { App, Vector2, Domain2, DotRenderer2, InputState } from "../../../src/lib";
 
 export class DotApp2 extends App {
     dots: Vector2[] = [];
