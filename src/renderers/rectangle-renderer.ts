@@ -1,9 +1,10 @@
 // jos feenstra
 
 import { Rectangle2 } from "../geo/rectangle";
+import { Context } from "../render/context";
 import { Renderer } from "../render/renderer";
 
-export class RectangleRenderer extends Renderer {
+export class RectangleRenderer extends Renderer<Rectangle2[]> {
     // attribute & uniform locations
     a_position: number;
     a_position_buffer: WebGLBuffer;
@@ -58,8 +59,17 @@ export class RectangleRenderer extends Renderer {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
     }
 
-    render(gl: WebGLRenderingContext, rs: Rectangle2[]) {
+    set() {
+        throw "not used";
+    }
+
+    render() {
+        throw "not used!";
+    }
+
+    setAndRender(rs: Rectangle2[], c: Context) {
         // Clear the canvas
+        let gl = this.gl;
         gl.clearColor(0, 0, 0, 0);
         gl.clear(gl.COLOR_BUFFER_BIT);
 

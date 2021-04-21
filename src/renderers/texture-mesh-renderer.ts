@@ -10,8 +10,9 @@ import { Matrix4 } from "../math/matrix";
 import { DrawSpeed, Renderer } from "../render/renderer";
 import { LineRenderer } from "./line-renderer";
 import { SimpleMeshRenderer } from "./simple-mesh-renderer";
+import { Context } from "../render/context";
 
-export class TextureMeshRenderer extends Renderer {
+export class TextureMeshRenderer extends Renderer<Renderable> {
     // attribute & uniform locations
     a_position: number;
     a_position_buffer: WebGLBuffer;
@@ -82,12 +83,13 @@ export class TextureMeshRenderer extends Renderer {
         this.texture = gl.createTexture();
     }
 
-    setAndRender(gl: WebGLRenderingContext, matrix: Matrix4, mesh: Renderable) {
-        this.set(gl, mesh, DrawSpeed.DynamicDraw);
-        this.render(gl, matrix);
+    static new(gl: WebGLRenderingContext): TextureMeshRenderer {
+        return new TextureMeshRenderer(gl);
     }
 
-    set(gl: WebGLRenderingContext, r: Renderable, speed: DrawSpeed = DrawSpeed.StaticDraw) {
+    set(r: Renderable, speed: DrawSpeed) {
+        let gl = this.gl;
+
         if (!r.texture) {
             console.warn("Mesh does not contain a texture!");
             return;
@@ -126,8 +128,10 @@ export class TextureMeshRenderer extends Renderer {
         gl.generateMipmap(gl.TEXTURE_2D);
     }
 
-    // render 1 image to the screen
-    render(gl: WebGLRenderingContext, matrix: Matrix4) {
+    render(context: Context) {
+        let gl = this.gl;
+        let camera = context.camera;
+        let matrix = camera.totalMatrix;
         // console.log("rendering..");
 
         // use the program
@@ -156,5 +160,10 @@ export class TextureMeshRenderer extends Renderer {
 
         // draw!
         gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
+    }
+
+    setAndRender(r: Renderable, context: Context) {
+        this.set(r, DrawSpeed.DynamicDraw);
+        this.render(context);
     }
 }

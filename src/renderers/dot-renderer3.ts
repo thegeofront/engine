@@ -4,9 +4,12 @@ import { FloatMatrix } from "../data/float-matrix";
 import { getGeneralFloatMatrix, Vector2Array, Vector3Array } from "../data/vector-array";
 import { Matrix4 } from "../math/matrix";
 import { Vector2, Vector3 } from "../math/vector";
+import { Context } from "../render/context";
 import { DrawSpeed, Renderer } from "../render/renderer";
 
-export class DotRenderer3 extends Renderer {
+type Points = Vector2Array | Vector3Array | Vector2[] | Vector3[];
+
+export class DotRenderer3 extends Renderer<Points> {
     // attribute & uniform locations
     a_position: number;
     a_position_buffer: WebGLBuffer;
@@ -97,12 +100,12 @@ export class DotRenderer3 extends Renderer {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
     }
 
-    set(vectors: Vector2Array | Vector3Array | Vector2[] | Vector3[], speed: DrawSpeed) {
+    set(points: Points, speed: DrawSpeed) {
         let gl = this.gl;
         gl.useProgram(this.program);
 
         // convert all possible entries to a general entry
-        let array = getGeneralFloatMatrix(vectors);
+        let array = getGeneralFloatMatrix(points);
 
         // from some other thing
         this.count = array.count();
@@ -114,7 +117,9 @@ export class DotRenderer3 extends Renderer {
         gl.bufferData(gl.ARRAY_BUFFER, array.data, super.convertDrawSpeed(speed));
     }
 
-    render(gl: WebGLRenderingContext, matrix: Matrix4) {
+    render(c: Context) {
+        let gl = this.gl;
+        let matrix = c.camera.totalMatrix;
         // Tell it to use our program (pair of shaders)
         gl.useProgram(this.program);
 
@@ -132,12 +137,8 @@ export class DotRenderer3 extends Renderer {
         gl.drawArrays(gl.POINTS, 0, this.count);
     }
 
-    setAndRender(
-        gl: WebGLRenderingContext,
-        matrix: Matrix4,
-        vectors: Vector2Array | Vector3Array | Vector2[] | Vector3[],
-    ) {
-        this.set(vectors, DrawSpeed.DynamicDraw);
-        this.render(gl, matrix);
+    setAndRender(data: Points, c: Context) {
+        this.set(data, DrawSpeed.DynamicDraw);
+        this.render(c);
     }
 }

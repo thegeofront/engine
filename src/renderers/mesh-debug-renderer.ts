@@ -12,8 +12,10 @@ import { LineRenderer } from "./line-renderer";
 import { SimpleMeshRenderer } from "./simple-mesh-renderer";
 import { NormalRenderer } from "./mesh-normals-renderer";
 import { Camera } from "../render/camera";
+import { MetaRenderer } from "../render/meta-renderer";
+import { Context } from "../render/context";
 
-export class MeshDebugRenderer {
+export class MeshDebugRenderer extends MetaRenderer<Renderable> {
     faceRend: SimpleMeshRenderer;
     lineRend: LineRenderer;
     normRend?: NormalRenderer;
@@ -25,22 +27,28 @@ export class MeshDebugRenderer {
         edgeColor = [1, 0, 0, 1],
         renderNormal = true,
     ) {
+        super();
         this.faceRend = new SimpleMeshRenderer(gl, faceColor);
         this.lineRend = new LineRenderer(gl, edgeColor);
         this.personal = Matrix4.newIdentity();
         if (renderNormal) this.normRend = new NormalRenderer(gl);
     }
 
-    buffer(gl: WebGLRenderingContext, mesh: Renderable, speed: DrawSpeed = DrawSpeed.StaticDraw) {
-        this.personal = mesh.position;
-        this.faceRend.setMesh(gl, mesh);
-        this.lineRend.set(gl, LineArray.fromMesh(mesh), speed);
-        this.normRend?.set(mesh, speed);
+    set(data: Renderable, speed: DrawSpeed = DrawSpeed.StaticDraw) {
+        this.personal = data.position;
+        this.faceRend.set(data.mesh);
+        this.lineRend.set(LineArray.fromMesh(data), speed);
+        this.normRend?.set(data, speed);
     }
 
-    render(gl: WebGLRenderingContext, camera: Camera) {
-        this.faceRend.render(gl, this.personal.multiplied(camera.totalMatrix));
-        this.lineRend.render(gl, this.personal.multiplied(camera.totalMatrix));
-        this.normRend?.render(gl, camera);
+    render(c: Context) {
+        this.faceRend.render(c);
+        this.lineRend.render(c);
+        this.normRend?.render(c);
+    }
+
+    setAndRender(r: Renderable, c: Context) {
+        this.set(r, DrawSpeed.DynamicDraw);
+        this.render(c);
     }
 }

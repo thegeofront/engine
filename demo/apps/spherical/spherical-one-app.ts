@@ -23,6 +23,7 @@ import {
     EdgeIndex,
     EnumParameter,
     GraphDebugRenderer,
+    Context,
 } from "../../../src/lib";
 
 import { Stopwatch } from "../../../src/system/stopwatch";
@@ -211,12 +212,12 @@ export class SphericalOneApp extends App {
                 10,
             ).toRenderable();
             somesphere.calculateVertexNormals();
-            this.meshRend.set(this.gl, somesphere, DrawSpeed.StaticDraw);
+            this.meshRend.set(somesphere, DrawSpeed.StaticDraw);
         } else if (liftType == 0) {
             let something = mesh.toRenderable();
             something.transform(Matrix4.newScaler(0.99, 0.99, 0.99));
             something.calculateFaceNormals();
-            this.meshRend.set(this.gl, something, DrawSpeed.StaticDraw);
+            this.meshRend.set(something, DrawSpeed.StaticDraw);
         }
 
         this.graphRend.set(this.graph, DrawSpeed.DynamicDraw);
@@ -261,8 +262,8 @@ export class SphericalOneApp extends App {
     }
 
     draw(gl: WebGLRenderingContext) {
-        this.camera.updateMatrices(gl.canvas as HTMLCanvasElement);
-        this.meshRend.render(gl, this.camera);
-        this.graphRend.render(gl, this.camera);
+        let c = new Context(this.camera);
+        this.meshRend.render(c);
+        this.graphRend.render(c);
     }
 }

@@ -5,6 +5,7 @@
 import {
     App,
     Camera,
+    Context,
     Cube,
     Domain3,
     DotRenderer3,
@@ -126,7 +127,7 @@ export class GeometryApp extends App {
         // get to-screen matrix
         const canvas = gl.canvas as HTMLCanvasElement;
         let matrix = this.camera.totalMatrix;
-
+        let c = new Context(this.camera);
         // render the grid
         // this.greyLineRenderer.render(gl, matrix);
         // this.whiteLineRenderer.render(gl, matrix);
@@ -135,12 +136,11 @@ export class GeometryApp extends App {
 
         // render the map
         // TODO create MeshArray
-        this.meshRenderer.render(gl, this.camera);
+        this.meshRenderer.render(c);
 
         // render other things
         for (let geo of this.geo) {
-            this.transMeshRenderer.buffer(gl, geo, DrawSpeed.DynamicDraw);
-            this.transMeshRenderer.render(gl, this.camera);
+            this.transMeshRenderer.setAndRender(geo, c);
         }
     }
 
@@ -306,7 +306,7 @@ export class GeometryApp extends App {
 
         let m = Mesh.fromJoin(mapGeo).toRenderable();
         m.calculateFaceNormals();
-        this.meshRenderer.set(this.gl, m);
+        this.meshRenderer.set(m);
     }
 
     worldToMap(coord: Vector3): Vector3 {

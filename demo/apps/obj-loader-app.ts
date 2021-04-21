@@ -18,6 +18,7 @@ import {
     meshFromObj,
     Domain3,
     DrawSpeed,
+    Context,
 } from "../../src/lib";
 
 export class ObjLoaderApp extends App {
@@ -51,19 +52,19 @@ export class ObjLoaderApp extends App {
 
     draw(gl: WebGLRenderingContext) {
         // get to-screen matrix
+        let c = new Context(this.camera);
         const canvas = gl.canvas as HTMLCanvasElement;
         let matrix = this.camera.totalMatrix;
 
         if (this.obj == undefined)
             this.dotRenderer.setAndRender(
-                gl,
-                matrix,
                 Vector3Array.fromList([new Vector3(0, 0, 0), new Vector3(1, 1, 1)]),
+                c,
             );
         else {
-            this.dotRenderer.setAndRender(gl, matrix, this.obj!.mesh.verts);
+            this.dotRenderer.setAndRender(this.obj!.mesh.verts, c);
             // this.meshRenderer.render(gl, matrix);
-            this.lineRenderer.render(gl, matrix);
+            this.lineRenderer.render(c);
         }
     }
 }
@@ -108,5 +109,5 @@ async function processFiles(this: ObjLoaderApp, files: FileList) {
 
     // put the data into the render buffers.
     // this.meshRenderer.set(this.gl, this.obj.verts, this.obj.faces);
-    this.lineRenderer.set(this.gl, this.renderable, DrawSpeed.StaticDraw);
+    this.lineRenderer.set(this.renderable, DrawSpeed.StaticDraw);
 }

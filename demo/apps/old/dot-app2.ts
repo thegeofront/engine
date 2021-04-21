@@ -1,7 +1,7 @@
 // author : Jos Feenstra
 // purpose : test with Renderers, Domains & Vectors
 
-import { App, Vector2, Domain2, DotRenderer2, InputState } from "../../../src/lib";
+import { App, Vector2, Domain2, DotRenderer2, InputState, Context, Camera } from "../../../src/lib";
 
 export class DotApp2 extends App {
     dots: Vector2[] = [];
@@ -9,12 +9,15 @@ export class DotApp2 extends App {
 
     bounds: Domain2;
     renderer: DotRenderer2;
+    context: Context;
 
     // unique constructors
     constructor(gl: WebGLRenderingContext) {
         super(gl);
+        let canvas = gl.canvas as HTMLCanvasElement;
         this.bounds = Domain2.fromBounds(0, 500, 0, 500);
         this.renderer = new DotRenderer2(gl, 5, [1, 1, 1, 1], true);
+        this.context = new Context(new Camera(canvas, 1, false));
     }
 
     start() {
@@ -46,6 +49,6 @@ export class DotApp2 extends App {
     }
 
     draw(gl: WebGLRenderingContext) {
-        this.renderer.render(gl, this.dots);
+        this.renderer.render(this.context);
     }
 }

@@ -14,8 +14,10 @@ import { NormalRenderer } from "./mesh-normals-renderer";
 import { Camera } from "../render/camera";
 import { DotRenderer3 } from "./dot-renderer3";
 import { Graph } from "../mesh/graph";
+import { Context } from "../render/context";
+import { MetaRenderer } from "../render/meta-renderer";
 
-export class GraphDebugRenderer {
+export class GraphDebugRenderer extends MetaRenderer<Graph> {
     faceRend: SimpleMeshRenderer;
     lineRend: LineRenderer;
     pointRend: DotRenderer3;
@@ -27,6 +29,7 @@ export class GraphDebugRenderer {
         edgeColor = [1, 0, 0, 1],
         renderNormal = true,
     ) {
+        super();
         this.faceRend = new SimpleMeshRenderer(gl, faceColor);
         this.lineRend = new LineRenderer(gl, edgeColor);
         this.pointRend = new DotRenderer3(gl, 7, edgeColor, false);
@@ -37,15 +40,19 @@ export class GraphDebugRenderer {
         //this.faceRend.setMesh(gl, mesh);
 
         this.pointRend.set(graph.allVertPositions(), speed);
-        this.lineRend.set(this.lineRend.gl, graph.toLines(), speed);
+        this.lineRend.set(graph.toLines(), speed);
         // this.normRend?.setWithLists(graph.allVertPositions(), graph.allNorms(), speed);
     }
 
     // render 1 image to the screen
-    render(gl: WebGLRenderingContext, camera: Camera) {
-        this.pointRend.render(gl, camera.totalMatrix);
+    render(c: Context) {
+        this.pointRend.render(c);
         // this.faceRend.render(gl, camera.totalMatrix);
-        this.lineRend.render(gl, camera.totalMatrix);
+        this.lineRend.render(c);
         // this.normRend?.render(gl, camera);
+    }
+
+    setAndRender(r: Graph, context: Context): void {
+        throw new Error("Method not implemented.");
     }
 }

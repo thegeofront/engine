@@ -15,6 +15,7 @@ import { StatApp } from "./apps/old/stat-app";
 import { SphericalOneApp } from "./apps/spherical/spherical-one-app";
 import { SphericalThreeApp } from "./apps/spherical/spherical-three-app";
 import { LeastSquaresApp } from "./apps/math/least-squares-app";
+import { UITestApp } from "./apps/ui-test-app";
 
 var core: Core;
 
@@ -33,10 +34,11 @@ function main() {
 
     // init swap app
     let appCollection = [
-        LeastSquaresApp,
-        SphericalThreeApp,
+        UITestApp,
         SphericalTwoApp,
+        SphericalThreeApp,
         SphericalOneApp,
+        LeastSquaresApp,
         GeometryApp,
         MeshInspectorApp,
         IcosahedronApp,
@@ -47,7 +49,7 @@ function main() {
     let swapApp = new SwapApp(gl, core, appCollection);
     core.addApp(swapApp);
     // swapApp.swap(0);
-    swapApp.swapFromUrl(location.hash, 2);
+    swapApp.swapFromUrl(location.hash, 0);
 
     // a specific app dealing with webcams & other things
     // addWebcamAppWhenReady(core, canvas, video);

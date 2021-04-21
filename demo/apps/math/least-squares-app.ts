@@ -18,6 +18,7 @@ import {
     DrawSpeed,
     Plane,
     Matrix3,
+    Context,
 } from "../../../src/lib";
 
 // good sites explaining the power of least squares
@@ -127,7 +128,7 @@ export class LeastSquaresApp extends App {
 
     startGrid() {
         let grid = LineArray.fromGrid(Plane.WorldXY().moveTo(new Vector3(0, 0, -1)), 100, 2);
-        this.lineRenderer.set(this.gl, grid, DrawSpeed.StaticDraw);
+        this.lineRenderer.set(grid, DrawSpeed.StaticDraw);
     }
 
     start() {
@@ -189,11 +190,12 @@ export class LeastSquaresApp extends App {
         // get to-screen matrix
         const canvas = gl.canvas as HTMLCanvasElement;
         let matrix = this.camera.totalMatrix;
+        let c = new Context(this.camera);
 
-        this.lineRenderer.render(gl, matrix);
-        this.drRed.setAndRender(gl, matrix, this.points);
-        this.drBlue.setAndRender(gl, matrix, this.Pnormal);
-        this.drGreen.setAndRender(gl, matrix, this.Plsa);
+        this.lineRenderer.render(c);
+        this.drRed.setAndRender(this.points, c);
+        this.drBlue.setAndRender(this.Pnormal, c);
+        this.drGreen.setAndRender(this.Plsa, c);
     }
 }
 

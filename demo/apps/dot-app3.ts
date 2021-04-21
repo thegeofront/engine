@@ -3,7 +3,16 @@
 // author : Jos Feenstra
 // purpose : test with Renderers, Domains & Vectors
 
-import { Domain3, DotRenderer3, Camera, Vector3, InputState, Matrix4, App } from "../../src/lib";
+import {
+    Domain3,
+    DotRenderer3,
+    Camera,
+    Vector3,
+    InputState,
+    Matrix4,
+    App,
+    Context,
+} from "../../src/lib";
 
 export class DotApp3 extends App {
     dots: Vector3[] = [];
@@ -30,7 +39,14 @@ export class DotApp3 extends App {
     }
 
     spawnSome(count: number, normrange: number) {
-        const normSpace = Domain3.fromBounds(-normrange, normrange, -normrange, normrange, -normrange, normrange);
+        const normSpace = Domain3.fromBounds(
+            -normrange,
+            normrange,
+            -normrange,
+            normrange,
+            -normrange,
+            normrange,
+        );
 
         for (let i = 0; i < count; i++) {
             this.dots.push(this.bounds.elevate(Vector3.fromRandom()));
@@ -66,10 +82,11 @@ export class DotApp3 extends App {
         // get to-screen matrix
         const canvas = gl.canvas as HTMLCanvasElement;
         let matrix = this.camera.totalMatrix;
+        let c = new Context(this.camera);
 
         // render the corners of the box with the red renderer,
         // and the dots themselves with the white renderer
-        this.redDotRend.setAndRender(gl, matrix, this.bounds.corners(Matrix4.newIdentity()));
-        this.whiteDotRend.setAndRender(gl, matrix, this.dots);
+        this.redDotRend.setAndRender(this.bounds.corners(Matrix4.newIdentity()), c);
+        this.whiteDotRend.setAndRender(this.dots, c);
     }
 }

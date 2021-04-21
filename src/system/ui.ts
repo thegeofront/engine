@@ -90,9 +90,9 @@ export class UI {
         text1.innerText = param.name;
 
         // TODO update beyond our control
-        param.onset = () => {
-            // console.log("TODO");
-        };
+        // param.onset = () => {
+        //     // console.log("TODO");
+        // };
 
         this.addDiv("control", [text1, checkcontainer]);
 
@@ -125,14 +125,12 @@ export class UI {
         // put them all together
         this.addDiv("control", [text1, slider, text2]);
 
-        // on update in code
-        p.onset = () => {
-            // console.log("TODO");
-        };
+        // on reverse update
+        param.setSliderAndText(slider, text2);
 
         // on update by user
         slider.oninput = () => {
-            p.set(slider.valueAsNumber);
+            p.set(slider.valueAsNumber, false);
             onInput(slider.valueAsNumber);
             if (param instanceof EnumParameter) {
                 text2.innerText = param.getName();
@@ -210,7 +208,6 @@ export class Parameter {
     min: number;
     max: number;
     step: number;
-    onset?: Function;
 
     constructor(name: string, state: number, min = -Infinity, max = Infinity, step = 0.1) {
         this.name = name;
@@ -234,18 +231,33 @@ export class Parameter {
         return this.state;
     }
 
-    set(state: number) {
+    set(state: number, activateOnSet = true) {
         // something is still wrong here...
         let clamped = GeonMath.clamp(state, this.min, this.max);
         let rest = state - this.min;
         let times = Math.round(rest / this.step);
         let stepped = this.min + this.step * times;
         this.state = GeonMath.clamp(stepped, this.min, this.max);
-        if (this.onset) this.onset(this.state);
+        if (activateOnSet && this.slider && this.text) this.onset();
     }
 
     getNPermutations() {
         return Math.min((this.max - this.min) / this.step + 1);
+    }
+
+    // TODO make this less tied together
+
+    private slider?: HTMLInputElement;
+    private text?: HTMLElement;
+
+    setSliderAndText(slider: HTMLInputElement, text: HTMLElement) {
+        this.slider = slider;
+        this.text = text;
+    }
+
+    private onset() {
+        this.slider!.valueAsNumber = this.state;
+        this.text!.innerText = this.state.toString();
     }
 }
 
@@ -276,5 +288,20 @@ export class EnumParameter {
 
     getNPermutations() {
         return this.p.getNPermutations();
+    }
+
+    // TODO make this less tied together
+
+    private slider?: HTMLInputElement;
+    private text?: HTMLElement;
+
+    setSliderAndText(slider: HTMLInputElement, text: HTMLElement) {
+        this.slider = slider;
+        this.text = text;
+    }
+
+    private onset() {
+        this.slider!.valueAsNumber = this.get();
+        this.text!.innerText = this.getName();
     }
 }

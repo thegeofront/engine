@@ -73,7 +73,7 @@ export class Camera {
         this.angleBeta = beta;
     }
 
-    updateMatrices(canvas: HTMLCanvasElement) {
+    private updateMatrices(canvas: HTMLCanvasElement) {
         this.worldMatrix = this.getWorldMatrix();
         this.projectMatrix = this.getProjectionMatrix(canvas);
         this.totalMatrix = this.worldMatrix.multiplied(this.projectMatrix);

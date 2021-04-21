@@ -16,6 +16,7 @@ import {
     DrawSpeed,
     Mesh,
     NormalRenderer,
+    Context,
 } from "../../src/lib";
 
 export class IcosahedronApp extends App {
@@ -119,7 +120,7 @@ export class IcosahedronApp extends App {
     start() {
         this.graph = this.getIcosahedron();
         this.mesh = graphToMultiMesh(this.graph, this.radius, this.detail, this.inner.get() == 1);
-        this.meshRend.set(this.gl, this.mesh);
+        this.meshRend.set(this.mesh);
         // this.normalRend.set(this.graph.toRenderable(), DrawSpeed.DynamicDraw);
 
         // console.log("all loops: ", this.graph.allLoops());
@@ -133,13 +134,13 @@ export class IcosahedronApp extends App {
             let rot = Matrix4.newXRotation(alpha).multiply(Matrix4.newYRotation(alpha));
             this.mesh!.transform(rot);
 
-            this.meshRend.set(this.gl, this.mesh, DrawSpeed.DynamicDraw);
+            this.meshRend.set(this.mesh, DrawSpeed.DynamicDraw);
         }
     }
 
     draw(gl: WebGLRenderingContext) {
-        this.camera.updateMatrices(gl.canvas as HTMLCanvasElement);
-        this.meshRend.render(gl, this.camera);
+        let c = new Context(this.camera);
+        this.meshRend.render(c);
         // this.normalRend.render(gl, this.camera);
     }
 }

@@ -18,6 +18,7 @@ import {
     Mesh,
     InputState,
     EnumParameter,
+    Context,
 } from "../../src/lib";
 
 export class MeshInspectorApp extends App {
@@ -129,12 +130,12 @@ export class MeshInspectorApp extends App {
 
         // TODO abstract this to scene
         if (this.shademethod.get() == 0) {
-            this.meshRenderer.buffer(this.gl, dmesh);
+            this.meshRenderer.set(dmesh);
         } else {
-            this.shadedMeshRenderer.set(this.gl, dmesh);
+            this.shadedMeshRenderer.set(dmesh);
         }
 
-        this.lineRenderer.set(this.gl, grid);
+        this.lineRenderer.set(grid);
         // this.dotRenderer.set(mesh.verts, DrawSpeed.StaticDraw);
     }
 
@@ -145,15 +146,16 @@ export class MeshInspectorApp extends App {
 
     draw(gl: WebGLRenderingContext) {
         // TODO abstract this to 'scene'
+        let c = new Context(this.camera);
         let matrix = this.camera.totalMatrix;
-        this.dotRenderer.render(gl, matrix);
+        this.dotRenderer.render(c);
 
         if (this.shademethod.get() == 0) {
-            this.meshRenderer.render(gl, this.camera);
+            this.meshRenderer.render(c);
         } else if (this.shademethod.get() == 1) {
-            this.shadedMeshRenderer.render(gl, this.camera);
+            this.shadedMeshRenderer.render(c);
         }
 
-        this.lineRenderer.render(gl, matrix);
+        this.lineRenderer.render(c);
     }
 }

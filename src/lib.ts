@@ -43,16 +43,19 @@ export * from "./mesh/mesh";
 export * from "./mesh/render-mesh";
 export * from "./mesh/topo-mesh";
 
-export * from "./renderers/billboard-renderer";
 export * from "./render/camera";
+export * from "./render/combo";
+export * from "./render/light";
+export * from "./render/context";
+export * from "./render/renderer";
+
+export * from "./renderers/billboard-renderer";
 export * from "./renderers/dot-renderer2";
 export * from "./renderers/dot-renderer3";
 export * from "./renderers/line-renderer";
 export * from "./renderers/mesh-debug-renderer";
 export * from "./renderers/mesh-normals-renderer";
 export * from "./renderers/rectangle-renderer";
-export * from "./render/renderer";
-// export * from "./render/scene";
 export * from "./renderers/shaded-mesh-renderer";
 export * from "./renderers/simple-mesh-renderer";
 export * from "./renderers/texture-mesh-renderer";
@@ -63,3 +66,5 @@ export * from "./system/fpsCounter";
 export * from "./system/input-state";
 export * from "./system/ui";
 export * from "./system/core";
+
+export * from "./rendercombos/image-combo";

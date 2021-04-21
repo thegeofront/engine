@@ -25,6 +25,7 @@ import {
     EnumParameter,
     GraphDebugRenderer,
     IntMatrix,
+    Context,
 } from "../../../src/lib";
 
 import {
@@ -145,13 +146,12 @@ export class SphericalThreeApp extends App {
     }
 
     draw(gl: WebGLRenderingContext) {
-        this.camera.updateMatrices(gl.canvas as HTMLCanvasElement);
-
+        let c = new Context(this.camera);
         this.meshRend.setShallow(this.gl, this.world);
-        this.meshRend.render(gl, this.camera);
+        this.meshRend.render(c);
 
-        this.meshRend.render(gl, this.camera);
-        this.floorRend.render(gl, this.camera);
+        this.meshRend.render(c);
+        this.floorRend.render(c);
     }
 
     bufferWorld() {
@@ -159,12 +159,12 @@ export class SphericalThreeApp extends App {
         this.world.calculateFaceNormals();
 
         this.world.color = [0.9, 0.9, 0.9, 1];
-        this.meshRend.set(this.gl, this.world, DrawSpeed.StaticDraw);
+        this.meshRend.set(this.world, DrawSpeed.StaticDraw);
 
         this.worldFloor = meshifyGraphSurface(this.graph);
         this.worldFloor.calculateFaceNormals();
         this.worldFloor.color = [0.3, 0.3, 0.3, 1];
-        this.floorRend.set(this.gl, this.worldFloor, DrawSpeed.StaticDraw);
+        this.floorRend.set(this.worldFloor, DrawSpeed.StaticDraw);
     }
 
     smoothWorld() {

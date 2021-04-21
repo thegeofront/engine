@@ -11,8 +11,9 @@ import { Vector3 } from "../math/vector";
 import { LineArray } from "../mesh/line-array";
 import { DrawSpeed, Renderer } from "../render/renderer";
 import { Mesh } from "../mesh/mesh";
+import { Context } from "../render/context";
 
-export class LineRenderer extends Renderer {
+export class LineRenderer extends Renderer<LineArray | Mesh> {
     a_position: number;
     a_position_buffer: WebGLBuffer;
     index_buffer: WebGLBuffer;
@@ -67,13 +68,9 @@ export class LineRenderer extends Renderer {
         this.vertCount = 0;
     }
 
-    set(
-        gl: WebGLRenderingContext,
-        data: LineArray | Mesh,
-        speed = DrawSpeed.StaticDraw,
-        personal = Matrix4.newIdentity(),
-    ) {
+    set(data: LineArray | Mesh, speed = DrawSpeed.StaticDraw, personal = Matrix4.newIdentity()) {
         // save how many faces need to be drawn
+        let gl = this.gl;
         let links;
         let verts;
         if (data instanceof Mesh) {
@@ -102,7 +99,9 @@ export class LineRenderer extends Renderer {
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, links.buffer, drawspeed);
     }
 
-    render(gl: WebGLRenderingContext, matrix: Matrix4) {
+    render(c: Context) {
+        let gl = this.gl;
+        let matrix = c.camera.totalMatrix;
         // Tell it to use our program (pair of shaders)
         // POINTERS MUST ALSO BE SET, DO EVERYTHING EXCEPT GL.BUFFERDATA
         gl.useProgram(this.program);
@@ -122,8 +121,8 @@ export class LineRenderer extends Renderer {
         gl.drawElements(gl.LINES, this.count, gl.UNSIGNED_SHORT, 0);
     }
 
-    setAndRender(gl: WebGLRenderingContext, matrix: Matrix4, data: LineArray) {
-        this.set(gl, data, DrawSpeed.DynamicDraw);
-        this.render(gl, matrix);
+    setAndRender(data: LineArray, c: Context) {
+        this.set(data, DrawSpeed.DynamicDraw);
+        this.render(c);
     }
 }

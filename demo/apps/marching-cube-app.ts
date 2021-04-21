@@ -20,6 +20,7 @@ import {
     Matrix4,
     Cube,
     Domain3,
+    Context,
 } from "../../src/lib";
 
 // TODO: MAKE IT 3D
@@ -110,6 +111,7 @@ export class MarchingCubeApp extends App {
         // get to-screen matrix
         const canvas = gl.canvas as HTMLCanvasElement;
         let matrix = this.camera.totalMatrix;
+        let c = new Context(this.camera);
 
         // render the grid
         // this.greyLineRenderer.render(gl, matrix);
@@ -119,7 +121,7 @@ export class MarchingCubeApp extends App {
 
         // render the map
         // TODO create MeshArray
-        this.meshRenderer.render(gl, this.camera);
+        this.meshRenderer.render(c);
 
         // render other things
         // for (let geo of this.geo) {
@@ -284,7 +286,7 @@ export class MarchingCubeApp extends App {
                 mapGeo.push(Mesh.fromCube(cube));
             }
         });
-        this.meshRenderer.buffer(this.gl, Mesh.fromJoin(mapGeo).toRenderable());
+        this.meshRenderer.set(Mesh.fromJoin(mapGeo).toRenderable());
     }
 
     worldToMap(coord: Vector3): Vector3 {

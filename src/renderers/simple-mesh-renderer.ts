@@ -2,13 +2,10 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of a mesh.
 
-import { IntMatrix } from "../data/int-matrix";
-import { Vector3Array } from "../data/vector-array";
-import { Renderable } from "../mesh/render-mesh";
-import { Matrix4 } from "../math/matrix";
-import { DrawSpeed, Renderer } from "../render/renderer";
+import { DrawSpeed, IntMatrix, Matrix4, Mesh, Renderable, Renderer, Vector3Array } from "../lib";
+import { Context } from "../render/context";
 
-export class SimpleMeshRenderer extends Renderer {
+export class SimpleMeshRenderer extends Renderer<Mesh> {
     // attribute & uniform locations
     a_position: number;
     a_position_buffer: WebGLBuffer;
@@ -61,19 +58,12 @@ export class SimpleMeshRenderer extends Renderer {
         this.index_buffer = gl.createBuffer()!;
     }
 
-    setMesh(gl: WebGLRenderingContext, rend: Renderable, speed: DrawSpeed = DrawSpeed.StaticDraw) {
-        return this.set(gl, rend.mesh.verts, rend.mesh.links, speed);
-    }
+    set(mesh: Mesh, speed: DrawSpeed = DrawSpeed.StaticDraw) {
+        let gl = this.gl;
 
-    set(
-        gl: WebGLRenderingContext,
-        verts: Vector3Array,
-        faces: IntMatrix,
-        speed: DrawSpeed = DrawSpeed.StaticDraw,
-    ) {
         // save how many faces need to be drawn
         gl.useProgram(this.program);
-        this.count = faces.data.length;
+        this.count = mesh.links.data.length;
 
         // vertices
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
@@ -81,15 +71,18 @@ export class SimpleMeshRenderer extends Renderer {
         var type = gl.FLOAT;
         var normalize = false;
         gl.vertexAttribPointer(this.a_position, this.size, gl.FLOAT, false, 0, 0);
-        gl.bufferData(gl.ARRAY_BUFFER, verts.data, this.convertDrawSpeed(speed));
+        gl.bufferData(gl.ARRAY_BUFFER, mesh.verts.data, this.convertDrawSpeed(speed));
 
         // indices
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, faces.data, this.convertDrawSpeed(speed));
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, mesh.links.data, this.convertDrawSpeed(speed));
     }
 
     // render 1 image to the screen
-    render(gl: WebGLRenderingContext, matrix: Matrix4) {
+    render(c: Context) {
+        let gl = this.gl;
+        let matrix = c.camera.totalMatrix;
+
         // Tell it to use our program (pair of shaders)
         gl.useProgram(this.program);
         gl.enableVertexAttribArray(this.a_position);
@@ -102,5 +95,10 @@ export class SimpleMeshRenderer extends Renderer {
 
         // Draw the point.
         gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
+    }
+
+    setAndRender(r: Mesh, context: Context): void {
+        this.set(r, DrawSpeed.DynamicDraw);
+        this.render(context);
     }
 }

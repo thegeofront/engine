@@ -4,6 +4,10 @@
 // credits to : https://webglfundamentals.org/
 // note: im still figuring out how to organize this
 
+import { Renderable } from "../mesh/render-mesh";
+import { Camera } from "./camera";
+import { Context } from "./context";
+
 // import { Scene } from "./scene";
 
 var nextTextureId = 0;
@@ -14,7 +18,8 @@ export enum DrawSpeed {
     DynamicDraw, // if you plan on using the 'set' method every frame
 }
 
-export class Renderer {
+// @param T = data to feed the renderer at 'set'
+export abstract class Renderer<T> {
     gl: WebGLRenderingContext;
     program: WebGLProgram;
 
@@ -23,9 +28,17 @@ export class Renderer {
         this.program = Renderer.createProgramFromScripts(gl, vertexScript, fragmentScript);
     }
 
-    buffer(...vars: any) {}
+    abstract set(r: T, speed: DrawSpeed): void;
 
-    render(...vars: any) {}
+    abstract render(context: Context): void;
+
+    setAndRender(r: T, context: Context) {
+        this.set(r, DrawSpeed.DynamicDraw);
+        this.render(context);
+    }
+
+    // helpers. these could live somewhere else... maybe in Context?
+    //#region
 
     static getNextTextureID() {
         let id = nextTextureId;
@@ -121,4 +134,6 @@ export class Renderer {
         let fragmentShader = Renderer.compileShader(gl, fragmentScript, gl.FRAGMENT_SHADER);
         return Renderer.createProgram(gl, vertexShader, fragmentShader);
     }
+
+    //#endregion
 }

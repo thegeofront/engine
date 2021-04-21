@@ -13,8 +13,9 @@ import { SimpleMeshRenderer } from "./simple-mesh-renderer";
 import { Camera } from "../render/camera";
 import { Vector3 } from "../math/vector";
 import { Const } from "../lib";
+import { Context } from "../render/context";
 
-export class ShadedMeshRenderer extends Renderer {
+export class ShadedMeshRenderer extends Renderer<Renderable> {
     // attribute & uniform locations
     a_vertex_position: number;
     a_vertex_postition_buffer: WebGLBuffer;
@@ -123,8 +124,9 @@ export class ShadedMeshRenderer extends Renderer {
         this.index_buffer = gl.createBuffer()!;
     }
 
-    set(gl: WebGLRenderingContext, rend: Renderable, speed: DrawSpeed = DrawSpeed.StaticDraw) {
+    set(rend: Renderable, speed: DrawSpeed = DrawSpeed.StaticDraw) {
         // NOTE: processing time is longer: we use DrawArray instead of DrawElements, to deal with normals & uv data
+        let gl = this.gl;
         this.setShallow(gl, rend);
 
         let normalType = rend.getNormalType();
@@ -244,8 +246,10 @@ export class ShadedMeshRenderer extends Renderer {
     }
 
     // render the previous set data to the screen
-    render(gl: WebGLRenderingContext, camera: Camera) {
+    render(c: Context) {
         // console.log("rendering..");
+        let gl = this.gl;
+        let camera = c.camera;
 
         // use the program
         gl.useProgram(this.program);

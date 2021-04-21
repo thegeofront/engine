@@ -11,8 +11,9 @@ import { Vector3 } from "../math/vector";
 import { getDefaultIndices, LineArray } from "../mesh/line-array";
 import { DrawSpeed, Renderer } from "../render/renderer";
 import { Camera } from "../render/camera";
+import { Context } from "../render/context";
 
-export class NormalRenderer extends Renderer {
+export class NormalRenderer extends Renderer<Renderable> {
     a_position: number;
     a_position_buffer: WebGLBuffer;
     index_buffer: WebGLBuffer;
@@ -75,8 +76,6 @@ export class NormalRenderer extends Renderer {
         this.vertCount = 0;
         this.scale = 0.4;
     }
-
-    setWithLists(pos: Vector3[], norms: Vector3[], speed = DrawSpeed.StaticDraw) {}
 
     // take a general render mesh, and extract normals
     set(rend: Renderable, speed = DrawSpeed.StaticDraw) {
@@ -154,8 +153,10 @@ export class NormalRenderer extends Renderer {
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, getDefaultIndices(this.count), drawspeed);
     }
 
-    render(gl: WebGLRenderingContext, camera: Camera) {
-        let matrix = camera.totalMatrix;
+    render(c: Context) {
+        let gl = this.gl;
+        let matrix = c.camera.totalMatrix;
+        let camera = c.camera;
 
         // Tell it to use our program (pair of shaders)
         // POINTERS MUST ALSO BE SET, DO EVERYTHING EXCEPT GL.BUFFERDATA

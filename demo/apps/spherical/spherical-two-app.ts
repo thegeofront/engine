@@ -23,6 +23,7 @@ import {
     EdgeIndex,
     EnumParameter,
     GraphDebugRenderer,
+    Context,
 } from "../../../src/lib";
 
 import { Stopwatch } from "../../../src/system/stopwatch";
@@ -31,7 +32,7 @@ import { graphToMultiMesh } from "../icosahedron-app";
 import { averageEdgeLength, laPlacian, quadification, squarification } from "./spherical";
 
 export class SphericalTwoApp extends App {
-    camera: Camera;
+    c: Context;
     meshRend: MeshDebugRenderer;
     debugRend: MeshDebugRenderer;
     graphRend: GraphDebugRenderer;
@@ -60,8 +61,8 @@ export class SphericalTwoApp extends App {
         super(gl, "Multiple Layers of spherical geometry");
 
         let canvas = gl.canvas as HTMLCanvasElement;
-        this.camera = new Camera(canvas, 1, true);
-        this.camera.set(-4.08, 1.24, -0.71);
+        this.c = new Context(new Camera(canvas, 1, true));
+        this.c.camera.set(-4.08, 1.24, -0.71);
         // this.meshRend = new ShadedMeshRenderer(gl);
         this.meshRend = new MeshDebugRenderer(gl, [0, 0, 0, 1], [0.3, 0.3, 0.3, 1], false);
         this.debugRend = new MeshDebugRenderer(gl, [0.5, 0, 0, 1], [0, 0, 0, 1], false);
@@ -75,7 +76,7 @@ export class SphericalTwoApp extends App {
         };
 
         this.rotate = new Parameter("rotate", 1, 0, 1, 1);
-        this.randomEdges = new Parameter("delete random edges", 1, 0, 1, 1);
+        this.randomEdges = new Parameter("delete edges", 1, 0, 1, 1);
         this.smooth = new Parameter("smooth", 0, 0, 1, 1);
         this.subCount = new Parameter("sub count", 2, 0, 4, 1);
         this.quadSubCount = new Parameter("sub count quad", 1, 0, 2, 1);
@@ -171,7 +172,7 @@ export class SphericalTwoApp extends App {
     }
 
     update(state: InputState) {
-        this.camera.update(state);
+        this.c.camera.update(state);
 
         let pulse = Math.sin(state.newTime);
 
@@ -215,11 +216,8 @@ export class SphericalTwoApp extends App {
     }
 
     draw(gl: WebGLRenderingContext) {
-        this.camera.updateMatrices(gl.canvas as HTMLCanvasElement);
-
         for (let world of [this.world, this.world2, this.world3]) {
-            this.meshRend.buffer(this.gl, world, DrawSpeed.DynamicDraw);
-            this.meshRend.render(gl, this.camera);
+            this.meshRend.setAndRender(world, this.c);
         }
 
         // this.graphRend.render(gl, this.camera);

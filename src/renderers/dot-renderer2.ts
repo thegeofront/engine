@@ -1,9 +1,10 @@
 // jos feenstra
 
 import { Vector2 } from "../math/vector";
+import { Context } from "../render/context";
 import { Renderer } from "../render/renderer";
 
-export class DotRenderer2 extends Renderer {
+export class DotRenderer2 extends Renderer<Vector2[]> {
     // attribute & uniform locations
     a_position: number;
     a_position_buffer: WebGLBuffer;
@@ -87,8 +88,13 @@ export class DotRenderer2 extends Renderer {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
     }
 
+    set() {}
+
+    render(context: Context): void {}
+
     // render 1 image to the screen
-    render(gl: WebGLRenderingContext, dots: Vector2[]) {
+    setAndRender(dots: Vector2[], context: Context) {
+        let gl = this.gl;
         // Tell it to use our program (pair of shaders)
         gl.useProgram(this.program);
 
