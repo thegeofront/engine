@@ -31,8 +31,8 @@ export class LeastSquaresApp extends App {
 
     // state
     points!: Vector3Array;
-    Pnormal!: Vector3Array;
     Plsa!: Vector3Array;
+    Pnormal!: Vector3Array;
 
     // render
     camera: Camera;

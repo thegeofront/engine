@@ -31,6 +31,13 @@ import { Context } from "./context";
 import { DrawSpeed, Renderer } from "./renderer";
 import { MeshPickRenderer } from "../renderers/pick-renderer";
 
+// staticcombo
+
+// dynacombo
+
+// multistaic combo
+// Vector3 & dotrenderer
+
 export class Combo<S, B, R extends Renderer<B>> {
     public state: S[];
     public buffered: B[] = [];

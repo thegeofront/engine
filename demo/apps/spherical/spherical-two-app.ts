@@ -184,9 +184,9 @@ export class SphericalTwoApp extends App {
             let roty = Matrix4.newYRotation(alpha);
             let rot = rotx.multiply(roty);
             this.graph.transform(rot);
-            this.world.position.multiply(rot);
-            this.world2.position.multiply(Matrix4.newXRotation(-alpha));
-            this.world3.position.multiply(Matrix4.newZRotation(-alpha));
+            this.world.transform(rot);
+            this.world2.transform(Matrix4.newXRotation(-alpha));
+            this.world3.transform(Matrix4.newZRotation(-alpha));
         }
 
         // sucessive over relaxation

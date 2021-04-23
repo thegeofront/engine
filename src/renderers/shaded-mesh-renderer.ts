@@ -132,6 +132,7 @@ export class ShadedMeshRenderer extends Renderer<Renderable> {
         let normalType = rend.getNormalType();
         if (normalType == NormalKind.Face) {
             // save how many verts need to be drawn
+
             gl.useProgram(this.program);
             this.count = rend.mesh.links.data.length;
             let ds = this.convertDrawSpeed(speed);
@@ -171,7 +172,7 @@ export class ShadedMeshRenderer extends Renderer<Renderable> {
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
             gl.bufferData(
                 gl.ELEMENT_ARRAY_BUFFER,
-                getDefaultIndices(this.count).buffer,
+                getDefaultIndices(this.count),
                 this.convertDrawSpeed(speed),
             );
         } else if (normalType == NormalKind.Vertex) {
@@ -205,8 +206,6 @@ export class ShadedMeshRenderer extends Renderer<Renderable> {
             // index
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
             gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, rend.mesh.links.data, ds);
-        } else if (normalType == NormalKind.MultiVertex) {
-            console.log("cannot render multi vertex normals");
         } else {
             console.log("cannot render with this normal data");
         }

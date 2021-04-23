@@ -41,8 +41,7 @@ export class MeshInspectorApp extends App {
     distance = new Parameter("distance", 3.0, 0, 4.0, 0.01);
     radius = new Parameter("radius", 1.0, 0, 4.0, 0.01);
     detail = new Parameter("detail", 5, 0, 100, 1);
-    renderNormals = new Parameter("render normals", 1, 0, 1, 0); // boolean Param
-    shademethod = EnumParameter.new("render method", 0, ["debug", "shaded"]);
+    shademethod = EnumParameter.new("render method", 0, ["debug", "vertex shaded", "face shaded"]);
 
     constructor(gl: WebGLRenderingContext) {
         // setup render env
@@ -73,10 +72,6 @@ export class MeshInspectorApp extends App {
         });
 
         ui.addParameter(this.detail, (value) => {
-            this.start();
-        });
-
-        ui.addBooleanParameter(this.renderNormals, (b) => {
             this.start();
         });
 
@@ -114,25 +109,18 @@ export class MeshInspectorApp extends App {
             ),
             Mesh.newCylinder(new Vector3(0, 0, -rad), new Vector3(0, 0, rad), rad, det),
         ]);
-        let dmesh = mesh.toRenderable();
-
-        if (this.renderNormals.get() == 1) {
-            // dmesh.calculateFaceNormals();
-            dmesh.calculateVertexNormals();
-        }
-
-        // console.log(new Parameter("shadeMethod",0,0,2,0.5).getNPermutations())
-
-        // let mesh = Mesh.fromCube(new Cube(this.plane, Domain3.fromRadius(1)));
-
-        // console.log(mesh.verts);
-        // console.log(mesh.links);
+        let rend = mesh.toRenderable();
+        rend.calculateVertexNormals();
 
         // TODO abstract this to scene
+        console.log("normal type", rend.getNormalType());
         if (this.shademethod.get() == 0) {
-            this.meshRenderer.set(dmesh);
+            this.meshRenderer.set(rend);
+        } else if (this.shademethod.get() == 1) {
+            this.shadedMeshRenderer.set(rend);
         } else {
-            this.shadedMeshRenderer.set(dmesh);
+            rend.calculateFaceNormals();
+            this.shadedMeshRenderer.set(rend);
         }
 
         this.lineRenderer.set(grid);
@@ -152,7 +140,7 @@ export class MeshInspectorApp extends App {
 
         if (this.shademethod.get() == 0) {
             this.meshRenderer.render(c);
-        } else if (this.shademethod.get() == 1) {
+        } else {
             this.shadedMeshRenderer.render(c);
         }
 

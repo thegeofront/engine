@@ -74,8 +74,14 @@ export class LineArray {
         // y lines
         for (let i = 0; i < count; i++) {
             let t = -halfTotalSize + dis * i;
-            lines.setVector(2 * count + i * 2, new Vector3(-halfTotalSize, -halfTotalSize + dis * i, 0));
-            lines.setVector(2 * count + i * 2 + 1, new Vector3(halfTotalSize, -halfTotalSize + dis * i, 0));
+            lines.setVector(
+                2 * count + i * 2,
+                new Vector3(-halfTotalSize, -halfTotalSize + dis * i, 0),
+            );
+            lines.setVector(
+                2 * count + i * 2 + 1,
+                new Vector3(halfTotalSize, -halfTotalSize + dis * i, 0),
+            );
         }
 
         // finally, transform everything to worldspace, and create the linerenderdata object
@@ -104,8 +110,14 @@ export class LineArray {
         // y lines
         for (let i = 0; i < count; i++) {
             let t = -halfTotalSize + dis * i;
-            lines.setVector(2 * count + i * 2, new Vector3(-halfTotalSize, -halfTotalSize + dis * i, 0));
-            lines.setVector(2 * count + i * 2 + 1, new Vector3(halfTotalSize, -halfTotalSize + dis * i, 0));
+            lines.setVector(
+                2 * count + i * 2,
+                new Vector3(-halfTotalSize, -halfTotalSize + dis * i, 0),
+            );
+            lines.setVector(
+                2 * count + i * 2 + 1,
+                new Vector3(halfTotalSize, -halfTotalSize + dis * i, 0),
+            );
         }
 
         // icon I  to show ihat
@@ -146,7 +158,10 @@ export class LineArray {
         for (let i = 0; i < count; i++) {
             // radial fraction of a circle
             let t = (i / count) * (Math.PI * 2);
-            verts.setVector(i, c.plane.pushToWorld(new Vector3(Math.cos(t) * c.radius, Math.sin(t) * c.radius, 0)));
+            verts.setVector(
+                i,
+                c.plane.pushToWorld(new Vector3(Math.cos(t) * c.radius, Math.sin(t) * c.radius, 0)),
+            );
         }
         return new LineArray(verts, getPairIndices(count));
     }
