@@ -121,16 +121,16 @@ export class InputState {
         this.minimumTick = 1000 / 144;
 
         // mouse
-        canvas.addEventListener("mousemove", this.setMousePos.bind(this));
         canvas.addEventListener("mousedown", this.setMouseDown.bind(this));
         canvas.addEventListener("mouseup", this.setMouseUp.bind(this));
         canvas.addEventListener("contextmenu", (e) => {
             e.preventDefault();
             e.stopPropagation();
         });
-        canvas.addEventListener("mousemove", this.setMousePos.bind(this));
+        document.addEventListener("mousemove", this.setMousePos.bind(this));
         canvas.addEventListener("wheel", this.setMouseScroll.bind(this));
-        canvas.addEventListener("touchmove", this.setTouch.bind(this));
+
+        document.addEventListener("touchmove", this.setTouch.bind(this));
         canvas.addEventListener("touchstart", this.setTouch.bind(this));
         canvas.addEventListener("touchend", this.setTouchUp.bind(this));
         for (let i = 0; i < 223; i++) this.keysDown[i] = false;

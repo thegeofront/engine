@@ -33,7 +33,6 @@ import {
     laPlacian,
     quadification,
     squarification,
-    constructRenderableFromSphereGraph,
     createGraph,
     createTileWorld,
     meshifyTileWorld,

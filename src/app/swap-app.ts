@@ -78,13 +78,7 @@ export class SwapApp extends App {
     update(state: InputState) {
         if (state.IsKeyPressed("m")) {
             // simple toggle
-            if (this.isuihidden) {
-                this.core.ui.show();
-                this.isuihidden = false;
-            } else {
-                this.core.ui.hide();
-                this.isuihidden = true;
-            }
+            this.core.ui.toggleVisibility();
         }
     }
 }

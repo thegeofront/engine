@@ -154,13 +154,13 @@ export function meshifyTileWorld(
     return rend;
 }
 
-export function constructRenderableFromSphereGraph(
+export function constructMeshFromSphereGraph(
     graph: Graph,
     radius: number, // to project back
     liftBot: number, //
     liftTop: number, //
     rand: number,
-): Renderable {
+): Mesh {
     // recalculate world mesh
     let scaler1 = 1 + liftBot / radius;
     let scaler2 = 1 + liftTop / radius;
@@ -192,8 +192,7 @@ export function constructRenderableFromSphereGraph(
         meshes.push(m);
     }
 
-    let rend = Mesh.fromJoin(meshes).toRenderable();
-    rend.calculateVertexNormals();
+    let rend = Mesh.fromJoin(meshes);
     return rend;
 }
 

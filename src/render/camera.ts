@@ -34,9 +34,11 @@ export class Camera {
 
     // settings
     canMove: boolean;
+    canControl: any;
 
-    constructor(canvas: HTMLCanvasElement, z_offset = 1, canMove = false) {
+    constructor(canvas: HTMLCanvasElement, z_offset = 1, canMove = false, canControl = true) {
         this.canMove = canMove;
+        this.canControl = canControl;
 
         this.pos = new Vector3(0, 0, 0);
         this.z_offset = -z_offset;
@@ -55,16 +57,41 @@ export class Camera {
 
         if (state.IsKeyPressed("p")) {
             console.log(
-                `printing camera status. 
-                pos: ${this.pos}, 
-                offset: ${this.offset}, 
-                speed: ${this.speed}, 
-                alpha ${this.angleAlpha},
-                beta: ${this.angleBeta}`,
+                "camera state: ",
+                this.pos.x,
+                this.pos.y,
+                this.pos.z,
+                this.z_offset,
+                this.angleAlpha,
+                this.angleBeta,
             );
+
+            // console.log(
+            //     `printing camera status.
+            //     pos: ${this.pos},
+            //     offset: ${this.offset},
+            //     speed: ${this.speed},
+            //     alpha ${this.angleAlpha},
+            //     beta: ${this.angleBeta}`,
+            // );
 
             console.log("speed is now: " + this.speed);
         }
+    }
+
+    // just a quick way of getting & setting
+
+    getState(): number[] {
+        return [this.pos.x, this.pos.y, this.pos.z, this.z_offset, this.angleAlpha, this.angleBeta];
+    }
+
+    setState(state: number[]) {
+        this.pos.x = state[0];
+        this.pos.y = state[1];
+        this.pos.z = state[2];
+        this.z_offset = state[3];
+        this.angleAlpha = state[4];
+        this.angleBeta = state[5];
     }
 
     set(offset: number, alpha: number, beta: number) {
@@ -89,6 +116,10 @@ export class Camera {
     }
 
     private updateControls(state: InputState) {
+        if (!this.canControl) {
+            return;
+        }
+
         let deltaScroll = state.scrollValue * 1.2;
 
         this.offset.z = Math.min(-0.001, this.z_offset - deltaScroll);

@@ -30,6 +30,7 @@ import {
 import { Context } from "./context";
 import { DrawSpeed, Renderer } from "./renderer";
 import { MeshPickRenderer } from "../renderers/pick-renderer";
+import { MetaRenderer } from "./meta-renderer";
 
 // staticcombo
 
@@ -38,7 +39,7 @@ import { MeshPickRenderer } from "../renderers/pick-renderer";
 // multistaic combo
 // Vector3 & dotrenderer
 
-export class Combo<S, B, R extends Renderer<B>> {
+export class Combi<S, B, R extends Renderer<B> | MetaRenderer<B>> {
     public state: S[];
     public buffered: B[] = [];
     public renderer: R;
@@ -48,27 +49,44 @@ export class Combo<S, B, R extends Renderer<B>> {
         state: S[],
         renderConstructor: (gl: WebGLRenderingContext) => R,
     ) {
-        this.state = state;
-        this.buffered = [];
+        this.state = [];
+        this.buffered;
         this.renderer = renderConstructor(gl);
-    }
-
-    add(item: S, buffer = true) {
-        this.state.push(item);
-        if (buffer) {
-            this.buffer();
-        }
     }
 
     protected buffer() {}
 
-    draw(context: Context) {
+    render(context: Context) {
         for (let i = 0; i < this.buffered.length; i++) {
             const b = this.buffered[i];
             this.renderer.setAndRender(b, context);
         }
     }
 }
+
+export class Combo<S, B, R extends Renderer<B> | MetaRenderer<B>> {
+    public state: S;
+    public buffered!: B;
+    public renderer: R;
+
+    protected constructor(
+        gl: WebGLRenderingContext,
+        state: S,
+        renderConstructor: (gl: WebGLRenderingContext) => R,
+    ) {
+        this.state = state;
+        this.buffered;
+        this.renderer = renderConstructor(gl);
+    }
+
+    protected buffer() {}
+
+    render(context: Context) {
+        this.renderer.render(context);
+    }
+}
+
+// Combi
 
 // // small tie-together of data & renderer.
 // // used to interact with the rendering behaviour of a renderableMesh.

@@ -12,21 +12,21 @@ import {
     Matrix4,
     App,
     UI,
-    ImageCombo,
+    ImageCombi,
     GeonImage,
     Context,
 } from "../../src/lib";
 
 export class UITestApp extends App {
     context: Context;
-    images: ImageCombo;
+    images: ImageCombi;
 
     constructor(gl: WebGLRenderingContext) {
         super(gl);
 
         let canvas = gl.canvas as HTMLCanvasElement;
         this.context = new Context(new Camera(canvas));
-        this.images = ImageCombo.new(gl);
+        this.images = ImageCombi.new(gl);
     }
 
     ui(ui: UI) {}
@@ -34,7 +34,7 @@ export class UITestApp extends App {
     start() {
         let img = new GeonImage(10, 10, 4);
         img.fill([255, 255, 255, 255]);
-        this.images.add(img);
+        this.images.state.push(img);
     }
 
     update(state: InputState) {
@@ -46,6 +46,6 @@ export class UITestApp extends App {
     }
 
     draw(gl: WebGLRenderingContext) {
-        this.images.draw(this.context);
+        this.images.render(this.context);
     }
 }

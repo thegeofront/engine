@@ -34,6 +34,15 @@ export class MeshDebugRenderer extends MetaRenderer<Renderable> {
         if (renderNormal) this.normRend = new NormalRenderer(gl);
     }
 
+    static new(
+        gl: WebGLRenderingContext,
+        faceColor = [1, 0, 0, 0.25],
+        edgeColor = [1, 0, 0, 1],
+        renderNormal = true,
+    ) {
+        return new MeshDebugRenderer(gl, faceColor, edgeColor, renderNormal);
+    }
+
     set(data: Renderable, speed: DrawSpeed = DrawSpeed.StaticDraw) {
         this.personal = data.position;
         this.faceRend.set(data.mesh);

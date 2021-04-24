@@ -2,18 +2,22 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of a mesh.
 
-import { DrawSpeed, IntMatrix, Matrix4, Mesh, Renderable, Renderer, Vector3Array } from "../lib";
+import { DrawSpeed, IntMatrix, Matrix4, Renderable, Renderer, Vector3Array } from "../lib";
 import { Context } from "../render/context";
 
-export class SimpleMeshRenderer extends Renderer<Mesh> {
+export class TransformMeshRenderer extends Renderer<Renderable> {
     // attribute & uniform locations
     a_position: number;
     a_position_buffer: WebGLBuffer;
     index_buffer: WebGLBuffer;
     u_transform: WebGLUniformLocation;
+    u_personal: WebGLUniformLocation;
     u_color: WebGLUniformLocation;
     count: number;
     size: number;
+
+    personal: Matrix4;
+    color: number[];
 
     constructor(gl: WebGLRenderingContext, color = [1, 0, 0, 0.25]) {
         const vs = `
@@ -22,10 +26,11 @@ export class SimpleMeshRenderer extends Renderer<Mesh> {
 
         attribute vec4 a_position;
         uniform mat4 u_transform;
+        uniform mat4 u_personal;
         uniform vec4 u_color;
 
         void main() {
-            gl_Position = u_transform * a_position;
+            gl_Position = u_transform * u_personal * a_position;
         }
         `;
 
@@ -44,10 +49,10 @@ export class SimpleMeshRenderer extends Renderer<Mesh> {
         super(gl, vs, fs);
 
         this.u_transform = gl.getUniformLocation(this.program, "u_transform")!;
+        this.u_personal = gl.getUniformLocation(this.program, "u_personal")!;
         this.u_color = gl.getUniformLocation(this.program, "u_color")!;
 
         gl.useProgram(this.program);
-        gl.uniform4f(this.u_color, color[0], color[1], color[2], color[3]);
         this.count = 0;
         this.size = 0;
 
@@ -57,10 +62,16 @@ export class SimpleMeshRenderer extends Renderer<Mesh> {
         this.a_position = gl.getAttribLocation(this.program, "a_position");
         this.a_position_buffer = gl.createBuffer()!;
         this.index_buffer = gl.createBuffer()!;
+
+        this.personal = Matrix4.newIdentity();
+        this.color = color;
     }
 
-    set(mesh: Mesh, speed: DrawSpeed = DrawSpeed.StaticDraw) {
+    set(data: Renderable, speed: DrawSpeed = DrawSpeed.StaticDraw) {
         let gl = this.gl;
+        let mesh = data.mesh;
+        this.color = data.color;
+        this.personal = data.position;
 
         // save how many faces need to be drawn
         gl.useProgram(this.program);
@@ -93,12 +104,14 @@ export class SimpleMeshRenderer extends Renderer<Mesh> {
 
         // set uniforms
         gl.uniformMatrix4fv(this.u_transform, false, matrix.data);
+        gl.uniformMatrix4fv(this.u_personal, false, this.personal.data);
+        gl.uniform4f(this.u_color, this.color[0], this.color[1], this.color[2], this.color[3]);
 
         // Draw the point.
         gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
     }
 
-    setAndRender(r: Mesh, context: Context): void {
+    setAndRender(r: Renderable, context: Context): void {
         this.set(r, DrawSpeed.DynamicDraw);
         this.render(context);
     }

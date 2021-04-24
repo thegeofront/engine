@@ -67,4 +67,4 @@ export * from "./system/input-state";
 export * from "./system/ui";
 export * from "./system/core";
 
-export * from "./rendercombos/image-combo";
+export * from "./rendercombos/image-combi";

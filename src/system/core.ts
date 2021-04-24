@@ -59,8 +59,8 @@ export class Core {
         const canvas = this.canvas;
         const gl = this.gl;
 
-        // put fps in the titel
-        document.title = "fps: " + this.fpsCounter.getFps();
+        // put fps in the title
+        // document.title = "fps: " + this.fpsCounter.getFps();
 
         // pre-gl business
         if (window.innerHeight != canvas.height || window.innerWidth != canvas.width) {

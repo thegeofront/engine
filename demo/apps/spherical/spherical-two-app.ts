@@ -1,6 +1,4 @@
-// TODO
-// - improve quadification: less triangles!
-// - improve squarification: speed & equal sizes
+// landing page
 
 import {
     App,
@@ -27,7 +25,7 @@ import {
 } from "../../../src/lib";
 
 import { Stopwatch } from "../../../src/system/stopwatch";
-import { constructRenderableFromSphereGraph } from "./spherical";
+import { constructMeshFromSphereGraph } from "./spherical";
 import { graphToMultiMesh } from "../icosahedron-app";
 import { averageEdgeLength, laPlacian, quadification, squarification } from "./spherical";
 
@@ -166,9 +164,27 @@ export class SphericalTwoApp extends App {
     }
 
     bufferWorld() {
-        this.world = constructRenderableFromSphereGraph(this.graph, this.radius, 0, 0.1, 0.6);
-        this.world2 = constructRenderableFromSphereGraph(this.graph, this.radius, 0.1, 0.2, 0.4);
-        this.world3 = constructRenderableFromSphereGraph(this.graph, this.radius, 0.2, 0.3, 0.2);
+        this.world = constructMeshFromSphereGraph(
+            this.graph,
+            this.radius,
+            0,
+            0.1,
+            0.6,
+        ).toRenderable();
+        this.world2 = constructMeshFromSphereGraph(
+            this.graph,
+            this.radius,
+            0.1,
+            0.2,
+            0.4,
+        ).toRenderable();
+        this.world3 = constructMeshFromSphereGraph(
+            this.graph,
+            this.radius,
+            0.2,
+            0.3,
+            0.2,
+        ).toRenderable();
     }
 
     update(state: InputState) {

@@ -5,7 +5,7 @@ const path = require('path');
 module.exports = [
 {
     name: 'demo',
-    devtool: "eval-source-map", // just source-map is slower, but nicer
+    // devtool: "eval-source-map", // just source-map is slower, but nicer
     entry: "./demo/index.ts", 
     mode: 'development',
     module: {

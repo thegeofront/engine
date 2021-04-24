@@ -24,6 +24,10 @@ export class Mesh {
         public links: IntMatrix, // relationships, can be 2 (lines) | 3 (triangles) | 4 (quads)
     ) {}
 
+    clone(): Mesh {
+        return new Mesh(this.verts.clone(), this.links.clone());
+    }
+
     static new(verts: Vector3Array, links: IntMatrix): Mesh {
         return new Mesh(verts, links);
     }
@@ -376,6 +380,36 @@ export class Mesh {
     }
 
     // CONVERTERS
+
+    toLines(): Mesh {
+        const getLines = (num: number) => {
+            let count = this.links.count() * num;
+            let lines = new IntMatrix(count, 2);
+            for (let i = 0; i < this.links.count(); i++) {
+                for (let j = 0; j < num; j++) {
+                    let jnext = (j + 1) % num;
+                    let iLines = i * num + j;
+                    lines.set(iLines, 0, this.links.get(i, j));
+                    lines.set(iLines, 1, this.links.get(i, jnext));
+                }
+            }
+            return lines;
+        };
+
+        let type = this.getType();
+        if (type == MeshType.Lines) {
+            return this.clone();
+        } else if (type == MeshType.Triangles) {
+            let lines = getLines(3);
+            return Mesh.new(this.verts.clone(), lines);
+        } else if (type == MeshType.Quads) {
+            let lines = getLines(4);
+            return Mesh.new(this.verts.clone(), lines);
+        } else {
+            console.warn("cannot convert to lines");
+            return Mesh.newEmpty(0, 0, 0);
+        }
+    }
 
     toRenderable(): Renderable {
         return Renderable.fromMesh(this);

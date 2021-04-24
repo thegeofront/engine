@@ -16,6 +16,15 @@ export class UI {
     // the context system makes sure that ui additions appear under the currently active,
     // selected app, and that these ui elements are removed when switching to another app.
 
+    toggleVisibility() {
+        // simple toggle
+        if (this.globalContext.hidden) {
+            this.show();
+        } else {
+            this.hide();
+        }
+    }
+
     hide() {
         this.globalContext.hidden = true;
     }

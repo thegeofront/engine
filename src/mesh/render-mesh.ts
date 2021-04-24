@@ -51,6 +51,7 @@ export class Renderable {
     // render speed
     // shader
     color = [1, 1, 1, 1];
+    linecolor = [1, 1, 1, 1];
 
     constructor(
         vertCount: number,
