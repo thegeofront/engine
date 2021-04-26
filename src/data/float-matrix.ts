@@ -15,10 +15,10 @@ export class FloatMatrix {
     print() {
         let strings: string[] = [];
         const WIDTH = 8;
-        for (var i = 0; i < this._height; i++) {
+        for (var i = 0; i < this._width; i++) {
             strings.push("|");
-            for (var j = 0; j < this._width; j++) {
-                let str = this.get(i, j).toFixed(2);
+            for (var j = 0; j < this._height; j++) {
+                let str = this.get(j, i).toFixed(2); // TODO THIS IS INCORRECT
                 str = str.padStart(WIDTH, " ");
                 strings.push(str);
 

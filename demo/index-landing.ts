@@ -34,27 +34,14 @@ function main() {
     core = new Core(canvas, gl, ui);
 
     // init swap app
-    let appCollection = [
-        UITestApp,
-        SphericalLandingApp,
-        SphericalTwoApp,
-        SphericalThreeApp,
-        SphericalOneApp,
-        LeastSquaresApp,
-        GeometryApp,
-        MeshInspectorApp,
-        IcosahedronApp,
-        DotApp3,
-        ObjLoaderApp,
-    ];
-
-    let swapApp = new SwapApp(gl, core, appCollection);
-    core.addApp(swapApp);
+    // let appCollection = [SphericalLandingApp];
+    // let swapApp = new SwapApp(gl, core, appCollection);
+    // core.addApp(swapApp);
     // swapApp.swap(0);
-    swapApp.swapFromUrl(location.hash, 1);
 
-    // a specific app dealing with webcams & other things
-    // addWebcamAppWhenReady(core, canvas, video);
+    // or do it directly
+    let sphereApp = new SphericalLandingApp(gl);
+    core.addApp(sphereApp);
 
     // infinite loop
     function loop() {

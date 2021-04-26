@@ -24,6 +24,7 @@ import {
 // good sites explaining the power of least squares
 // https://courses.physics.illinois.edu/cs357/sp2020/notes/ref-17-least-squares.html
 // http://textbooks.math.gatech.edu/ila/least-squares.html
+// https://www.cc.gatech.edu/classes/AY2016/cs4476_fall/results/proj3/html/cpaulus3/index.html
 
 export class LeastSquaresApp extends App {
     // ui
@@ -170,12 +171,25 @@ export class LeastSquaresApp extends App {
         let lsa_matrix = leastSquares(this.points, this.Pnormal);
         this.Plsa = this.points.clone().transform(lsa_matrix);
 
-        // show
+        // also just take the average of translation vectors
+        let translated = combine(this.points, this.Pnormal, (a, b) => {
+            return b.subbed(a);
+        });
+        let average = translated.average();
+        let avg_matrix = Matrix4.newTranslation(average.x, average.y, average.z);
+        this.Plsa = this.points.clone().transform(avg_matrix);
+
         console.log("original matrix: (blue)");
         M.print();
+        console.log(M.get(0, 3));
 
         console.log("lsa+svd recovered matrix from nothing but the points: (green)");
         lsa_matrix.print();
+
+        let lsa_trans_matrix = leastSquaresTranslation(this.points, this.Pnormal);
+
+        console.log("only translation matrix: (green)");
+        lsa_trans_matrix.print();
 
         // TODO something is going wrong with setting, so we are using set&render in the draw step every time...
         this.startGrid();
@@ -197,6 +211,25 @@ export class LeastSquaresApp extends App {
         this.drBlue.setAndRender(this.Pnormal, c);
         this.drGreen.setAndRender(this.Plsa, c);
     }
+}
+
+function combine(
+    va: Vector3Array,
+    vb: Vector3Array,
+    callback: (a: Vector3, b: Vector3) => Vector3,
+): Vector3Array {
+    let result = new Vector3Array(va.count());
+    if (va.count() != vb.count()) {
+        console.warn("not same length!");
+        return result;
+    }
+    let count = va.count();
+
+    for (let i = 0; i < count; i++) {
+        result.setVector(i, callback(va.getVector(i), vb.getVector(i)));
+    }
+
+    return result;
 }
 
 function createRandomPoints(count: number, range: number): Vector3Array {
@@ -259,4 +292,63 @@ function leastSquares(left: Vector3Array, right: Vector3Array): Matrix4 {
     // create the actual matrix
     let matrix = Matrix4.new([...col]);
     return matrix.transpose();
+}
+
+// The Same, but only recover the translation between the vectors
+function leastSquaresTranslation(left: Vector3Array, right: Vector3Array): Matrix4 {
+    if (left.count() != right.count()) {
+        throw "matrices need to be of equal width & height";
+    }
+
+    // construct linear system of equations
+    let n = left.count();
+
+    let left_width = 4;
+    let right_width = 3;
+
+    let height = right_width * n;
+    let width = 16;
+    let M = new FloatMatrix(height, width);
+
+    // per row in floatmatrix
+    for (let f = 0; f < n; f++) {
+        let l_vec = [...left.getRow(f), 1];
+        let r_vec = [...right.getRow(f), 1];
+
+        // go over x', y', z', 1 on the right side
+        for (let part = 0; part < right_width; part++) {
+            //
+            let i = f * right_width + part;
+            let offset = left_width * part;
+
+            // X  Y  Z  1  0  0  0  0 ...
+            for (let j = 0; j < l_vec.length; j++) {
+                M.set(i, j + offset, l_vec[j]);
+            }
+
+            // ... -v*X  -v*Y  -v*Z   -v*1
+            offset = width - left_width;
+            for (let j = 0; j < l_vec.length; j++) {
+                let v = M.get(i, j + offset);
+                M.set(i, j + offset, v + -1 * r_vec[part] * l_vec[j]);
+            }
+        }
+    }
+
+    M.print();
+
+    let [U, S, V] = Stat.svd(M);
+    let col = V.getColumn(V._width - 1);
+    let scaler = 1 / col[15];
+    for (let i = 0; i < col.length; i++) {
+        col[i] = Math.round(col[i] * scaler * 100000) / 100000;
+    }
+
+    // create the actual matrix
+    let matrix = Matrix4.new([...col]);
+    return matrix.transpose();
+}
+
+function leastSquaresGeneral(A: FloatMatrix, b: FloatMatrix): FloatMatrix {
+    return b;
 }
