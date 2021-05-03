@@ -1,18 +1,81 @@
+//
+
+import { Vector2, Vector3 } from "../math/vector";
 import { Parameter } from "../system/ui";
 
 // css classes
-const DUO_WRAPPER = "duo-wrapper";
-const DUO_HEADER = "duo-header";
-const DUO_BODY = "duo-body";
-const DUO_SLIDER_HOR = "duo-slider-hor";
-const DUO_SLIDER_VER = "duo-slider-ver";
-const DUO_CANVAS = "duo-canvas";
+const DUO_WRAPPER = "duo-param-wrapper";
+const DUO_HEADER = "duo-param-header";
+const DUO_BODY = "duo-param-body";
+// const DUO_SLIDER_HOR    = "duo-param-hor";
+// const DUO_SLIDER_VER    = "duo-param-ver";
+const DUO_CANVAS = "duo-param-canvas";
 
 export class DuoParameter {
-    constructor(public x: Parameter, public y: Parameter) {}
+    canvas: HTMLCanvasElement;
+    ctx: CanvasRenderingContext2D;
 
-    static new(name: string, x: Parameter, y: Parameter) {
-        return new DuoParameter(x, y);
+    x: Parameter;
+    y: Parameter;
+    state: Vector2; // state in parameter space
+
+    constructor(canvas: HTMLCanvasElement, x: Parameter, y: Parameter) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext("2d")!;
+        this.x = x;
+        this.y = y;
+        this.state = Vector2.new();
+        this.start();
+    }
+
+    static new(canvas: HTMLCanvasElement, x: Parameter, y: Parameter): DuoParameter {
+        return new DuoParameter(canvas, x, y);
+    }
+
+    static newFromImage(image: ImageData) {
+        // return this.new()
+    }
+
+    start() {
+        // set listeners
+        this.canvas.addEventListener("mouseenter", (e: MouseEvent) => {
+            this.updateState(e);
+            this.updateDraw();
+            console.log("on canvas!");
+        });
+
+        this.canvas.addEventListener("mousemove", (e: MouseEvent) => {
+            this.updateState(e);
+            this.updateDraw();
+        });
+
+        this.canvas.addEventListener("mouseleave", () => {
+            console.log("on leave!");
+        });
+    }
+
+    // the mouse is moving on the canvas, update everything accordingly
+    updateState(e: MouseEvent) {
+        var x = e.offsetX; // - e.offsetX; //x position within the element.
+        var y = e.offsetY; // - e.offsetY; //y position within the element.
+
+        this.x.set(x, false);
+        this.y.set(y, false);
+
+        if (e) {
+            this.state.set(x, y);
+        }
+
+        // console.log("mouse is at", x, y);
+        // if (e.but) this.state.set(x, y);
+    }
+
+    updateDraw() {
+        let ctx = this.ctx;
+        let width = this.canvas.width;
+        let height = this.canvas.height;
+        this.ctx.clearRect(0, 0, width, height);
+        drawCircle(ctx, this.state, 5, "red");
     }
 
     toHtml(): HTMLDivElement {
@@ -21,13 +84,16 @@ export class DuoParameter {
 
         div.innerHTML = `
             <p class=${DUO_HEADER}></p>
-            <div class = ${DUO_BODY}>
-                <input type="range" class=${DUO_SLIDER_HOR}></input>
-                <input type="range" class=${DUO_SLIDER_VER}></input>
-                <canvas class=${DUO_CANVAS}></canvas>
-            </div>
+            <canvas class=${DUO_CANVAS}></canvas>
         `;
 
         return div;
     }
+}
+
+function drawCircle(ctx: CanvasRenderingContext2D, pos: Vector2, radius: number, fill = "white") {
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = "red";
+    ctx.fill();
 }

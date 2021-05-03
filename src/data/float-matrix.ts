@@ -143,6 +143,7 @@ export class FloatMatrix {
     }
 
     // generalized multiplication
+
     multiply(b: FloatMatrix): FloatMatrix {
         let a = this;
         if (b._width !== a._height) {
@@ -184,3 +185,142 @@ export class FloatMatrix {
         return native;
     }
 }
+
+// stolen something from https://jamesmccaffrey.wordpress.com/2020/04/24/matrix-inverse-with-javascript/
+// James D. McCaffrey
+
+// function matInverse(m)
+// {
+//   // assumes determinant is not 0
+//   // that is, the matrix does have an inverse
+//   let n = m.length;
+//   let result = matMake(n, n, 0.0); // make a copy
+//   for (let i = 0; i less-than n; ++i) {
+//     for (let j = 0; j less-than n; ++j) {
+//       result[i][j] = m[i][j];
+//     }
+//   }
+
+//   let lum = matMake(n, n, 0.0); // combined lower & upper
+//   let perm = vecMake(n, 0.0);  // out parameter
+//   matDecompose(m, lum, perm);  // ignore return
+
+//   let b = vecMake(n, 0.0);
+//   for (let i = 0; i less-than n; ++i) {
+//     for (let j = 0; j less-than n; ++j) {
+//       if (i == perm[j])
+//         b[j] = 1.0;
+//       else
+//         b[j] = 0.0;
+//     }
+
+//     let x = reduce(lum, b); //
+//     for (let j = 0; j less-than n; ++j)
+//       result[j][i] = x[j];
+//   }
+//   return result;
+// }
+
+// function matDeterminant(m)
+// {
+//   let n = m.length;
+//   let lum = matMake(n, n, 0.0);;
+//   let perm = vecMake(n, 0.0);
+//   let result = matDecompose(m, lum, perm);  // -1 or +1
+//   for (let i = 0; i less-than n; ++i)
+//     result *= lum[i][i];
+//   return result;
+// }
+
+// function matDecompose(m, lum, perm)
+// {
+//   // Crout's LU decomposition for matrix determinant and inverse
+//   // stores combined lower & upper in lum[][]
+//   // stores row permuations into perm[]
+//   // returns +1 or -1 according to even or odd perms
+//   // lower gets dummy 1.0s on diagonal (0.0s above)
+//   // upper gets lum values on diagonal (0.0s below)
+
+//   let toggle = +1; // even (+1) or odd (-1) row permutatuions
+//   let n = m.length;
+
+//   // make a copy of m[][] into result lum[][]
+//   //lum = matMake(n, n, 0.0);
+//   for (let i = 0; i less-than n; ++i) {
+//     for (let j = 0; j less-than n; ++j) {
+//       lum[i][j] = m[i][j];
+//     }
+//   }
+
+//   // make perm[]
+//   //perm = vecMake(n, 0.0);
+//   for (let i = 0; i less-than n; ++i)
+//     perm[i] = i;
+
+//   for (let j = 0; j less-than n - 1; ++j) {  // note n-1
+//     let max = Math.abs(lum[j][j]);
+//     let piv = j;
+
+//     for (let i = j + 1; i less-than n; ++i) {  // pivot index
+//       let xij = Math.abs(lum[i][j]);
+//       if (xij greater-than max) {
+//         max = xij;
+//         piv = i;
+//       }
+//     } // i
+
+//     if (piv != j) {
+//       let tmp = lum[piv];  // swap rows j, piv
+//       lum[piv] = lum[j];
+//       lum[j] = tmp;
+
+//       let t = perm[piv];  // swap perm elements
+//       perm[piv] = perm[j];
+//       perm[j] = t;
+
+//       toggle = -toggle;
+//     }
+
+//     let xjj = lum[j][j];
+//     if (xjj != 0.0) {  // TODO: fix bad compare here
+//       for (let i = j + 1; i less-than n; ++i) {
+//         let xij = lum[i][j] / xjj;
+//         lum[i][j] = xij;
+//         for (let k = j + 1; k less-than n; ++k) {
+//           lum[i][k] -= xij * lum[j][k];
+//         }
+//       }
+//     }
+
+//   } // j
+
+//   return toggle;  // for determinant
+// } // matDecompose
+
+// function reduce(lum, b) // helper
+// {
+//   let n = lum.length;
+//   let x = vecMake(n, 0.0);
+//   for (let i = 0; i less-than n; ++i) {
+//     x[i] = b[i];
+//   }
+
+//   for (let i = 1; i less-than n; ++i) {
+//     let sum = x[i];
+//     for (let j = 0; j less-than i; ++j) {
+//       sum -= lum[i][j] * x[j];
+//     }
+//     x[i] = sum;
+//   }
+
+//   x[n - 1] /= lum[n - 1][n - 1];
+//   for (let i = n - 2; i greater-than-equal 0; --i) {
+//     let sum = x[i];
+//     for (let j = i + 1; j less-than n; ++j) {
+//       sum -= lum[i][j] * x[j];
+//     }
+//     x[i] = sum / lum[i][i];
+//   }
+
+//   return x;
+// } // reduce

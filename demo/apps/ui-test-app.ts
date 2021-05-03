@@ -15,11 +15,15 @@ import {
     ImageCombi,
     GeonImage,
     Context,
+    Parameter,
 } from "../../src/lib";
+import { DuoParameter } from "../../src/ui/duo-parameter";
 
 export class UITestApp extends App {
     context: Context;
     images: ImageCombi;
+
+    param!: DuoParameter;
 
     constructor(gl: WebGLRenderingContext) {
         super(gl);
@@ -29,7 +33,17 @@ export class UITestApp extends App {
         this.images = ImageCombi.new(gl);
     }
 
-    ui(ui: UI) {}
+    ui(ui: UI) {
+        let canvas = ui.addElement("canvas", "duo-param-canvas") as HTMLCanvasElement;
+        canvas.width = 400;
+        canvas.height = 400;
+
+        this.param = DuoParameter.new(
+            canvas,
+            new Parameter("x", 0, 0, 1, 0.01),
+            new Parameter("y", 0, 0, 1, 0.01),
+        );
+    }
 
     start() {
         let img = new GeonImage(10, 10, 4);

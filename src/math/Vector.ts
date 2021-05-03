@@ -36,7 +36,11 @@ export class Vector3 {
     }
 
     static fromLerp(v1: Vector3, v2: Vector3, alpha: number): Vector3 {
-        return new Vector3(v1.x + (v2.x - v1.x) * alpha, v1.y + (v2.y - v1.y) * alpha, v1.z + (v2.z - v1.z) * alpha);
+        return new Vector3(
+            v1.x + (v2.x - v1.x) * alpha,
+            v1.y + (v2.y - v1.y) * alpha,
+            v1.z + (v2.z - v1.z) * alpha,
+        );
     }
 
     static fromArray(a: Float32Array | number[] | Array<number>): Vector3 {
@@ -49,7 +53,11 @@ export class Vector3 {
 
     static fromSphere(radius: number, theta: number, phi: number): Vector3 {
         const sinPhiRadius = Math.sin(phi) * radius;
-        return this.constructor(sinPhiRadius * Math.sin(theta), Math.cos(phi) * radius, sinPhiRadius * Math.cos(theta));
+        return this.constructor(
+            sinPhiRadius * Math.sin(theta),
+            Math.cos(phi) * radius,
+            sinPhiRadius * Math.cos(theta),
+        );
     }
 
     static fromCylinder(radius: number, theta: number, height: number): Vector3 {
@@ -62,7 +70,11 @@ export class Vector3 {
         if (Math.abs(tP1 - tP2) < 0.00001) return p1;
         let mu = (t - tP1) / (tP2 - tP1);
 
-        return new Vector3(p1.x + mu * (p2.x - p1.x), p1.y + mu * (p2.y - p1.y), p1.z + mu * (p2.z - p1.z));
+        return new Vector3(
+            p1.x + mu * (p2.x - p1.x),
+            p1.y + mu * (p2.y - p1.y),
+            p1.z + mu * (p2.z - p1.z),
+        );
     }
 
     // #endregion
@@ -203,11 +215,19 @@ export class Vector3 {
     }
 
     minimumed(other: Vector3): Vector3 {
-        return new Vector3(Math.min(this.x, other.x), Math.min(this.y, other.y), Math.min(this.z, other.z));
+        return new Vector3(
+            Math.min(this.x, other.x),
+            Math.min(this.y, other.y),
+            Math.min(this.z, other.z),
+        );
     }
 
     maximumed(other: Vector3): Vector3 {
-        return new Vector3(Math.max(this.x, other.x), Math.max(this.y, other.y), Math.max(this.z, other.z));
+        return new Vector3(
+            Math.max(this.x, other.x),
+            Math.max(this.y, other.y),
+            Math.max(this.z, other.z),
+        );
     }
 
     clamped(min: Vector3, max: Vector3): Vector3 {
@@ -330,7 +350,11 @@ export class Vector3 {
     }
 
     lerp(other: Vector3, alpha: number): Vector3 {
-        return new Vector3((other.x - this.x) * alpha, (other.y - this.y) * alpha, (other.z - this.z) * alpha);
+        return new Vector3(
+            (other.x - this.x) * alpha,
+            (other.y - this.y) * alpha,
+            (other.z - this.z) * alpha,
+        );
     }
 
     // #endregion
@@ -375,6 +399,10 @@ export class Vector2 {
 
     // --- factories & other statics
 
+    static new(x = 0, y = 0) {
+        return new Vector2(x, y);
+    }
+
     static fromArray(a: Array<number>): Vector2 {
         return new Vector2(a[0], a[1]);
     }
@@ -401,7 +429,10 @@ export class Vector2 {
     // }
 
     static fromCircle(center: Vector2, radius: number, theta: number): Vector2 {
-        return new Vector2(center.x + radius * Math.sin(theta), center.y + radius * Math.cos(theta));
+        return new Vector2(
+            center.x + radius * Math.sin(theta),
+            center.y + radius * Math.cos(theta),
+        );
     }
 
     static fromCopy(other: Vector2): Vector2 {
@@ -652,7 +683,10 @@ export class Vector2 {
     }
 
     lerp(other: Vector2, alpha: number): Vector2 {
-        return new Vector2(this.x + (other.x - this.x) * alpha, this.y + (other.y - this.y) * alpha);
+        return new Vector2(
+            this.x + (other.x - this.x) * alpha,
+            this.y + (other.y - this.y) * alpha,
+        );
     }
 
     // calculate the 'triangle sign' of three points. Can be used to determine clockwise & counter clockwise
