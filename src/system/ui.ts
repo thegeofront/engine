@@ -247,7 +247,7 @@ export class Parameter {
         let times = Math.round(rest / this.step);
         let stepped = this.min + this.step * times;
         this.state = GeonMath.clamp(stepped, this.min, this.max);
-        if (activateOnSet && this.slider && this.text) this.onset();
+        if (activateOnSet) this.onset();
     }
 
     getNPermutations() {
@@ -259,14 +259,20 @@ export class Parameter {
     private slider?: HTMLInputElement;
     private text?: HTMLElement;
 
-    setSliderAndText(slider: HTMLInputElement, text: HTMLElement) {
+    setSlider(slider: HTMLInputElement) {
+        this.slider = slider;
+    }
+
+    setSliderAndText(slider: HTMLInputElement, text?: HTMLElement) {
         this.slider = slider;
         this.text = text;
     }
 
     private onset() {
-        this.slider!.valueAsNumber = this.state;
-        this.text!.innerText = this.state.toString();
+        if (this.slider)
+            this.slider.valueAsNumber = this.state;
+        if (this.text)
+            this.text.innerText = this.state.toString();
     }
 }
 
@@ -304,13 +310,19 @@ export class EnumParameter {
     private slider?: HTMLInputElement;
     private text?: HTMLElement;
 
-    setSliderAndText(slider: HTMLInputElement, text: HTMLElement) {
+    setSlider(slider: HTMLInputElement) {
+        this.slider = slider;
+    }
+
+    setSliderAndText(slider: HTMLInputElement, text?: HTMLElement) {
         this.slider = slider;
         this.text = text;
     }
 
     private onset() {
-        this.slider!.valueAsNumber = this.get();
-        this.text!.innerText = this.getName();
+        if (this.slider)
+            this.slider!.valueAsNumber = this.get();
+        if (this.text)
+            this.text!.innerText = this.getName();
     }
 }

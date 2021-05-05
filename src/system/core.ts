@@ -6,6 +6,7 @@ import { InputState } from "./input-state";
 import { App } from "../app/app";
 import { FpsCounter } from "./fpsCounter";
 import { UI } from "./ui";
+import { Renderer } from "../render/renderer";
 
 export class Core {
     canvas: HTMLCanvasElement;
@@ -13,6 +14,7 @@ export class Core {
     state: InputState;
     ui: UI;
     fpsCounter: FpsCounter;
+    fullscreen = true;
 
     private apps: Map<string, App>;
 
@@ -63,19 +65,21 @@ export class Core {
         // document.title = "fps: " + this.fpsCounter.getFps();
 
         // pre-gl business
-        if (window.innerHeight != canvas.height || window.innerWidth != canvas.width) {
-            canvas.height = window.innerHeight;
-            // canvas.clientHeight = window.innerHeight;
-            canvas.style.height = window.innerHeight.toString();
+        if (this.fullscreen) {
+            if (window.innerHeight != canvas.height || window.innerWidth != canvas.width) {
+                canvas.height = window.innerHeight;
+                // canvas.clientHeight = window.innerHeight;
+                canvas.style.height = window.innerHeight.toString();
 
-            canvas.width = window.innerWidth;
-            // canvas.clientWidth = window.innerWidth;
-            canvas.style.width = window.innerWidth.toString();
+                canvas.width = window.innerWidth;
+                // canvas.clientWidth = window.innerWidth;
+                canvas.style.width = window.innerWidth.toString();
 
-            gl.viewport(0, 0, window.innerWidth, window.innerHeight);
+                gl.viewport(0, 0, window.innerWidth, window.innerHeight);
+            }
+        } else {
         }
 
-        // Renderer.resizeCanvas(this.gl);
         this.gl.clearColor(0, 0, 0, 0);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
 

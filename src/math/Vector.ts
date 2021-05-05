@@ -14,7 +14,7 @@ export class Vector3 {
     // #region constructors
     constructor(public x: number, public y: number, public z: number) {}
 
-    static new(x: number, y: number, z: number) {
+    static new(x=0, y=0, z=0) {
         return new Vector3(x, y, z);
     }
 
