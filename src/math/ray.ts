@@ -2,7 +2,7 @@
 // purpose: infinite Ray used for projection and similar actions
 // notes:   found some nice examples at https://www.cs.princeton.edu/courses/archive/fall00/cs426/lectures/raycast/sld004.htm
 
-import { LineArray } from "../mesh/line-array";
+import { MultiLine } from "../mesh/multi-line";
 import { Plane } from "../geo/plane";
 import { Vector3 } from "./vector";
 
@@ -39,8 +39,8 @@ export class Ray {
         return -(ray.origin.dot(plane.normal) + plane.d) / ray.normal.dot(plane.normal);
     }
 
-    toLine(length: number): LineArray {
+    toLine(length: number): MultiLine {
         let toPoint = this.at(length);
-        return LineArray.fromLines([this.origin, toPoint]);
+        return MultiLine.fromLines([this.origin, toPoint]);
     }
 }

@@ -2,7 +2,7 @@
 // author:  Jos Feenstra
 // purpose: Represents a cube in 3d space, in a certain pose.
 
-import { Vector3Array } from "../data/vector-array";
+import { MultiVector3 } from "../data/multi-vector";
 import { Domain3 } from "../math/domain";
 import { Vector3 } from "../math/vector";
 import { Geo } from "./geo";

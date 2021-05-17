@@ -3,12 +3,12 @@
 // purpose: WebGL based rendering of lines.
 
 import { FloatMatrix } from "../data/float-matrix";
-import { Vector2Array, Vector3Array } from "../data/vector-array";
+import { MultiVector2, MultiVector3 } from "../data/multi-vector";
 import { NormalKind, Renderable } from "../mesh/render-mesh";
 import { Polyline } from "../geo/polyline";
 import { Matrix4 } from "../math/matrix";
 import { Vector3 } from "../math/vector";
-import { getDefaultIndices, LineArray } from "../mesh/line-array";
+import { getDefaultIndices, MultiLine } from "../mesh/multi-line";
 import { DrawSpeed, Renderer } from "../render/renderer";
 import { Camera } from "../render/camera";
 import { Context } from "../render/context";
@@ -85,8 +85,8 @@ export class NormalRenderer extends Renderer<Renderable> {
         let drawspeed = this.convertDrawSpeed(speed);
         this.vertCount = 3;
 
-        let lineverts: Vector3Array;
-        let normals: Vector3Array;
+        let lineverts: MultiVector3;
+        let normals: MultiVector3;
 
         // different buffer fills based upon normal kind
         let normalKind = rend.getNormalType();
@@ -94,8 +94,8 @@ export class NormalRenderer extends Renderer<Renderable> {
             let faceCount = rend.mesh.links.count();
             this.count = faceCount * 2;
 
-            lineverts = new Vector3Array(this.count);
-            normals = new Vector3Array(this.count);
+            lineverts = new MultiVector3(this.count);
+            normals = new MultiVector3(this.count);
 
             for (let f = 0; f < faceCount; f++) {
                 let center = rend.getFaceVertices(f).average();
@@ -113,8 +113,8 @@ export class NormalRenderer extends Renderer<Renderable> {
             let vertCount = rend.mesh.verts.count();
             this.count = vertCount * 2;
 
-            lineverts = new Vector3Array(this.count);
-            normals = new Vector3Array(this.count);
+            lineverts = new MultiVector3(this.count);
+            normals = new MultiVector3(this.count);
 
             for (let i = 0; i < vertCount; i++) {
                 let center = rend.mesh.verts.getVector(i);

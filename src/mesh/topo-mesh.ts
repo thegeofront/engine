@@ -1,6 +1,6 @@
 import { HashTable } from "../data/hash-table";
 import { IntMatrix } from "../data/int-matrix";
-import { Vector3Array } from "../data/vector-array";
+import { MultiVector3 } from "../data/multi-vector";
 import { Vector2, Vector3 } from "../math/vector";
 import { Renderable } from "./render-mesh";
 import { Triangle2, Triangle3 } from "../geo/triangle";
@@ -186,7 +186,7 @@ export class TopoMesh extends Renderable {
     closestFace(p: Vector3): number {
         // NOTE this doesnt really work all that well...
         let faceIds = this.closestFaces(p);
-        let closestPoints = new Vector3Array(faceIds.length);
+        let closestPoints = new MultiVector3(faceIds.length);
         faceIds.forEach((id, i) => {
             let tr = this.getTriangle3(id);
             let cp = tr.closestPoint(p);
@@ -257,7 +257,11 @@ export class TopoMesh extends Renderable {
     private getFacePoints(tr: number, uv: boolean): [any, any, any] {
         let pointIds = this.mesh.links.getRow(tr);
         if (uv) {
-            return [this.uvs.getVector(pointIds[0]), this.uvs.getVector(pointIds[1]), this.uvs.getVector(pointIds[2])];
+            return [
+                this.uvs.getVector(pointIds[0]),
+                this.uvs.getVector(pointIds[1]),
+                this.uvs.getVector(pointIds[2]),
+            ];
         } else {
             return [
                 this.mesh.verts.getVector(pointIds[0]),

@@ -4,10 +4,10 @@ import {
     LineRenderer,
     Camera,
     Vector3,
-    LineArray,
+    MultiLine,
     InputState,
     Parameter,
-    Vector3Array,
+    MultiVector3,
     DrawSpeed,
     Plane,
     Context,
@@ -22,7 +22,7 @@ export class SplineApp extends App {
 
     // state
     dots: Vector3[];
-    lines: LineArray[];
+    lines: MultiLine[];
 
     // render
     camera: Camera;
@@ -62,7 +62,7 @@ export class SplineApp extends App {
     ui(ui: UI) {}
 
     startGrid() {
-        let grid = LineArray.fromGrid(Plane.WorldXY(), 100, 2);
+        let grid = MultiLine.fromGrid(Plane.WorldXY(), 100, 2);
         this.lrGrid.set(grid, DrawSpeed.StaticDraw);
     }
 
@@ -76,7 +76,7 @@ export class SplineApp extends App {
         let c = new Context(this.camera);
 
         this.drRed.setAndRender(this.dots, c);
-        this.lrRed.setAndRender(LineArray.fromJoin(this.lines), c);
+        this.lrRed.setAndRender(MultiLine.fromJoin(this.lines), c);
         this.lrGrid.render(c);
     }
 }

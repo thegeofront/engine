@@ -1,7 +1,7 @@
 // author : Jos Feenstra
 // purpose : contain all logic regarding
 
-import { LineArray } from "../mesh/line-array";
+import { MultiLine } from "../mesh/multi-line";
 import { Plane } from "../geo/plane";
 import { GeonMath } from "../math/math";
 import { Matrix4 } from "../math/matrix";

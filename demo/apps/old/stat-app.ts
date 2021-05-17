@@ -6,7 +6,7 @@ import {
     Camera,
     Renderable,
     Vector3,
-    LineArray,
+    MultiLine,
     FloatMatrix,
     Stat,
     InputState,
@@ -25,7 +25,7 @@ export class StatApp extends App {
 
     obj?: Renderable;
     dots: Vector3[] = [];
-    renderable?: LineArray;
+    renderable?: MultiLine;
 
     constructor(gl: WebGLRenderingContext) {
         super(gl);

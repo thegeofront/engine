@@ -3,17 +3,17 @@
 // purpose: WebGL based rendering of lines.
 
 import { FloatMatrix } from "../data/float-matrix";
-import { Vector2Array, Vector3Array } from "../data/vector-array";
+import { MultiVector2, MultiVector3 } from "../data/multi-vector";
 import { Renderable } from "../mesh/render-mesh";
 import { Polyline } from "../geo/polyline";
 import { Matrix4 } from "../math/matrix";
 import { Vector3 } from "../math/vector";
-import { LineArray } from "../mesh/line-array";
+import { MultiLine } from "../mesh/multi-line";
 import { DrawSpeed, Renderer } from "../render/renderer";
 import { Mesh } from "../mesh/mesh";
 import { Context } from "../render/context";
 
-export class LineRenderer extends Renderer<LineArray | Mesh> {
+export class LineRenderer extends Renderer<MultiLine | Mesh> {
     a_position: number;
     a_position_buffer: WebGLBuffer;
     index_buffer: WebGLBuffer;
@@ -68,7 +68,7 @@ export class LineRenderer extends Renderer<LineArray | Mesh> {
         this.vertCount = 0;
     }
 
-    set(data: LineArray | Mesh, speed = DrawSpeed.StaticDraw, personal = Matrix4.newIdentity()) {
+    set(data: MultiLine | Mesh, speed = DrawSpeed.StaticDraw, personal = Matrix4.newIdentity()) {
         // save how many faces need to be drawn
         let gl = this.gl;
         let links;
@@ -121,7 +121,7 @@ export class LineRenderer extends Renderer<LineArray | Mesh> {
         gl.drawElements(gl.LINES, this.count, gl.UNSIGNED_SHORT, 0);
     }
 
-    setAndRender(data: LineArray, c: Context) {
+    setAndRender(data: MultiLine, c: Context) {
         this.set(data, DrawSpeed.DynamicDraw);
         this.render(c);
     }

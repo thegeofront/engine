@@ -3,12 +3,12 @@
 // purpose: WebGL based rendering of lines.
 
 import { FloatMatrix } from "../data/float-matrix";
-import { Vector2Array, Vector3Array } from "../data/vector-array";
+import { MultiVector2, MultiVector3 } from "../data/multi-vector";
 import { Renderable } from "../mesh/render-mesh";
 import { Polyline } from "../geo/polyline";
 import { Matrix4 } from "../math/matrix";
 import { Vector3 } from "../math/vector";
-import { LineArray } from "../mesh/line-array";
+import { MultiLine } from "../mesh/multi-line";
 import { DrawSpeed, Renderer } from "../render/renderer";
 import { Mesh } from "../mesh/mesh";
 import { Context } from "../render/context";

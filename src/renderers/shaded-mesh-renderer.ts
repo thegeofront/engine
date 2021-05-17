@@ -3,8 +3,8 @@
 // purpose: A shader wrapper for rendering shaded, textured, meshes
 
 import { IntMatrix } from "../data/int-matrix";
-import { getDefaultIndices, LineArray } from "../mesh/line-array";
-import { Vector3Array } from "../data/vector-array";
+import { getDefaultIndices, MultiLine } from "../mesh/multi-line";
+import { MultiVector3 } from "../data/multi-vector";
 import { NormalKind, Renderable } from "../mesh/render-mesh";
 import { Matrix4 } from "../math/matrix";
 import { DrawSpeed, Renderer } from "../render/renderer";
@@ -138,8 +138,8 @@ export class ShadedMeshRenderer extends Renderer<Renderable> {
             let ds = this.convertDrawSpeed(speed);
 
             // convert to non-indexed verts & norms
-            let verts = new Vector3Array(this.count);
-            let norms = new Vector3Array(this.count);
+            let verts = new MultiVector3(this.count);
+            let norms = new MultiVector3(this.count);
             let ambi = new Float32Array(this.count);
 
             let faceCount = rend.mesh.links.count();

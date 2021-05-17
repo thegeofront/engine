@@ -9,10 +9,10 @@ import {
     SimpleMeshRenderer,
     Camera,
     Renderable,
-    LineArray,
+    MultiLine,
     addDropFileEventListeners,
     InputState,
-    Vector3Array,
+    MultiVector3,
     Vector3,
     loadTextFromFile,
     meshFromObj,
@@ -28,7 +28,7 @@ export class ObjLoaderApp extends App {
     camera: Camera;
 
     obj?: Renderable;
-    renderable?: LineArray;
+    renderable?: MultiLine;
 
     constructor(gl: WebGLRenderingContext) {
         super(gl);
@@ -58,7 +58,7 @@ export class ObjLoaderApp extends App {
 
         if (this.obj == undefined)
             this.dotRenderer.setAndRender(
-                Vector3Array.fromList([new Vector3(0, 0, 0), new Vector3(1, 1, 1)]),
+                MultiVector3.fromList([new Vector3(0, 0, 0), new Vector3(1, 1, 1)]),
                 c,
             );
         else {
@@ -76,7 +76,7 @@ async function processFiles(this: ObjLoaderApp, files: FileList) {
     // see if we can build an correct obj from the files
     let objtext = await loadTextFromFile(file);
     this.obj = meshFromObj(objtext);
-    this.renderable = LineArray.fromMesh(this.obj);
+    this.renderable = MultiLine.fromMesh(this.obj);
 
     // scale down if too big.
     // NOTE: this could also be done using matrices. Figure that out!

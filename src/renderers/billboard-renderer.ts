@@ -2,7 +2,7 @@
 // author:  Jos Feenstra
 // purpose: Renderer images as billboards.
 
-import { Vector2Array, Vector3Array } from "../data/vector-array";
+import { MultiVector2, MultiVector3 } from "../data/multi-vector";
 import { GeonImage } from "../img/Image";
 import { Renderable } from "../mesh/render-mesh";
 import { Context } from "../render/context";
@@ -13,8 +13,8 @@ import { DrawSpeed, Renderer } from "../render/renderer";
 
 type RenderPackage = {
     texture: GeonImage;
-    dots: Vector3Array;
-    textureDots: Vector2Array;
+    dots: MultiVector3;
+    textureDots: MultiVector2;
 };
 
 // this is just a template for copy-pasting

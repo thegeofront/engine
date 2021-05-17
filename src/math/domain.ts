@@ -5,7 +5,7 @@
 //
 
 import { FloatMatrix } from "../data/float-matrix";
-import { Vector2Array, Vector3Array } from "../data/vector-array";
+import { MultiVector2, MultiVector3 } from "../data/multi-vector";
 import { Matrix4 } from "./matrix";
 import { Vector2, Vector3 } from "./vector";
 
@@ -116,9 +116,12 @@ export class Domain2 {
         return new Domain2(new Domain(x0, x1), new Domain(y0, y1));
     }
 
-    static fromInclude(data: Vector2Array | FloatMatrix): Domain2 {
+    static fromInclude(data: MultiVector2 | FloatMatrix): Domain2 {
         // note : could be quicker by going verbose, this now iterates over data 4 times
-        return new Domain2(Domain.fromInclude(data.getColumn(0)), Domain.fromInclude(data.getColumn(1)));
+        return new Domain2(
+            Domain.fromInclude(data.getColumn(0)),
+            Domain.fromInclude(data.getColumn(1)),
+        );
     }
 
     offset(xXyYoffset: number[]) {
@@ -199,7 +202,14 @@ export class Domain3 {
         this.z = z;
     }
 
-    static fromBounds(x0: number, x1: number, y0: number, y1: number, z0: number, z1: number): Domain3 {
+    static fromBounds(
+        x0: number,
+        x1: number,
+        y0: number,
+        y1: number,
+        z0: number,
+        z1: number,
+    ): Domain3 {
         return new Domain3(new Domain(x0, x1), new Domain(y0, y1), new Domain(z0, z1));
     }
 
@@ -211,7 +221,7 @@ export class Domain3 {
         return new Domain3(Domain.fromRadius(rx), Domain.fromRadius(ry), Domain.fromRadius(rz));
     }
 
-    static fromInclude(data: Vector3Array): Domain3 {
+    static fromInclude(data: MultiVector3): Domain3 {
         // note : could be quicker by going verbose, this now iterates over data 6 times
         return new Domain3(
             Domain.fromInclude(data.getColumn(0)),
@@ -242,7 +252,11 @@ export class Domain3 {
 
     normalize(value: Vector3): Vector3 {
         // normalize a parameter
-        return new Vector3(this.x.normalize(value.x), this.y.normalize(value.y), this.z.normalize(value.z));
+        return new Vector3(
+            this.x.normalize(value.x),
+            this.y.normalize(value.y),
+            this.z.normalize(value.z),
+        );
     }
 
     elevate(t: Vector3): Vector3 {
@@ -256,9 +270,9 @@ export class Domain3 {
         return other.elevate(norm);
     }
 
-    remapAll(values: Vector3Array, other: Domain3 = new Domain3()): Vector3Array {
+    remapAll(values: MultiVector3, other: Domain3 = new Domain3()): MultiVector3 {
         // normalize a value, then elevate it to a new domain
-        let newValues = new Vector3Array(values.count());
+        let newValues = new MultiVector3(values.count());
         for (let i = 0; i < values.count(); i++) {
             let norm = this.normalize(values.getVector(i));
             newValues.setVector(i, other.elevate(norm));

@@ -10,7 +10,7 @@
 //   - quads (links.width = 4. will need to be converted to triangles)
 
 import { IntMatrix } from "../data/int-matrix";
-import { Vector2Array, Vector3Array } from "../data/vector-array";
+import { MultiVector2, MultiVector3 } from "../data/multi-vector";
 import { Vector2, Vector3 } from "../math/vector";
 import { Cube } from "../geo/cube";
 import { Rectangle3 } from "../geo/rectangle";
@@ -39,8 +39,8 @@ export enum NormalKind {
 export class Renderable {
     mesh: Mesh;
 
-    norms: Vector3Array;
-    uvs: Vector2Array;
+    norms: MultiVector3;
+    uvs: MultiVector2;
     ambi: Float32Array;
     texture?: ImageData;
 
@@ -62,8 +62,8 @@ export class Renderable {
     ) {
         let perFaceCount = 3;
         this.mesh = Mesh.newEmpty(vertCount, faceCount, perFaceCount);
-        this.norms = new Vector3Array(normCount);
-        this.uvs = new Vector2Array(uvCount);
+        this.norms = new MultiVector3(normCount);
+        this.uvs = new MultiVector2(uvCount);
         this.ambi = new Float32Array(vertCount);
         this.texture = texture;
         this.position = Matrix4.newIdentity();
@@ -106,7 +106,7 @@ export class Renderable {
     static fromGraph(graph: Graph) {
         let mesh = graph.toMesh();
         let r = Renderable.fromMesh(mesh);
-        r.norms = Vector3Array.fromList(graph.allNorms());
+        r.norms = MultiVector3.fromList(graph.allNorms());
         r._normKind = NormalKind.Vertex; // fix this!!
         return r;
     }
@@ -136,7 +136,7 @@ export class Renderable {
         return faces;
     }
 
-    getFaceVertices(f: faceID): Vector3Array {
+    getFaceVertices(f: faceID): MultiVector3 {
         return this.mesh.getLinkVerts(f);
     }
 
@@ -155,7 +155,7 @@ export class Renderable {
         // recalculate things if needed
     }
 
-    setUvs(uvs: Vector2Array | Float32Array) {
+    setUvs(uvs: MultiVector2 | Float32Array) {
         if (uvs instanceof Float32Array) {
             this.uvs!.data = uvs;
         } else {
@@ -176,17 +176,17 @@ export class Renderable {
     calculateFaceNormals() {
         if (this.getType() != MeshType.Triangles) {
             console.error("can only calculate normals from triangular meshes");
-            this.norms = new Vector3Array(0);
+            this.norms = new MultiVector3(0);
             return;
         }
         let norms = this.mesh.calculateFaceNormals();
-        this.norms = Vector3Array.fromList(norms);
+        this.norms = MultiVector3.fromList(norms);
         this._normKind = NormalKind.Face;
     }
 
     calculateVertexNormals() {
         let norms = this.mesh.calculateVertexNormals();
-        this.norms = Vector3Array.fromList(norms);
+        this.norms = MultiVector3.fromList(norms);
         this._normKind = NormalKind.Vertex;
     }
 
@@ -196,7 +196,7 @@ export class Renderable {
 
         // calculate
         this.calculateFaceNormals();
-        let vertNormals = new Vector3Array(this.mesh.verts.count());
+        let vertNormals = new MultiVector3(this.mesh.verts.count());
         this.mesh.verts.forEach((v, i) => {
             let adjFaces = this.getAdjacentFaces(i);
             vertNormals.setVector(i, this.norms.take(adjFaces).average());

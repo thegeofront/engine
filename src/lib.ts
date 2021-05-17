@@ -11,7 +11,7 @@ export * from "./data/hash-table";
 export * from "./data/int-cube";
 export * from "./data/int-matrix";
 export * from "./data/linked-list";
-export * from "./data/vector-array";
+export * from "./data/multi-vector";
 
 export * from "./geo/circle2";
 export * from "./geo/circle3";
@@ -38,7 +38,7 @@ export * from "./math/util";
 export * from "./math/vector";
 
 export * from "./mesh/graph";
-export * from "./mesh/line-array";
+export * from "./mesh/multi-line";
 export * from "./mesh/mesh";
 export * from "./mesh/render-mesh";
 export * from "./mesh/topo-mesh";

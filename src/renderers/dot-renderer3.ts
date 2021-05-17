@@ -1,13 +1,13 @@
 // jos feenstra
 
 import { FloatMatrix } from "../data/float-matrix";
-import { getGeneralFloatMatrix, Vector2Array, Vector3Array } from "../data/vector-array";
+import { getGeneralFloatMatrix, MultiVector2, MultiVector3 } from "../data/multi-vector";
 import { Matrix4 } from "../math/matrix";
 import { Vector2, Vector3 } from "../math/vector";
 import { Context } from "../render/context";
 import { DrawSpeed, Renderer } from "../render/renderer";
 
-type Points = Vector2Array | Vector3Array | Vector2[] | Vector3[];
+type Points = MultiVector2 | MultiVector3 | Vector2[] | Vector3[];
 
 export class DotRenderer3 extends Renderer<Points> {
     // attribute & uniform locations

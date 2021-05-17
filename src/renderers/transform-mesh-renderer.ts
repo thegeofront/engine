@@ -2,7 +2,7 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of a mesh.
 
-import { DrawSpeed, IntMatrix, Matrix4, Renderable, Renderer, Vector3Array } from "../lib";
+import { DrawSpeed, IntMatrix, Matrix4, Renderable, Renderer, MultiVector3 } from "../lib";
 import { Context } from "../render/context";
 
 export class TransformMeshRenderer extends Renderer<Renderable> {

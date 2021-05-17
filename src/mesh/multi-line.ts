@@ -4,7 +4,7 @@
 //          use it to not continuously have to calculate these aspects if the underlying object is unchanged.
 
 import { FloatMatrix } from "../data/float-matrix";
-import { getGeneralFloatMatrix, Vector2Array, Vector3Array } from "../data/vector-array";
+import { getGeneralFloatMatrix, MultiVector2, MultiVector3 } from "../data/multi-vector";
 import { Circle2 } from "../geo/circle2";
 import { Circle3 } from "../geo/circle3";
 import { Cube } from "../geo/cube";
@@ -15,7 +15,7 @@ import { Matrix4 } from "../math/matrix";
 import { Vector2, Vector3 } from "../math/vector";
 
 // represents a collection of multiple lines. These could form 1 polyline, but this is not a requirement
-export class LineArray {
+export class MultiLine {
     verts: FloatMatrix;
     links: Uint16Array;
 
@@ -29,13 +29,13 @@ export class LineArray {
     }
 
     // this assumes even vectices are 'from' points, and odd vertices are 'to' points
-    static fromLines(verts: Vector2[] | Vector3[] | Vector2Array | Vector3Array) {
+    static fromLines(verts: Vector2[] | Vector3[] | MultiVector2 | MultiVector3) {
         let data = getGeneralFloatMatrix(verts);
-        return new LineArray(data);
+        return new MultiLine(data);
     }
 
     // get all lines from a mesh
-    static fromMesh(rend: Renderable, uv = false): LineArray {
+    static fromMesh(rend: Renderable, uv = false): MultiLine {
         // 3 edges per face, 2 indices per edge
         let mesh = rend.mesh;
         let count = mesh.links.count() * 6;
@@ -50,9 +50,9 @@ export class LineArray {
             data[iData + 5] = mesh.links.get(i, 0);
         }
         if (uv) {
-            return new LineArray(rend.uvs, data);
+            return new MultiLine(rend.uvs, data);
         } else {
-            return new LineArray(mesh.verts, data);
+            return new MultiLine(mesh.verts, data);
         }
     }
 
@@ -62,7 +62,7 @@ export class LineArray {
 
         // 2 vectors per line, 2 lines per count
         // plus 5 lines, for ihat and jhat icons
-        let lines = new Vector3Array(count * 4);
+        let lines = new MultiVector3(count * 4);
 
         // x lines
         for (let i = 0; i < count; i++) {
@@ -86,11 +86,11 @@ export class LineArray {
 
         // finally, transform everything to worldspace, and create the linerenderdata object
         lines.forEach((v) => plane.pushToWorld(v));
-        return new LineArray(lines);
+        return new MultiLine(lines);
     }
 
     // get all lines from a plane
-    static fromPlane(plane: Plane): LineArray {
+    static fromPlane(plane: Plane): MultiLine {
         let count = Const.PLANE_RENDER_LINECOUNT;
         let dis = Const.PLANE_RENDER_LINEDISTANCE;
         let disSmall = dis / 10;
@@ -98,7 +98,7 @@ export class LineArray {
 
         // 2 vectors per line, 2 lines per count
         // plus 5 lines, for ihat and jhat icons
-        let lines = new Vector3Array(count * 4 + 5 * 2);
+        let lines = new MultiVector3(count * 4 + 5 * 2);
 
         // x lines
         for (let i = 0; i < count; i++) {
@@ -145,13 +145,13 @@ export class LineArray {
 
         // finally, transform everything to worldspace, and create the linerenderdata object
         lines.forEach((v) => plane.pushToWorld(v));
-        return new LineArray(lines);
+        return new MultiLine(lines);
     }
 
     // get all lines representing a circle in 2d. use an optional matrix to
-    static fromCircle(c: Circle3, numSegments = Const.CIRCLE_SEGMENTS): LineArray {
+    static fromCircle(c: Circle3, numSegments = Const.CIRCLE_SEGMENTS): MultiLine {
         let count = numSegments;
-        let verts = new Vector3Array(count);
+        let verts = new MultiVector3(count);
 
         // x lines
         for (let i = 0; i < count; i++) {
@@ -162,7 +162,7 @@ export class LineArray {
                 c.plane.pushToWorld(new Vector3(Math.cos(t) * c.radius, Math.sin(t) * c.radius, 0)),
             );
         }
-        return new LineArray(verts, getPairIndices(count));
+        return new MultiLine(verts, getPairIndices(count));
     }
 
     // turn a spline into a polyline, and render it
@@ -170,13 +170,13 @@ export class LineArray {
         throw "todo!";
     }
 
-    static fromCube(cube: Cube): LineArray {
-        let verts = Vector3Array.fromList(cube.getCorners());
+    static fromCube(cube: Cube): MultiLine {
+        let verts = MultiVector3.fromList(cube.getCorners());
 
-        return new LineArray(verts);
+        return new MultiLine(verts);
     }
 
-    static fromJoin(lines: LineArray[]): LineArray {
+    static fromJoin(lines: MultiLine[]): MultiLine {
         // join meshes, dont try to look for duplicate vertices
         // TODO : make this the trouble of Matrices and Arrays
         let idsCount = 0;
@@ -186,7 +186,7 @@ export class LineArray {
             vertCount += line.verts.count();
         }
 
-        let verts = new Vector3Array(vertCount);
+        let verts = new MultiVector3(vertCount);
         let ids = new Uint16Array(idsCount);
 
         let accVerts = 0;
@@ -202,7 +202,7 @@ export class LineArray {
             accFaces += lineset.links.length;
         }
 
-        return new LineArray(verts, ids);
+        return new MultiLine(verts, ids);
     }
 }
 

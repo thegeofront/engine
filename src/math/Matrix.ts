@@ -3,7 +3,7 @@
 // TODO: FIX MATRIX4 !!!
 // NOTE:
 
-import { Vector3Array } from "../data/vector-array";
+import { MultiVector3 } from "../data/multi-vector";
 import { FloatMatrix } from "../data/float-matrix";
 import { Quaternion } from "./quaternion";
 import { Vector2, Vector3 } from "./vector";
@@ -979,7 +979,7 @@ export class Matrix4 extends FloatMatrix {
         return new Vector3(data[0], data[1], data[2]);
     }
 
-    multiplyVectors(other: Vector3Array): Vector3Array {
+    multiplyVectors(other: MultiVector3): MultiVector3 {
         // dumb way
         for (let i = 0; i < this.count(); i++) {
             let vec = other.getVector(i);

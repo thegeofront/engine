@@ -6,13 +6,13 @@ import {
     Camera,
     Renderable,
     Vector3,
-    LineArray,
+    MultiLine,
     FloatMatrix,
     Stat,
     InputState,
     UI,
     Parameter,
-    Vector3Array,
+    MultiVector3,
     Domain3,
     Matrix4,
     DrawSpeed,
@@ -31,9 +31,9 @@ export class LeastSquaresApp extends App {
     params: Parameter[] = [];
 
     // state
-    points!: Vector3Array;
-    Plsa!: Vector3Array;
-    Pnormal!: Vector3Array;
+    points!: MultiVector3;
+    Plsa!: MultiVector3;
+    Pnormal!: MultiVector3;
 
     // render
     camera: Camera;
@@ -128,7 +128,7 @@ export class LeastSquaresApp extends App {
     }
 
     startGrid() {
-        let grid = LineArray.fromGrid(Plane.WorldXY().moveTo(new Vector3(0, 0, -1)), 100, 2);
+        let grid = MultiLine.fromGrid(Plane.WorldXY().moveTo(new Vector3(0, 0, -1)), 100, 2);
         this.lineRenderer.set(grid, DrawSpeed.StaticDraw);
     }
 
@@ -214,11 +214,11 @@ export class LeastSquaresApp extends App {
 }
 
 function combine(
-    va: Vector3Array,
-    vb: Vector3Array,
+    va: MultiVector3,
+    vb: MultiVector3,
     callback: (a: Vector3, b: Vector3) => Vector3,
-): Vector3Array {
-    let result = new Vector3Array(va.count());
+): MultiVector3 {
+    let result = new MultiVector3(va.count());
     if (va.count() != vb.count()) {
         console.warn("not same length!");
         return result;
@@ -232,9 +232,9 @@ function combine(
     return result;
 }
 
-function createRandomPoints(count: number, range: number): Vector3Array {
+function createRandomPoints(count: number, range: number): MultiVector3 {
     let bounds = Domain3.fromBounds(-range, range, -range, range, -range, range);
-    let arr = new Vector3Array(count);
+    let arr = new MultiVector3(count);
     for (let i = 0; i < count; i++) {
         arr.setVector(i, bounds.elevate(Vector3.fromRandom()));
     }
@@ -242,7 +242,7 @@ function createRandomPoints(count: number, range: number): Vector3Array {
 }
 
 // solve x for Ax = b, where in this case, A = left, b = right.
-function leastSquares(left: Vector3Array, right: Vector3Array): Matrix4 {
+function leastSquares(left: MultiVector3, right: MultiVector3): Matrix4 {
     if (left.count() != right.count()) {
         throw "matrices need to be of equal width & height";
     }
@@ -295,7 +295,7 @@ function leastSquares(left: Vector3Array, right: Vector3Array): Matrix4 {
 }
 
 // The Same, but only recover the translation between the vectors
-function leastSquaresTranslation(left: Vector3Array, right: Vector3Array): Matrix4 {
+function leastSquaresTranslation(left: MultiVector3, right: MultiVector3): Matrix4 {
     if (left.count() != right.count()) {
         throw "matrices need to be of equal width & height";
     }

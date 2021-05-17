@@ -10,7 +10,7 @@ import {
     MeshDebugRenderer,
     ShadedMeshRenderer,
     Plane,
-    LineArray,
+    MultiLine,
     Renderable,
     Parameter,
     UI,
@@ -31,7 +31,7 @@ export class MeshInspectorApp extends App {
 
     // geo data
     plane: Plane = Plane.WorldXY();
-    grid?: LineArray;
+    grid?: MultiLine;
     geo: Renderable[] = [];
 
     // logic data
@@ -82,7 +82,7 @@ export class MeshInspectorApp extends App {
     }
 
     start() {
-        let grid = LineArray.fromGrid(
+        let grid = MultiLine.fromGrid(
             this.plane.clone().moveTo(new Vector3(0, 0, -this.radius.get())),
             100,
             2,

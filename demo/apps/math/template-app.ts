@@ -4,10 +4,10 @@ import {
     LineRenderer,
     Camera,
     Vector3,
-    LineArray,
+    MultiLine,
     InputState,
     Parameter,
-    Vector3Array,
+    MultiVector3,
     DrawSpeed,
     Plane,
     Context,
@@ -19,9 +19,9 @@ export class TemplateApp extends App {
     params: Parameter[] = [];
 
     // state
-    points!: Vector3Array;
-    Plsa!: Vector3Array;
-    Pnormal!: Vector3Array;
+    points!: MultiVector3;
+    Plsa!: MultiVector3;
+    Pnormal!: MultiVector3;
 
     // render
     camera: Camera;
@@ -46,7 +46,7 @@ export class TemplateApp extends App {
     ui(ui: UI) {}
 
     startGrid() {
-        let grid = LineArray.fromGrid(Plane.WorldXY().moveTo(new Vector3(0, 0, -1)), 100, 2);
+        let grid = MultiLine.fromGrid(Plane.WorldXY().moveTo(new Vector3(0, 0, -1)), 100, 2);
         this.gridRenderer.set(grid, DrawSpeed.StaticDraw);
     }
 

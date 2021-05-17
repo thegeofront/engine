@@ -12,7 +12,7 @@ import {
     DrawSpeed,
     InputState,
     IntCube,
-    LineArray,
+    MultiLine,
     LineRenderer,
     Matrix4,
     Mesh,
@@ -38,12 +38,12 @@ export class GeometryApp extends App {
 
     // geo data
     plane: Plane = Plane.WorldXY();
-    gridLarge!: LineArray;
-    gridSmall!: LineArray;
+    gridLarge!: MultiLine;
+    gridSmall!: MultiLine;
     dots: Vector3[] = [];
     geo: Renderable[] = [];
     mapGeo: Renderable[] = [];
-    cursorVisual?: LineArray;
+    cursorVisual?: MultiLine;
 
     // logic data
     size = 50;
@@ -105,8 +105,8 @@ export class GeometryApp extends App {
 
         // console.log("done")
 
-        this.gridLarge = LineArray.fromGrid(this.plane, this.size, this.cellSize);
-        this.gridSmall = LineArray.fromGrid(this.plane, this.size * 10 - 1, this.cellSize / 10);
+        this.gridLarge = MultiLine.fromGrid(this.plane, this.size, this.cellSize);
+        this.gridSmall = MultiLine.fromGrid(this.plane, this.size * 10 - 1, this.cellSize / 10);
 
         // this.whiteLineRenderer.set(this.gl, this.gridLarge, DrawSpeed.StaticDraw);
         // this.greyLineRenderer.set(this.gl, this.gridSmall, DrawSpeed.StaticDraw);

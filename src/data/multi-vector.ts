@@ -10,14 +10,14 @@ import { Matrix4 } from "../math/matrix";
 import { Vector3, Vector2 } from "../math/vector";
 import { FloatMatrix } from "./float-matrix";
 
-export class Vector2Array extends FloatMatrix {
+export class MultiVector2 extends FloatMatrix {
     constructor(count: number) {
         super(count, 2);
     }
 
-    static fromList(vecs: Vector2[]): Vector2Array {
+    static fromList(vecs: Vector2[]): MultiVector2 {
         let length = vecs.length;
-        let array = new Vector2Array(length);
+        let array = new MultiVector2(length);
         for (let i = 0; i < vecs.length; i++) {
             array.data[i * 2] = vecs[i].x;
             array.data[i * 2 + 1] = vecs[i].y;
@@ -25,7 +25,7 @@ export class Vector2Array extends FloatMatrix {
         return array;
     }
 
-    forEach(callbackfn: (value: Vector2, index: number) => void): Vector2Array {
+    forEach(callbackfn: (value: Vector2, index: number) => void): MultiVector2 {
         for (let i = 0; i < this.count(); i++) {
             let vec = this.getVector(i);
             callbackfn(vec, i);
@@ -34,7 +34,7 @@ export class Vector2Array extends FloatMatrix {
         return this;
     }
 
-    map(callbackfn: (value: Vector2, index: number) => any): Vector2Array {
+    map(callbackfn: (value: Vector2, index: number) => any): MultiVector2 {
         let clone = this.clone();
 
         for (let i = 0; i < this.count(); i++) {
@@ -66,8 +66,8 @@ export class Vector2Array extends FloatMatrix {
         return vecs;
     }
 
-    to3D(): Vector3Array {
-        let array = new Vector3Array(this.count());
+    to3D(): MultiVector3 {
+        let array = new MultiVector3(this.count());
         for (let i = 0; i < this.count(); i++) {
             let row = this.getRow(i);
             array.setRow(i, [row[0], row[1], 0]);
@@ -75,8 +75,8 @@ export class Vector2Array extends FloatMatrix {
         return array;
     }
 
-    clone(): Vector2Array {
-        let clone = new Vector2Array(this._height);
+    clone(): MultiVector2 {
+        let clone = new MultiVector2(this._height);
         for (let i = 0; i < this.data.length; i++) {
             clone.data[i] = this.data[i];
         }
@@ -84,14 +84,14 @@ export class Vector2Array extends FloatMatrix {
     }
 }
 
-export class Vector3Array extends FloatMatrix {
+export class MultiVector3 extends FloatMatrix {
     constructor(count: number) {
         super(count, 3);
     }
 
-    static fromList(vecs: Vector3[]): Vector3Array {
+    static fromList(vecs: Vector3[]): MultiVector3 {
         let length = vecs.length;
-        let array = new Vector3Array(length);
+        let array = new MultiVector3(length);
         for (let i = 0; i < vecs.length; i++) {
             array.data[i * 3] = vecs[i].x;
             array.data[i * 3 + 1] = vecs[i].y;
@@ -100,10 +100,10 @@ export class Vector3Array extends FloatMatrix {
         return array;
     }
 
-    static fromNative(native: number[][]): Vector3Array {
+    static fromNative(native: number[][]): MultiVector3 {
         // assume all subarrays have the same shape!!
         let height = native.length;
-        let matrix = new Vector3Array(height);
+        let matrix = new MultiVector3(height);
         for (var i = 0; i < native.length; i++) {
             for (var j = 0; j < native[0].length; j++) {
                 matrix.set(i, j, native[i][j]);
@@ -120,7 +120,7 @@ export class Vector3Array extends FloatMatrix {
         }
     }
 
-    forEach(callbackfn: (value: Vector3, index: number) => any): Vector3Array {
+    forEach(callbackfn: (value: Vector3, index: number) => any): MultiVector3 {
         for (let i = 0; i < this.count(); i++) {
             let vec = this.getVector(i);
             vec = callbackfn(vec, i)!;
@@ -131,10 +131,10 @@ export class Vector3Array extends FloatMatrix {
         return this;
     }
 
-    take(indices: number[]): Vector3Array {
+    take(indices: number[]): MultiVector3 {
         // create a new floatarray
         const count = indices.length;
-        let array = new Vector3Array(count);
+        let array = new MultiVector3(count);
         for (let i = 0; i < count; i++) {
             let getIndex = indices[i];
             array.setVector(i, this.getVector(getIndex));
@@ -142,7 +142,7 @@ export class Vector3Array extends FloatMatrix {
         return array;
     }
 
-    map(callbackfn: (value: Vector3, index: number) => any): Vector3Array {
+    map(callbackfn: (value: Vector3, index: number) => any): MultiVector3 {
         let clone = this.clone();
 
         for (let i = 0; i < this.count(); i++) {
@@ -157,8 +157,8 @@ export class Vector3Array extends FloatMatrix {
         return clone;
     }
 
-    mapWith(other: Vector3Array, callback: (a: number, b: number) => number) {
-        return super.mapWith(other, callback) as Vector3Array;
+    mapWith(other: MultiVector3, callback: (a: number, b: number) => number) {
+        return super.mapWith(other, callback) as MultiVector3;
     }
 
     setVector(i: number, vec: Vector3) {
@@ -183,7 +183,7 @@ export class Vector3Array extends FloatMatrix {
         return vecs;
     }
 
-    transform(m: Matrix4): Vector3Array {
+    transform(m: Matrix4): MultiVector3 {
         // THIS CAN BE SPEED UP: BOTH MATRIX 4 & VECTOR3ARRAY ARE JUST FLOAT-MATRICES
         for (let i = 0; i < this._height; i++) {
             let vec = this.getVector(i);
@@ -194,8 +194,8 @@ export class Vector3Array extends FloatMatrix {
         return this;
     }
 
-    to2D(): Vector2Array {
-        let clone = new Vector2Array(this._height);
+    to2D(): MultiVector2 {
+        let clone = new MultiVector2(this._height);
         for (let i = 0; i < this._height; i++) {
             for (let j = 0; j < 2; j++) {
                 clone.set(i, j, this.get(i, j));
@@ -204,8 +204,8 @@ export class Vector3Array extends FloatMatrix {
         return clone;
     }
 
-    clone(): Vector3Array {
-        let clone = new Vector3Array(this._height);
+    clone(): MultiVector3 {
+        let clone = new MultiVector3(this._height);
         for (let i = 0; i < this.data.length; i++) {
             clone.data[i] = this.data[i];
         }
@@ -266,17 +266,16 @@ export class Vector3Array extends FloatMatrix {
     }
 }
 
-// TODO : to FloatMatrix
 export function getGeneralFloatMatrix(
-    vectors: Vector2Array | Vector3Array | Vector2[] | Vector3[],
+    vectors: MultiVector2 | MultiVector3 | Vector2[] | Vector3[],
 ): FloatMatrix {
-    if (vectors instanceof Vector2Array) {
+    if (vectors instanceof MultiVector2) {
         return vectors;
-    } else if (vectors instanceof Vector3Array) {
+    } else if (vectors instanceof MultiVector3) {
         return vectors;
     } else if (vectors[0] instanceof Vector2) {
-        return Vector2Array.fromList(vectors as Vector2[]);
+        return MultiVector2.fromList(vectors as Vector2[]);
     } else {
-        return Vector3Array.fromList(vectors as Vector3[]);
+        return MultiVector3.fromList(vectors as Vector3[]);
     }
 }

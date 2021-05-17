@@ -1,4 +1,4 @@
-import { Vector3Array } from "../data/vector-array";
+import { MultiVector3 } from "../data/multi-vector";
 import { Const } from "../math/const";
 import { Vector3 } from "../math/vector";
 

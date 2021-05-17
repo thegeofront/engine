@@ -1,4 +1,4 @@
-import { Vector2Array } from "../data/vector-array";
+import { MultiVector2 } from "../data/multi-vector";
 import { Const } from "../math/const";
 import { Vector2, Vector3 } from "../math/vector";
 import { LineCurve2 } from "./line";
@@ -15,8 +15,8 @@ export class Triangle2 {
         this.c = c;
     }
 
-    points(): Vector2Array {
-        return Vector2Array.fromList([this.a, this.b, this.c]);
+    points(): MultiVector2 {
+        return MultiVector2.fromList([this.a, this.b, this.c]);
     }
 
     toBarycentric(point: Vector2): Vector3 {

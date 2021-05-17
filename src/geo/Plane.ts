@@ -3,7 +3,7 @@
 // purpose: definition of a 3d plane.
 // todo:    turn Center, Ihat, Jhat, Khat construction to an actual matrix
 
-import { Vector3Array } from "../data/vector-array";
+import { MultiVector3 } from "../data/multi-vector";
 import { GeonMath } from "../math/math";
 import { Matrix4 } from "../math/matrix";
 import { Stat } from "../math/statistics";
@@ -61,7 +61,7 @@ export class Plane {
         return Plane.from3pt(Vector3.zero(), Vector3.unitX(), Vector3.unitZ());
     }
 
-    static fromLeastSquares(pts: Vector3Array): Plane {
+    static fromLeastSquares(pts: MultiVector3): Plane {
         let mean = pts.mean();
         let cov = Stat.cov(pts);
         let [eigValues, eigVectors] = Stat.eig(cov);
@@ -73,14 +73,31 @@ export class Plane {
         return Plane.fromPVV(mean, biggestEigenVector, secondBiggestEigenVector);
     }
 
-    static fromXYLeastSquares(pts: Vector3Array): Plane {
+    static fromXYLeastSquares(pts: MultiVector3): Plane {
         // quite specific, but this was needed.
         let mean = pts.mean();
         return Plane.WorldXY().transform(Matrix4.newTranslation(mean.x, mean.y, mean.z));
     }
 
     static planeMatrixFromVecs(c: Vector3, i: Vector3, j: Vector3, k: Vector3) {
-        return new Matrix4([i.x, i.y, i.z, 0, j.x, j.y, j.z, 0, k.x, k.y, k.z, 0, c.x, c.y, c.z, 1]);
+        return new Matrix4([
+            i.x,
+            i.y,
+            i.z,
+            0,
+            j.x,
+            j.y,
+            j.z,
+            0,
+            k.x,
+            k.y,
+            k.z,
+            0,
+            c.x,
+            c.y,
+            c.z,
+            1,
+        ]);
     }
 
     public get ihat() {

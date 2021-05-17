@@ -7,7 +7,7 @@
 // idea: should normals be part of the Mesh?
 
 import { IntMatrix } from "../data/int-matrix";
-import { Vector2Array, Vector3Array } from "../data/vector-array";
+import { MultiVector2, MultiVector3 } from "../data/multi-vector";
 import { Vector2, Vector3 } from "../math/vector";
 import { Cube } from "../geo/cube";
 import { Rectangle3 } from "../geo/rectangle";
@@ -20,7 +20,7 @@ export class Mesh {
     // CONSTRUCTORS
 
     constructor(
-        public verts: Vector3Array,
+        public verts: MultiVector3,
         public links: IntMatrix, // relationships, can be 2 (lines) | 3 (triangles) | 4 (quads)
     ) {}
 
@@ -28,27 +28,27 @@ export class Mesh {
         return new Mesh(this.verts.clone(), this.links.clone());
     }
 
-    static new(verts: Vector3Array, links: IntMatrix): Mesh {
+    static new(verts: MultiVector3, links: IntMatrix): Mesh {
         return new Mesh(verts, links);
     }
 
     static fromLists(verts: Vector3[], faces: number[]): Mesh {
-        return new Mesh(Vector3Array.fromList(verts), IntMatrix.fromList(faces, 3));
+        return new Mesh(MultiVector3.fromList(verts), IntMatrix.fromList(faces, 3));
     }
 
     static newEmpty(vertCount: number, linkCount: number, perLinkCount: number): Mesh {
-        return new Mesh(new Vector3Array(vertCount), new IntMatrix(linkCount, perLinkCount));
+        return new Mesh(new MultiVector3(vertCount), new IntMatrix(linkCount, perLinkCount));
     }
 
     static newLines(positions: Vector3[], edges: number[]) {
-        let verts = Vector3Array.fromList(positions);
+        let verts = MultiVector3.fromList(positions);
         let links = IntMatrix.fromList(edges, 2);
 
         return new Mesh(verts, links);
     }
 
     static zero(): Mesh {
-        return new Mesh(new Vector3Array(0), new IntMatrix(0, 0));
+        return new Mesh(new MultiVector3(0), new IntMatrix(0, 0));
     }
 
     static fromJoin(meshes: Mesh[]): Mesh {
@@ -62,7 +62,7 @@ export class Mesh {
             faceCount += mesh.links.count();
         }
 
-        let verts = new Vector3Array(vertCount);
+        let verts = new MultiVector3(vertCount);
         let links = new IntMatrix(faceCount, 3);
 
         let accVerts = 0;
@@ -172,7 +172,7 @@ export class Mesh {
     static newSphere(center: Vector3, radius: number, numRings: number, numPerRing: number): Mesh {
         // verts
         let vertCount = numRings * numPerRing + 2;
-        let verts = new Vector3Array(vertCount);
+        let verts = new MultiVector3(vertCount);
         let setVert = function (i: number, vector: Vector3) {
             verts.setVector(i, vector.scale(radius).add(center));
         };
@@ -254,7 +254,7 @@ export class Mesh {
 
         let numVerts = numPerRing * 2 + 2;
         let numFaces = (numVerts - 2) * 2;
-        let verts = new Vector3Array(numVerts);
+        let verts = new MultiVector3(numVerts);
 
         // some dumb stuff
         let setVert = function (i: number, vector: Vector3) {
@@ -324,7 +324,7 @@ export class Mesh {
     static newCone(center: Vector3, radius: number, height: number, numPerRing: number) {
         let numVerts = numPerRing + 2;
         let numFaces = numPerRing * 2;
-        let verts = new Vector3Array(numVerts);
+        let verts = new MultiVector3(numVerts);
         let setVert = function (i: number, vector: Vector3) {
             verts.setVector(i, vector.add(center));
         };
@@ -365,7 +365,7 @@ export class Mesh {
     static fromGraph(graph: Graph): Mesh {
         // NOTE : doesnt really work if the loops are not of size 3.
 
-        let verts = Vector3Array.fromList(graph.allVertPositions());
+        let verts = MultiVector3.fromList(graph.allVertPositions());
         let loops = graph.allVertLoopsAsInts();
 
         let links = new IntMatrix(loops.length, 3);
@@ -436,7 +436,7 @@ export class Mesh {
     }
 
     getLinkVerts(f: number) {
-        let verts = new Vector3Array(this.links._width);
+        let verts = new MultiVector3(this.links._width);
         this.links.getRow(f).forEach((v, i) => {
             verts.setVector(i, this.verts.getVector(v));
         });
@@ -466,7 +466,7 @@ export class Mesh {
         let faceNormals = this.calculateFaceNormals();
 
         // stack all face normals per vertex
-        let array = new Vector3Array(this.verts.count());
+        let array = new MultiVector3(this.verts.count());
         for (let i = 0; i < faceCount; i++) {
             let normal = faceNormals[i];
             this.links.getRow(i).forEach((vertexIndex) => {

@@ -3,7 +3,7 @@
 import { Const } from "../math/const";
 import { Matrix4 } from "../math/matrix";
 import { Vector3 } from "../math/vector";
-import { LineArray } from "../mesh/line-array";
+import { MultiLine } from "../mesh/multi-line";
 import { Mesh } from "../mesh/mesh";
 import { Circle2 } from "./circle2";
 import { Plane } from "./plane";
@@ -34,8 +34,8 @@ export class Circle3 {
     }
 
     // convert
-    buffer(): LineArray {
-        return LineArray.fromCircle(this);
+    buffer(): MultiLine {
+        return MultiLine.fromCircle(this);
     }
 
     includes(p: Vector3): boolean {
