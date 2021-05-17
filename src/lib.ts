@@ -44,7 +44,7 @@ export * from "./mesh/render-mesh";
 export * from "./mesh/topo-mesh";
 
 export * from "./render/camera";
-export * from "./render/combo";
+export * from "./combo/combo";
 export * from "./render/light";
 export * from "./render/context";
 export * from "./render/renderer";
@@ -67,4 +67,4 @@ export * from "./system/input-state";
 export * from "./system/ui";
 export * from "./system/core";
 
-export * from "./rendercombos/image-combi";
+export * from "./combo/image-combi";

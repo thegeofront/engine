@@ -9,7 +9,7 @@ import {
     GeonImage,
     TextureMeshRenderer,
 } from "../lib";
-import { Combi, Combo } from "../render/combo";
+import { Combi, Combo } from "./combo";
 
 export class ImageCombi extends Combi<GeonImage, Renderable, TextureMeshRenderer> {
     private constructor(gl: WebGLRenderingContext) {

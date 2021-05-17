@@ -149,9 +149,8 @@ export class LineArray {
     }
 
     // get all lines representing a circle in 2d. use an optional matrix to
-    static fromCircle(c: Circle3): LineArray {
-        let count = Const.CIRCLE_SEGMENTS;
-        // let count = 12;
+    static fromCircle(c: Circle3, numSegments = Const.CIRCLE_SEGMENTS): LineArray {
+        let count = numSegments;
         let verts = new Vector3Array(count);
 
         // x lines

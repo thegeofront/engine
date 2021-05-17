@@ -17,6 +17,7 @@ import { SphericalThreeApp } from "./apps/spherical/spherical-three-app";
 import { LeastSquaresApp } from "./apps/math/least-squares-app";
 import { UITestApp } from "./apps/ui-test-app";
 import { SphericalLandingApp } from "./apps/spherical/spherical-landing";
+import { SplineApp } from "./apps/math/spline-app";
 
 var core: Core;
 
@@ -35,7 +36,7 @@ function main() {
 
     // init swap app
     let appCollection = [
-        UITestApp,
+        SplineApp,
         SphericalLandingApp,
         SphericalTwoApp,
         SphericalThreeApp,
@@ -51,27 +52,18 @@ function main() {
     let swapApp = new SwapApp(gl, core, appCollection);
     core.addApp(swapApp);
     // swapApp.swap(0);
-    swapApp.swapFromUrl(location.hash, 1);
+    swapApp.swapFromUrl(location.hash, 0);
 
     // a specific app dealing with webcams & other things
     // addWebcamAppWhenReady(core, canvas, video);
 
     // infinite loop
     function loop() {
-        if (core.STOP) {
-            // TODO : notify the User that we have stopped running...
-            return;
-        }
         core.update();
         core.draw();
         requestAnimationFrame(loop);
     }
     requestAnimationFrame(loop);
 }
-window.addEventListener(
-    "load",
-    function () {
-        main();
-    },
-    false,
-);
+
+window.addEventListener("load", main, false);

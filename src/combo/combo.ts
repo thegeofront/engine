@@ -27,10 +27,10 @@ import {
     Mesh,
     Camera,
 } from "../lib";
-import { Context } from "./context";
-import { DrawSpeed, Renderer } from "./renderer";
+import { Context } from "../render/context";
+import { DrawSpeed, Renderer } from "../render/renderer";
 import { MeshPickRenderer } from "../renderers/pick-renderer";
-import { MetaRenderer } from "./meta-renderer";
+import { MetaRenderer } from "../render/meta-renderer";
 
 // staticcombo
 

@@ -33,7 +33,7 @@ import { Stopwatch } from "../../../src/system/stopwatch";
 import { constructMeshFromSphereGraph, createGraph } from "./spherical";
 import { graphToMultiMesh } from "../icosahedron-app";
 import { averageEdgeLength, laPlacian, quadification, squarification } from "./spherical";
-import { StaticMeshCombo } from "../../../src/rendercombos/mesh-combo";
+import { StaticMeshCombo } from "../../../src/combo/mesh-combo";
 
 export class SphericalLandingApp extends App {
     c: Context;

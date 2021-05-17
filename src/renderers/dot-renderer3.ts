@@ -100,7 +100,7 @@ export class DotRenderer3 extends Renderer<Points> {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
     }
 
-    set(points: Points, speed: DrawSpeed) {
+    set(points: Points, speed: DrawSpeed = DrawSpeed.StaticDraw) {
         let gl = this.gl;
         gl.useProgram(this.program);
 

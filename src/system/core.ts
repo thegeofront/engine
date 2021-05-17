@@ -14,11 +14,11 @@ export class Core {
     state: InputState;
     ui: UI;
     fpsCounter: FpsCounter;
+
     fullscreen = true;
+    fpsInTitle = true;
 
     private apps: Map<string, App>;
-
-    STOP = false;
 
     constructor(canvas: HTMLCanvasElement, gl: WebGLRenderingContext, uiFrame: HTMLDivElement) {
         this.canvas = canvas;
@@ -50,7 +50,6 @@ export class Core {
     update() {
         this.state.preUpdate();
         this.fpsCounter.update(this.state);
-        if (this.state.IsKeyPressed("Esc")) this.STOP = true;
         this.apps.forEach((app) => {
             app.update(this.state);
         });
@@ -62,10 +61,12 @@ export class Core {
         const gl = this.gl;
 
         // put fps in the title
-        // document.title = "fps: " + this.fpsCounter.getFps();
+        if (this.fpsInTitle) {
+            document.title = "fps: " + this.fpsCounter.getFps();
+        }
 
-        // pre-gl business
         if (this.fullscreen) {
+            // pre-gl business
             if (window.innerHeight != canvas.height || window.innerWidth != canvas.width) {
                 canvas.height = window.innerHeight;
                 // canvas.clientHeight = window.innerHeight;
