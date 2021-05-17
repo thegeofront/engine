@@ -5,7 +5,7 @@
 import { FloatMatrix } from "../data/float-matrix";
 import { MultiVector2, MultiVector3 } from "../data/multi-vector";
 import { Renderable } from "../mesh/render-mesh";
-import { Polyline } from "../geo/polyline";
+import { Polyline } from "../geo/curve/polyline";
 import { Matrix4 } from "../math/matrix";
 import { Vector3 } from "../math/vector";
 import { MultiLine } from "../mesh/multi-line";

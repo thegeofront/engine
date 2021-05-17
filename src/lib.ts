@@ -20,7 +20,7 @@ export * from "./geo/geo";
 export * from "./geo/intersect";
 export * from "./geo/line";
 export * from "./geo/plane";
-export * from "./geo/polyline";
+export * from "./geo/curve/polyline";
 export * from "./geo/rectangle";
 export * from "./geo/triangle";
 

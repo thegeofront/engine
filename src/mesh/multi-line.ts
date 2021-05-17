@@ -13,8 +13,7 @@ import { Plane } from "../geo/plane";
 import { Const } from "../math/const";
 import { Matrix4 } from "../math/matrix";
 import { Vector2, Vector3 } from "../math/vector";
-import { Bezier, Curve } from "../geo/spline";
-
+import { Curve } from "../geo/curve/curve";
 // represents a collection of multiple lines. These could form 1 polyline, but this is not a requirement
 export class MultiLine {
     verts: FloatMatrix;

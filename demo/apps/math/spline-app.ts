@@ -1,4 +1,5 @@
-import { Bezier } from "../../../src/geo/spline";
+import { Bezier } from "../../../src/geo/curve/bezier";
+import { Loft } from "../../../src/geo/srf/loft";
 import {
     App,
     DotRenderer3,
@@ -15,6 +16,7 @@ import {
     UI,
     Circle3,
     Mesh,
+    Polyline,
 } from "../../../src/lib";
 
 export class SplineApp extends App {
@@ -47,31 +49,48 @@ export class SplineApp extends App {
     }
 
     ui(ui: UI) {
-        let param = Parameter.new("t", 0, 0, 1, 0.001);
-        this.params.push(param);
-        ui.addParameter(param, this.start.bind(this));
+        this.params.push(Parameter.new("t", 0, 0, 1, 0.001));
+        this.params.push(Parameter.new("u", 0.5, 0, 1, 0.001));
+        this.params.push(Parameter.new("v", 0.5, 0, 1, 0.001));
+
+        for (let param of this.params) {
+            ui.addParameter(param, this.start.bind(this));
+        }
     }
 
     start() {
         this.startGrid();
         this.dots = [];
-        this.lines = [];
-        this.dots.push(
+
+        let curve1 = Polyline.new([
+            Vector3.new(3, -1, 3),
+            Vector3.new(1, -1, 3),
+            Vector3.new(1, 1, 3),
+            Vector3.new(-1, 1, 3),
+        ]);
+        let curve2 = Bezier.new([
             Vector3.new(3, -1, 0),
             Vector3.new(1, -1, 0),
             Vector3.new(1, 1, 0),
             Vector3.new(-1, 1, 0),
-        );
+        ])!;
 
-        let spline = Bezier.new(this.dots, 3)!;
-        this.lines.push(MultiLine.fromCurve(spline));
+        let loft = Loft.new([curve1, curve2]);
+
         let t = this.params[0].get();
+        let u = this.params[1].get();
+        let v = this.params[2].get();
 
-        this.dots.push(spline.eval(t));
+        this.dots.push(curve1.eval(t));
+        this.dots.push(curve2.eval(t));
+        this.dots.push(loft.eval(u, v));
 
-        for (let dot of this.dots) {
-            this.lines.push(Circle3.newPlanar(dot, 0.1).buffer());
-        }
+        this.lines = [];
+        this.lines.push(curve1.buffer());
+        this.lines.push(curve2.buffer(100));
+        // for (let dot of this.dots) {
+        //     this.lines.push(Circle3.newPlanar(dot, 0.1).buffer());
+        // }
     }
 
     startGrid() {
