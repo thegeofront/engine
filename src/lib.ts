@@ -62,7 +62,7 @@ export * from "./renderers/texture-mesh-renderer";
 export * from "./renderers/graph-debug-renderer";
 
 export * from "./system/domwrappers";
-export * from "./system/fpsCounter";
+export * from "./system/fps-counter";
 export * from "./system/input-state";
 export * from "./system/ui";
 export * from "./system/core";

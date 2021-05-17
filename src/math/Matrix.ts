@@ -448,6 +448,10 @@ export class Matrix4 extends FloatMatrix {
         return new Matrix4([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, tx, ty, tz, 1]);
     }
 
+    static newTranslate(v: Vector3): Matrix4 {
+        return new Matrix4([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, v.x, v.y, v.z, 1]);
+    }
+
     static newXRotation(angleInRadians: number): Matrix4 {
         var c = Math.cos(angleInRadians);
         var s = Math.sin(angleInRadians);

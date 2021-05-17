@@ -7,42 +7,72 @@ import { Matrix4 } from "../math/matrix";
 import { Vector3 } from "../math/vector";
 
 // i want traits....
-export class Geo {
-    constructor() {}
+export abstract class Geo {
+    abstract clone(): this;
 
-    clone() {}
-
-    transform(m: Matrix4) {
-        return this;
-    }
+    abstract transform(m: Matrix4): this;
 
     rotateX(radians: number) {
         let rotater = Matrix4.newXRotation(radians);
-        // etc...
+        return this.transform(rotater);
     }
 
     rotateY(radians: number) {
         let rotater = Matrix4.newYRotation(radians);
-        // etc...
+        return this.transform(rotater);
     }
 
     rotateZ(radians: number) {
         let rotater = Matrix4.newZRotation(radians);
-        // etc...
+        return this.transform(rotater);
     }
 
     rotate(radians: number, axis: Vector3) {
         let rotater = Matrix4.newAxisRotation(axis, radians);
-        // etc...
+        return this.transform(rotater);
     }
 
     move(m: Vector3) {
-        let mover = Matrix4.newScaler(m.x, m.y, m.z);
-        // etc...
+        let mover = Matrix4.newTranslate(m);
+        return this.transform(mover);
     }
 
     scale(s: Vector3) {
         let scaler = Matrix4.newScaler(s.x, s.y, s.z);
-        // etc..
+        return this.transform(scaler);
+    }
+
+    // all past-tense functions return a copied object, just like the vectors
+
+    abstract transformed(m: Matrix4): this;
+
+    rotatedX(radians: number) {
+        let rotater = Matrix4.newXRotation(radians);
+        return this.transformed(rotater);
+    }
+
+    rotatedY(radians: number) {
+        let rotater = Matrix4.newYRotation(radians);
+        return this.transformed(rotater);
+    }
+
+    rotatedZ(radians: number) {
+        let rotater = Matrix4.newZRotation(radians);
+        return this.transformed(rotater);
+    }
+
+    rotated(radians: number, axis: Vector3) {
+        let rotater = Matrix4.newAxisRotation(axis, radians);
+        return this.transformed(rotater);
+    }
+
+    moved(m: Vector3) {
+        let mover = Matrix4.newTranslate(m);
+        return this.transformed(mover);
+    }
+
+    scaled(s: Vector3) {
+        let scaler = Matrix4.newScaler(s.x, s.y, s.z);
+        return this.transformed(scaler);
     }
 }

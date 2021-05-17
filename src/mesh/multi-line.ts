@@ -13,6 +13,7 @@ import { Plane } from "../geo/plane";
 import { Const } from "../math/const";
 import { Matrix4 } from "../math/matrix";
 import { Vector2, Vector3 } from "../math/vector";
+import { Bezier, Curve } from "../geo/spline";
 
 // represents a collection of multiple lines. These could form 1 polyline, but this is not a requirement
 export class MultiLine {
@@ -148,7 +149,6 @@ export class MultiLine {
         return new MultiLine(lines);
     }
 
-    // get all lines representing a circle in 2d. use an optional matrix to
     static fromCircle(c: Circle3, numSegments = Const.CIRCLE_SEGMENTS): MultiLine {
         let count = numSegments;
         let verts = new MultiVector3(count);
@@ -162,12 +162,18 @@ export class MultiLine {
                 c.plane.pushToWorld(new Vector3(Math.cos(t) * c.radius, Math.sin(t) * c.radius, 0)),
             );
         }
-        return new MultiLine(verts, getPairIndices(count));
+        return new MultiLine(verts, getPairIndices(count, true));
     }
 
-    // turn a spline into a polyline, and render it
-    static fromSpline() {
-        throw "todo!";
+    static fromCurve(b: Curve, numSegments = Const.BEZIER_SEGMENTS) {
+        let count = numSegments + 1;
+        let verts = new MultiVector3(count);
+        for (let i = 0; i < count; i++) {
+            // fraction
+            let t = i / numSegments;
+            verts.setVector(i, b.eval(t));
+        }
+        return new MultiLine(verts, getPairIndices(count, false));
     }
 
     static fromCube(cube: Cube): MultiLine {
@@ -215,9 +221,12 @@ export function getDefaultIndices(count: number): Uint16Array {
     return data;
 }
 
-function getPairIndices(count: number): Uint16Array {
+function getPairIndices(count: number, cyclic: boolean): Uint16Array {
     // given count of 3 => return 0,1 | 1,2 | 2,0
     let length = count * 2;
+    if (!cyclic) {
+        length -= 2;
+    }
     let data = new Uint16Array(length);
     for (let i = 0; i < count; i++) {
         data[i * 2] = i;

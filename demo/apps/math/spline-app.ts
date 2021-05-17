@@ -1,3 +1,4 @@
+import { Bezier } from "../../../src/geo/spline";
 import {
     App,
     DotRenderer3,
@@ -35,7 +36,7 @@ export class SplineApp extends App {
 
         let canvas = gl.canvas as HTMLCanvasElement;
         this.camera = new Camera(canvas, -2, true);
-        this.camera.set(-2, 1, 1);
+        this.camera.set(-10, 1, 1);
 
         this.dots = [];
         this.lines = [];
@@ -45,21 +46,33 @@ export class SplineApp extends App {
         this.lrGrid = new LineRenderer(gl, [0.3, 0.3, 0.3, 1]);
     }
 
+    ui(ui: UI) {
+        let param = Parameter.new("t", 0, 0, 1, 0.001);
+        this.params.push(param);
+        ui.addParameter(param, this.start.bind(this));
+    }
+
     start() {
         this.startGrid();
+        this.dots = [];
+        this.lines = [];
         this.dots.push(
-            Vector3.new(-1, -1, 0),
+            Vector3.new(3, -1, 0),
             Vector3.new(1, -1, 0),
-            Vector3.new(-1, 1, 0),
             Vector3.new(1, 1, 0),
+            Vector3.new(-1, 1, 0),
         );
+
+        let spline = Bezier.new(this.dots, 3)!;
+        this.lines.push(MultiLine.fromCurve(spline));
+        let t = this.params[0].get();
+
+        this.dots.push(spline.eval(t));
 
         for (let dot of this.dots) {
             this.lines.push(Circle3.newPlanar(dot, 0.1).buffer());
         }
     }
-
-    ui(ui: UI) {}
 
     startGrid() {
         let grid = MultiLine.fromGrid(Plane.WorldXY(), 100, 2);

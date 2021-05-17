@@ -4,7 +4,7 @@
 
 import { InputState } from "./input-state";
 import { App } from "../app/app";
-import { FpsCounter } from "./fpsCounter";
+import { FpsCounter } from "./fps-counter";
 import { UI } from "./ui";
 import { Renderer } from "../render/renderer";
 
