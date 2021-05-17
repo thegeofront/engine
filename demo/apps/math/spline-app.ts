@@ -53,7 +53,6 @@ export class SplineApp extends App {
     }
 
     ui(ui: UI) {
-        this.params.push(Parameter.new("t", 0, 0, 1, 0.001));
         this.params.push(Parameter.new("u", 0.5, 0, 1, 0.001));
         this.params.push(Parameter.new("v", 0.5, 0, 1, 0.001));
 
@@ -90,11 +89,10 @@ export class SplineApp extends App {
             Vector3.new(-1, 1, 0),
         ])!;
 
-        let t = this.params[0].get();
-        let u = this.params[1].get();
-        let v = this.params[2].get();
-        let y = this.params[3].get();
-        let detail = this.params[4].get();
+        let u = this.params[0].get();
+        let v = this.params[1].get();
+        let y = this.params[2].get();
+        let detail = this.params[3].get();
 
         curve2.move(Vector3.new(0, y, 0));
 
@@ -105,14 +103,14 @@ export class SplineApp extends App {
 
         // dots
         this.dots = [];
-        this.dots.push(curve1.eval(t));
-        this.dots.push(curve2.eval(t));
         this.dots.push(loft.eval(u, v));
 
         // lines
         this.lines = [];
-        for (let curve in [curve1]) this.lines.push(curve1.buffer(100));
-        this.lines.push(curve2.buffer(100));
+        for (let curve of curves) {
+            this.lines.push(curve.buffer(100));
+        }
+        this.lines.push(loft.isoCurveV(u).buffer(detail));
         // for (let dot of this.dots) {
         //     this.lines.push(Circle3.newPlanar(dot, 0.1).buffer());
         // }

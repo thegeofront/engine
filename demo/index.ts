@@ -37,7 +37,6 @@ function main() {
     // init swap app
     let appCollection = [
         SplineApp,
-        SphericalLandingApp,
         SphericalTwoApp,
         SphericalThreeApp,
         SphericalOneApp,

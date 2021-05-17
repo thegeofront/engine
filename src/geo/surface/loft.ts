@@ -22,11 +22,14 @@ export class Loft extends Surface {
     }
 
     eval(u: number, v: number): Vector3 {
-        let p = Vector3.zero();
+        return this.isoCurveV(u).eval(v);
+    }
+
+    isoCurveV(u: number): Bezier {
         let pts = [];
         for (let i = 0; i < this.curves.length; i++) {
             pts.push(this.curves[i].eval(u));
         }
-        return Bezier.new(pts).eval(v);
+        return Bezier.new(pts);
     }
 }
