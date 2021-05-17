@@ -6,6 +6,7 @@
 // - Polyline (not terminologically correct but in terms of logic it makes sense)
 
 import { MultiLine, Vector3 } from "../../lib";
+import { Geo } from "../geo";
 
 // pascals's triangle. Hardcoded for performance
 export const PASCAL = [
@@ -21,8 +22,11 @@ export const PASCAL = [
 export const MAX_DEGREE = PASCAL.length - 1;
 
 // domain is always normalzed, from 0 to 1
-export abstract class Curve {
-    constructor(public verts: Vector3[], public readonly degree: number) {}
+export abstract class Curve extends Geo {
+    constructor(public verts: Vector3[], public readonly degree: number) {
+        super();
+    }
+
     abstract eval(t: number): Vector3;
 
     buffer(numSegments: number): MultiLine {

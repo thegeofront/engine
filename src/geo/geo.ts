@@ -8,9 +8,9 @@ import { Vector3 } from "../math/vector";
 
 // i want traits....
 export abstract class Geo {
-    abstract clone(): this;
+    abstract clone(): Geo;
 
-    abstract transform(m: Matrix4): this;
+    abstract transform(m: Matrix4): Geo;
 
     rotateX(radians: number) {
         let rotater = Matrix4.newXRotation(radians);
@@ -44,7 +44,9 @@ export abstract class Geo {
 
     // all past-tense functions return a copied object, just like the vectors
 
-    abstract transformed(m: Matrix4): this;
+    transformed(m: Matrix4): Geo {
+        return (this.clone() as any).transform(m);
+    }
 
     rotatedX(radians: number) {
         let rotater = Matrix4.newXRotation(radians);

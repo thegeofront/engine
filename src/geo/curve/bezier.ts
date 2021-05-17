@@ -3,6 +3,8 @@
 // purpose: mathematical representation of parametric curves
 // notes:   - using Vector3[] > MultiVector3, since their is no added benefit as of right now
 
+import { MultiVector3 } from "../../data/multi-vector";
+import { Matrix4 } from "../../math/matrix";
 import { Vector3 } from "../../math/vector";
 import { Curve, MAX_DEGREE, PASCAL } from "./curve";
 
@@ -34,5 +36,15 @@ export class Bezier extends Curve {
             p.add(this.verts[i].scaled(Bezier.B(t, i, this.degree)));
         }
         return p;
+    }
+
+    clone(): Bezier {
+        let b = Bezier.new(MultiVector3.fromList(this.verts).toList());
+        return b;
+    }
+
+    transform(m: Matrix4): Bezier {
+        m.multiplyVectorList(this.verts);
+        return this;
     }
 }

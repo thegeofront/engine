@@ -15,6 +15,7 @@ import { Renderable, MeshType as MeshType } from "./render-mesh";
 import { Plane } from "../geo/plane";
 import { Matrix4 } from "../math/matrix";
 import { Graph } from "./graph";
+import { Surface } from "../geo/surface/loft";
 
 export class Mesh {
     // CONSTRUCTORS
@@ -44,6 +45,41 @@ export class Mesh {
         let verts = MultiVector3.fromList(positions);
         let links = IntMatrix.fromList(edges, 2);
 
+        return new Mesh(verts, links);
+    }
+
+    static fromSurface(srf: Surface, uSegments = 10, vSegments = 10): Mesh {
+        // returns vertices & indices of a flat grid
+        let uPoints = uSegments + 1;
+        let vPoints = vSegments + 1;
+
+        let verts = new MultiVector3(uPoints * vPoints);
+        let links = new IntMatrix(uSegments * vSegments * 2, 3);
+
+        // create all positions
+        for (let u = 0; u < uPoints; u++) {
+            for (let v = 0; v < vPoints; v++) {
+                let i = u * vPoints + v;
+                verts.setVector(i, srf.eval(u / uSegments, v / vSegments));
+            }
+        }
+
+        // create all indices
+        // a---c
+        // | \ |
+        // b---d
+        for (let u = 0; u < uSegments; u++) {
+            for (let v = 0; v < vSegments; v++) {
+                let start_index = 2 * (u * vSegments + v);
+                let a = u * uPoints + v;
+                let b = a + vPoints;
+                let c = a + 1;
+                let d = b + 1;
+
+                links.setRow(start_index, [a, b, d]);
+                links.setRow(start_index + 1, [c, a, d]);
+            }
+        }
         return new Mesh(verts, links);
     }
 

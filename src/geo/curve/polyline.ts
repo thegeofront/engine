@@ -1,3 +1,5 @@
+import { MultiVector3 } from "../../data/multi-vector";
+import { Matrix4 } from "../../math/matrix";
 import { Vector3 } from "../../math/vector";
 import { Curve } from "./curve";
 
@@ -22,5 +24,15 @@ export class Polyline extends Curve {
 
     buffer() {
         return super.buffer(this.verts.length - 1);
+    }
+
+    clone(): Polyline {
+        let b = Polyline.new(MultiVector3.fromList(this.verts).toList());
+        return b;
+    }
+
+    transform(m: Matrix4): Polyline {
+        m.multiplyVectorList(this.verts);
+        return this;
     }
 }
