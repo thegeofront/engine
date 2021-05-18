@@ -983,11 +983,12 @@ export class Matrix4 extends FloatMatrix {
         return new Vector3(data[0], data[1], data[2]);
     }
 
-    multiplyVectorList(other: Vector3[]) {
-        for (let i = 0; i < other.length; i++) {
-            other[i] = this.multiplyVector(other[i]);
+    multipliedVectorList(vecs: Vector3[]) {
+        let result = Array<Vector3>(vecs.length);
+        for (let i = 0; i < vecs.length; i++) {
+            result[i] = this.multiplyVector(vecs[i]);
         }
-        return other;
+        return result;
     }
 
     multiplyVectors(other: MultiVector3): MultiVector3 {

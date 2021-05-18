@@ -27,9 +27,21 @@ export abstract class Curve extends Geo {
         super();
     }
 
-    abstract eval(t: number): Vector3;
+    abstract pointAt(t: number): Vector3;
 
-    buffer(numSegments: number): MultiLine {
-        return MultiLine.fromCurve(this, numSegments);
-    }
+    abstract buffer(numSegments: number): MultiLine;
+    // deal with 'length'
+
+    // protected length
+    // protected lengthMap!: number[];
+    // protected mustRecalculate = true;
+
+    // protected recalculateLength() {}
+
+    // public getLength() {
+    //     if (mustRecalculate) {
+    //         this.recalculateLength();
+    //     }
+
+    // }
 }

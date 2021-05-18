@@ -235,8 +235,8 @@ export class SphericalLandingApp extends App {
         } else {
             return;
         }
-        let fade1 = GeonMath.fade(this.lerpColorState);
-        let fade2 = GeonMath.fade(Math.min(this.lerpColorState * 2, 1));
+        let fade1 = GeonMath.smooth(this.lerpColorState);
+        let fade2 = GeonMath.smooth(Math.min(this.lerpColorState * 2, 1));
 
         this.worlds.forEach((w) => {
             w.color = lerpList(this.color, [0, 0, 0, 0], 1 - fade1);

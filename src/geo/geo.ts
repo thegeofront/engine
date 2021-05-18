@@ -12,6 +12,8 @@ export abstract class Geo {
 
     abstract transform(m: Matrix4): Geo;
 
+    abstract transformed(m: Matrix4): Geo;
+
     rotateX(radians: number) {
         let rotater = Matrix4.newXRotation(radians);
         return this.transform(rotater);
@@ -43,10 +45,6 @@ export abstract class Geo {
     }
 
     // all past-tense functions return a copied object, just like the vectors
-
-    transformed(m: Matrix4): Geo {
-        return (this.clone() as any).transform(m);
-    }
 
     rotatedX(radians: number) {
         let rotater = Matrix4.newXRotation(radians);

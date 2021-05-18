@@ -55,8 +55,8 @@ export class SplineApp extends App {
     ui(ui: UI) {
         this.params.push(Parameter.new("t", 0.5, 0, 1, 0.001));
 
-        this.params.push(Parameter.new("u", 0.5, 0, 2, 0.001));
-        this.params.push(Parameter.new("v", 0.5, 0, 2, 0.001));
+        this.params.push(Parameter.new("u", 0.5, 0, 1, 0.001));
+        this.params.push(Parameter.new("v", 0.5, 0, 1, 0.001));
 
         this.params.push(Parameter.new("y", 0, -5, 5, 0.001));
 
@@ -115,8 +115,9 @@ export class SplineApp extends App {
         // dots
         this.dots = [];
         this.dots.push(...bezier.verts);
-        this.dots.push(bezier.eval(t));
-        this.dots.push(bezier.eval(t).add(bezier.tangent(t).normalize()));
+        this.dots.push(bezier.pointAt(t));
+        this.dots.push(bezier.pointAt(t).add(bezier.tangentAt(t)));
+        this.dots.push(bezier.pointAt(t).add(bezier.normalAt(t)));
         this.dots.push(loft.eval(u, v));
 
         // lines
@@ -131,7 +132,7 @@ export class SplineApp extends App {
         // }
 
         // mesh
-        this.mr.set(loft.bufferExact().toRenderable());
+        this.mr.set(loft.buffer(detail, detail).toRenderable());
     }
 
     startGrid() {

@@ -14,6 +14,8 @@ import { Const } from "../math/const";
 import { Matrix4 } from "../math/matrix";
 import { Vector2, Vector3 } from "../math/vector";
 import { Curve } from "../geo/curve/curve";
+import { Polyline } from "../geo/curve/polyline";
+import { Bezier } from "../geo/curve/bezier";
 // represents a collection of multiple lines. These could form 1 polyline, but this is not a requirement
 export class MultiLine {
     verts: FloatMatrix;
@@ -164,13 +166,17 @@ export class MultiLine {
         return new MultiLine(verts, getPairIndices(count, true));
     }
 
-    static fromCurve(b: Curve, numSegments = Const.BEZIER_SEGMENTS) {
+    static fromPolyline(p: Polyline) {
+        return new MultiLine(MultiVector3.fromList(p.verts), getPairIndices(p.verts.length, false));
+    }
+
+    static fromBezier(b: Bezier, numSegments = Const.BEZIER_SEGMENTS) {
         let count = numSegments + 1;
         let verts = new MultiVector3(count);
         for (let i = 0; i < count; i++) {
             // fraction
             let t = i / numSegments;
-            verts.setVector(i, b.eval(t));
+            verts.setVector(i, b.pointAt(t));
         }
         return new MultiLine(verts, getPairIndices(count, false));
     }

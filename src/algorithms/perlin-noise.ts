@@ -350,9 +350,9 @@ export class Perlin {
         let bab = p[p[p[this.inc(xi)] + yi] + this.inc(zi)];
         let bbb = p[p[p[this.inc(xi)] + this.inc(yi)] + this.inc(zi)];
 
-        let u = GeonMath.fade(xf);
-        let v = GeonMath.fade(yf);
-        let w = GeonMath.fade(zf);
+        let u = GeonMath.smooth(xf);
+        let v = GeonMath.smooth(yf);
+        let w = GeonMath.smooth(zf);
 
         let x1, x2, y1, y2;
         x1 = GeonMath.lerp(
@@ -368,7 +368,11 @@ export class Perlin {
         y1 = GeonMath.lerp(x1, x2, v);
 
         x1 = GeonMath.lerp(this.grad(aab, xf, yf, zf - 1), this.grad(bab, xf - 1, yf, zf - 1), u);
-        x2 = GeonMath.lerp(this.grad(abb, xf, yf - 1, zf - 1), this.grad(bbb, xf - 1, yf - 1, zf - 1), u);
+        x2 = GeonMath.lerp(
+            this.grad(abb, xf, yf - 1, zf - 1),
+            this.grad(bbb, xf - 1, yf - 1, zf - 1),
+            u,
+        );
         y2 = GeonMath.lerp(x1, x2, v);
 
         return (GeonMath.lerp(y1, y2, w) + 1) / 2;

@@ -19,13 +19,13 @@ export class Loft extends BiSurface {
     }
 
     eval(u: number, v: number): Vector3 {
-        return this.isoCurveV(u).eval(v);
+        return this.isoCurveV(u).pointAt(v);
     }
 
     isoCurveV(u: number): Bezier {
         let pts = [];
         for (let i = 0; i < this.curves.length; i++) {
-            pts.push(this.curves[i].eval(u));
+            pts.push(this.curves[i].pointAt(u));
         }
         return Bezier.new(pts);
     }
