@@ -9,7 +9,7 @@ import { Vector3 } from "../../math/vector";
 import { Curve, MAX_DEGREE, PASCAL } from "./curve";
 
 export class Bezier extends Curve {
-    private constructor(verts: Vector3[], degree: number) {
+    public constructor(verts: Vector3[], degree: number) {
         super(verts, degree);
     }
 
@@ -38,6 +38,26 @@ export class Bezier extends Curve {
         return p;
     }
 
+    /**
+     * Calculate the so-called hodograph of this curve, which is a curve representing all its tangents
+     */
+    hodograph(): Bezier {
+        let hodoVerts: Vector3[] = [];
+        for (let i = 0; i < this.verts.length - 1; i++) {
+            hodoVerts.push(this.verts[i + 1].subbed(this.verts[i]));
+        }
+        return Bezier.new(hodoVerts);
+    }
+
+    /**
+     * Calculate the tangent at parameter t.
+     * Tangent is calculated using a method described here: https://pages.mtu.edu/~shene/COURSES/cs3621/NOTES/spline/Bezier/bezier-der.html
+     */
+    tangent(t: number): Vector3 {
+        // evaluate the so-called 'hodograph' of this curve
+        return this.hodograph().eval(t);
+    }
+
     clone(): Bezier {
         let b = Bezier.new(MultiVector3.fromList(this.verts).toList());
         return b;
@@ -46,5 +66,16 @@ export class Bezier extends Curve {
     transform(m: Matrix4): Bezier {
         m.multiplyVectorList(this.verts);
         return this;
+    }
+}
+
+// Shorthand for Cubic Bezier
+export class Cubez extends Bezier {
+    private constructor(verts: Vector3[]) {
+        super(verts, 3);
+    }
+
+    static new(verts: Vector3[]) {
+        return new Cubez(verts);
     }
 }

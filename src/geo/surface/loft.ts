@@ -1,18 +1,15 @@
 // name:    spline.ts
 // author:  Jos Feenstra
-// purpose: mathematical representation of a parametric surface
+// purpose: mathematical representation of a parametric loft surface
 
 import { Vector3 } from "../../math/vector";
+import { Mesh } from "../../mesh/mesh";
 import { Bezier } from "../curve/bezier";
 import { Curve } from "../curve/curve";
+import { Polyline } from "../curve/polyline";
+import { BiSurface } from "./surface";
 
-// todo : research tensor: https://en.wikipedia.org/wiki/Tensor_product
-
-export abstract class Surface {
-    abstract eval(u: number, v: number): Vector3;
-}
-
-export class Loft extends Surface {
+export class Loft extends BiSurface {
     private constructor(public curves: Curve[]) {
         super();
     }
@@ -31,5 +28,46 @@ export class Loft extends Surface {
             pts.push(this.curves[i].eval(u));
         }
         return Bezier.new(pts);
+    }
+
+    /**
+     *
+     * @param uSegments when using polylines, please use a value divisible by the number of polygons used:
+     *      loft between 4 segment polyline & 5 segment polyline? use 20:
+     *          - 4 / 20 is a round number
+     *          - 5 / 20 is a round number
+     * @param vSegments
+     * @returns
+     */
+    buffer(uSegments: number, vSegments: number) {
+        // // NOTE : to make this always watertight: take note of the precision when using polylines:
+        // for (let c of this.curves) {
+        //     if (c instanceof Polyline) {
+        //         let leftover = uSegments % (c.verts.length - 1);
+        //         if (leftover != 0) {
+        //             console.warn("mesh might not be watertight! leftover: ", leftover);
+        //         }
+        //     }
+        // }
+        return Mesh.fromSurface(this, uSegments, vSegments);
+    }
+
+    /**
+     * same as buffer, but the udetail is semi-automated
+     */
+    bufferExact() {
+        // NOTE : to make this always watertight: take note of the precision when using polylines:
+        let vals: number[] = [];
+        for (let c of this.curves) {
+            if (c instanceof Polyline) {
+                vals.push(c.verts.length - 1);
+            }
+        }
+
+        let perfectuSegments = vals.reduce((a, b) => {
+            return a * b;
+        });
+
+        return Mesh.fromSurface(this, perfectuSegments, perfectuSegments);
     }
 }

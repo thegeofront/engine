@@ -15,7 +15,7 @@ import { Renderable, MeshType as MeshType } from "./render-mesh";
 import { Plane } from "../geo/plane";
 import { Matrix4 } from "../math/matrix";
 import { Graph } from "./graph";
-import { Surface } from "../geo/surface/loft";
+import { BiSurface } from "../geo/surface/surface";
 
 export class Mesh {
     // CONSTRUCTORS
@@ -48,7 +48,7 @@ export class Mesh {
         return new Mesh(verts, links);
     }
 
-    static fromSurface(srf: Surface, uSegments = 10, vSegments = 10): Mesh {
+    static fromSurface(srf: BiSurface, uSegments = 10, vSegments = 10): Mesh {
         // returns vertices & indices of a flat grid
         let uPoints = uSegments + 1;
         let vPoints = vSegments + 1;
@@ -60,6 +60,7 @@ export class Mesh {
         for (let u = 0; u < uPoints; u++) {
             for (let v = 0; v < vPoints; v++) {
                 let i = u * vPoints + v;
+
                 verts.setVector(i, srf.eval(u / uSegments, v / vSegments));
             }
         }

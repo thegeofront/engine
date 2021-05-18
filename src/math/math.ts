@@ -27,6 +27,22 @@ export class GeonMath {
         return (d * Math.PI) / 180;
     }
 
+    static fact(n: number) {
+        let prod = 1;
+        for (let i = 1; i < n + 1; i++) {
+            prod * i;
+        }
+        return prod;
+    }
+
+    static stack(n: number) {
+        let prod = 1;
+        for (let i = 1; i < n + 1; i++) {
+            prod + i;
+        }
+        return prod;
+    }
+
     // /**
     //  * return true if a is rougly the same value as b.
     //  * uses the predefined tolerance
