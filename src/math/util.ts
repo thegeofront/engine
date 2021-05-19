@@ -6,4 +6,12 @@ export class Util {
         }
         return array;
     }
+
+    static collect<T>(gen: Generator<T>): Array<T> {
+        let arr = new Array<T>();
+        for (let item of gen) {
+            arr.push(item);
+        }
+        return arr;
+    }
 }

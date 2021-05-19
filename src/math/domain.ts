@@ -68,15 +68,16 @@ export class Domain {
 
     *iter(count: number): Generator<number> {
         // iterate over this Domain 'count' number of times
-        let step = this.size() / count;
-        for (let i = this.t0; i < this.t1; i += step) {
-            yield i;
+        let step = this.size() / (count - 1);
+        for (let i = 0; i < count; i++) {
+            let val = this.t0 + i * step;
+            yield val;
         }
     }
 
     *iterStep(step: number): Generator<number> {
         // iterate over this domain with a stepsize of 'step'
-        for (let i = this.t0; i < this.t1; i += step) {
+        for (let i = this.t0; i <= this.t1; i += step) {
             yield i;
         }
     }
@@ -102,6 +103,10 @@ export class Domain2 {
     constructor(x: Domain = new Domain(), y: Domain = new Domain()) {
         this.x = x;
         this.y = y;
+    }
+
+    static fromRadii(rx: number, ry: number): Domain2 {
+        return new Domain2(Domain.fromRadius(rx), Domain.fromRadius(ry));
     }
 
     static fromRadius(r: number): Domain2 {
@@ -169,23 +174,23 @@ export class Domain2 {
         return data;
     }
 
-    // *iter(countX: number, countY: number) : Generator<Vector2, void, unknown> {
-    //     // iterate over this Domain 'count' number of times
-    //     for (const y in this.y.iter(countY)) {
-    //         for (const x in this.x.iter(countX)) {
-    //             // yield new Vector2(x, y);
-    //         }
-    //     }
-    // }
+    *iter(countX: number, countY: number): Generator<Vector2> {
+        // iterate over this Domain 'count' number of times
+        for (const y of this.y.iter(countY)) {
+            for (const x of this.x.iter(countX)) {
+                yield new Vector2(x, y);
+            }
+        }
+    }
 
-    // *iterStep(sizeX: number, sizeY: number) : Generator<Vector2, void, unknown> {
-    //     // iterate over this domain with a stepsize of 'step'
-    //     for (let y in this.y.iterStep(sizeY)) {
-    //         for (let x in this.x.iterStep(sizeX)) {
-    //             // yield new Vector2(x, y);
-    //         }
-    //     }
-    // }
+    *iterStep(sizeX: number, sizeY: number): Generator<Vector2> {
+        // iterate over this domain with a stepsize of 'step'
+        for (let y of this.y.iterStep(sizeY)) {
+            for (let x of this.x.iterStep(sizeX)) {
+                yield new Vector2(x, y);
+            }
+        }
+    }
 }
 
 export class Domain3 {
@@ -290,5 +295,27 @@ export class Domain3 {
             }
         }
         return data;
+    }
+
+    *iter(countX: number, countY: number, countZ: number): Generator<Vector3> {
+        // iterate over this Domain 'count' number of times
+        for (const z of this.z.iter(countZ)) {
+            for (const y of this.y.iter(countY)) {
+                for (const x of this.x.iter(countX)) {
+                    yield new Vector3(x, y, z);
+                }
+            }
+        }
+    }
+
+    *iterStep(sizeX: number, sizeY: number, sizeZ: number): Generator<Vector3> {
+        // iterate over this domain with a stepsize of 'step'
+        for (let z of this.z.iterStep(sizeZ)) {
+            for (let y of this.y.iterStep(sizeY)) {
+                for (let x of this.x.iterStep(sizeX)) {
+                    yield new Vector3(x, y, z);
+                }
+            }
+        }
     }
 }

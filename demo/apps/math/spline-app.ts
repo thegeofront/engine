@@ -50,18 +50,34 @@ export class SplineApp extends App {
     }
 
     ui(ui: UI) {
+        ui.addText("BEZIER CURVE");
         this.params.push(Parameter.new("t", 0.5, 0, 1, 0.001));
+        ui.addParameter(this.params[0], this.start.bind(this));
 
+        ui.addText("LOFT");
         this.params.push(Parameter.new("u", 0.5, 0, 1, 0.001));
+        ui.addParameter(this.params[1], this.start.bind(this));
         this.params.push(Parameter.new("v", 0.5, 0, 1, 0.001));
+        ui.addParameter(this.params[2], this.start.bind(this));
+        this.params.push(Parameter.new("displace bottom", 0, -5, 5, 0.001));
+        ui.addParameter(this.params[3], this.start.bind(this));
 
-        this.params.push(Parameter.new("y", 0, -5, 5, 0.001));
+        ui.addText("BEZIER SQUARE");
+        this.params.push(Parameter.new("degree", 0.5, 0, 1, 0.001));
+        ui.addParameter(this.params[4], this.start.bind(this));
+        this.params.push(Parameter.new("displace", 0.5, 0, 1, 0.001));
+        ui.addParameter(this.params[5], this.start.bind(this));
+
+        ui.addText("BEZIER TRIANGLE");
+        this.params.push(Parameter.new("degree", 0.5, 0, 1, 0.001));
+        ui.addParameter(this.params[6], this.start.bind(this));
+        this.params.push(Parameter.new("displace", 0.5, 0, 1, 0.001));
+        ui.addParameter(this.params[7], this.start.bind(this));
+
+        ui.addText("OVERALL");
 
         this.params.push(Parameter.new("detail", 10, 2, 100, 1));
-
-        for (let param of this.params) {
-            ui.addParameter(param, this.start.bind(this));
-        }
+        ui.addParameter(this.params[this.params.length - 1], this.start.bind(this));
     }
 
     start() {
@@ -73,7 +89,7 @@ export class SplineApp extends App {
         let u = this.params[1].get();
         let v = this.params[2].get();
         let y = this.params[3].get();
-        let detail = this.params[4].get();
+        let detail = this.params[this.params.length - 1].get();
 
         // 1 - bezier
         let bezier = Bezier.new([
@@ -109,22 +125,8 @@ export class SplineApp extends App {
         loftcurves[2].move(Vector3.new(0, y, 0));
         let loft = Loft.new(loftcurves);
 
-        // 3 - bisurface
-        let surface = BezierSquare.new([
-            Vector3.new(7, 1, 0),
-            Vector3.new(7, 3, 0),
-            Vector3.new(7, 5, 0),
-            Vector3.new(9, 1, 0),
-            Vector3.new(9, 3, 0),
-            Vector3.new(9, 5, 0),
-            Vector3.new(11, 1, 0),
-            Vector3.new(11, 3, 0),
-            Vector3.new(11, 5, 0),
-        ])!;
-
         // dots
         this.dots = [];
-        this.dots.push(...surface.verts);
         this.dots.push(...bezier.verts);
         this.dots.push(bezier.pointAt(t));
         this.dots.push(bezier.pointAt(t).add(bezier.tangentAt(t)));

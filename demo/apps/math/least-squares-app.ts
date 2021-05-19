@@ -20,6 +20,7 @@ import {
     Matrix3,
     Context,
 } from "../../../src/lib";
+import { Random } from "../../../src/math/random";
 
 // good sites explaining the power of least squares
 // https://courses.physics.illinois.edu/cs357/sp2020/notes/ref-17-least-squares.html
@@ -31,6 +32,7 @@ export class LeastSquaresApp extends App {
     params: Parameter[] = [];
 
     // state
+    rng: Random;
     points!: MultiVector3;
     Plsa!: MultiVector3;
     Pnormal!: MultiVector3;
@@ -47,6 +49,7 @@ export class LeastSquaresApp extends App {
         super(gl);
 
         let canvas = gl.canvas as HTMLCanvasElement;
+        this.rng = Random.fromRandom();
         this.camera = new Camera(canvas, -2, true);
 
         this.drRed = new DotRenderer3(gl, 10, [1, 0, 0, 1], false);
@@ -54,7 +57,7 @@ export class LeastSquaresApp extends App {
         this.drBlue = new DotRenderer3(gl, 10, [0, 0, 1, 1], false);
         this.lineRenderer = new LineRenderer(gl, [0.3, 0.3, 0.3, 1]);
 
-        this.points = createRandomPoints(16, 1);
+        this.points = createRandomPoints(16, 1, this.rng);
 
         this.resetCamera();
     }
@@ -111,7 +114,7 @@ export class LeastSquaresApp extends App {
         ui.addText("");
         ui.addParameter(p[9], recalc);
         ui.addParameter(p[11], () => {
-            this.points = createRandomPoints(this.params[11].get(), 1);
+            this.points = createRandomPoints(this.params[11].get(), 1, this.rng);
             this.start();
         });
         ui.addBooleanParameter(p[10]);
@@ -162,7 +165,7 @@ export class LeastSquaresApp extends App {
         this.Pnormal = this.points.clone().transform(M);
 
         // apply noise
-        let noise = createRandomPoints(this.params[11].get(), this.params[9].get());
+        let noise = createRandomPoints(this.params[11].get(), this.params[9].get(), this.rng);
         this.Pnormal = this.Pnormal.mapWith(noise, (a, b) => {
             return a + b;
         });
@@ -232,13 +235,13 @@ function combine(
     return result;
 }
 
-function createRandomPoints(count: number, range: number): MultiVector3 {
+function createRandomPoints(count: number, range: number, rng: Random): MultiVector3 {
     let bounds = Domain3.fromBounds(-range, range, -range, range, -range, range);
-    let arr = new MultiVector3(count);
+    let multi = new MultiVector3(count);
     for (let i = 0; i < count; i++) {
-        arr.setVector(i, bounds.elevate(Vector3.fromRandom()));
+        multi.setVector(i, bounds.elevate(Vector3.fromRandom(rng)));
     }
-    return arr;
+    return multi;
 }
 
 // solve x for Ax = b, where in this case, A = left, b = right.

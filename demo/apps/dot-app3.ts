@@ -13,6 +13,7 @@ import {
     App,
     Context,
 } from "../../src/lib";
+import { Random } from "../../src/math/random";
 
 export class DotApp3 extends App {
     dots: Vector3[] = [];
@@ -48,9 +49,10 @@ export class DotApp3 extends App {
             normrange,
         );
 
+        let rng = Random.fromRandom();
         for (let i = 0; i < count; i++) {
-            this.dots.push(this.bounds.elevate(Vector3.fromRandom()));
-            this.dirs.push(normSpace.elevate(Vector3.fromRandom()));
+            this.dots.push(this.bounds.elevate(Vector3.fromRandom(rng)));
+            this.dirs.push(normSpace.elevate(Vector3.fromRandom(rng)));
         }
     }
 

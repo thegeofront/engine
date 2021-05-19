@@ -8,13 +8,14 @@
 import { Const } from "./const";
 import { GeonMath } from "./math";
 import { Matrix4 } from "./matrix";
+import { Random } from "./random";
 import { Util } from "./util";
 
 export class Vector3 {
     // #region constructors
     constructor(public x: number, public y: number, public z: number) {}
 
-    static new(x=0, y=0, z=0) {
+    static new(x = 0, y = 0, z = 0) {
         return new Vector3(x, y, z);
     }
 
@@ -47,8 +48,13 @@ export class Vector3 {
         return new Vector3(a[0], a[1], a[2]);
     }
 
-    static fromRandom(): Vector3 {
-        return new Vector3(Math.random(), Math.random(), Math.random());
+    static fromRandom(rng: Random): Vector3 {
+        return new Vector3(rng.get(), rng.get(), rng.get());
+    }
+
+    static fromRandomUnit(rng: Random): Vector3 {
+        // NOTE : this is not perfectly random, but good enough...
+        return this.fromRandom(rng).sub(Vector3.new(0.5, 0.5, 0.5)).normalize();
     }
 
     static fromSphere(radius: number, theta: number, phi: number): Vector3 {
