@@ -34,12 +34,12 @@ export class Polyline extends Curve {
     }
 
     lengthAt(t: number): number {
-        let lengths = this.getLengths();
+        let lengths = this.getLazyLengths();
         return GeonMath.sample(lengths, t);
     }
 
     tAtLength(length: number): number {
-        let lengths = this.getLengths();
+        let lengths = this.getLazyLengths();
         let [idxA, idxB] = GeonMath.between(lengths, length);
         let [min, max] = [lengths[idxA], lengths[idxB]];
 
@@ -48,15 +48,14 @@ export class Polyline extends Curve {
     }
 
     length(): number {
-        return this.getLengths()[this.verts.length - 1];
+        return this.getLazyLengths()[this.verts.length - 1];
     }
 
-    getLengths() {
+    getLazyLengths() {
         if (!this._lengths) {
-            console.error("no lengths!");
-            throw "no lengths!";
+            this.bufferLengths();
         }
-        return this._lengths;
+        return this._lengths!;
     }
 
     bufferLengths() {

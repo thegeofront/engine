@@ -91,11 +91,11 @@ export class Bezier extends Curve {
         this.toPolyline(100).tAtLength(length);
     }
 
-    getApprox() {
+    getLazyApprox() {
         if (!this._approx) {
-            throw "approximate polyline is unset. Recalculate approx after every transformation.";
+            this.bufferApprox();
         }
-        return this._approx;
+        return this._approx!;
     }
 
     bufferApprox() {
