@@ -1,5 +1,5 @@
 import { Bezier } from "../../../src/geo/curve/bezier";
-import { BezierSquare } from "../../../src/geo/surface/bezier";
+import { BezierSquare } from "../../../src/geo/surface/bezier-square";
 import { Loft } from "../../../src/geo/surface/loft";
 import {
     App,
@@ -21,6 +21,7 @@ import {
     Domain2,
     MultiVector2,
     Perlin,
+    Circle3,
 } from "../../../src/lib";
 import { Random } from "../../../src/math/random";
 
@@ -40,13 +41,14 @@ export class SurfaceApp extends App {
     lrRed: LineRenderer;
     mr: MeshDebugRenderer;
     perlin: Perlin;
+    drBlue: DotRenderer3;
 
     constructor(gl: WebGLRenderingContext) {
         super(gl);
 
         let canvas = gl.canvas as HTMLCanvasElement;
         this.camera = new Camera(canvas, -2, true);
-        this.camera.set(-10, 1, 1);
+        this.camera.setState([21.926, 11.337, -10.04, -10, 1.12, 1.08]);
 
         this.perlin = Perlin.new();
         this.seed = Random.randomSeed();
@@ -54,6 +56,7 @@ export class SurfaceApp extends App {
         this.lines = [];
 
         this.drRed = new DotRenderer3(gl, 10, [1, 0, 0, 1], false);
+        this.drBlue = new DotRenderer3(gl, 10, [0, 0, 1, 1], false);
         this.lrRed = new LineRenderer(gl, [1, 0, 0, 1]);
         this.lrGrid = new LineRenderer(gl, [0.3, 0.3, 0.3, 1]);
         this.mr = new MeshDebugRenderer(gl, [1, 0, 0, 0.5], [1, 1, 1, 0.5]);
@@ -61,13 +64,13 @@ export class SurfaceApp extends App {
 
     ui(ui: UI) {
         ui.addText("BEZIER SQUARE");
-        this.params.push(Parameter.new("degree", 3, 2, 1000, 1));
+        this.params.push(Parameter.new("degree", 3, 2, 6, 1));
         ui.addParameter(this.params[0], this.start.bind(this));
-        this.params.push(Parameter.new("displace", 0.5, 0, 1, 0.001));
+        this.params.push(Parameter.new("displace", 1.5, 0, 5, 0.001));
         ui.addParameter(this.params[1], this.start.bind(this));
-        this.params.push(Parameter.new("perlin", 0.5, 0, 1, 0.001));
+        this.params.push(Parameter.new("detail", 2, 2, 100, 1));
         ui.addParameter(this.params[2], this.start.bind(this));
-        this.params.push(Parameter.new("detail", 10, 2, 100, 1));
+        this.params.push(Parameter.new("select", 0, 0, 20, 1));
         ui.addParameter(this.params[3], this.start.bind(this));
     }
 
@@ -79,26 +82,40 @@ export class SurfaceApp extends App {
         let degree = this.params[0].get();
         let displace = this.params[1].get();
         let detail = this.params[2].get();
+        let select = this.params[3].get();
 
         // get some points
         let rng = Random.fromSeed(this.seed);
-        let vecs3 = Domain2.fromRadius(11)
+        let vecs = Domain2.fromRadius(11)
             .spawn(degree + 1, degree + 1)
             .to3D()
             .forEach((v) => {
                 return v.add(Vector3.fromRandomUnit(rng).scale(displace));
             });
-        this.drRed.set(vecs3);
+
+        // create a surface from it
+        // console.log(vecs.count);
+        let surface = BezierSquare.new(vecs)!;
+
+        this.drRed.set(vecs);
+
+        // console.log(surface.pointAt(0.5, 0.5));
+
+        // console.log(surface.buffer(detail, detail));
+
+        // this.drRed.set(surface.buffer(detail, detail).verts);
 
         // lines
         this.lines = [];
+        this.lines.push(Circle3.newPlanar(vecs.get(select), 1).buffer());
         // this.lines.push(loft.isoCurveV(u).buffer(detail));
         // for (let dot of this.dots) {
         //     this.lines.push(Circle3.newPlanar(dot, 0.1).buffer());
         // }
 
         // mesh
-        // this.mr.set(loft.buffer(detail, detail).toRenderable());
+        // this.drBlue.set(surface.buffer(detail, detail).verts);
+        this.mr.set(surface.buffer(detail, detail).toRenderable());
     }
 
     startGrid() {
@@ -115,9 +132,10 @@ export class SurfaceApp extends App {
         let matrix = this.camera.totalMatrix;
         let c = new Context(this.camera);
 
-        // this.lrRed.setAndRender(MultiLine.fromJoin(this.lines), c);
+        this.lrRed.setAndRender(MultiLine.fromJoin(this.lines), c);
+        this.drBlue.render(c);
         this.drRed.render(c);
         this.lrGrid.render(c);
-        // this.mr.render(c);
+        this.mr.render(c);
     }
 }

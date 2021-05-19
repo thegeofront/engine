@@ -1,5 +1,5 @@
 import { Bezier } from "../../../src/geo/curve/bezier";
-import { BezierSquare } from "../../../src/geo/surface/bezier";
+import { BezierSquare } from "../../../src/geo/surface/bezier-square";
 import { Loft } from "../../../src/geo/surface/loft";
 import {
     App,

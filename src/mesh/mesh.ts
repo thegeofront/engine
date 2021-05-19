@@ -63,7 +63,7 @@ export class Mesh {
             for (let v = 0; v < vPoints; v++) {
                 let i = u * vPoints + v;
 
-                verts.set(i, srf.eval(u / uSegments, v / vSegments));
+                verts.set(i, srf.pointAt(u / uSegments, v / vSegments));
             }
         }
 

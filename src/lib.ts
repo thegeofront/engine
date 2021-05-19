@@ -48,7 +48,7 @@ export * from "./geo/curve/polyline";
 export * from "./geo/curve/spline";
 
 export * from "./geo/surface/surface";
-export * from "./geo/surface/bezier";
+export * from "./geo/surface/bezier-square";
 export * from "./geo/surface/loft";
 
 export * from "./img/Image";

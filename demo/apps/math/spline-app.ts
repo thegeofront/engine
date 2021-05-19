@@ -1,5 +1,5 @@
 import { Bezier } from "../../../src/geo/curve/bezier";
-import { BezierSquare } from "../../../src/geo/surface/bezier";
+import { BezierSquare } from "../../../src/geo/surface/bezier-square";
 import { Loft } from "../../../src/geo/surface/loft";
 import {
     App,
@@ -124,7 +124,7 @@ export class SplineApp extends App {
         this.dots.push(bezier.pointAt(t));
         this.dots.push(bezier.pointAt(t).add(bezier.tangentAt(t)));
         this.dots.push(bezier.pointAt(t).add(bezier.normalAt(t)));
-        this.dots.push(loft.eval(u, v));
+        this.dots.push(loft.pointAt(u, v));
 
         // lines
         this.lines = [];

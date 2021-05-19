@@ -21,7 +21,7 @@ export class Loft extends BiSurface {
         return new Loft(curves);
     }
 
-    eval(u: number, v: number): Vector3 {
+    pointAt(u: number, v: number): Vector3 {
         return this.isoCurveV(u).pointAt(v);
     }
 
@@ -31,19 +31,6 @@ export class Loft extends BiSurface {
             pts.set(i, this.curves[i].pointAt(u));
         }
         return Bezier.new(pts);
-    }
-
-    /**
-     *
-     * @param uSegments when using polylines, please use a value divisible by the number of polygons used:
-     *      loft between 4 segment polyline & 5 segment polyline? use 20:
-     *          - 4 / 20 is a round number
-     *          - 5 / 20 is a round number
-     * @param vSegments
-     * @returns
-     */
-    buffer(uSegments: number, vSegments: number) {
-        return Mesh.fromSurface(this, uSegments, vSegments);
     }
 
     /**
