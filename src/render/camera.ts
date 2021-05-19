@@ -57,13 +57,11 @@ export class Camera {
 
         if (state.IsKeyPressed("p")) {
             console.log(
-                "camera state: ",
-                this.pos.x,
-                this.pos.y,
-                this.pos.z,
-                this.z_offset,
-                this.angleAlpha,
-                this.angleBeta,
+                `camera state: [${this.pos.x.toPrecision(5)}, ${this.pos.y.toPrecision(
+                    5,
+                )}, ${this.pos.z.toPrecision(5)}, ${this.z_offset}, ${this.angleAlpha},${
+                    this.angleBeta
+                }]`,
             );
 
             // console.log(

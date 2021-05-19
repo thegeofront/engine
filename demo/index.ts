@@ -19,6 +19,7 @@ import { UITestApp } from "./apps/ui-test-app";
 import { SphericalLandingApp } from "./apps/spherical/spherical-landing";
 import { SplineApp } from "./apps/math/spline-app";
 import { SurfaceApp } from "./apps/math/surface-app";
+import { SomePointsApp } from "./apps/math/some-points-app";
 
 var core: Core;
 
@@ -38,6 +39,7 @@ function main() {
     // init swap app
     let appCollection = [
         SurfaceApp,
+        SomePointsApp,
         SplineApp,
         SphericalTwoApp,
         SphericalThreeApp,

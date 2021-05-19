@@ -113,9 +113,9 @@ export class DotRenderer3 extends Renderer<MultiVector> {
         // from some other thing
         this.count = array.count();
 
-        // // Bind the position buffer.
-        gl.enableVertexAttribArray(this.a_position);
+        // // Bind the position buffer
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
+        gl.enableVertexAttribArray(this.a_position);
         gl.vertexAttribPointer(this.a_position, array.width, gl.FLOAT, false, 0, 0);
         gl.bufferData(gl.ARRAY_BUFFER, array.data, super.convertDrawSpeed(speed));
     }
@@ -135,6 +135,7 @@ export class DotRenderer3 extends Renderer<MultiVector> {
         // // Bind the position buffer.
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
         gl.enableVertexAttribArray(this.a_position);
+        gl.vertexAttribPointer(this.a_position, 3, gl.FLOAT, false, 0, 0);
 
         // Draw the point.
         gl.drawArrays(gl.POINTS, 0, this.count);

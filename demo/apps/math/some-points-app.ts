@@ -21,54 +21,52 @@ import {
     Domain2,
     MultiVector2,
     Perlin,
+    MultiVector3,
 } from "../../../src/lib";
 import { Random } from "../../../src/math/random";
 
-export class SurfaceApp extends App {
+export class SomePointsApp extends App {
     // ui
     params: Parameter[] = [];
 
     // state
     seed: number;
-    dots: Vector3[];
-    lines: MultiLine[];
+    perlin: Perlin;
+    dots!: MultiVector3;
 
     // render
     camera: Camera;
     drRed: DotRenderer3;
     lrGrid: LineRenderer;
-    lrRed: LineRenderer;
-    mr: MeshDebugRenderer;
-    perlin: Perlin;
 
     constructor(gl: WebGLRenderingContext) {
         super(gl);
 
         let canvas = gl.canvas as HTMLCanvasElement;
         this.camera = new Camera(canvas, -2, true);
-        this.camera.set(-10, 1, 1);
+        this.camera.setState([16.157, 0.79017, -7.02, -10, 1.12, 1.5600000000000014]);
 
         this.perlin = Perlin.new();
         this.seed = Random.randomSeed();
-        this.dots = [];
-        this.lines = [];
 
         this.drRed = new DotRenderer3(gl, 10, [1, 0, 0, 1], false);
-        this.lrRed = new LineRenderer(gl, [1, 0, 0, 1]);
         this.lrGrid = new LineRenderer(gl, [0.3, 0.3, 0.3, 1]);
-        this.mr = new MeshDebugRenderer(gl, [1, 0, 0, 0.5], [1, 1, 1, 0.5]);
     }
 
     ui(ui: UI) {
         ui.addText("BEZIER SQUARE");
-        this.params.push(Parameter.new("degree", 3, 2, 1000, 1));
+
+        this.params.push(Parameter.new("count", 100, 2, 500, 1));
+        this.params.push(Parameter.new("displace", 0, 0, 1, 0.001));
+        this.params.push(Parameter.newBoolean("perlin move", true));
+        this.params.push(Parameter.new("perlin amp", 4, 1, 10, 0.01));
+        this.params.push(Parameter.new("perlin speed", 1, 0.5, 5, 0.1));
+
         ui.addParameter(this.params[0], this.start.bind(this));
-        this.params.push(Parameter.new("displace", 0.5, 0, 1, 0.001));
         ui.addParameter(this.params[1], this.start.bind(this));
-        this.params.push(Parameter.new("perlin", 0.5, 0, 1, 0.001));
-        ui.addParameter(this.params[2], this.start.bind(this));
-        this.params.push(Parameter.new("detail", 10, 2, 100, 1));
+        ui.addBooleanParameter(this.params[2], this.start.bind(this));
         ui.addParameter(this.params[3], this.start.bind(this));
+        ui.addParameter(this.params[4], this.start.bind(this));
     }
 
     start() {
@@ -78,7 +76,6 @@ export class SurfaceApp extends App {
         // get all parameters
         let degree = this.params[0].get();
         let displace = this.params[1].get();
-        let detail = this.params[2].get();
 
         // get some points
         let rng = Random.fromSeed(this.seed);
@@ -88,17 +85,10 @@ export class SurfaceApp extends App {
             .forEach((v) => {
                 return v.add(Vector3.fromRandomUnit(rng).scale(displace));
             });
-        this.drRed.set(vecs3);
 
-        // lines
-        this.lines = [];
-        // this.lines.push(loft.isoCurveV(u).buffer(detail));
-        // for (let dot of this.dots) {
-        //     this.lines.push(Circle3.newPlanar(dot, 0.1).buffer());
-        // }
-
-        // mesh
-        // this.mr.set(loft.buffer(detail, detail).toRenderable());
+        // save them, and put them in the renderer, which we need if we are not updating for perlin effect
+        this.dots = vecs3;
+        this.drRed.set(vecs3, DrawSpeed.StaticDraw);
     }
 
     startGrid() {
@@ -108,16 +98,23 @@ export class SurfaceApp extends App {
 
     update(state: InputState) {
         this.camera.update(state);
+
+        let perlinMove = this.params[2].get() == 1;
+        if (perlinMove) {
+            let factor = this.params[3].get();
+            let speed = this.params[4].get();
+            let news = this.dots.map((v) => {
+                let n = this.perlin.noise(v.x, v.y, state.newTime * 0.0001 * speed) * factor;
+                return v.added(Vector3.new(0, 0, n));
+            });
+            this.drRed.set(news, DrawSpeed.DynamicDraw);
+        }
     }
 
     draw(gl: WebGLRenderingContext) {
-        const canvas = gl.canvas as HTMLCanvasElement;
-        let matrix = this.camera.totalMatrix;
         let c = new Context(this.camera);
 
-        // this.lrRed.setAndRender(MultiLine.fromJoin(this.lines), c);
         this.drRed.render(c);
         this.lrGrid.render(c);
-        // this.mr.render(c);
     }
 }

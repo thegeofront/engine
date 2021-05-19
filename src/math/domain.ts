@@ -4,6 +4,7 @@
 // purpose: general representation of a domain / range / bound of numbers
 
 import { Matrix4, MultiVector2, MultiVector3, Vector2, Vector3 } from "../lib";
+import { Stopwatch } from "../system/stopwatch";
 
 export class Domain {
     // note: including t0, including t1
@@ -64,6 +65,21 @@ export class Domain {
         // normalize a value, then elevate it to a new domain
         let norm = this.normalize(value);
         return other.elevate(norm);
+    }
+
+    /**
+     * generate `count` values evenly distributed along the domain.
+     */
+    spawn(count: number): Float32Array {
+        // this is almost 100x slower
+        // return new Float32Array(this.iter(count));
+
+        let result = new Float32Array(count);
+        let step = this.size() / (count - 1);
+        for (let i = 0; i < count; i++) {
+            result[i] = this.t0 + i * step;
+        }
+        return result;
     }
 
     *iter(count: number): Generator<number> {
@@ -174,22 +190,23 @@ export class Domain2 {
         return data;
     }
 
-    *iter(countX: number, countY: number): Generator<Vector2> {
+    /**
+     * generate `countX * CountY` vector2's evenly distributed along the domain.
+     */
+    spawn(countX: number, countY: number) {
         // iterate over this Domain 'count' number of times
-        for (const y of this.y.iter(countY)) {
-            for (const x of this.x.iter(countX)) {
-                yield new Vector2(x, y);
-            }
-        }
-    }
+        let result = MultiVector2.new(countX * countY);
+        let i = 0;
 
-    *iterStep(sizeX: number, sizeY: number): Generator<Vector2> {
-        // iterate over this domain with a stepsize of 'step'
-        for (let y of this.y.iterStep(sizeY)) {
-            for (let x of this.x.iterStep(sizeX)) {
-                yield new Vector2(x, y);
+        let yRange = this.y.spawn(countY);
+        let xRange = this.x.spawn(countX);
+        for (const y of yRange) {
+            for (const x of xRange) {
+                result.setXY(i, x, y);
+                i++;
             }
         }
+        return result;
     }
 }
 
@@ -297,25 +314,41 @@ export class Domain3 {
         return data;
     }
 
-    *iter(countX: number, countY: number, countZ: number): Generator<Vector3> {
+    /**
+     * generate `countX * countY * countZ` vector3's evenly distributed along the domain.
+     */
+    spawn(countX: number, countY: number, countZ: number) {
         // iterate over this Domain 'count' number of times
-        for (const z of this.z.iter(countZ)) {
-            for (const y of this.y.iter(countY)) {
-                for (const x of this.x.iter(countX)) {
-                    yield new Vector3(x, y, z);
-                }
-            }
-        }
-    }
+        let result = MultiVector3.new(countX * countY);
+        let i = 0;
 
-    *iterStep(sizeX: number, sizeY: number, sizeZ: number): Generator<Vector3> {
-        // iterate over this domain with a stepsize of 'step'
-        for (let z of this.z.iterStep(sizeZ)) {
-            for (let y of this.y.iterStep(sizeY)) {
-                for (let x of this.x.iterStep(sizeX)) {
-                    yield new Vector3(x, y, z);
+        // this looks dumb, i have tried other methods, this is still the fastest...
+        let zRange = this.z.spawn(countZ);
+        let yRange = this.y.spawn(countY);
+        let xRange = this.x.spawn(countX);
+        for (const z of zRange) {
+            for (const y of yRange) {
+                for (const x of xRange) {
+                    result.setXYZ(i, x, y, z);
+                    i++;
                 }
             }
         }
+        return result;
     }
+}
+
+function benchmark() {
+    // GENERAL BENCHMARKING CONCLUSIONS
+    // use typedarrays
+    // do not use yield. Its just not how javascript likes to function, often 100x slower
+    let sw = Stopwatch.new();
+
+    let domain = Domain2.fromRadius(5);
+
+    sw.log("init");
+
+    let count = 1000;
+    domain.spawn(count, count);
+    sw.log("spawn1");
 }

@@ -278,6 +278,10 @@ export class Perlin {
         }
     }
 
+    static new() {
+        return new Perlin();
+    }
+
     private grad(hash: number, x: number, y: number, z: number): number {
         switch (hash & 0xf) {
             case 0x0:

@@ -219,6 +219,18 @@ export class MultiVector3 extends Geo {
     transformed(m: Matrix4): MultiVector3 {
         return new MultiVector3(calc(this.matrix, m));
     }
+
+    move(v: Vector3): MultiVector3 {
+        return this.map((v) => {
+            return v.added(v);
+        });
+    }
+
+    scale(s: Vector3): MultiVector3 {
+        return this.map((v) => {
+            return v.multiplied(s);
+        });
+    }
 }
 
 function calc(a: FloatMatrix, b: Matrix4) {
@@ -238,38 +250,6 @@ function calc(a: FloatMatrix, b: Matrix4) {
     return product;
 }
 
-function benchmark() {
-    // TODAY I LEARNED THAT OPTIMIZATION IS ALWAYS UNEXPECTED...
-    let sw = Stopwatch.new();
-    let vecs1 = Util.collect(Domain3.fromRadius(5).iter(200, 200, 20));
-    sw.printTime("list version init");
-
-    for (let v of vecs1) {
-        v.add(new Vector3(1, 2, 3));
-    }
-    sw.printTime("list version edit");
-
-    let vecs2 = MultiVector3.new(200 * 200 * 20);
-    let iter = Domain3.fromRadius(5).iter(200, 200, 20);
-    for (let i = 0; i < vecs2.count; i++) {
-        vecs2.set(i, iter.next().value);
-    }
-    sw.printTime("array version init");
-
-    for (let i = 0; i < vecs2.count; i++) {
-        vecs2.set(i, vecs2.get(i).add(new Vector3(1, 2, 3)));
-    }
-    sw.printTime("array version edit");
-
-    vecs2.forEach((v) => {
-        v.add(Vector3.new(1, 2, 3));
-    });
-    sw.printTime("array internal version edit");
-
-    vecs2.rotateX(1);
-    sw.printTime("array version transform");
-}
-
 function benchmark2() {
     let sw = Stopwatch.new();
 
@@ -279,21 +259,21 @@ function benchmark2() {
     for (let i = 0; i < count; i++) {
         mv.set(i, Vector3.fromRandomUnit(rng));
     }
-    sw.printTime("v1: init");
+    sw.log("v1: init");
 
     let vecs = Array<Vector3>(count);
     for (let i = 0; i < count; i++) {
         vecs[i] = Vector3.fromRandomUnit(rng);
     }
 
-    sw.printTime("v2: init");
+    sw.log("v2: init");
 
     let vecs3 = Array<Vector3>();
     for (let i = 0; i < count; i++) {
         vecs3.push(Vector3.fromRandomUnit(rng));
     }
 
-    sw.printTime("v3: init");
+    sw.log("v3: init");
 
     // v1: init took: 123 ms
     // v2: init took: 184 ms
