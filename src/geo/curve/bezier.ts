@@ -6,8 +6,10 @@
 import { MultiVector3 } from "../../data/multi-vector-3";
 import { Matrix4 } from "../../math/matrix";
 import { Polynomial } from "../../math/polynomial";
+import { Random } from "../../math/random";
 import { Vector3 } from "../../math/vector";
 import { MultiLine } from "../../mesh/multi-line";
+import { Stopwatch } from "../../system/stopwatch";
 import { Curve } from "./curve";
 import { Polyline } from "./polyline";
 

@@ -1,6 +1,7 @@
 import { Geo } from "../geo/geo";
 import { Domain3, Util } from "../lib";
 import { Matrix4 } from "../math/matrix";
+import { Random } from "../math/random";
 import { Vector3 } from "../math/vector";
 import { Stopwatch } from "../system/stopwatch";
 import { FloatMatrix } from "./float-matrix";
@@ -267,4 +268,35 @@ function benchmark() {
 
     vecs2.rotateX(1);
     sw.printTime("array version transform");
+}
+
+function benchmark2() {
+    let sw = Stopwatch.new();
+
+    let count = 1000000;
+    let mv = MultiVector3.new(count);
+    let rng = Random.fromSeed(1337);
+    for (let i = 0; i < count; i++) {
+        mv.set(i, Vector3.fromRandomUnit(rng));
+    }
+    sw.printTime("v1: init");
+
+    let vecs = Array<Vector3>(count);
+    for (let i = 0; i < count; i++) {
+        vecs[i] = Vector3.fromRandomUnit(rng);
+    }
+
+    sw.printTime("v2: init");
+
+    let vecs3 = Array<Vector3>();
+    for (let i = 0; i < count; i++) {
+        vecs3.push(Vector3.fromRandomUnit(rng));
+    }
+
+    sw.printTime("v3: init");
+
+    // v1: init took: 123 ms
+    // v2: init took: 184 ms
+    // v3: init took: 469 ms
+    // conclusion: MultiVector3 works as intended!
 }
