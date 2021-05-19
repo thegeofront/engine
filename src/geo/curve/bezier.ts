@@ -14,31 +14,35 @@ import { Polyline } from "./polyline";
 export class Bezier extends Curve {
     private _approx?: Polyline;
 
-    public constructor(verts: Vector3[], degree: number) {
+    public constructor(verts: MultiVector3, degree: number) {
         super(verts, degree);
     }
 
-    static new(verts: Vector3[]) {
-        return new Bezier(verts, verts.length - 1);
+    static fromList(verts: Vector3[]) {
+        return this.new(MultiVector3.fromList(verts));
+    }
+
+    static new(verts: MultiVector3) {
+        return new Bezier(verts, verts.count - 1);
     }
 
     /**
      * Calculate the so-called hodograph of this curve, which is a curve representing all its tangents
      */
     hodograph(): Bezier {
-        let hodoVerts: Vector3[] = [];
-        for (let i = 0; i < this.verts.length - 1; i++) {
-            hodoVerts.push(this.verts[i + 1].subbed(this.verts[i]));
+        let hodoVerts = MultiVector3.new(this.verts.count - 1);
+        for (let i = 0; i < this.verts.count - 1; i++) {
+            hodoVerts.set(i, this.verts.get(i + 1).subbed(this.verts.get(i)));
         }
         return Bezier.new(hodoVerts);
     }
 
     toPolyline(segments: number) {
         let count = segments + 1;
-        let verts = new Array<Vector3>(count);
+        let verts = MultiVector3.new(count);
         for (let i = 0; i < count; i++) {
             let t = i / segments; // fraction
-            verts[i] = this.pointAt(t);
+            verts.set(i, this.pointAt(t));
         }
         return Polyline.new(verts);
     }
@@ -49,7 +53,7 @@ export class Bezier extends Curve {
     pointAt(t: number): Vector3 {
         let p = Vector3.zero();
         for (let i = 0; i < this.degree + 1; i++) {
-            p.add(this.verts[i].scaled(Polynomial.bernstein(t, i, this.degree)));
+            p.add(this.verts.get(i).scaled(Polynomial.bernstein(t, i, this.degree)));
         }
         return p;
     }
@@ -96,28 +100,28 @@ export class Bezier extends Curve {
     // geo trait
 
     clone(): Bezier {
-        return Bezier.new(MultiVector3.fromList(this.verts).toList());
+        return Bezier.new(this.verts.clone());
     }
 
     transform(m: Matrix4): Bezier {
         this._approx = undefined; // invalidate buffered data
-        this.verts = m.multipliedVectorList(this.verts);
+        this.verts.transform(m);
         return this;
     }
 
     transformed(m: Matrix4): Bezier {
         this._approx = undefined; // invalidate buffered data
-        return Bezier.new(m.multipliedVectorList(this.verts));
+        return Bezier.new(this.verts.transformed(m));
     }
 }
 
 // Shorthand for Cubic Bezier
 export class Cubez extends Bezier {
-    private constructor(verts: Vector3[]) {
+    private constructor(verts: MultiVector3) {
         super(verts, 3);
     }
 
-    static new(verts: Vector3[]) {
+    static new(verts: MultiVector3) {
         return new Cubez(verts);
     }
 }

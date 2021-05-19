@@ -16,7 +16,12 @@ import {
     DrawSpeed,
     InputState,
     Context,
+    Util,
+    Domain2,
+    Domain3,
+    MultiVector3,
 } from "../../../src/lib";
+import { Stopwatch } from "../../../src/system/stopwatch";
 
 export class SplineApp extends App {
     // ui
@@ -80,7 +85,7 @@ export class SplineApp extends App {
         let detail = this.params[this.params.length - 1].get();
 
         // 1 - bezier
-        let bezier = Bezier.new([
+        let bezier = Bezier.fromList([
             Vector3.new(-7, -1, 0),
             Vector3.new(-7, 1, 0),
             Vector3.new(-9, -1, 0),
@@ -89,20 +94,20 @@ export class SplineApp extends App {
 
         // 2 - loft
         let loftcurves = [
-            Polyline.new([
+            Polyline.fromList([
                 Vector3.new(3, -1, 4),
                 Vector3.new(1, -2, 4),
                 Vector3.new(1, 2, 4.5),
                 Vector3.new(-1, 1, 4),
             ]),
-            Bezier.new([
+            Bezier.fromList([
                 Vector3.new(3, -1, 2),
                 Vector3.new(1, -1, 1.5),
                 Vector3.new(1, 1, 1.5),
                 Vector3.new(-1, 1, 2),
                 Vector3.new(-2, 1, 2),
             ]),
-            Bezier.new([
+            Bezier.fromList([
                 Vector3.new(3, -1, 0),
                 Vector3.new(1, -1, 0),
                 Vector3.new(1, 1, 0),
@@ -115,7 +120,7 @@ export class SplineApp extends App {
 
         // dots
         this.dots = [];
-        this.dots.push(...bezier.verts);
+        this.dots.push(...bezier.verts.toList());
         this.dots.push(bezier.pointAt(t));
         this.dots.push(bezier.pointAt(t).add(bezier.tangentAt(t)));
         this.dots.push(bezier.pointAt(t).add(bezier.normalAt(t)));

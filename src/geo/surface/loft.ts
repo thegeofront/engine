@@ -2,6 +2,7 @@
 // author:  Jos Feenstra
 // purpose: mathematical representation of a parametric loft surface
 
+import { MultiVector3 } from "../../data/multi-vector-3";
 import { Matrix4 } from "../../math/matrix";
 import { Vector3 } from "../../math/vector";
 import { Mesh } from "../../mesh/mesh";
@@ -25,9 +26,9 @@ export class Loft extends BiSurface {
     }
 
     isoCurveV(u: number): Bezier {
-        let pts = [];
+        let pts = MultiVector3.new(this.curves.length);
         for (let i = 0; i < this.curves.length; i++) {
-            pts.push(this.curves[i].pointAt(u));
+            pts.set(i, this.curves[i].pointAt(u));
         }
         return Bezier.new(pts);
     }
@@ -53,7 +54,7 @@ export class Loft extends BiSurface {
         let vals: number[] = [];
         for (let c of this.curves) {
             if (c instanceof Polyline) {
-                vals.push(c.verts.length - 1);
+                vals.push(c.verts.count - 1);
             }
         }
 

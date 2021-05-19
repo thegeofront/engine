@@ -5,6 +5,7 @@
 // - Spline
 // - Polyline (not terminologically correct but in terms of logic it makes sense)
 
+import { MultiVector3 } from "../../data/multi-vector-3";
 import { Matrix4 } from "../../math/matrix";
 import { Vector3 } from "../../math/vector";
 import { MultiLine } from "../../mesh/multi-line";
@@ -12,7 +13,7 @@ import { Geo } from "../geo";
 
 // domain is always normalzed, from 0 to 1
 export abstract class Curve extends Geo {
-    constructor(public verts: Vector3[], public readonly degree: number) {
+    constructor(public verts: MultiVector3, public readonly degree: number) {
         super();
     }
 

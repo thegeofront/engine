@@ -165,10 +165,7 @@ export class MultiLine {
     }
 
     static fromPolyline(p: Polyline) {
-        return new MultiLine(
-            MultiVector3.fromList(p.verts).slice(),
-            getPairIndices(p.verts.length, false),
-        );
+        return new MultiLine(p.verts, getPairIndices(p.verts.count, false));
     }
 
     static fromBezier(b: Bezier, numSegments = Const.BEZIER_SEGMENTS) {

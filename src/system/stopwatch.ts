@@ -14,6 +14,10 @@ export class Stopwatch {
         return timePast;
     }
 
+    printTime(event: string) {
+        console.log(`${event} took: ${this.time()} ms`);
+    }
+
     private getTime() {
         return new Date().getTime();
     }

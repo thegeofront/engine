@@ -10,23 +10,27 @@ import { Curve } from "./curve";
 export class Polyline extends Curve {
     private _lengths?: number[];
 
-    private constructor(verts: Vector3[]) {
+    private constructor(verts: MultiVector3) {
         super(verts, 1);
         this.bufferLengths();
     }
 
-    static new(verts: Vector3[]) {
+    static fromList(verts: Vector3[]) {
+        return this.new(MultiVector3.fromList(verts));
+    }
+
+    static new(verts: MultiVector3) {
         return new Polyline(verts);
     }
 
     pointAt(t: number): Vector3 {
-        let count = this.verts.length - 1;
+        let count = this.verts.count - 1;
 
         let p = t * count;
         let idxA = Math.floor(p);
         let idxB = Math.ceil(p);
 
-        return Vector3.fromLerp(this.verts[idxA], this.verts[idxB], p - idxA);
+        return Vector3.fromLerp(this.verts.get(idxA), this.verts.get(idxB), p - idxA);
     }
 
     lengthAt(t: number): number {
@@ -44,7 +48,7 @@ export class Polyline extends Curve {
     }
 
     length(): number {
-        return this.getLazyLengths()[this.verts.length - 1];
+        return this.getLazyLengths()[this.verts.count - 1];
     }
 
     getLazyLengths() {
@@ -55,12 +59,12 @@ export class Polyline extends Curve {
     }
 
     bufferLengths() {
-        let count = this.verts.length;
+        let count = this.verts.count;
         let lengths = Array<number>(count);
         let acc = 0.0;
         lengths[0] = acc;
         for (let i = 0; i < count - 1; i++) {
-            acc += this.verts[i].disTo(this.verts[i + 1]);
+            acc += this.verts.get(i).disTo(this.verts.get(i + 1));
             lengths[i + 1] = acc;
         }
         this._lengths = lengths;
@@ -73,18 +77,18 @@ export class Polyline extends Curve {
     // geo trait
 
     clone(): Polyline {
-        let b = Polyline.new(MultiVector3.fromList(this.verts).toList());
+        let b = Polyline.new(this.verts.clone());
         return b;
     }
 
     transform(m: Matrix4): Polyline {
         this._lengths = undefined; // invalidate buffered data
-        this.verts = m.multipliedVectorList(this.verts);
+        this.verts.transform(m);
         return this;
     }
 
     transformed(m: Matrix4): Polyline {
         this._lengths = undefined; // invalidate buffered data
-        return Polyline.new(m.multipliedVectorList(this.verts));
+        return Polyline.new(this.verts.transformed(m));
     }
 }
