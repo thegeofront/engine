@@ -226,9 +226,9 @@ export class Domain3 {
     static fromInclude(data: MultiVector3): Domain3 {
         // note : could be quicker by going verbose, this now iterates over data 6 times
         return new Domain3(
-            Domain.fromInclude(data.getColumn(0)),
-            Domain.fromInclude(data.getColumn(1)),
-            Domain.fromInclude(data.getColumn(2)),
+            Domain.fromInclude(data.slice().getColumn(0)),
+            Domain.fromInclude(data.slice().getColumn(1)),
+            Domain.fromInclude(data.slice().getColumn(2)),
         );
     }
 
@@ -274,10 +274,10 @@ export class Domain3 {
 
     remapAll(values: MultiVector3, other: Domain3 = new Domain3()): MultiVector3 {
         // normalize a value, then elevate it to a new domain
-        let newValues = new MultiVector3(values.count());
-        for (let i = 0; i < values.count(); i++) {
-            let norm = this.normalize(values.getVector(i));
-            newValues.setVector(i, other.elevate(norm));
+        let newValues = MultiVector3.new(values.count);
+        for (let i = 0; i < values.count; i++) {
+            let norm = this.normalize(values.get(i));
+            newValues.set(i, other.elevate(norm));
         }
         return newValues;
     }

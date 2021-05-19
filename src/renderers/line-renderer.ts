@@ -65,7 +65,7 @@ export class LineRenderer extends Renderer<MultiLine | Mesh> {
         let links;
         let verts;
         if (data instanceof Mesh) {
-            verts = data.verts;
+            verts = data.verts.slice();
             links = data.links.getData();
         } else {
             verts = data.verts;

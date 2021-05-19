@@ -40,7 +40,7 @@ export class Mesh {
     }
 
     static newEmpty(vertCount: number, linkCount: number, perLinkCount: number): Mesh {
-        return new Mesh(new MultiVector3(vertCount), new IntMatrix(linkCount, perLinkCount));
+        return new Mesh(MultiVector3.new(vertCount), new IntMatrix(linkCount, perLinkCount));
     }
 
     static newLines(positions: Vector3[], edges: number[]) {
@@ -55,7 +55,7 @@ export class Mesh {
         let uPoints = uSegments + 1;
         let vPoints = vSegments + 1;
 
-        let verts = new MultiVector3(uPoints * vPoints);
+        let verts = MultiVector3.new(uPoints * vPoints);
         let links = new IntMatrix(uSegments * vSegments * 2, 3);
 
         // create all positions
@@ -63,7 +63,7 @@ export class Mesh {
             for (let v = 0; v < vPoints; v++) {
                 let i = u * vPoints + v;
 
-                verts.setVector(i, srf.eval(u / uSegments, v / vSegments));
+                verts.set(i, srf.eval(u / uSegments, v / vSegments));
             }
         }
 
@@ -87,7 +87,7 @@ export class Mesh {
     }
 
     static zero(): Mesh {
-        return new Mesh(new MultiVector3(0), new IntMatrix(0, 0));
+        return new Mesh(MultiVector3.new(0), new IntMatrix(0, 0));
     }
 
     static fromJoin(meshes: Mesh[]): Mesh {
@@ -97,19 +97,19 @@ export class Mesh {
         let faceCount = 0;
 
         for (let mesh of meshes) {
-            vertCount += mesh.verts.count();
+            vertCount += mesh.verts.count;
             faceCount += mesh.links.count();
         }
 
-        let verts = new MultiVector3(vertCount);
+        let verts = MultiVector3.new(vertCount);
         let links = new IntMatrix(faceCount, 3);
 
         let accVerts = 0;
         let accFaces = 0;
 
         for (let mesh of meshes) {
-            for (let i = 0; i < mesh.verts.count(); i++) {
-                verts.setVector(accVerts + i, mesh.verts.getVector(i));
+            for (let i = 0; i < mesh.verts.count; i++) {
+                verts.set(accVerts + i, mesh.verts.get(i));
             }
             for (let i = 0; i < mesh.links.count(); i++) {
                 let face = mesh.links.getRow(i);
@@ -118,7 +118,7 @@ export class Mesh {
                 }
                 links.setRow(accFaces + i, face);
             }
-            accVerts += mesh.verts.count();
+            accVerts += mesh.verts.count;
             accFaces += mesh.links.count();
         }
 
@@ -211,9 +211,9 @@ export class Mesh {
     static newSphere(center: Vector3, radius: number, numRings: number, numPerRing: number): Mesh {
         // verts
         let vertCount = numRings * numPerRing + 2;
-        let verts = new MultiVector3(vertCount);
+        let verts = MultiVector3.new(vertCount);
         let setVert = function (i: number, vector: Vector3) {
-            verts.setVector(i, vector.scale(radius).add(center));
+            verts.set(i, vector.scale(radius).add(center));
         };
 
         setVert(0, new Vector3(0, 0, 1));
@@ -293,11 +293,11 @@ export class Mesh {
 
         let numVerts = numPerRing * 2 + 2;
         let numFaces = (numVerts - 2) * 2;
-        let verts = new MultiVector3(numVerts);
+        let verts = MultiVector3.new(numVerts);
 
         // some dumb stuff
         let setVert = function (i: number, vector: Vector3) {
-            verts.setVector(i, vector);
+            verts.set(i, vector);
         };
 
         // planes to represent top & bottom
@@ -363,9 +363,9 @@ export class Mesh {
     static newCone(center: Vector3, radius: number, height: number, numPerRing: number) {
         let numVerts = numPerRing + 2;
         let numFaces = numPerRing * 2;
-        let verts = new MultiVector3(numVerts);
+        let verts = MultiVector3.new(numVerts);
         let setVert = function (i: number, vector: Vector3) {
-            verts.setVector(i, vector.add(center));
+            verts.set(i, vector.add(center));
         };
         let links = new IntMatrix(numFaces, 3);
         links.fill(-1);
@@ -475,9 +475,9 @@ export class Mesh {
     }
 
     getLinkVerts(f: number) {
-        let verts = new MultiVector3(this.links._width);
+        let verts = MultiVector3.new(this.links._width);
         this.links.getRow(f).forEach((v, i) => {
-            verts.setVector(i, this.verts.getVector(v));
+            verts.set(i, this.verts.get(v));
         });
         return verts;
     }
@@ -505,12 +505,12 @@ export class Mesh {
         let faceNormals = this.calculateFaceNormals();
 
         // stack all face normals per vertex
-        let array = new MultiVector3(this.verts.count());
+        let array = MultiVector3.new(this.verts.count);
         for (let i = 0; i < faceCount; i++) {
             let normal = faceNormals[i];
             this.links.getRow(i).forEach((vertexIndex) => {
-                let v = array.getVector(vertexIndex);
-                array.setVector(vertexIndex, v.add(normal));
+                let v = array.get(vertexIndex);
+                array.set(vertexIndex, v.add(normal));
             });
         }
 

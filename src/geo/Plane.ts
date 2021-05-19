@@ -58,7 +58,7 @@ export class Plane {
 
     static fromLeastSquares(pts: MultiVector3): Plane {
         let mean = pts.mean();
-        let cov = Stat.cov(pts);
+        let cov = Stat.cov(pts.slice());
         let [eigValues, eigVectors] = Stat.eig(cov);
         console.log(eigValues);
 

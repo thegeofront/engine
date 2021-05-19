@@ -91,14 +91,14 @@ export class TransformLineRenderer extends Renderer<Renderable> {
         // set it
         gl.useProgram(this.program);
         this.count = links.length;
-        this.vertCount = verts.width;
+        this.vertCount = verts.slice().width;
         let drawspeed = this.convertDrawSpeed(speed);
 
         // vertices
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
         gl.enableVertexAttribArray(this.a_position);
         gl.vertexAttribPointer(this.a_position, this.vertCount, gl.FLOAT, false, 0, 0);
-        gl.bufferData(gl.ARRAY_BUFFER, verts.data, drawspeed);
+        gl.bufferData(gl.ARRAY_BUFFER, verts.slice().data, drawspeed);
 
         // indices
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);

@@ -8,16 +8,18 @@
 
 import { FloatMatrix, MultiVector2, MultiVector3, Vector2, Vector3 } from "../lib";
 
-export type MultiVector = MultiVector2 | MultiVector3 | Vector2[] | Vector3[];
+export type MultiVector = FloatMatrix | MultiVector2 | MultiVector3 | Vector2[] | Vector3[];
 
-export function getGeneralFloatMatrix(vectors: MultiVector): FloatMatrix {
-    if (vectors instanceof MultiVector2) {
+export function ToFloatMatrix(vectors: MultiVector): FloatMatrix {
+    if (vectors instanceof FloatMatrix) {
+        return vectors;
+    } else if (vectors instanceof MultiVector2) {
         return vectors.toMatrixSlice();
     } else if (vectors instanceof MultiVector3) {
-        return vectors;
+        return vectors.slice();
     } else if (vectors[0] instanceof Vector2) {
         return MultiVector2.fromList(vectors as Vector2[]).toMatrixSlice();
     } else {
-        return MultiVector3.fromList(vectors as Vector3[]);
+        return MultiVector3.fromList(vectors as Vector3[]).slice();
     }
 }

@@ -28,8 +28,8 @@ export class TopoMesh extends Renderable {
 
     static copyFromRenderable(rend: Renderable): TopoMesh {
         let topoMesh = new TopoMesh(
-            rend.mesh.verts.count(),
-            rend.norms.count(),
+            rend.mesh.verts.count,
+            rend.norms.count,
             rend.uvs.count,
             rend.mesh.links.count(),
         );
@@ -190,11 +190,11 @@ export class TopoMesh extends Renderable {
     closestFace(p: Vector3): number {
         // NOTE this doesnt really work all that well...
         let faceIds = this.closestFaces(p);
-        let closestPoints = new MultiVector3(faceIds.length);
+        let closestPoints = MultiVector3.new(faceIds.length);
         faceIds.forEach((id, i) => {
             let tr = this.getTriangle3(id);
             let cp = tr.closestPoint(p);
-            closestPoints.setVector(i, cp);
+            closestPoints.set(i, cp);
         });
 
         // find the closest closest point
@@ -268,9 +268,9 @@ export class TopoMesh extends Renderable {
             ];
         } else {
             return [
-                this.mesh.verts.getVector(pointIds[0]),
-                this.mesh.verts.getVector(pointIds[1]),
-                this.mesh.verts.getVector(pointIds[2]),
+                this.mesh.verts.get(pointIds[0]),
+                this.mesh.verts.get(pointIds[1]),
+                this.mesh.verts.get(pointIds[2]),
             ];
         }
     }

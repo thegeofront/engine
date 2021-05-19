@@ -49,7 +49,7 @@ export class LeastSquaresApp extends App {
         super(gl);
 
         let canvas = gl.canvas as HTMLCanvasElement;
-        this.rng = Random.fromRandom();
+        this.rng = Random.fromSeed(1234);
         this.camera = new Camera(canvas, -2, true);
 
         this.drRed = new DotRenderer3(gl, 10, [1, 0, 0, 1], false);
@@ -165,9 +165,10 @@ export class LeastSquaresApp extends App {
         this.Pnormal = this.points.clone().transform(M);
 
         // apply noise
-        let noise = createRandomPoints(this.params[11].get(), this.params[9].get(), this.rng);
-        this.Pnormal = this.Pnormal.mapWith(noise, (a, b) => {
-            return a + b;
+        let rng = Random.fromSeed(123494854);
+        let noise = this.params[9].get();
+        this.Pnormal = this.Pnormal.map((v, i) => {
+            v.add(Vector3.fromRandomUnit(rng).scale(noise));
         });
 
         // approximate using least squares adjustment
@@ -175,12 +176,12 @@ export class LeastSquaresApp extends App {
         this.Plsa = this.points.clone().transform(lsa_matrix);
 
         // also just take the average of translation vectors
-        let translated = combine(this.points, this.Pnormal, (a, b) => {
-            return b.subbed(a);
-        });
-        let average = translated.average();
-        let avg_matrix = Matrix4.newTranslation(average.x, average.y, average.z);
-        this.Plsa = this.points.clone().transform(avg_matrix);
+        // let translated = combine(this.points, this.Pnormal, (a, b) => {
+        //     return b.subbed(a);
+        // });
+        // let average = translated.average();
+        // let avg_matrix = Matrix4.newTranslation(average.x, average.y, average.z);
+        // this.Plsa = this.points.clone().transform(avg_matrix);
 
         console.log("original matrix: (blue)");
         M.print();
@@ -189,10 +190,10 @@ export class LeastSquaresApp extends App {
         console.log("lsa+svd recovered matrix from nothing but the points: (green)");
         lsa_matrix.print();
 
-        let lsa_trans_matrix = leastSquaresTranslation(this.points, this.Pnormal);
+        // let lsa_trans_matrix = leastSquaresTranslation(this.points, this.Pnormal);
 
-        console.log("only translation matrix: (green)");
-        lsa_trans_matrix.print();
+        // console.log("only translation matrix: (green)");
+        // lsa_trans_matrix.print();
 
         // TODO something is going wrong with setting, so we are using set&render in the draw step every time...
         this.startGrid();
@@ -221,15 +222,15 @@ function combine(
     vb: MultiVector3,
     callback: (a: Vector3, b: Vector3) => Vector3,
 ): MultiVector3 {
-    let result = new MultiVector3(va.count());
-    if (va.count() != vb.count()) {
+    let result = MultiVector3.new(va.count);
+    if (va.count != vb.count) {
         console.warn("not same length!");
         return result;
     }
-    let count = va.count();
+    let count = va.count;
 
     for (let i = 0; i < count; i++) {
-        result.setVector(i, callback(va.getVector(i), vb.getVector(i)));
+        result.set(i, callback(va.get(i), vb.get(i)));
     }
 
     return result;
@@ -237,21 +238,21 @@ function combine(
 
 function createRandomPoints(count: number, range: number, rng: Random): MultiVector3 {
     let bounds = Domain3.fromBounds(-range, range, -range, range, -range, range);
-    let multi = new MultiVector3(count);
+    let multi = MultiVector3.new(count);
     for (let i = 0; i < count; i++) {
-        multi.setVector(i, bounds.elevate(Vector3.fromRandom(rng)));
+        multi.set(i, bounds.elevate(Vector3.fromRandom(rng)));
     }
     return multi;
 }
 
 // solve x for Ax = b, where in this case, A = left, b = right.
 function leastSquares(left: MultiVector3, right: MultiVector3): Matrix4 {
-    if (left.count() != right.count()) {
+    if (left.count != right.count) {
         throw "matrices need to be of equal width & height";
     }
 
     // construct linear system of equations
-    let n = left.count();
+    let n = left.count;
 
     let left_width = 4;
     let right_width = 3;
@@ -262,8 +263,8 @@ function leastSquares(left: MultiVector3, right: MultiVector3): Matrix4 {
 
     // per row in floatmatrix
     for (let f = 0; f < n; f++) {
-        let l_vec = [...left.getRow(f), 1];
-        let r_vec = [...right.getRow(f), 1];
+        let l_vec = [...left.slice().getRow(f), 1];
+        let r_vec = [...right.slice().getRow(f), 1];
 
         // go over x', y', z', 1 on the right side
         for (let part = 0; part < right_width; part++) {
@@ -299,12 +300,12 @@ function leastSquares(left: MultiVector3, right: MultiVector3): Matrix4 {
 
 // The Same, but only recover the translation between the vectors
 function leastSquaresTranslation(left: MultiVector3, right: MultiVector3): Matrix4 {
-    if (left.count() != right.count()) {
+    if (left.count != right.count) {
         throw "matrices need to be of equal width & height";
     }
 
     // construct linear system of equations
-    let n = left.count();
+    let n = left.count;
 
     let left_width = 4;
     let right_width = 3;
@@ -315,8 +316,8 @@ function leastSquaresTranslation(left: MultiVector3, right: MultiVector3): Matri
 
     // per row in floatmatrix
     for (let f = 0; f < n; f++) {
-        let l_vec = [...left.getRow(f), 1];
-        let r_vec = [...right.getRow(f), 1];
+        let l_vec = [...left.slice().getRow(f), 1];
+        let r_vec = [...right.slice().getRow(f), 1];
 
         // go over x', y', z', 1 on the right side
         for (let part = 0; part < right_width; part++) {

@@ -3,7 +3,7 @@
 import {
     Context,
     DrawSpeed,
-    getGeneralFloatMatrix,
+    ToFloatMatrix,
     MultiVector,
     MultiVector2,
     MultiVector3,
@@ -108,7 +108,7 @@ export class DotRenderer3 extends Renderer<MultiVector> {
         gl.useProgram(this.program);
 
         // convert all possible entries to a general entry
-        let array = getGeneralFloatMatrix(points);
+        let array = ToFloatMatrix(points);
 
         // from some other thing
         this.count = array.count();

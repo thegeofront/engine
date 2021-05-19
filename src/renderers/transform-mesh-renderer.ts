@@ -83,7 +83,7 @@ export class TransformMeshRenderer extends Renderer<Renderable> {
         var type = gl.FLOAT;
         var normalize = false;
         gl.vertexAttribPointer(this.a_position, this.size, gl.FLOAT, false, 0, 0);
-        gl.bufferData(gl.ARRAY_BUFFER, mesh.verts.data, this.convertDrawSpeed(speed));
+        gl.bufferData(gl.ARRAY_BUFFER, mesh.verts.slice().data, this.convertDrawSpeed(speed));
 
         // indices
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);

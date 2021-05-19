@@ -30,6 +30,8 @@ export enum NormalKind {
 }
 
 export class Renderable {
+    // this desperately calls for an overhaul...
+
     mesh: Mesh;
 
     norms: MultiVector3;
@@ -55,7 +57,7 @@ export class Renderable {
     ) {
         let perFaceCount = 3;
         this.mesh = Mesh.newEmpty(vertCount, faceCount, perFaceCount);
-        this.norms = new MultiVector3(normCount);
+        this.norms = MultiVector3.new(normCount);
         this.uvs = MultiVector2.new(uvCount);
         this.ambi = new Float32Array(vertCount);
         this.texture = texture;
@@ -73,9 +75,8 @@ export class Renderable {
     }
 
     static fromMesh(mesh: Mesh): Renderable {
-        let r = new Renderable(mesh.verts.count(), 0, 0, mesh.links.count());
-        r.mesh.verts.data = mesh.verts.data;
-        r.mesh.links.data = mesh.links.data;
+        let r = new Renderable(mesh.verts.count, 0, 0, mesh.links.count());
+        r.mesh = mesh;
         return r;
     }
 
@@ -88,9 +89,9 @@ export class Renderable {
             uvs.length / 2,
             faces.length / 3,
         );
-        r.mesh.verts.fillWith(verts);
+        r.mesh.verts.slice().fillWith(verts);
         r.mesh.links!.fillWith(faces);
-        r.norms!.fillWith(norms);
+        r.norms!.slice().fillWith(norms);
         r.uvs = MultiVector2.fromData(uvs);
 
         return r;
@@ -107,11 +108,11 @@ export class Renderable {
     // geometry trait
 
     transform(matrix: Matrix4) {
-        for (let i = 0; i < this.mesh.verts.count(); i++) {
-            let v = this.mesh.verts.getVector(i);
-            let n = this.norms.getVector(i);
-            this.mesh.verts.setVector(i, matrix.multiplyVector(v));
-            this.norms.setVector(i, matrix.multiplyVector(n)); // TODO, EXTRACT ONLY ROTATION PART FROM THE MATRIX
+        for (let i = 0; i < this.mesh.verts.count; i++) {
+            let v = this.mesh.verts.get(i);
+            let n = this.norms.get(i);
+            this.mesh.verts.set(i, matrix.multiplyVector(v));
+            this.norms.set(i, matrix.multiplyVector(n)); // TODO, EXTRACT ONLY ROTATION PART FROM THE MATRIX
         }
     }
 
@@ -169,7 +170,7 @@ export class Renderable {
     calculateFaceNormals() {
         if (this.getType() != MeshType.Triangles) {
             console.error("can only calculate normals from triangular meshes");
-            this.norms = new MultiVector3(0);
+            this.norms = MultiVector3.new(0);
             return;
         }
         let norms = this.mesh.calculateFaceNormals();
@@ -189,10 +190,9 @@ export class Renderable {
 
         // calculate
         this.calculateFaceNormals();
-        let vertNormals = new MultiVector3(this.mesh.verts.count());
-        this.mesh.verts.forEach((v, i) => {
+        let vertNormals = this.mesh.verts.map((v, i) => {
             let adjFaces = this.getAdjacentFaces(i);
-            vertNormals.setVector(i, this.norms.take(adjFaces).average());
+            vertNormals.set(i, this.norms.take(adjFaces).average());
         });
 
         this.norms = vertNormals;

@@ -62,18 +62,6 @@ export class SplineApp extends App {
         this.params.push(Parameter.new("displace bottom", 0, -5, 5, 0.001));
         ui.addParameter(this.params[3], this.start.bind(this));
 
-        ui.addText("BEZIER SQUARE");
-        this.params.push(Parameter.new("degree", 0.5, 0, 1, 0.001));
-        ui.addParameter(this.params[4], this.start.bind(this));
-        this.params.push(Parameter.new("displace", 0.5, 0, 1, 0.001));
-        ui.addParameter(this.params[5], this.start.bind(this));
-
-        ui.addText("BEZIER TRIANGLE");
-        this.params.push(Parameter.new("degree", 0.5, 0, 1, 0.001));
-        ui.addParameter(this.params[6], this.start.bind(this));
-        this.params.push(Parameter.new("displace", 0.5, 0, 1, 0.001));
-        ui.addParameter(this.params[7], this.start.bind(this));
-
         ui.addText("OVERALL");
 
         this.params.push(Parameter.new("detail", 10, 2, 100, 1));

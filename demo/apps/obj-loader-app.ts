@@ -88,11 +88,11 @@ async function processFiles(this: ObjLoaderApp, files: FileList) {
 
     // TODO : one line these types of operations?
     // they will be quite common i think...
-    let count = this.obj.mesh.verts.count();
+    let count = this.obj.mesh.verts.count;
     for (let i = 0; i < count; i++) {
-        let vec = this.obj.mesh.verts.getVector(i);
+        let vec = this.obj.mesh.verts.get(i);
         vec.scale(factor);
-        this.obj.mesh.verts.setVector(i, vec);
+        this.obj.mesh.verts.set(i, vec);
     }
 
     // let objBounds = Domain3.fromInclude(this.obj.verts);

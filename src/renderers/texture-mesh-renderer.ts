@@ -96,7 +96,7 @@ export class TextureMeshRenderer extends Renderer<Renderable> {
         // buffer 1
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
         gl.vertexAttribPointer(this.a_position, 3, gl.FLOAT, false, 0, 0);
-        gl.bufferData(gl.ARRAY_BUFFER, r.mesh.verts.data, this.convertDrawSpeed(speed));
+        gl.bufferData(gl.ARRAY_BUFFER, r.mesh.verts.slice().data, this.convertDrawSpeed(speed));
 
         // buffer 2
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_texcoord_buffer);

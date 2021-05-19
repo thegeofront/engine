@@ -3,13 +3,14 @@
 // purpose: represents an object which can be fed directly to a linerenderer.
 //          use it to not continuously have to calculate these aspects if the underlying object is unchanged.
 
+import { MultiVector } from "../data/multi-vector";
 import {
     FloatMatrix,
     Vector2,
     Vector3,
     MultiVector2,
     MultiVector3,
-    getGeneralFloatMatrix,
+    ToFloatMatrix,
     Plane,
     Const,
     Circle3,
@@ -24,10 +25,10 @@ export class MultiLine {
     verts: FloatMatrix;
     links: Uint16Array;
 
-    private constructor(verts: FloatMatrix, ids?: Uint16Array) {
-        this.verts = verts;
+    private constructor(verts: MultiVector, ids?: Uint16Array) {
+        this.verts = ToFloatMatrix(verts);
         if (ids == undefined) {
-            this.links = getDefaultIndices(verts.count());
+            this.links = getDefaultIndices(this.verts.height);
         } else {
             this.links = ids;
         }
@@ -35,7 +36,7 @@ export class MultiLine {
 
     // this assumes even vectices are 'from' points, and odd vertices are 'to' points
     static fromLines(verts: Vector2[] | Vector3[] | MultiVector2 | MultiVector3) {
-        let data = getGeneralFloatMatrix(verts);
+        let data = ToFloatMatrix(verts);
         return new MultiLine(data);
     }
 
@@ -57,7 +58,7 @@ export class MultiLine {
         if (uv) {
             return new MultiLine(rend.uvs.toMatrixSlice(), data);
         } else {
-            return new MultiLine(mesh.verts, data);
+            return new MultiLine(mesh.verts.slice(), data);
         }
     }
 
@@ -67,23 +68,20 @@ export class MultiLine {
 
         // 2 vectors per line, 2 lines per count
         // plus 5 lines, for ihat and jhat icons
-        let lines = new MultiVector3(count * 4);
+        let lines = MultiVector3.new(count * 4);
 
         // x lines
         for (let i = 0; i < count; i++) {
             let t = -halfTotalSize + dis * i;
-            lines.setVector(i * 2, new Vector3(t, -halfTotalSize, 0));
-            lines.setVector(i * 2 + 1, new Vector3(t, halfTotalSize, 0));
+            lines.set(i * 2, new Vector3(t, -halfTotalSize, 0));
+            lines.set(i * 2 + 1, new Vector3(t, halfTotalSize, 0));
         }
 
         // y lines
         for (let i = 0; i < count; i++) {
             let t = -halfTotalSize + dis * i;
-            lines.setVector(
-                2 * count + i * 2,
-                new Vector3(-halfTotalSize, -halfTotalSize + dis * i, 0),
-            );
-            lines.setVector(
+            lines.set(2 * count + i * 2, new Vector3(-halfTotalSize, -halfTotalSize + dis * i, 0));
+            lines.set(
                 2 * count + i * 2 + 1,
                 new Vector3(halfTotalSize, -halfTotalSize + dis * i, 0),
             );
@@ -91,7 +89,7 @@ export class MultiLine {
 
         // finally, transform everything to worldspace, and create the linerenderdata object
         lines.forEach((v) => plane.pushToWorld(v));
-        return new MultiLine(lines);
+        return new MultiLine(lines.slice());
     }
 
     // get all lines from a plane
@@ -103,85 +101,85 @@ export class MultiLine {
 
         // 2 vectors per line, 2 lines per count
         // plus 5 lines, for ihat and jhat icons
-        let lines = new MultiVector3(count * 4 + 5 * 2);
+        let lines = MultiVector3.new(count * 4 + 5 * 2);
 
         // x lines
         for (let i = 0; i < count; i++) {
             let t = -halfTotalSize + dis * i;
-            lines.setVector(i * 2, new Vector3(t, -halfTotalSize, 0));
-            lines.setVector(i * 2 + 1, new Vector3(t, halfTotalSize, 0));
+            lines.set(i * 2, new Vector3(t, -halfTotalSize, 0));
+            lines.set(i * 2 + 1, new Vector3(t, halfTotalSize, 0));
         }
 
         // y lines
         for (let i = 0; i < count; i++) {
             let t = -halfTotalSize + dis * i;
-            lines.setVector(
-                2 * count + i * 2,
-                new Vector3(-halfTotalSize, -halfTotalSize + dis * i, 0),
-            );
-            lines.setVector(
+            lines.set(2 * count + i * 2, new Vector3(-halfTotalSize, -halfTotalSize + dis * i, 0));
+            lines.set(
                 2 * count + i * 2 + 1,
                 new Vector3(halfTotalSize, -halfTotalSize + dis * i, 0),
             );
         }
 
         // icon I  to show ihat
-        let iconLine1 = lines.count() - 10;
-        lines.setVector(iconLine1, new Vector3(halfTotalSize + disSmall, -disSmall, 0));
-        lines.setVector(iconLine1 + 1, new Vector3(halfTotalSize + disSmall * 4, disSmall, 0));
+        let iconLine1 = lines.count - 10;
+        lines.set(iconLine1, new Vector3(halfTotalSize + disSmall, -disSmall, 0));
+        lines.set(iconLine1 + 1, new Vector3(halfTotalSize + disSmall * 4, disSmall, 0));
 
-        let iconLine2 = lines.count() - 8;
-        lines.setVector(iconLine2, new Vector3(halfTotalSize + disSmall, disSmall, 0));
-        lines.setVector(iconLine2 + 1, new Vector3(halfTotalSize + disSmall * 4, -disSmall, 0));
+        let iconLine2 = lines.count - 8;
+        lines.set(iconLine2, new Vector3(halfTotalSize + disSmall, disSmall, 0));
+        lines.set(iconLine2 + 1, new Vector3(halfTotalSize + disSmall * 4, -disSmall, 0));
 
         // icon II to show jhat
-        let iconLine3 = lines.count() - 6;
-        lines.setVector(iconLine3, new Vector3(0, halfTotalSize + disSmall * 2.5, 0));
-        lines.setVector(iconLine3 + 1, new Vector3(disSmall, halfTotalSize + disSmall * 4, 0));
+        let iconLine3 = lines.count - 6;
+        lines.set(iconLine3, new Vector3(0, halfTotalSize + disSmall * 2.5, 0));
+        lines.set(iconLine3 + 1, new Vector3(disSmall, halfTotalSize + disSmall * 4, 0));
 
-        let iconLine4 = lines.count() - 4;
-        lines.setVector(iconLine4, new Vector3(disSmall, halfTotalSize + disSmall, 0));
-        lines.setVector(iconLine4 + 1, new Vector3(-disSmall, halfTotalSize + disSmall * 4, 0));
+        let iconLine4 = lines.count - 4;
+        lines.set(iconLine4, new Vector3(disSmall, halfTotalSize + disSmall, 0));
+        lines.set(iconLine4 + 1, new Vector3(-disSmall, halfTotalSize + disSmall * 4, 0));
 
         // icon III to show khat / normal direction
-        let iconLine5 = lines.count() - 2;
-        lines.setVector(iconLine5, new Vector3(0, 0, 0));
-        lines.setVector(iconLine5 + 1, new Vector3(0, 0, dis));
+        let iconLine5 = lines.count - 2;
+        lines.set(iconLine5, new Vector3(0, 0, 0));
+        lines.set(iconLine5 + 1, new Vector3(0, 0, dis));
 
         // finally, transform everything to worldspace, and create the linerenderdata object
         lines.forEach((v) => plane.pushToWorld(v));
-        return new MultiLine(lines);
+        return new MultiLine(lines.slice());
     }
 
     static fromCircle(c: Circle3, numSegments = Const.CIRCLE_SEGMENTS): MultiLine {
         let count = numSegments;
-        let verts = new MultiVector3(count);
+        let verts = MultiVector3.new(count);
 
         // x lines
         for (let i = 0; i < count; i++) {
             // radial fraction of a circle
             let t = (i / count) * (Math.PI * 2);
-            verts.setVector(
+            verts.set(
                 i,
                 c.plane.pushToWorld(new Vector3(Math.cos(t) * c.radius, Math.sin(t) * c.radius, 0)),
             );
         }
-        return new MultiLine(verts, getPairIndices(count, true));
+        return new MultiLine(verts.slice(), getPairIndices(count, true));
     }
 
     static fromPolyline(p: Polyline) {
-        return new MultiLine(MultiVector3.fromList(p.verts), getPairIndices(p.verts.length, false));
+        return new MultiLine(
+            MultiVector3.fromList(p.verts).slice(),
+            getPairIndices(p.verts.length, false),
+        );
     }
 
     static fromBezier(b: Bezier, numSegments = Const.BEZIER_SEGMENTS) {
         let count = numSegments + 1;
-        let verts = new MultiVector3(count);
+        let verts = MultiVector3.new(count);
         for (let i = 0; i < count; i++) {
             // fraction
             let t = i / numSegments;
-            verts.setVector(i, b.pointAt(t));
+            verts.set(i, b.pointAt(t));
         }
-        return new MultiLine(verts, getPairIndices(count, false));
+        return new MultiLine(verts.slice(), getPairIndices(count, false));
     }
 
     static fromCube(cube: Cube): MultiLine {
@@ -200,14 +198,14 @@ export class MultiLine {
             vertCount += line.verts.count();
         }
 
-        let verts = new MultiVector3(vertCount);
+        let verts = MultiVector3.new(vertCount);
         let ids = new Uint16Array(idsCount);
 
         let accVerts = 0;
         let accFaces = 0;
         for (let lineset of lines) {
             for (let i = 0; i < lineset.verts.count(); i++) {
-                verts.setRow(accVerts + i, lineset.verts.getRow(i));
+                verts.slice().setRow(accVerts + i, lineset.verts.getRow(i));
             }
             for (let i = 0; i < lineset.links.length; i++) {
                 ids[accFaces + i] = lineset.links[i] + accVerts;

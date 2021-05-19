@@ -1,8 +1,11 @@
+import { Geo } from "../geo/geo";
+import { Matrix4 } from "../math/matrix";
+
 // generic all-pupose matrix of floats
 export class FloatMatrix {
     data: Float32Array;
-    width: number;
-    height: number;
+    readonly width: number;
+    readonly height: number;
 
     constructor(height: number, width: number, data: number[] = []) {
         this.height = height;
@@ -151,8 +154,12 @@ export class FloatMatrix {
 
     multiplied(b: FloatMatrix): FloatMatrix {
         let a = this;
-        if (b.width !== a.height) {
-            throw new Error("Columns in A should be the same as the number of rows in B");
+        if (b.height !== a.width) {
+            throw new Error(
+                `Columns in A should be the same as the number of rows in B
+                b.width ${b.height},
+                a.height ${a.width}`,
+            );
         }
         var product = new FloatMatrix(a.height, b.width);
 

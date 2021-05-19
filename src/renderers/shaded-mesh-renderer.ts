@@ -138,17 +138,17 @@ export class ShadedMeshRenderer extends Renderer<Renderable> {
             let ds = this.convertDrawSpeed(speed);
 
             // convert to non-indexed verts & norms
-            let verts = new MultiVector3(this.count);
-            let norms = new MultiVector3(this.count);
+            let verts = MultiVector3.new(this.count);
+            let norms = MultiVector3.new(this.count);
             let ambi = new Float32Array(this.count);
 
             let faceCount = rend.mesh.links.count();
             for (let i = 0; i < rend.mesh.links.count(); i++) {
-                let norm = rend.norms.getVector(i);
+                let norm = rend.norms.get(i);
                 rend.mesh.links.getRow(i).forEach((v, j) => {
                     let id = i * 3 + j;
-                    verts.setVector(id, rend.mesh.verts.getVector(v));
-                    norms.setVector(id, norm);
+                    verts.set(id, rend.mesh.verts.get(v));
+                    norms.set(id, norm);
                     ambi[id] = 1;
                 });
             }
@@ -156,12 +156,12 @@ export class ShadedMeshRenderer extends Renderer<Renderable> {
             // buffer 1
             gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_postition_buffer);
             gl.vertexAttribPointer(this.a_vertex_position, 3, gl.FLOAT, false, 0, 0);
-            gl.bufferData(gl.ARRAY_BUFFER, verts.data.buffer, ds);
+            gl.bufferData(gl.ARRAY_BUFFER, verts.slice().data.buffer, ds);
 
             // buffer 2
             gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_normal_buffer);
             gl.vertexAttribPointer(this.a_vertex_normal, 3, gl.FLOAT, false, 0, 0);
-            gl.bufferData(gl.ARRAY_BUFFER, norms.data.buffer, ds);
+            gl.bufferData(gl.ARRAY_BUFFER, norms.slice().data.buffer, ds);
 
             // buffer 3
             // gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_ambi_buffer);
@@ -191,12 +191,12 @@ export class ShadedMeshRenderer extends Renderer<Renderable> {
             // buffer 1
             gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_postition_buffer);
             gl.vertexAttribPointer(this.a_vertex_position, 3, gl.FLOAT, false, 0, 0);
-            gl.bufferData(gl.ARRAY_BUFFER, rend.mesh.verts.data, ds);
+            gl.bufferData(gl.ARRAY_BUFFER, rend.mesh.verts.slice().data, ds);
 
             // buffer 2
             gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_normal_buffer);
             gl.vertexAttribPointer(this.a_vertex_normal, 3, gl.FLOAT, false, 0, 0);
-            gl.bufferData(gl.ARRAY_BUFFER, rend.norms.data, ds);
+            gl.bufferData(gl.ARRAY_BUFFER, rend.norms.slice().data, ds);
 
             // buffer 3
             // gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_ambi_buffer);

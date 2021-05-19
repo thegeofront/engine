@@ -24,9 +24,10 @@ export class MultiVector2 extends Geo {
     }
 
     static fromMatrix(data: FloatMatrix): MultiVector2 {
-        let multi = MultiVector2.new(data.height);
-        multi.matrix.fillFrom(data);
-        return multi;
+        if (data.width != 2) {
+            throw new Error("incorrect.");
+        }
+        return new MultiVector2(data);
     }
 
     static fromData(data: number[] | Float32Array): MultiVector2 {
@@ -110,12 +111,12 @@ export class MultiVector2 extends Geo {
     }
 
     to3D(): MultiVector3 {
-        let array = new MultiVector3(this.count);
+        let vecs = MultiVector3.new(this.count);
         for (let i = 0; i < this.count; i++) {
             let row = this.matrix.getRow(i);
-            array.setRow(i, [row[0], row[1], 0]);
+            vecs.setXYZ(i, row[0], row[1], 0);
         }
-        return array;
+        return vecs;
     }
 
     clone(): MultiVector2 {

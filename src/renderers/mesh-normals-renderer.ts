@@ -94,40 +94,40 @@ export class NormalRenderer extends Renderer<Renderable> {
             let faceCount = rend.mesh.links.count();
             this.count = faceCount * 2;
 
-            lineverts = new MultiVector3(this.count);
-            normals = new MultiVector3(this.count);
+            lineverts = MultiVector3.new(this.count);
+            normals = MultiVector3.new(this.count);
 
             for (let f = 0; f < faceCount; f++) {
                 let center = rend.getFaceVertices(f).average();
-                let normal = rend.norms.getVector(f);
+                let normal = rend.norms.get(f);
                 let i1 = f * 2;
                 let i2 = f * 2 + 1;
 
-                lineverts.setVector(i1, center);
-                lineverts.setVector(i2, center.add(normal.scaled(this.scale)));
+                lineverts.set(i1, center);
+                lineverts.set(i2, center.add(normal.scaled(this.scale)));
                 let color = normal.add(new Vector3(1, 1, 1).div(2));
-                normals.setVector(i1, color);
-                normals.setVector(i2, color);
+                normals.set(i1, color);
+                normals.set(i2, color);
             }
         } else if (normalKind == NormalKind.Vertex) {
-            let vertCount = rend.mesh.verts.count();
+            let vertCount = rend.mesh.verts.count;
             this.count = vertCount * 2;
 
-            lineverts = new MultiVector3(this.count);
-            normals = new MultiVector3(this.count);
+            lineverts = MultiVector3.new(this.count);
+            normals = MultiVector3.new(this.count);
 
             for (let i = 0; i < vertCount; i++) {
-                let center = rend.mesh.verts.getVector(i);
-                let normal = rend.norms.getVector(i);
+                let center = rend.mesh.verts.get(i);
+                let normal = rend.norms.get(i);
                 let i1 = i * 2;
                 let i2 = i * 2 + 1;
 
-                lineverts.setVector(i1, center);
-                lineverts.setVector(i2, center.add(normal.scaled(this.scale)));
+                lineverts.set(i1, center);
+                lineverts.set(i2, center.add(normal.scaled(this.scale)));
 
                 let color = normal.add(new Vector3(1, 1, 1)).div(2);
-                normals.setVector(i1, color);
-                normals.setVector(i2, color);
+                normals.set(i1, color);
+                normals.set(i2, color);
             }
             // console.log(normals);
         } else {
@@ -140,13 +140,13 @@ export class NormalRenderer extends Renderer<Renderable> {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
         gl.enableVertexAttribArray(this.a_position);
         gl.vertexAttribPointer(this.a_position, this.vertCount, gl.FLOAT, false, 0, 0);
-        gl.bufferData(gl.ARRAY_BUFFER, lineverts.data, drawspeed);
+        gl.bufferData(gl.ARRAY_BUFFER, lineverts.slice().data, drawspeed);
 
         // normals
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_color_buffer);
         gl.enableVertexAttribArray(this.a_color);
         gl.vertexAttribPointer(this.a_color, this.vertCount, gl.FLOAT, false, 0, 0);
-        gl.bufferData(gl.ARRAY_BUFFER, normals.data, drawspeed);
+        gl.bufferData(gl.ARRAY_BUFFER, normals.slice().data, drawspeed);
 
         // indices
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
