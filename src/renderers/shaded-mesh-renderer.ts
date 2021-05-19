@@ -2,18 +2,18 @@
 // author:  Jos Feenstra
 // purpose: A shader wrapper for rendering shaded, textured, meshes
 
-import { IntMatrix } from "../data/int-matrix";
-import { getDefaultIndices, MultiLine } from "../mesh/multi-line";
-import { MultiVector3 } from "../data/multi-vector";
-import { NormalKind, Renderable } from "../mesh/render-mesh";
-import { Matrix4 } from "../math/matrix";
-import { DrawSpeed, Renderer } from "../render/renderer";
-import { LineRenderer } from "./line-renderer";
-import { SimpleMeshRenderer } from "./simple-mesh-renderer";
-import { Camera } from "../render/camera";
-import { Vector3 } from "../math/vector";
-import { Const } from "../lib";
-import { Context } from "../render/context";
+import {
+    Renderer,
+    Renderable,
+    DrawSpeed,
+    NormalKind,
+    MultiVector3,
+    getDefaultIndices,
+    Const,
+    Context,
+    Matrix4,
+    Vector3,
+} from "../lib";
 
 export class ShadedMeshRenderer extends Renderer<Renderable> {
     // attribute & uniform locations

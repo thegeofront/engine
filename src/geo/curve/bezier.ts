@@ -3,7 +3,7 @@
 // purpose: mathematical representation of parametric curves
 // notes:   - using Vector3[] > MultiVector3, since their is no added benefit as of right now
 
-import { MultiVector3 } from "../../data/multi-vector";
+import { MultiVector3 } from "../../data/multi-vector-3";
 import { Matrix4 } from "../../math/matrix";
 import { Polynomial } from "../../math/polynomial";
 import { Vector3 } from "../../math/vector";

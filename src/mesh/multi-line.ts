@@ -3,19 +3,22 @@
 // purpose: represents an object which can be fed directly to a linerenderer.
 //          use it to not continuously have to calculate these aspects if the underlying object is unchanged.
 
-import { FloatMatrix } from "../data/float-matrix";
-import { getGeneralFloatMatrix, MultiVector2, MultiVector3 } from "../data/multi-vector";
-import { Circle2 } from "../geo/circle2";
-import { Circle3 } from "../geo/circle3";
-import { Cube } from "../geo/cube";
-import { Renderable } from "./render-mesh";
-import { Plane } from "../geo/plane";
-import { Const } from "../math/const";
-import { Matrix4 } from "../math/matrix";
-import { Vector2, Vector3 } from "../math/vector";
-import { Curve } from "../geo/curve/curve";
-import { Polyline } from "../geo/curve/polyline";
-import { Bezier } from "../geo/curve/bezier";
+import {
+    FloatMatrix,
+    Vector2,
+    Vector3,
+    MultiVector2,
+    MultiVector3,
+    getGeneralFloatMatrix,
+    Plane,
+    Const,
+    Circle3,
+    Polyline,
+    Bezier,
+    Cube,
+    Renderable,
+} from "../lib";
+
 // represents a collection of multiple lines. These could form 1 polyline, but this is not a requirement
 export class MultiLine {
     verts: FloatMatrix;
@@ -52,7 +55,7 @@ export class MultiLine {
             data[iData + 5] = mesh.links.get(i, 0);
         }
         if (uv) {
-            return new MultiLine(rend.uvs, data);
+            return new MultiLine(rend.uvs.toMatrixSlice(), data);
         } else {
             return new MultiLine(mesh.verts, data);
         }

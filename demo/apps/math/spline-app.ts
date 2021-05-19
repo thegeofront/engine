@@ -3,26 +3,20 @@ import { BezierSquare } from "../../../src/geo/surface/bezier";
 import { Loft } from "../../../src/geo/surface/loft";
 import {
     App,
-    DotRenderer3,
-    LineRenderer,
-    Camera,
+    Parameter,
     Vector3,
     MultiLine,
-    InputState,
-    Parameter,
-    MultiVector3,
-    DrawSpeed,
-    Plane,
-    Context,
-    UI,
-    Circle3,
-    Mesh,
-    Polyline,
-    ShadedMeshRenderer,
+    Camera,
+    DotRenderer3,
+    LineRenderer,
     MeshDebugRenderer,
-    GeonMath,
+    UI,
+    Polyline,
+    Plane,
+    DrawSpeed,
+    InputState,
+    Context,
 } from "../../../src/lib";
-import { Polynomial } from "../../../src/math/polynomial";
 
 export class SplineApp extends App {
     // ui

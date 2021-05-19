@@ -1,15 +1,18 @@
 // jos feenstra
 
-import { FloatMatrix } from "../data/float-matrix";
-import { getGeneralFloatMatrix, MultiVector2, MultiVector3 } from "../data/multi-vector";
-import { Matrix4 } from "../math/matrix";
-import { Vector2, Vector3 } from "../math/vector";
-import { Context } from "../render/context";
-import { DrawSpeed, Renderer } from "../render/renderer";
+import {
+    Context,
+    DrawSpeed,
+    getGeneralFloatMatrix,
+    MultiVector,
+    MultiVector2,
+    MultiVector3,
+    Renderer,
+    Vector2,
+    Vector3,
+} from "../lib";
 
-type Points = MultiVector2 | MultiVector3 | Vector2[] | Vector3[];
-
-export class DotRenderer3 extends Renderer<Points> {
+export class DotRenderer3 extends Renderer<MultiVector> {
     // attribute & uniform locations
     a_position: number;
     a_position_buffer: WebGLBuffer;
@@ -100,7 +103,7 @@ export class DotRenderer3 extends Renderer<Points> {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
     }
 
-    set(points: Points, speed: DrawSpeed = DrawSpeed.StaticDraw) {
+    set(points: MultiVector, speed: DrawSpeed = DrawSpeed.StaticDraw) {
         let gl = this.gl;
         gl.useProgram(this.program);
 
@@ -113,7 +116,7 @@ export class DotRenderer3 extends Renderer<Points> {
         // // Bind the position buffer.
         gl.enableVertexAttribArray(this.a_position);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
-        gl.vertexAttribPointer(this.a_position, array._width, gl.FLOAT, false, 0, 0);
+        gl.vertexAttribPointer(this.a_position, array.width, gl.FLOAT, false, 0, 0);
         gl.bufferData(gl.ARRAY_BUFFER, array.data, super.convertDrawSpeed(speed));
     }
 
@@ -137,7 +140,7 @@ export class DotRenderer3 extends Renderer<Points> {
         gl.drawArrays(gl.POINTS, 0, this.count);
     }
 
-    setAndRender(data: Points, c: Context) {
+    setAndRender(data: MultiVector, c: Context) {
         this.set(data, DrawSpeed.DynamicDraw);
         this.render(c);
     }

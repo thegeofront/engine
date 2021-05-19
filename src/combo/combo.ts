@@ -16,17 +16,6 @@
 // TODO: maybe find a better name, but 'combo' is quite distinct in a way
 // todo: force buffering a bit more. make a way that requiers this.buffered to be filled
 
-import {
-    GeonImage,
-    Renderable,
-    TextureMeshRenderer,
-    Rectangle3,
-    Plane,
-    Vector3,
-    Domain2,
-    Mesh,
-    Camera,
-} from "../lib";
 import { Context } from "../render/context";
 import { DrawSpeed, Renderer } from "../render/renderer";
 import { MeshPickRenderer } from "../renderers/pick-renderer";

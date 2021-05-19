@@ -12,20 +12,8 @@ export * from "./data/int-cube";
 export * from "./data/int-matrix";
 export * from "./data/linked-list";
 export * from "./data/multi-vector";
-
-export * from "./geo/circle2";
-export * from "./geo/circle3";
-export * from "./geo/cube";
-export * from "./geo/geo";
-export * from "./geo/intersect";
-export * from "./geo/line";
-export * from "./geo/plane";
-export * from "./geo/curve/polyline";
-export * from "./geo/rectangle";
-export * from "./geo/triangle";
-
-export * from "./img/Image";
-export * from "./img/kernels";
+export * from "./data/multi-vector-3";
+export * from "./data/multi-vector-2";
 
 export * from "./math/const";
 export * from "./math/domain";
@@ -42,6 +30,29 @@ export * from "./mesh/multi-line";
 export * from "./mesh/mesh";
 export * from "./mesh/render-mesh";
 export * from "./mesh/topo-mesh";
+
+export * from "./geo/geo";
+export * from "./geo/circle2";
+export * from "./geo/circle3";
+export * from "./geo/cube";
+export * from "./geo/intersect";
+export * from "./geo/line";
+export * from "./geo/plane";
+export * from "./geo/curve/polyline";
+export * from "./geo/rectangle";
+export * from "./geo/triangle";
+
+export * from "./geo/curve/curve";
+export * from "./geo/curve/bezier";
+export * from "./geo/curve/polyline";
+export * from "./geo/curve/spline";
+
+export * from "./geo/surface/surface";
+export * from "./geo/surface/bezier";
+export * from "./geo/surface/loft";
+
+export * from "./img/Image";
+export * from "./img/kernels";
 
 export * from "./render/camera";
 export * from "./combo/combo";

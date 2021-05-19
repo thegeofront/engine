@@ -62,7 +62,7 @@ export class Stat {
 
     // calculate variance / covariance matrix
     static cov(matrix: FloatMatrix) {
-        let size = matrix._width;
+        let size = matrix.width;
         let cov = new FloatMatrix(size, size);
 
         let columns = Array<Float32Array>(size);

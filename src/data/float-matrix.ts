@@ -1,13 +1,13 @@
 // generic all-pupose matrix of floats
 export class FloatMatrix {
     data: Float32Array;
-    _width: number;
-    _height: number;
+    width: number;
+    height: number;
 
     constructor(height: number, width: number, data: number[] = []) {
-        this._height = height;
-        this._width = width;
-        this.data = new Float32Array(this._width * this._height);
+        this.height = height;
+        this.width = width;
+        this.data = new Float32Array(this.width * this.height);
         if (data == [] || data.length == 0) this.fill(0);
         else this.setData(data);
     }
@@ -15,14 +15,14 @@ export class FloatMatrix {
     print() {
         let strings: string[] = [];
         const WIDTH = 8;
-        for (var i = 0; i < this._width; i++) {
+        for (var i = 0; i < this.width; i++) {
             strings.push("|");
-            for (var j = 0; j < this._height; j++) {
+            for (var j = 0; j < this.height; j++) {
                 let str = this.get(j, i).toFixed(2); // TODO THIS IS INCORRECT
                 str = str.padStart(WIDTH, " ");
                 strings.push(str);
 
-                if (j < this._width - 2) {
+                if (j < this.width - 2) {
                     strings.push("  ");
                 }
             }
@@ -31,16 +31,8 @@ export class FloatMatrix {
         console.log(strings.join(""));
     }
 
-    clone(): FloatMatrix {
-        let clone = new FloatMatrix(this._height, this._width);
-        for (let i = 0; i < this.data.length; i++) {
-            clone.data[i] = this.data[i];
-        }
-        return clone;
-    }
-
     setData(data: number[]) {
-        if (data.length != this._height * this._width)
+        if (data.length != this.height * this.width)
             throw "data.length does not match width * height " + data.length.toString();
         this.data.set(data);
     }
@@ -48,40 +40,53 @@ export class FloatMatrix {
     count() {
         // number of entries / rows.
         // when derrived classes ask for 'how many of x?' they usually mean this.
-        return this._height;
+        return this.height;
     }
 
     getDimensions(): [number, number] {
-        return [this._height, this._width];
+        return [this.height, this.width];
     }
 
     fill(value: number) {
-        let size = this._height * this._width;
+        let size = this.height * this.width;
         for (let i = 0; i < size; i++) {
             this.data[i] = value;
         }
     }
 
-    fillWith(data: number[], valuesPerEntry: number = this._width) {
+    fillWith(data: number[] | Float32Array, valuesPerEntry: number = this.width) {
         // values per entry can be used to setData which is not of the same shape.
         let vpe = valuesPerEntry;
-        if (vpe > this._width)
+        if (vpe > this.width)
             throw "values per entry is larger than this._width. This will spill over.";
-        for (let i = 0; i < this._height; i++) {
+        for (let i = 0; i < this.height; i++) {
             for (let j = 0; j < vpe; j++) {
                 this.set(i, j, data[i * vpe + j]);
             }
         }
     }
 
+    fillFrom(other: FloatMatrix): FloatMatrix {
+        if (other.height < this.height || other.width < this.width) {
+            throw new Error("need same dimentions");
+        }
+
+        for (let i = 0; i < other.height; i++) {
+            for (let j = 0; j < 2; j++) {
+                this.set(i, j, other.get(i, j));
+            }
+        }
+        return this;
+    }
+
     get(i: number, j: number): number {
-        return this.data[i * this._width + j];
+        return this.data[i * this.width + j];
     }
 
     getRow(i: number): Float32Array {
         // if (i < 0 || i > this.height) throw "column is out of bounds for FloatArray"
-        let data = new Float32Array(this._width);
-        for (let j = 0; j < this._width; j++) {
+        let data = new Float32Array(this.width);
+        for (let j = 0; j < this.width; j++) {
             data[j] = this.get(i, j);
         }
         return data;
@@ -89,21 +94,21 @@ export class FloatMatrix {
 
     getColumn(j: number): Float32Array {
         // if (j < 0 || j > this.width) throw "column is out of bounds for FloatArray"
-        let data = new Float32Array(this._height);
-        for (let i = 0; i < this._height; i++) {
-            let index = i * this._width + j;
+        let data = new Float32Array(this.height);
+        for (let i = 0; i < this.height; i++) {
+            let index = i * this.width + j;
             data[i] = this.data[index];
         }
         return data;
     }
 
     set(i: number, j: number, value: number) {
-        this.data[i * this._width + j] = value;
+        this.data[i * this.width + j] = value;
     }
 
     setRow(rowIndex: number, row: number[] | Float32Array) {
         // if (this.width != row.length) throw "dimention of floatarray is not " + row.length;
-        for (let j = 0; j < this._width; j++) {
+        for (let j = 0; j < this.width; j++) {
             this.set(rowIndex, j, row[j]);
         }
     }
@@ -118,7 +123,7 @@ export class FloatMatrix {
     takeRows(indices: number[]): FloatMatrix {
         // create a new floatarray
         const count = indices.length;
-        let array = new FloatMatrix(count, this._width);
+        let array = new FloatMatrix(count, this.width);
         for (let i = 0; i < count; i++) {
             let getIndex = indices[i];
             array.setRow(i, this.getRow(getIndex));
@@ -130,8 +135,8 @@ export class FloatMatrix {
     mapWith(other: FloatMatrix, callback: (self: number, other: number) => number): FloatMatrix {
         let result = this.clone();
 
-        let width = Math.min(this._width, other._height);
-        let height = Math.min(this._height, other._height);
+        let width = Math.min(this.width, other.height);
+        let height = Math.min(this.height, other.height);
 
         for (var i = 0; i < height; i++) {
             for (var j = 0; j < width; j++) {
@@ -144,21 +149,27 @@ export class FloatMatrix {
 
     // generalized multiplication
 
-    multiply(b: FloatMatrix): FloatMatrix {
+    multiplied(b: FloatMatrix): FloatMatrix {
         let a = this;
-        if (b._width !== a._height) {
+        if (b.width !== a.height) {
             throw new Error("Columns in A should be the same as the number of rows in B");
         }
-        var product = new FloatMatrix(a._height, b._width);
+        var product = new FloatMatrix(a.height, b.width);
 
-        for (var i = 0; i < product._height; i++) {
-            for (var j = 0; j < b._width; j++) {
-                for (var k = 0; k < a._width; k++) {
+        for (var i = 0; i < product.height; i++) {
+            for (var j = 0; j < b.width; j++) {
+                for (var k = 0; k < a.width; k++) {
                     product.set(i, j, product.get(i, j) + a.get(i, k) * b.get(k, j));
                 }
             }
         }
         return product;
+    }
+
+    multiply(b: FloatMatrix): FloatMatrix {
+        let result = this.multiplied(b);
+        this.data = result.data;
+        return this;
     }
 
     static fromNative(native: number[][]): FloatMatrix {
@@ -176,13 +187,23 @@ export class FloatMatrix {
 
     toNative(): number[][] {
         let native: number[][] = [];
-        for (var i = 0; i < this._height; i++) {
+        for (var i = 0; i < this.height; i++) {
             native[i] = [];
-            for (var j = 0; j < this._width; j++) {
+            for (var j = 0; j < this.width; j++) {
                 native[i][j] = this.get(i, j);
             }
         }
         return native;
+    }
+
+    // geo trait
+
+    clone(): FloatMatrix {
+        let clone = new FloatMatrix(this.height, this.width);
+        for (let i = 0; i < this.data.length; i++) {
+            clone.data[i] = this.data[i];
+        }
+        return clone;
     }
 }
 

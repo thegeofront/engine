@@ -1,20 +1,12 @@
-import {
-    Combo,
-    GeonImage,
-    Renderable,
-    TextureMeshRenderer,
-    Rectangle3,
-    Plane,
-    Vector3,
-    Domain2,
-    Mesh,
-    Context,
-} from "../lib";
 import { Matrix4 } from "../math/matrix";
+import { Mesh } from "../mesh/mesh";
+import { Renderable } from "../mesh/render-mesh";
+import { Context } from "../render/context";
 import { DrawSpeed } from "../render/renderer";
 import { MeshDebugRenderer } from "../renderers/mesh-debug-renderer";
 import { TransformLineRenderer } from "../renderers/transform-line-renderer";
 import { TransformMeshRenderer } from "../renderers/transform-mesh-renderer";
+import { Combo } from "./combo";
 
 export class StaticMeshCombo extends Combo<Mesh, Renderable, TransformLineRenderer> {
     color: number[];

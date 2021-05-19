@@ -1,14 +1,11 @@
-import {
-    Renderable,
-    Rectangle3,
-    Plane,
-    Vector3,
-    Domain2,
-    Mesh,
-    Camera,
-    GeonImage,
-    TextureMeshRenderer,
-} from "../lib";
+import { Plane } from "../geo/plane";
+import { Rectangle3 } from "../geo/rectangle";
+import { GeonImage } from "../img/Image";
+import { Domain2 } from "../math/domain";
+import { Vector3 } from "../math/vector";
+import { Mesh } from "../mesh/mesh";
+import { Renderable } from "../mesh/render-mesh";
+import { TextureMeshRenderer } from "../renderers/texture-mesh-renderer";
 import { Combi, Combo } from "./combo";
 
 export class ImageCombi extends Combi<GeonImage, Renderable, TextureMeshRenderer> {

@@ -2,16 +2,10 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of lines.
 
-import { FloatMatrix } from "../data/float-matrix";
-import { MultiVector2, MultiVector3 } from "../data/multi-vector";
-import { Renderable } from "../mesh/render-mesh";
-import { Polyline } from "../geo/curve/polyline";
 import { Matrix4 } from "../math/matrix";
-import { Vector3 } from "../math/vector";
-import { MultiLine } from "../mesh/multi-line";
-import { DrawSpeed, Renderer } from "../render/renderer";
-import { Mesh } from "../mesh/mesh";
+import { Renderable } from "../mesh/render-mesh";
 import { Context } from "../render/context";
+import { Renderer, DrawSpeed } from "../render/renderer";
 
 export class TransformLineRenderer extends Renderer<Renderable> {
     private a_position: number;
@@ -97,7 +91,7 @@ export class TransformLineRenderer extends Renderer<Renderable> {
         // set it
         gl.useProgram(this.program);
         this.count = links.length;
-        this.vertCount = verts._width;
+        this.vertCount = verts.width;
         let drawspeed = this.convertDrawSpeed(speed);
 
         // vertices

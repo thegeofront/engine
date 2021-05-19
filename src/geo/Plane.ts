@@ -3,12 +3,7 @@
 // purpose: definition of a 3d plane.
 // todo:    turn Center, Ihat, Jhat, Khat construction to an actual matrix
 
-import { MultiVector3 } from "../data/multi-vector";
-import { GeonMath } from "../math/math";
-import { Matrix4 } from "../math/matrix";
-import { Stat } from "../math/statistics";
-import { Vector2, Vector3 } from "../math/vector";
-import { Const } from "../math/const";
+import { Matrix4, Vector3, Const, MultiVector3, Stat } from "../lib";
 
 export class Plane {
     _matrix!: Matrix4;

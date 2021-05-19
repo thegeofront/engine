@@ -2,11 +2,7 @@
 // author:  Jos Feenstra
 // purpose: Renderer images as billboards.
 
-import { MultiVector2, MultiVector3 } from "../data/multi-vector";
-import { GeonImage } from "../img/Image";
-import { Renderable } from "../mesh/render-mesh";
-import { Context } from "../render/context";
-import { DrawSpeed, Renderer } from "../render/renderer";
+import { GeonImage, MultiVector3, MultiVector2, Renderer, DrawSpeed, Context } from "../lib";
 
 // mooi font om te gebruiken
 // https://datagoblin.itch.io/monogram

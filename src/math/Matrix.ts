@@ -3,8 +3,8 @@
 // TODO: FIX MATRIX4 !!!
 // NOTE:
 
-import { MultiVector3 } from "../data/multi-vector";
 import { FloatMatrix } from "../data/float-matrix";
+import { MultiVector3 } from "../data/multi-vector-3";
 import { Quaternion } from "./quaternion";
 import { Vector2, Vector3 } from "./vector";
 

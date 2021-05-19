@@ -5,7 +5,9 @@
 // - Spline
 // - Polyline (not terminologically correct but in terms of logic it makes sense)
 
-import { Matrix4, MultiLine, Vector3 } from "../../lib";
+import { Matrix4 } from "../../math/matrix";
+import { Vector3 } from "../../math/vector";
+import { MultiLine } from "../../mesh/multi-line";
 import { Geo } from "../geo";
 
 // domain is always normalzed, from 0 to 1

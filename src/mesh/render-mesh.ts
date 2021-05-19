@@ -9,14 +9,7 @@
 //   - triangles (links.width = 3)
 //   - quads (links.width = 4. will need to be converted to triangles)
 
-import { IntMatrix } from "../data/int-matrix";
-import { MultiVector2, MultiVector3 } from "../data/multi-vector";
-import { Vector2, Vector3 } from "../math/vector";
-import { Cube } from "../geo/cube";
-import { Rectangle3 } from "../geo/rectangle";
-import { Matrix4 } from "../math/matrix";
-import { Mesh } from "./mesh";
-import { Graph } from "./graph";
+import { Graph, Matrix4, Mesh, MultiVector2, MultiVector3 } from "../lib";
 
 type vertexID = number;
 type faceID = number;
@@ -63,7 +56,7 @@ export class Renderable {
         let perFaceCount = 3;
         this.mesh = Mesh.newEmpty(vertCount, faceCount, perFaceCount);
         this.norms = new MultiVector3(normCount);
-        this.uvs = new MultiVector2(uvCount);
+        this.uvs = MultiVector2.new(uvCount);
         this.ambi = new Float32Array(vertCount);
         this.texture = texture;
         this.position = Matrix4.newIdentity();
@@ -98,7 +91,7 @@ export class Renderable {
         r.mesh.verts.fillWith(verts);
         r.mesh.links!.fillWith(faces);
         r.norms!.fillWith(norms);
-        r.uvs!.fillWith(uvs);
+        r.uvs = MultiVector2.fromData(uvs);
 
         return r;
     }
@@ -157,7 +150,7 @@ export class Renderable {
 
     setUvs(uvs: MultiVector2 | Float32Array) {
         if (uvs instanceof Float32Array) {
-            this.uvs!.data = uvs;
+            this.uvs = MultiVector2.fromData(uvs);
         } else {
             this.uvs = uvs;
         }

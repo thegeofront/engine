@@ -1,6 +1,8 @@
-import { MultiVector3 } from "../data/multi-vector";
-import { Const } from "../math/const";
-import { Vector3 } from "../math/vector";
+// name:    intersect.ts
+// author:  Jos Feenstra
+// purpose: intersection utility functions
+
+import { Const, Vector3 } from "../lib";
 
 /**
  * @returns -1 if no intersection, 0 of parallel or touching, 1 if intersection;

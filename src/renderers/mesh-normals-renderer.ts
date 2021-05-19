@@ -2,16 +2,16 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of lines.
 
-import { FloatMatrix } from "../data/float-matrix";
-import { MultiVector2, MultiVector3 } from "../data/multi-vector";
-import { NormalKind, Renderable } from "../mesh/render-mesh";
-import { Polyline } from "../geo/curve/polyline";
-import { Matrix4 } from "../math/matrix";
-import { Vector3 } from "../math/vector";
-import { getDefaultIndices, MultiLine } from "../mesh/multi-line";
-import { DrawSpeed, Renderer } from "../render/renderer";
-import { Camera } from "../render/camera";
-import { Context } from "../render/context";
+import {
+    Renderer,
+    Renderable,
+    DrawSpeed,
+    MultiVector3,
+    NormalKind,
+    Vector3,
+    getDefaultIndices,
+    Context,
+} from "../lib";
 
 export class NormalRenderer extends Renderer<Renderable> {
     a_position: number;

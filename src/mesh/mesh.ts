@@ -2,20 +2,22 @@
 // Author: Jos Feenstra
 // Purpose:
 
+import {
+    BiSurface,
+    Cube,
+    Graph,
+    IntMatrix,
+    MeshType,
+    MultiVector3,
+    Plane,
+    Rectangle3,
+    Renderable,
+    Vector3,
+} from "../lib";
+
 // a very pure idea of a mesh : Vertices + links between vertices.
 // Could be anything with these properties: lines, triangle-mesh, quads
 // idea: should normals be part of the Mesh?
-
-import { IntMatrix } from "../data/int-matrix";
-import { MultiVector2, MultiVector3 } from "../data/multi-vector";
-import { Vector2, Vector3 } from "../math/vector";
-import { Cube } from "../geo/cube";
-import { Rectangle3 } from "../geo/rectangle";
-import { Renderable, MeshType as MeshType } from "./render-mesh";
-import { Plane } from "../geo/plane";
-import { Matrix4 } from "../math/matrix";
-import { Graph } from "./graph";
-import { BiSurface } from "../geo/surface/surface";
 
 export class Mesh {
     // CONSTRUCTORS

@@ -4,11 +4,7 @@
 // Note: ive complicated this quite a bit, since we have to deal with the length of the polyline quite often.
 // I want to keep side effects to a minimum, so bufferLengths() needs to be called everytime the curve is changed in some way
 
-import { MultiVector3 } from "../../data/multi-vector";
-import { GeonMath } from "../../lib";
-import { Matrix4 } from "../../math/matrix";
-import { Vector3 } from "../../math/vector";
-import { MultiLine } from "../../mesh/multi-line";
+import { GeonMath, Matrix4, MultiLine, MultiVector3, Vector3 } from "../../lib";
 import { Curve } from "./curve";
 
 export class Polyline extends Curve {

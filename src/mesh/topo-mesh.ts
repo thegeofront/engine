@@ -1,9 +1,13 @@
-import { HashTable } from "../data/hash-table";
-import { IntMatrix } from "../data/int-matrix";
-import { MultiVector3 } from "../data/multi-vector";
-import { Vector2, Vector3 } from "../math/vector";
-import { Renderable } from "./render-mesh";
-import { Triangle2, Triangle3 } from "../geo/triangle";
+import {
+    IntMatrix,
+    HashTable,
+    Vector2,
+    Vector3,
+    MultiVector3,
+    Triangle2,
+    Triangle3,
+    Renderable,
+} from "../lib";
 
 // a mesh with topological information
 export class TopoMesh extends Renderable {
@@ -26,7 +30,7 @@ export class TopoMesh extends Renderable {
         let topoMesh = new TopoMesh(
             rend.mesh.verts.count(),
             rend.norms.count(),
-            rend.uvs.count(),
+            rend.uvs.count,
             rend.mesh.links.count(),
         );
         topoMesh.mesh.verts = rend.mesh.verts.clone();
@@ -122,8 +126,8 @@ export class TopoMesh extends Renderable {
                 let face = this.mesh.links.getRow(faceIndex);
                 let edge: [number, number] = [face[i], face[j]];
 
-                let b = this.uvs.getVector(edge[0]);
-                let c = this.uvs.getVector(edge[1]);
+                let b = this.uvs.get(edge[0]);
+                let c = this.uvs.get(edge[1]);
 
                 let sign = point.sign(b, c);
 
@@ -258,9 +262,9 @@ export class TopoMesh extends Renderable {
         let pointIds = this.mesh.links.getRow(tr);
         if (uv) {
             return [
-                this.uvs.getVector(pointIds[0]),
-                this.uvs.getVector(pointIds[1]),
-                this.uvs.getVector(pointIds[2]),
+                this.uvs.get(pointIds[0]),
+                this.uvs.get(pointIds[1]),
+                this.uvs.get(pointIds[2]),
             ];
         } else {
             return [

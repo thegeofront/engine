@@ -1,8 +1,4 @@
-import { MultiVector2 } from "../data/multi-vector";
-import { Const } from "../math/const";
-import { Vector2, Vector3 } from "../math/vector";
-import { LineCurve2 } from "./line";
-import { Plane } from "./plane";
+import { Vector2, MultiVector2, Vector3, Plane, LineCurve2 } from "../lib";
 
 export class Triangle2 {
     a: Vector2;

@@ -283,7 +283,7 @@ function leastSquares(left: MultiVector3, right: MultiVector3): Matrix4 {
     }
 
     let [U, S, V] = Stat.svd(M);
-    let col = V.getColumn(V._width - 1);
+    let col = V.getColumn(V.width - 1);
     let scaler = 1 / col[15];
     for (let i = 0; i < col.length; i++) {
         col[i] = Math.round(col[i] * scaler * 100000) / 100000;
@@ -338,7 +338,7 @@ function leastSquaresTranslation(left: MultiVector3, right: MultiVector3): Matri
     M.print();
 
     let [U, S, V] = Stat.svd(M);
-    let col = V.getColumn(V._width - 1);
+    let col = V.getColumn(V.width - 1);
     let scaler = 1 / col[15];
     for (let i = 0; i < col.length; i++) {
         col[i] = Math.round(col[i] * scaler * 100000) / 100000;

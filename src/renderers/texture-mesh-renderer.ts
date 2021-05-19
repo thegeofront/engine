@@ -2,14 +2,8 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of a mesh.
 
-import { IntMatrix } from "../data/int-matrix";
-import { MultiLine } from "../mesh/multi-line";
-import { MultiVector3 } from "../data/multi-vector";
 import { Renderable } from "../mesh/render-mesh";
-import { Matrix4 } from "../math/matrix";
 import { DrawSpeed, Renderer } from "../render/renderer";
-import { LineRenderer } from "./line-renderer";
-import { SimpleMeshRenderer } from "./simple-mesh-renderer";
 import { Context } from "../render/context";
 
 export class TextureMeshRenderer extends Renderer<Renderable> {
@@ -107,7 +101,7 @@ export class TextureMeshRenderer extends Renderer<Renderable> {
         // buffer 2
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_texcoord_buffer);
         gl.vertexAttribPointer(this.a_texcoord, 2, gl.FLOAT, false, 0, 0);
-        gl.bufferData(gl.ARRAY_BUFFER, r.uvs.data, this.convertDrawSpeed(speed));
+        gl.bufferData(gl.ARRAY_BUFFER, r.uvs.toMatrixSlice().data, this.convertDrawSpeed(speed));
 
         // buffer 3
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);

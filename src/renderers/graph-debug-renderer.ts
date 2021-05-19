@@ -2,20 +2,12 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of a mesh.
 
-import { IntMatrix } from "../data/int-matrix";
-import { MultiLine } from "../mesh/multi-line";
-import { MultiVector3 } from "../data/multi-vector";
-import { Renderable } from "../mesh/render-mesh";
-import { Matrix4 } from "../math/matrix";
-import { DrawSpeed, Renderer } from "../render/renderer";
-import { LineRenderer } from "./line-renderer";
-import { SimpleMeshRenderer } from "./simple-mesh-renderer";
-import { NormalRenderer } from "./mesh-normals-renderer";
-import { Camera } from "../render/camera";
-import { DotRenderer3 } from "./dot-renderer3";
-import { Graph } from "../mesh/graph";
-import { Context } from "../render/context";
+import { Graph, DrawSpeed, Context } from "../lib";
 import { MetaRenderer } from "../render/meta-renderer";
+import { DotRenderer3 } from "./dot-renderer3";
+import { LineRenderer } from "./line-renderer";
+import { NormalRenderer } from "./mesh-normals-renderer";
+import { SimpleMeshRenderer } from "./simple-mesh-renderer";
 
 export class GraphDebugRenderer extends MetaRenderer<Graph> {
     faceRend: SimpleMeshRenderer;
