@@ -12,8 +12,10 @@ import {
     Plane,
     Rectangle3,
     Renderable,
+    TriSurface,
     Vector3,
 } from "../lib";
+import { GeonMath } from "../math/math";
 
 // a very pure idea of a mesh : Vertices + links between vertices.
 // Could be anything with these properties: lines, triangle-mesh, quads
@@ -50,7 +52,7 @@ export class Mesh {
         return new Mesh(verts, links);
     }
 
-    static fromSurface(srf: BiSurface, uSegments = 10, vSegments = 10): Mesh {
+    static fromBiSurface(srf: BiSurface, uSegments = 10, vSegments = 10): Mesh {
         // returns vertices & indices of a flat grid
         let uPoints = uSegments + 1;
         let vPoints = vSegments + 1;
@@ -83,6 +85,25 @@ export class Mesh {
                 links.setRow(start_index + 1, [c, a, d]);
             }
         }
+        return new Mesh(verts, links);
+    }
+
+    static fromTriSurface(srf: TriSurface, segments = 10): Mesh {
+        // returns vertices & indices of a flat grid
+        let uPoints = segments + 1;
+
+        let verts = MultiVector3.new(GeonMath.stack(uPoints));
+        let links = new IntMatrix(GeonMath.stack(uPoints), 3);
+
+        // // create all positions
+        // for (let u = 0; u < uPoints; u++) {
+        //     for (let v = 0; v < vPoints; v++) {
+        //         let i = u * vPoints + v;
+
+        //         verts.set(i, srf.pointAt(u / uSegments, v / vSegments));
+        //     }
+        // }
+
         return new Mesh(verts, links);
     }
 

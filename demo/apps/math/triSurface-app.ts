@@ -25,7 +25,7 @@ import {
 } from "../../../src/lib";
 import { Random } from "../../../src/math/random";
 
-export class SurfaceApp extends App {
+export class TriSurfaceApp extends App {
     // ui
     params: Parameter[] = [];
 

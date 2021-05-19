@@ -1,6 +1,8 @@
 // name:    spline.ts
 // author:  Jos Feenstra
 // purpose: base interface / abstract classes for surfaces
+// todo : research this : https://graphics.pixar.com/library/HarmonicCoordinates/
+// todo : and this : https://doc.cgal.org/latest/Barycentric_coordinates_2/index.html
 
 import { Geo, Mesh, Vector3 } from "../../lib";
 /**
@@ -13,17 +15,9 @@ export abstract class Surface extends Geo {}
  */
 export abstract class BiSurface extends Surface {
     abstract pointAt(u: number, v: number): Vector3;
-    /**
-     *
-     * @param uSegments when using polylines, please use a value divisible by the number of polygons used:
-     *      loft between 4 segment polyline & 5 segment polyline? use 20:
-     *          - 4 / 20 is a round number
-     *          - 5 / 20 is a round number
-     * @param vSegments
-     * @returns
-     */
+
     buffer(uSegments: number, vSegments: number): Mesh {
-        return Mesh.fromSurface(this, uSegments, vSegments);
+        return Mesh.fromBiSurface(this, uSegments, vSegments);
     }
 }
 
@@ -31,5 +25,9 @@ export abstract class BiSurface extends Surface {
  * Tridirectional surface
  */
 export abstract class TriSurface extends Surface {
-    abstract eval(u: number, v: number, w: number): Vector3;
+    abstract pointAt(u: number, v: number, w: number): Vector3;
+
+    buffer(segments: number): Mesh {
+        return Mesh.fromTriSurface(this, segments);
+    }
 }

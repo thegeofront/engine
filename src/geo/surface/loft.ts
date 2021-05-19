@@ -49,7 +49,7 @@ export class Loft extends BiSurface {
             return a * b;
         });
 
-        return Mesh.fromSurface(this, perfectuSegments, perfectuSegments);
+        return Mesh.fromBiSurface(this, perfectuSegments, perfectuSegments);
     }
 
     clone(): Loft {

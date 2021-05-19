@@ -9,11 +9,6 @@ import { Geo } from "../geo";
 import { BiSurface, TriSurface } from "./surface";
 
 /**
- * Three sided Bezier Surface
- */
-export class BezierTriangle {}
-
-/**
  * Four sided Bezier Surface
  */
 export class BezierSquare extends BiSurface {
@@ -52,7 +47,7 @@ export class BezierSquare extends BiSurface {
      * @param d
      * @returns
      */
-    static fromFourEdge(a: Bezier, b: Bezier, c: Bezier, d: Bezier): BezierTriangle | undefined {
+    static fromFourEdge(a: Bezier, b: Bezier, c: Bezier, d: Bezier): BezierSquare | undefined {
         // TODO do magic to discover the inner control points...
         // TODO bezier curves must be of the same degree
         return undefined;
