@@ -2,11 +2,13 @@
 // author:  Jos Feenstra
 // purpose: mathematical representation of a parametric loft surface
 
+import { Matrix4 } from "../../math/matrix";
 import { Vector3 } from "../../math/vector";
 import { Mesh } from "../../mesh/mesh";
 import { Bezier } from "../curve/bezier";
 import { Curve } from "../curve/curve";
 import { Polyline } from "../curve/polyline";
+import { Geo } from "../geo";
 import { BiSurface } from "./surface";
 
 export class Loft extends BiSurface {
@@ -40,15 +42,6 @@ export class Loft extends BiSurface {
      * @returns
      */
     buffer(uSegments: number, vSegments: number) {
-        // // NOTE : to make this always watertight: take note of the precision when using polylines:
-        // for (let c of this.curves) {
-        //     if (c instanceof Polyline) {
-        //         let leftover = uSegments % (c.verts.length - 1);
-        //         if (leftover != 0) {
-        //             console.warn("mesh might not be watertight! leftover: ", leftover);
-        //         }
-        //     }
-        // }
         return Mesh.fromSurface(this, uSegments, vSegments);
     }
 
@@ -69,5 +62,28 @@ export class Loft extends BiSurface {
         });
 
         return Mesh.fromSurface(this, perfectuSegments, perfectuSegments);
+    }
+
+    clone(): Loft {
+        let curves = new Array<Curve>();
+        for (let i = 0; i < this.curves.length; i++) {
+            curves[i] = this.curves[i].clone();
+        }
+        return Loft.new(curves);
+    }
+
+    transform(m: Matrix4): Loft {
+        for (let c of this.curves) {
+            c.transform(m);
+        }
+        return this;
+    }
+
+    transformed(m: Matrix4): Loft {
+        let curves = new Array<Curve>();
+        for (let i = 0; i < this.curves.length; i++) {
+            curves[i] = this.curves[i].transformed(m);
+        }
+        return Loft.new(curves);
     }
 }

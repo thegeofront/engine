@@ -1,4 +1,5 @@
 import { Bezier } from "../../../src/geo/curve/bezier";
+import { BezierSquare } from "../../../src/geo/surface/bezier";
 import { Loft } from "../../../src/geo/surface/loft";
 import {
     App,
@@ -114,8 +115,22 @@ export class SplineApp extends App {
         loftcurves[2].move(Vector3.new(0, y, 0));
         let loft = Loft.new(loftcurves);
 
+        // 3 - bisurface
+        let surface = BezierSquare.new([
+            Vector3.new(7, 1, 0),
+            Vector3.new(7, 3, 0),
+            Vector3.new(7, 5, 0),
+            Vector3.new(9, 1, 0),
+            Vector3.new(9, 3, 0),
+            Vector3.new(9, 5, 0),
+            Vector3.new(11, 1, 0),
+            Vector3.new(11, 3, 0),
+            Vector3.new(11, 5, 0),
+        ])!;
+
         // dots
         this.dots = [];
+        this.dots.push(...surface.verts);
         this.dots.push(...bezier.verts);
         this.dots.push(bezier.pointAt(t));
         this.dots.push(bezier.pointAt(t).add(bezier.tangentAt(t)));

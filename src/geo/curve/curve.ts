@@ -5,7 +5,7 @@
 // - Spline
 // - Polyline (not terminologically correct but in terms of logic it makes sense)
 
-import { MultiLine, Vector3 } from "../../lib";
+import { Matrix4, MultiLine, Vector3 } from "../../lib";
 import { Geo } from "../geo";
 
 // domain is always normalzed, from 0 to 1
@@ -17,6 +17,13 @@ export abstract class Curve extends Geo {
     abstract pointAt(t: number): Vector3;
 
     abstract buffer(numSegments: number): MultiLine;
+
+    abstract clone(): Curve;
+
+    abstract transform(m: Matrix4): Curve;
+
+    abstract transformed(m: Matrix4): Curve;
+
     // deal with 'length'
 
     // protected length

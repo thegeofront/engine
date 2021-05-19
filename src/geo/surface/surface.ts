@@ -2,12 +2,11 @@
 // author:  Jos Feenstra
 // purpose: base interface / abstract classes for surfaces
 
-import { Vector3 } from "../../math/vector";
-
+import { Geo, Vector3 } from "../../lib";
 /**
  * Any Surface. Maybe this will be expanded upon sometime in the future?
  */
-export abstract class Surface {}
+export abstract class Surface extends Geo {}
 
 /**
  * Bidirectional surface
