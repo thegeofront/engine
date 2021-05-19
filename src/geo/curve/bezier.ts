@@ -5,10 +5,10 @@
 
 import { MultiVector3 } from "../../data/multi-vector";
 import { Matrix4 } from "../../math/matrix";
+import { Polynomial } from "../../math/polynomial";
 import { Vector3 } from "../../math/vector";
 import { MultiLine } from "../../mesh/multi-line";
-import { Geo } from "../geo";
-import { Curve, MAX_DEGREE, PASCAL } from "./curve";
+import { Curve } from "./curve";
 import { Polyline } from "./polyline";
 
 export class Bezier extends Curve {
@@ -20,19 +20,6 @@ export class Bezier extends Curve {
 
     static new(verts: Vector3[]) {
         return new Bezier(verts, verts.length - 1);
-    }
-
-    /**
-     *   calculate weight using the Bernstein Polynomials:
-     *   (n over i) t^i * (1-t)^(n - i).
-     *   precalculated Pascal's triangle for a bit more efficiency
-     * @param t parameter t
-     * @param i vert index
-     * @param n degree
-     * @returns
-     */
-    private static B(t: number, i: number, n: number): number {
-        return PASCAL[n][i] * Math.pow(t, i) * Math.pow(1 - t, n - i);
     }
 
     /**
@@ -62,7 +49,7 @@ export class Bezier extends Curve {
     pointAt(t: number): Vector3 {
         let p = Vector3.zero();
         for (let i = 0; i < this.degree + 1; i++) {
-            p.add(this.verts[i].scaled(Bezier.B(t, i, this.degree)));
+            p.add(this.verts[i].scaled(Polynomial.bernstein(t, i, this.degree)));
         }
         return p;
     }

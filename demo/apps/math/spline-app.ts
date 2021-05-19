@@ -19,7 +19,9 @@ import {
     Polyline,
     ShadedMeshRenderer,
     MeshDebugRenderer,
+    GeonMath,
 } from "../../../src/lib";
+import { Polynomial } from "../../../src/math/polynomial";
 
 export class SplineApp extends App {
     // ui
