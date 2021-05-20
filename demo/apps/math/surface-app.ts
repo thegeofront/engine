@@ -36,7 +36,6 @@ export class SurfaceApp extends App {
 
     // render
     camera: Camera;
-    drRed: DotRenderer3;
     lrGrid: LineRenderer;
     lrRed: LineRenderer;
     mr: MeshDebugRenderer;
@@ -53,7 +52,6 @@ export class SurfaceApp extends App {
         this.dots = [];
         this.lines = [];
 
-        this.drRed = new DotRenderer3(gl, 10, [1, 0, 0, 1], false);
         this.drBlue = new DotRenderer3(gl, 10, [0, 0, 1, 1], false);
         this.lrRed = new LineRenderer(gl, [1, 0, 0, 1]);
         this.lrGrid = new LineRenderer(gl, [0.3, 0.3, 0.3, 1]);
@@ -64,12 +62,12 @@ export class SurfaceApp extends App {
         ui.addText("BEZIER SQUARE");
         this.params.push(Parameter.new("degree", 3, 2, 6, 1));
         ui.addParameter(this.params[0], this.start.bind(this));
-        this.params.push(Parameter.new("displace", 1.5, 0, 5, 0.001));
+        this.params.push(Parameter.new("displace", 4, 0, 10, 0.001));
         ui.addParameter(this.params[1], this.start.bind(this));
-        this.params.push(Parameter.new("detail", 2, 2, 100, 1));
+        this.params.push(Parameter.new("detail", 50, 2, 100, 1));
         ui.addParameter(this.params[2], this.start.bind(this));
-        this.params.push(Parameter.new("select", 0, 0, 20, 1));
-        ui.addParameter(this.params[3], this.start.bind(this));
+        // this.params.push(Parameter.new("select", 0, 0, 20, 1));
+        // ui.addParameter(this.params[3], this.start.bind(this));
     }
 
     start() {
@@ -80,7 +78,7 @@ export class SurfaceApp extends App {
         let degree = this.params[0].get();
         let displace = this.params[1].get();
         let detail = this.params[2].get();
-        let select = this.params[3].get();
+        // let select = this.params[3].get();
 
         // get some points
         let rng = Random.fromSeed(this.seed);
@@ -89,16 +87,18 @@ export class SurfaceApp extends App {
             .spawn(degree + 1, degree + 1) // spawn a bunch of points, the exact amound needed for the surface
             .to3D()
             .forEach((v) => {
-                return v.add(Vector3.fromRandomUnit(rng).scale(displace)); // and displace them slightly
+                return v
+                    .add(Vector3.fromRandomUnit(rng).scale(displace))
+                    .add(Vector3.unitZ().scale(5)); // and displace them slightly
             });
 
         // create a surface from it
         let surface = BezierSquare.new(vecs)!;
-        this.drRed.set(vecs);
+        this.drBlue.set(vecs);
 
         // lines
         this.lines = [];
-        this.lines.push(Circle3.newPlanar(vecs.get(select), 1).buffer());
+        // this.lines.push(Circle3.newPlanar(vecs.get(select), 1).buffer());
 
         // mesh
         // this.drBlue.set(surface.buffer(detail, detail).verts);
@@ -121,7 +121,6 @@ export class SurfaceApp extends App {
 
         this.lrRed.setAndRender(MultiLine.fromJoin(this.lines), c);
         this.drBlue.render(c);
-        this.drRed.render(c);
         this.lrGrid.render(c);
         this.mr.render(c);
     }
