@@ -131,7 +131,7 @@ export class NormalRenderer extends Renderer<Renderable> {
             }
             // console.log(normals);
         } else {
-            console.warn("no normals for type", normalKind);
+            // console.warn("no normals for type", normalKind);
             this.count = 0;
             return;
         }

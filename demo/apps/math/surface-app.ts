@@ -40,7 +40,6 @@ export class SurfaceApp extends App {
     lrGrid: LineRenderer;
     lrRed: LineRenderer;
     mr: MeshDebugRenderer;
-    perlin: Perlin;
     drBlue: DotRenderer3;
 
     constructor(gl: WebGLRenderingContext) {
@@ -50,7 +49,6 @@ export class SurfaceApp extends App {
         this.camera = new Camera(canvas, -2, true);
         this.camera.setState([21.926, 11.337, -10.04, -10, 1.12, 1.08]);
 
-        this.perlin = Perlin.new();
         this.seed = Random.randomSeed();
         this.dots = [];
         this.lines = [];
@@ -86,22 +84,17 @@ export class SurfaceApp extends App {
 
         // get some points
         let rng = Random.fromSeed(this.seed);
-        let vecs = Domain2.fromRadius(11)
-            .spawn(degree + 1, degree + 1)
+        let vecs = Domain2.fromRadius(-11) // span a (-size to size)**2 domain
+            .offset([-22, 22, 0, 0]) // flip it
+            .spawn(degree + 1, degree + 1) // spawn a bunch of points, the exact amound needed for the surface
             .to3D()
             .forEach((v) => {
-                return v.add(Vector3.fromRandomUnit(rng).scale(displace));
+                return v.add(Vector3.fromRandomUnit(rng).scale(displace)); // and displace them slightly
             });
 
         // create a surface from it
-        // console.log(vecs.count);
         let surface = BezierSquare.new(vecs)!;
-
         this.drRed.set(vecs);
-
-        // console.log(surface.pointAt(0.5, 0.5));
-        // console.log(surface.buffer(detail, detail));
-        // this.drRed.set(surface.buffer(detail, detail).verts);
 
         // lines
         this.lines = [];

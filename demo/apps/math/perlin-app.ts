@@ -25,7 +25,7 @@ import {
 } from "../../../src/lib";
 import { Random } from "../../../src/math/random";
 
-export class SomePointsApp extends App {
+export class PerlinApp extends App {
     // ui
     params: Parameter[] = [];
 
