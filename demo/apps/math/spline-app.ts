@@ -187,7 +187,7 @@ export class BezierApp extends App {
         let matrix = this.camera.totalMatrix;
         let c = new Context(this.camera);
 
-        // this.lrGrid.render(c);
+        this.lrGrid.render(c);
         this.drRed.setAndRender(this.dots, c);
         this.drBlue.render(c);
         this.lrRed.setAndRender(MultiLine.fromJoin(this.lines), c);
