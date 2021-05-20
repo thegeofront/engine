@@ -17,7 +17,7 @@ import { SphericalThreeApp } from "./apps/spherical/spherical-three-app";
 import { LeastSquaresApp } from "./apps/math/least-squares-app";
 import { UITestApp } from "./apps/ui-test-app";
 import { SphericalLandingApp } from "./apps/spherical/spherical-landing";
-import { SplineApp } from "./apps/math/spline-app";
+import { BezierApp } from "./apps/math/spline-app";
 import { SurfaceApp } from "./apps/math/surface-app";
 import { SomePointsApp } from "./apps/math/some-points-app";
 
@@ -40,7 +40,7 @@ function main() {
     let appCollection = [
         SurfaceApp,
         SomePointsApp,
-        SplineApp,
+        BezierApp,
         SphericalTwoApp,
         SphericalThreeApp,
         SphericalOneApp,

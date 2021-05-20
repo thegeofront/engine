@@ -4,9 +4,11 @@
 // notes:   - using Vector3[] > MultiVector3, since their is no added benefit as of right now
 
 import { MultiVector3 } from "../../data/multi-vector-3";
+import { GeonMath } from "../../math/math";
 import { Matrix4 } from "../../math/matrix";
 import { Polynomial } from "../../math/polynomial";
 import { Random } from "../../math/random";
+import { Util } from "../../math/util";
 import { Vector3 } from "../../math/vector";
 import { MultiLine } from "../../mesh/multi-line";
 import { Stopwatch } from "../../system/stopwatch";
@@ -73,10 +75,69 @@ export class Bezier extends Curve {
     }
 
     /**
-     * subdivide
+     *  This function returns the entire castejau piramid.
+     *  the final point is the first: verts[0].
+     *  Hovever, this is slower than the PointAt() method,
+     *  which uses bernstein polynomials
+     *
+     *  useful for:
+     *  Subdividing bezier curves, debugging, and splines
+     */
+    decastejau(t: number): MultiVector3 {
+        let size = this.verts.count;
+        // console.log(points.count);
+
+        // create the triangle of resulting points
+        let result = MultiVector3.new(GeonMath.stack(size));
+
+        // triangle iteration is complex :)
+        let tri = Util.iterateTriangle;
+
+        // copy paste the base
+        let basecolumn = size - 1;
+        let i = 0;
+        for (let row = 0; row <= basecolumn; row++) {
+            let idx = tri(basecolumn, row);
+            result.set(idx, this.verts.get(i));
+            i++;
+        }
+
+        // iterate over this triangle, starting at the base + 1
+        for (let col = size - 2; col > -1; col -= 1) {
+            for (let row = 0; row <= col; row++) {
+                let idx = tri(col, row);
+                let p_a = result.get(tri(col + 1, row));
+                let p_b = result.get(tri(col + 1, row + 1));
+                let q = p_b.scale(t).add(p_a.scale(1 - t));
+                result.set(idx, q);
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * subdivide into to new bezier curves,
+     * with the same number of control points
      */
     splitAt(t: number): [Bezier, Bezier] {
-        return [this, this];
+        // get triangle
+        let size = this.degree + 1;
+        let tri = this.decastejau(t);
+
+        // prepare
+        let left = MultiVector3.new(this.verts.count);
+        let right = MultiVector3.new(this.verts.count);
+
+        // the two edges of the triangle opposite to the base are the vertices we are interested in
+        let i = 0;
+        for (let col = size - 1; col > -1; col -= 1) {
+            left.set(i, tri.get(Util.iterateTriangle(col, 0)));
+            right.set(i, tri.get(Util.iterateTriangle(col, col)));
+            i++;
+        }
+
+        return [Bezier.new(left), Bezier.new(right)];
     }
 
     toPolyline(segments: number) {

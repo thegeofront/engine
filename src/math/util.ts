@@ -27,12 +27,9 @@ export class Util {
      * w 3 |>     >
      *   4 |>
      *
-        // iterate over this triangle, starting at the base
-        let tri = Util.iterateTriangle;
         for (let col = size - 1; col > -1; col -= 1) {
             for (let row = 0; row <= col; row++) {
-                let idx = tri(col, row);
-                console.log(idx);
+                let idx = Util.iterateTriangle(col, row);
             }
         }
      * ```

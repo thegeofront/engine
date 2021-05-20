@@ -23,7 +23,7 @@ import {
 } from "../../../src/lib";
 import { Stopwatch } from "../../../src/system/stopwatch";
 
-export class SplineApp extends App {
+export class BezierApp extends App {
     // ui
     params: Parameter[] = [];
 
@@ -37,6 +37,8 @@ export class SplineApp extends App {
     lrGrid: LineRenderer;
     lrRed: LineRenderer;
     mr: MeshDebugRenderer;
+    lrBlue: LineRenderer;
+    drBlue: DotRenderer3;
 
     constructor(gl: WebGLRenderingContext) {
         super(gl);
@@ -49,27 +51,25 @@ export class SplineApp extends App {
         this.lines = [];
 
         this.drRed = new DotRenderer3(gl, 10, [1, 0, 0, 1], false);
+        this.drBlue = new DotRenderer3(gl, 10, [0, 0, 1, 1], false);
         this.lrRed = new LineRenderer(gl, [1, 0, 0, 1]);
+        this.lrBlue = new LineRenderer(gl, [0, 0, 1, 1]);
         this.lrGrid = new LineRenderer(gl, [0.3, 0.3, 0.3, 1]);
         this.mr = new MeshDebugRenderer(gl, [1, 0, 0, 0.5], [1, 1, 1, 0.5]);
     }
 
     ui(ui: UI) {
-        ui.addText("BEZIER CURVE");
         this.params.push(Parameter.new("t", 0.5, 0, 1, 0.001));
         ui.addParameter(this.params[0], this.start.bind(this));
         this.params.push(Parameter.new("increase degree", 0, 0, 10, 1));
         ui.addParameter(this.params[1], this.start.bind(this));
 
-        ui.addText("LOFT");
         this.params.push(Parameter.new("u", 0.5, 0, 1, 0.001));
         ui.addParameter(this.params[2], this.start.bind(this));
         this.params.push(Parameter.new("v", 0.5, 0, 1, 0.001));
         ui.addParameter(this.params[3], this.start.bind(this));
         this.params.push(Parameter.new("displace bottom", 0, -5, 5, 0.001));
         ui.addParameter(this.params[4], this.start.bind(this));
-
-        ui.addText("OVERALL");
 
         this.params.push(Parameter.new("detail", 10, 2, 100, 1));
         ui.addParameter(this.params[this.params.length - 1], this.start.bind(this));
@@ -95,14 +95,36 @@ export class SplineApp extends App {
             Vector3.new(-9, 1, 0),
         ]);
 
-        // subidive bezier
+        bezier = bezier.splitAt(t)[0];
+
+        // subdivide bezier `sub` times
         for (let i = 0; i < sub; i++) {
             bezier = bezier.increaseDegree();
         }
 
+        // show decastejau triangle
+        let tri = bezier.decastejau(t);
+
+        // turn this triangle to lines
+        // iterate over this triangle, starting at the base
+        let lines = [];
+        let size = bezier.degree + 1;
+        for (let col = size - 1; col > -1; col -= 1) {
+            if (col < 1) continue;
+            let verts = MultiVector3.new(col + 1);
+
+            for (let row = 0; row <= col; row++) {
+                let idx = Util.iterateTriangle(col, row);
+                verts.set(row, tri.get(idx));
+            }
+            lines.push(MultiLine.fromPolyline(Polyline.new(verts)));
+        }
+        this.lrBlue.set(MultiLine.fromJoin(lines));
+        this.drBlue.set(tri);
+
         // 2 - loft
         let loftcurves = [
-            Polyline.fromList([
+            Bezier.fromList([
                 Vector3.new(3, -1, 4),
                 Vector3.new(1, -2, 4),
                 Vector3.new(1, 2, 4.5),
@@ -114,6 +136,7 @@ export class SplineApp extends App {
                 Vector3.new(1, 1, 1.5),
                 Vector3.new(-1, 1, 2),
                 Vector3.new(-2, 1, 2),
+                Vector3.new(-4, 2, 3),
             ]),
             Bezier.fromList([
                 Vector3.new(3, -1, 0),
@@ -136,11 +159,12 @@ export class SplineApp extends App {
 
         // lines
         this.lines = [];
-        this.lines.push(bezier.buffer(detail));
-        for (let curve of loftcurves) {
-            this.lines.push(curve.buffer(100));
-        }
+        // this.lines.push(bezier.buffer(detail));
+        // for (let curve of loftcurves) {
+        //     this.lines.push(curve.buffer(100));
+        // }
         this.lines.push(loft.isoCurveV(u).buffer(detail));
+        this.lines.push(loft.isoCurveU(v).buffer(detail));
         // for (let dot of this.dots) {
         //     this.lines.push(Circle3.newPlanar(dot, 0.1).buffer());
         // }
@@ -163,9 +187,11 @@ export class SplineApp extends App {
         let matrix = this.camera.totalMatrix;
         let c = new Context(this.camera);
 
+        // this.lrGrid.render(c);
         this.drRed.setAndRender(this.dots, c);
+        this.drBlue.render(c);
         this.lrRed.setAndRender(MultiLine.fromJoin(this.lines), c);
-        this.lrGrid.render(c);
+        this.lrBlue.render(c);
         this.mr.render(c);
     }
 }

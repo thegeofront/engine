@@ -13,12 +13,29 @@ import { Geo } from "../geo";
 import { BiSurface } from "./surface";
 
 export class Loft extends BiSurface {
-    private constructor(public curves: Curve[]) {
+    private constructor(public curves: Bezier[]) {
         super();
     }
 
-    static new(curves: Curve[]) {
-        return new Loft(curves);
+    static new(curves: Bezier[]) {
+        // make sure all curves are of the same degree, so we can easely interpolate
+        return new Loft(equalizeCurves(curves));
+    }
+
+    getTransposedCurves(): Bezier[] {
+        // this can only happen if the curves are all of the same degree,
+        // and at the very least, have the same number of controlpoints
+        let curves = [];
+        let isize = this.curves[0].verts.count;
+        let jsize = this.curves.length;
+        for (let i = 0; i < isize; i++) {
+            let verts = MultiVector3.new(this.curves.length);
+            for (let j = 0; j < jsize; j++) {
+                verts.set(j, this.curves[j].verts.get(i));
+            }
+            curves.push(Bezier.new(verts));
+        }
+        return curves;
     }
 
     pointAt(u: number, v: number): Vector3 {
@@ -26,9 +43,18 @@ export class Loft extends BiSurface {
     }
 
     isoCurveV(u: number): Bezier {
-        let pts = MultiVector3.new(this.curves.length);
-        for (let i = 0; i < this.curves.length; i++) {
-            pts.set(i, this.curves[i].pointAt(u));
+        return this.isoCurve(this.curves, u);
+    }
+
+    isoCurveU(v: number): Bezier {
+        let trans = this.getTransposedCurves();
+        return this.isoCurve(trans, v);
+    }
+
+    private isoCurve(curves: Bezier[], t: number) {
+        let pts = MultiVector3.new(curves.length);
+        for (let i = 0; i < curves.length; i++) {
+            pts.set(i, curves[i].pointAt(t));
         }
         return Bezier.new(pts);
     }
@@ -53,7 +79,7 @@ export class Loft extends BiSurface {
     }
 
     clone(): Loft {
-        let curves = new Array<Curve>();
+        let curves = new Array<Bezier>();
         for (let i = 0; i < this.curves.length; i++) {
             curves[i] = this.curves[i].clone();
         }
@@ -68,10 +94,31 @@ export class Loft extends BiSurface {
     }
 
     transformed(m: Matrix4): Loft {
-        let curves = new Array<Curve>();
+        let curves = new Array<Bezier>();
         for (let i = 0; i < this.curves.length; i++) {
             curves[i] = this.curves[i].transformed(m);
         }
         return Loft.new(curves);
     }
+}
+
+function equalizeCurves(curves: Bezier[]): Bezier[] {
+    // get highest degree
+    let maxDegree = 0;
+    for (let curve of curves) {
+        if (curve.degree > maxDegree) {
+            maxDegree = curve.degree;
+        }
+    }
+
+    for (let i = 0; i < curves.length; i++) {
+        let failsave = 20;
+
+        while (curves[i].degree < maxDegree && failsave < 100) {
+            curves[i] = curves[i].increaseDegree();
+            failsave++;
+        }
+    }
+
+    return curves;
 }
