@@ -59,7 +59,6 @@ export class SurfaceApp extends App {
     }
 
     ui(ui: UI) {
-        ui.addText("BEZIER SQUARE");
         this.params.push(Parameter.new("degree", 3, 2, 6, 1));
         ui.addParameter(this.params[0], this.start.bind(this));
         this.params.push(Parameter.new("displace", 4, 0, 10, 0.001));

@@ -17,9 +17,10 @@ import { SphericalThreeApp } from "./apps/spherical/spherical-three-app";
 import { LeastSquaresApp } from "./apps/math/least-squares-app";
 import { UITestApp } from "./apps/ui-test-app";
 import { SphericalLandingApp } from "./apps/spherical/spherical-landing";
-import { BezierApp } from "./apps/math/spline-app";
+import { BezierApp } from "./apps/math/bezier-app";
 import { SurfaceApp } from "./apps/math/surface-app";
 import { PerlinApp } from "./apps/math/perlin-app";
+import { LoftApp } from "./apps/math/loft-app";
 
 var core: Core;
 
@@ -41,6 +42,7 @@ function main() {
         SurfaceApp,
         PerlinApp,
         BezierApp,
+        LoftApp,
         SphericalTwoApp,
         SphericalThreeApp,
         SphericalOneApp,

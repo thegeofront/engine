@@ -20,6 +20,7 @@ import {
     Domain2,
     Domain3,
     MultiVector3,
+    Circle3,
 } from "../../../src/lib";
 import { Stopwatch } from "../../../src/system/stopwatch";
 
@@ -59,19 +60,14 @@ export class BezierApp extends App {
     }
 
     ui(ui: UI) {
-        this.params.push(Parameter.new("t", 0.5, 0, 1, 0.001));
+        this.params.push(Parameter.new("t", 0.6, 0, 1, 0.001));
         ui.addParameter(this.params[0], this.start.bind(this));
         this.params.push(Parameter.new("increase degree", 0, 0, 10, 1));
         ui.addParameter(this.params[1], this.start.bind(this));
-
-        this.params.push(Parameter.new("u", 0.5, 0, 1, 0.001));
+        this.params.push(Parameter.new("cut", 1, 0, 1, 0.001));
         ui.addParameter(this.params[2], this.start.bind(this));
-        this.params.push(Parameter.new("v", 0.5, 0, 1, 0.001));
-        ui.addParameter(this.params[3], this.start.bind(this));
-        this.params.push(Parameter.new("displace bottom", 0, -5, 5, 0.001));
-        ui.addParameter(this.params[4], this.start.bind(this));
 
-        this.params.push(Parameter.new("detail", 10, 2, 100, 1));
+        this.params.push(Parameter.new("detail", 50, 2, 100, 1));
         ui.addParameter(this.params[this.params.length - 1], this.start.bind(this));
     }
 
@@ -82,20 +78,19 @@ export class BezierApp extends App {
         // get all parameters
         let t = this.params[0].get();
         let sub = this.params[1].get();
-        let u = this.params[2].get();
-        let v = this.params[3].get();
-        let y = this.params[4].get();
+        let cut = this.params[2].get();
         let detail = this.params[this.params.length - 1].get();
 
         // 1 - bezier
         let bezier = Bezier.fromList([
-            Vector3.new(-7, -1, 0),
-            Vector3.new(-7, 1, 0),
-            Vector3.new(-9, -1, 0),
-            Vector3.new(-9, 1, 0),
+            Vector3.new(-2, -2, 0),
+            Vector3.new(-2, 2, 0),
+            Vector3.new(2, 2, 0),
+            Vector3.new(2, -2, 0),
         ]);
 
-        bezier = bezier.splitAt(t)[0];
+        let leftover: Bezier;
+        [bezier, leftover] = bezier.splitAt(cut);
 
         // subdivide bezier `sub` times
         for (let i = 0; i < sub; i++) {
@@ -119,35 +114,9 @@ export class BezierApp extends App {
             }
             lines.push(MultiLine.fromPolyline(Polyline.new(verts)));
         }
+        // lines.push(leftover.buffer(detail));
         this.lrBlue.set(MultiLine.fromJoin(lines));
         this.drBlue.set(tri);
-
-        // 2 - loft
-        let loftcurves = [
-            Bezier.fromList([
-                Vector3.new(3, -1, 4),
-                Vector3.new(1, -2, 4),
-                Vector3.new(1, 2, 4.5),
-                Vector3.new(-1, 1, 4),
-            ]),
-            Bezier.fromList([
-                Vector3.new(3, -1, 2),
-                Vector3.new(1, -1, 1.5),
-                Vector3.new(1, 1, 1.5),
-                Vector3.new(-1, 1, 2),
-                Vector3.new(-2, 1, 2),
-                Vector3.new(-4, 2, 3),
-            ]),
-            Bezier.fromList([
-                Vector3.new(3, -1, 0),
-                Vector3.new(1, -1, 0),
-                Vector3.new(1, 1, 0),
-                Vector3.new(-1, 1, 0),
-            ]),
-        ];
-
-        loftcurves[2].move(Vector3.new(0, y, 0));
-        let loft = Loft.new(loftcurves);
 
         // dots
         this.dots = [];
@@ -155,22 +124,17 @@ export class BezierApp extends App {
         this.dots.push(bezier.pointAt(t));
         this.dots.push(bezier.pointAt(t).add(bezier.tangentAt(t)));
         this.dots.push(bezier.pointAt(t).add(bezier.normalAt(t)));
-        this.dots.push(loft.pointAt(u, v));
 
         // lines
         this.lines = [];
-        // this.lines.push(bezier.buffer(detail));
+        this.lines.push(bezier.buffer(detail));
+        this.lines.push(Circle3.newPlanar(bezier.pointAt(t), 0.1).buffer());
         // for (let curve of loftcurves) {
         //     this.lines.push(curve.buffer(100));
         // }
-        this.lines.push(loft.isoCurveV(u).buffer(detail));
-        this.lines.push(loft.isoCurveU(v).buffer(detail));
         // for (let dot of this.dots) {
         //     this.lines.push(Circle3.newPlanar(dot, 0.1).buffer());
         // }
-
-        // mesh
-        this.mr.set(loft.buffer(detail, detail).toRenderable());
     }
 
     startGrid() {
@@ -192,6 +156,6 @@ export class BezierApp extends App {
         this.drBlue.render(c);
         this.lrRed.setAndRender(MultiLine.fromJoin(this.lines), c);
         this.lrBlue.render(c);
-        this.mr.render(c);
+        // this.mr.render(c);
     }
 }

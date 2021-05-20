@@ -24,6 +24,7 @@ import {
     MultiVector3,
 } from "../../../src/lib";
 import { Random } from "../../../src/math/random";
+import { DotRendererHeight } from "../../../src/renderers/dot-renderer-height";
 
 export class PerlinApp extends App {
     // ui
@@ -36,7 +37,7 @@ export class PerlinApp extends App {
 
     // render
     camera: Camera;
-    drRed: DotRenderer3;
+    drRed: DotRendererHeight;
     lrGrid: LineRenderer;
 
     constructor(gl: WebGLRenderingContext) {
@@ -44,23 +45,21 @@ export class PerlinApp extends App {
 
         let canvas = gl.canvas as HTMLCanvasElement;
         this.camera = new Camera(canvas, -2, true);
-        this.camera.setState([16.157, 0.79017, -7.02, -10, 1.12, 1.5600000000000014]);
+        this.camera.setState([21.919, -0.26769, -16.72, -10, 0.9, 1.5600000000000014]);
 
         this.perlin = Perlin.new();
         this.seed = Random.randomSeed();
 
-        this.drRed = new DotRenderer3(gl, 10, [1, 0, 0, 1], false);
+        this.drRed = new DotRendererHeight(gl, 15, [1, 0, 0, 1], 5, false);
         this.lrGrid = new LineRenderer(gl, [0.3, 0.3, 0.3, 1]);
     }
 
     ui(ui: UI) {
-        ui.addText("BEZIER SQUARE");
-
-        this.params.push(Parameter.new("count", 100, 2, 500, 1));
+        this.params.push(Parameter.new("count", 200, 2, 500, 1));
         this.params.push(Parameter.new("displace", 0, 0, 1, 0.001));
         this.params.push(Parameter.newBoolean("perlin move", true));
-        this.params.push(Parameter.new("perlin amp", 4, 1, 10, 0.01));
-        this.params.push(Parameter.new("perlin speed", 1, 0.5, 5, 0.1));
+        this.params.push(Parameter.new("perlin amp", 5, 1, 10, 0.01));
+        this.params.push(Parameter.new("perlin speed", 2.5, 0.5, 10, 0.1));
 
         ui.addParameter(this.params[0], this.start.bind(this));
         ui.addParameter(this.params[1], this.start.bind(this));
