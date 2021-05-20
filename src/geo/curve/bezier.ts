@@ -1,7 +1,7 @@
-// name:    spline.ts
+// name:    bezier.ts
 // author:  Jos Feenstra
-// purpose: mathematical representation of parametric curves
-// notes:   - using Vector3[] > MultiVector3, since their is no added benefit as of right now
+// purpose: mathematical representation of a simple parametric curve
+// notes:   based upon the excellent explainations from Prof. C.-K. Shene: https://pages.mtu.edu/~shene/COURSES/cs3621/NOTES/
 
 import { MultiVector3 } from "../../data/multi-vector-3";
 import { GeonMath } from "../../math/math";

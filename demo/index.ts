@@ -10,28 +10,21 @@ import { GeometryApp } from "./apps/geometry-app";
 import { IcosahedronApp } from "./apps/icosahedron-app";
 import { MeshInspectorApp } from "./apps/mesh-inspector-app";
 import { ObjLoaderApp } from "./apps/obj-loader-app";
-import { StatApp } from "./apps/old/stat-app";
-
 import { SphericalOneApp } from "./apps/spherical/spherical-one-app";
 import { SphericalThreeApp } from "./apps/spherical/spherical-three-app";
 import { LeastSquaresApp } from "./apps/math/least-squares-app";
-import { UITestApp } from "./apps/ui-test-app";
-import { SphericalLandingApp } from "./apps/spherical/spherical-landing";
 import { BezierApp } from "./apps/math/bezier-app";
 import { SurfaceApp } from "./apps/math/surface-app";
 import { PerlinApp } from "./apps/math/perlin-app";
 import { LoftApp } from "./apps/math/loft-app";
+import { StatApp } from "./apps/old/stat-app";
 
 var core: Core;
 
 function main() {
     // get references of all items on the canvas
     let canvas = document.getElementById("canvas")! as HTMLCanvasElement;
-    let video = document.getElementById("camera")! as HTMLVideoElement;
     let ui = document.getElementById("interface") as HTMLDivElement;
-    let cameraOn = document.getElementById("camera-on")! as HTMLButtonElement;
-    let cameraStop = document.getElementById("camera-off")! as HTMLButtonElement;
-    let buttonPredict = document.getElementById("predict")! as HTMLButtonElement;
 
     // init core
     let gl = Renderer.initWebglContext(canvas);
@@ -39,28 +32,27 @@ function main() {
 
     // init swap app
     let appCollection = [
-        SurfaceApp,
         PerlinApp,
+        SurfaceApp,
         BezierApp,
         LoftApp,
+        SphericalOneApp,
         SphericalTwoApp,
         SphericalThreeApp,
-        SphericalOneApp,
-        LeastSquaresApp,
         GeometryApp,
-        MeshInspectorApp,
         IcosahedronApp,
         DotApp3,
+        LeastSquaresApp,
+        MeshInspectorApp,
         ObjLoaderApp,
     ];
 
     let swapApp = new SwapApp(gl, core, appCollection);
     core.addApp(swapApp);
-    // swapApp.swap(0);
-    swapApp.swapFromUrl(location.hash, 0);
 
-    // a specific app dealing with webcams & other things
-    // addWebcamAppWhenReady(core, canvas, video);
+    // check if the hash matches one of the app names, if so, switch to that app. if not, goto the default start app.
+    let defaultIndex = 0;
+    swapApp.swapFromUrl(location.hash, defaultIndex);
 
     // infinite loop
     function loop() {

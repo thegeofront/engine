@@ -45,7 +45,7 @@ export class PerlinApp extends App {
 
         let canvas = gl.canvas as HTMLCanvasElement;
         this.camera = new Camera(canvas, -2, true);
-        this.camera.setState([21.919, -0.26769, -16.72, -10, 0.9, 1.5600000000000014]);
+        this.camera.setState([21.919, -0.26769, -16.72, -10, 0.9, 1.5700000000000014]);
 
         this.perlin = Perlin.new();
         this.seed = Random.randomSeed();
