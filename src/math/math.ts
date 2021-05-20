@@ -43,9 +43,9 @@ export class GeonMath {
     }
 
     static stack(n: number) {
-        let prod = 1;
+        let prod = 0;
         for (let i = 1; i < n + 1; i++) {
-            prod + i;
+            prod += i;
         }
         return prod;
     }

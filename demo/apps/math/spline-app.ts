@@ -58,14 +58,16 @@ export class SplineApp extends App {
         ui.addText("BEZIER CURVE");
         this.params.push(Parameter.new("t", 0.5, 0, 1, 0.001));
         ui.addParameter(this.params[0], this.start.bind(this));
+        this.params.push(Parameter.new("increase degree", 0, 0, 10, 1));
+        ui.addParameter(this.params[1], this.start.bind(this));
 
         ui.addText("LOFT");
         this.params.push(Parameter.new("u", 0.5, 0, 1, 0.001));
-        ui.addParameter(this.params[1], this.start.bind(this));
-        this.params.push(Parameter.new("v", 0.5, 0, 1, 0.001));
         ui.addParameter(this.params[2], this.start.bind(this));
-        this.params.push(Parameter.new("displace bottom", 0, -5, 5, 0.001));
+        this.params.push(Parameter.new("v", 0.5, 0, 1, 0.001));
         ui.addParameter(this.params[3], this.start.bind(this));
+        this.params.push(Parameter.new("displace bottom", 0, -5, 5, 0.001));
+        ui.addParameter(this.params[4], this.start.bind(this));
 
         ui.addText("OVERALL");
 
@@ -79,9 +81,10 @@ export class SplineApp extends App {
 
         // get all parameters
         let t = this.params[0].get();
-        let u = this.params[1].get();
-        let v = this.params[2].get();
-        let y = this.params[3].get();
+        let sub = this.params[1].get();
+        let u = this.params[2].get();
+        let v = this.params[3].get();
+        let y = this.params[4].get();
         let detail = this.params[this.params.length - 1].get();
 
         // 1 - bezier
@@ -91,6 +94,11 @@ export class SplineApp extends App {
             Vector3.new(-9, -1, 0),
             Vector3.new(-9, 1, 0),
         ]);
+
+        // subidive bezier
+        for (let i = 0; i < sub; i++) {
+            bezier = bezier.increaseDegree();
+        }
 
         // 2 - loft
         let loftcurves = [

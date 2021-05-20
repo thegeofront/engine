@@ -39,6 +39,46 @@ export class Bezier extends Curve {
         return Bezier.new(hodoVerts);
     }
 
+    /**
+     * Return a new curve which is a copy of this curve, but with one added control point
+     * Do this recursively, and you have something like decastejau's
+     * However, this process cannot be rewritten as a polynomial, since the i / (n + 1) ratio changes constantly
+     */
+    increaseDegree(): Bezier {
+        // if (degree <= this.degree) {
+        //     console.warn("same or lower degree than my current degree...");
+        //     return this.clone();
+        // }
+
+        // increase degree by one.
+        let n = this.degree;
+        let verts = MultiVector3.new(n + 2);
+
+        // copy first and last
+        verts.set(0, this.verts.get(0));
+        verts.set(verts.count - 1, this.verts.get(this.verts.count - 1));
+
+        // interpolate in-betweens
+        for (let i = 1; i < n + 1; i++) {
+            let pa = this.verts.get(i - 1);
+            let pb = this.verts.get(i);
+            let sa = i / (n + 1);
+            let sb = 1 - sa;
+            let q = pa.scale(sa).add(pb.scale(sb));
+            verts.set(i, q);
+        }
+
+        // create a new curve from it
+        return Bezier.new(verts);
+    }
+
+    /**
+     * subdivide
+     */
+    splitAt(t: number): [Bezier, Bezier] {
+        return [this, this];
+    }
+
     toPolyline(segments: number) {
         let count = segments + 1;
         let verts = MultiVector3.new(count);
