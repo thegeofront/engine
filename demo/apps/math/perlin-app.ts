@@ -102,10 +102,18 @@ export class PerlinApp extends App {
         if (perlinMove) {
             let factor = this.params[3].get();
             let speed = this.params[4].get();
-            let news = this.dots.map((v) => {
+            let news = MultiVector3.new(this.dots.count);
+            for (let i = 0; i < this.dots.count; i++) {
+                let v = this.dots.get(i);
                 let n = this.perlin.noise(v.x, v.y, state.newTime * 0.0001 * speed) * factor;
-                return v.added(Vector3.new(0, 0, n));
-            });
+                v.z = n;
+                news.set(i, v);
+            }
+
+            // let news = this.dots.map((v) => {
+            //     let n = this.perlin.noise(v.x, v.y, state.newTime * 0.0001 * speed) * factor;
+            //     return v.added(Vector3.new(0, 0, n));
+            // });
             this.drRed.set(news, DrawSpeed.DynamicDraw);
         }
     }

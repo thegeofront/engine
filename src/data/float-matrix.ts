@@ -11,8 +11,9 @@ export class FloatMatrix {
         this.height = height;
         this.width = width;
         this.data = new Float32Array(this.width * this.height);
-        if (data == [] || data.length == 0) this.fill(0);
-        else this.setData(data);
+        if (data == [] || data.length == 0) {
+            // this.fill(0); // not needed, and not efficient ;)
+        } else this.setData(data);
     }
 
     print() {
