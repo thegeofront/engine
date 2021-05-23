@@ -109,11 +109,6 @@ export class PerlinApp extends App {
                 v.z = n;
                 news.set(i, v);
             }
-
-            // let news = this.dots.map((v) => {
-            //     let n = this.perlin.noise(v.x, v.y, state.newTime * 0.0001 * speed) * factor;
-            //     return v.added(Vector3.new(0, 0, n));
-            // });
             this.drRed.set(news, DrawSpeed.DynamicDraw);
         }
     }

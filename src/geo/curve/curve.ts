@@ -6,6 +6,7 @@
 // - Polyline (not terminologically correct but in terms of logic it makes sense)
 
 import { MultiVector3 } from "../../data/multi-vector-3";
+import { GeonMath, Polyline, Util } from "../../lib";
 import { Matrix4 } from "../../math/matrix";
 import { Vector3 } from "../../math/vector";
 import { MultiLine } from "../../mesh/multi-line";
@@ -17,9 +18,23 @@ export abstract class Curve extends Geo {
         super();
     }
 
+    toPolyline(segments: number) {
+        let count = segments + 1;
+        let verts = MultiVector3.new(count);
+        for (let i = 0; i < count; i++) {
+            let t = i / segments; // fraction
+            verts.set(i, this.pointAt(t));
+        }
+        return Polyline.new(verts);
+    }
+
+    buffer(segments: number): MultiLine {
+        return MultiLine.fromPolyline(this.toPolyline(segments));
+    }
+
     abstract pointAt(t: number): Vector3;
 
-    abstract buffer(numSegments: number): MultiLine;
+    // abstract buffer(numSegments: number): MultiLine;
 
     abstract clone(): Curve;
 

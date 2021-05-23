@@ -75,55 +75,13 @@ export class Bezier extends Curve {
     }
 
     /**
-     *  This function returns the entire castejau piramid.
-     *  the final point is the first: verts[0].
-     *  Hovever, this is slower than the PointAt() method,
-     *  which uses bernstein polynomials
-     *
-     *  useful for:
-     *  Subdividing bezier curves, debugging, and splines
-     */
-    decastejau(t: number): MultiVector3 {
-        let size = this.verts.count;
-        // console.log(points.count);
-
-        // create the triangle of resulting points
-        let result = MultiVector3.new(GeonMath.stack(size));
-
-        // triangle iteration is complex :)
-        let tri = Util.iterateTriangle;
-
-        // copy paste the base
-        let basecolumn = size - 1;
-        let i = 0;
-        for (let row = 0; row <= basecolumn; row++) {
-            let idx = tri(basecolumn, row);
-            result.set(idx, this.verts.get(i));
-            i++;
-        }
-
-        // iterate over this triangle, starting at the base + 1
-        for (let col = size - 2; col > -1; col -= 1) {
-            for (let row = 0; row <= col; row++) {
-                let idx = tri(col, row);
-                let p_a = result.get(tri(col + 1, row));
-                let p_b = result.get(tri(col + 1, row + 1));
-                let q = p_b.scale(t).add(p_a.scale(1 - t));
-                result.set(idx, q);
-            }
-        }
-
-        return result;
-    }
-
-    /**
      * subdivide into to new bezier curves,
      * with the same number of control points
      */
     splitAt(t: number): [Bezier, Bezier] {
         // get triangle
         let size = this.degree + 1;
-        let tri = this.decastejau(t);
+        let tri = Polynomial.decastejau(this.verts, t);
 
         // prepare
         let left = MultiVector3.new(this.verts.count);
@@ -138,16 +96,6 @@ export class Bezier extends Curve {
         }
 
         return [Bezier.new(left), Bezier.new(right)];
-    }
-
-    toPolyline(segments: number) {
-        let count = segments + 1;
-        let verts = MultiVector3.new(count);
-        for (let i = 0; i < count; i++) {
-            let t = i / segments; // fraction
-            verts.set(i, this.pointAt(t));
-        }
-        return Polyline.new(verts);
     }
 
     /**
@@ -194,10 +142,6 @@ export class Bezier extends Curve {
 
     bufferApprox() {
         this._approx = this.toPolyline(100);
-    }
-
-    buffer(segments: number): MultiLine {
-        return MultiLine.fromPolyline(this.toPolyline(segments));
     }
 
     // geo trait

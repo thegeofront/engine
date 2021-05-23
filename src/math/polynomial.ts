@@ -1,5 +1,6 @@
 // purpose: polynomial math needed for curves & surfaces
 // note: uses a hardcoded pascal's triangle for performance reasons
+// notes:   based upon the excellent explainations from Prof. C.-K. Shene: https://pages.mtu.edu/~shene/COURSES/cs3621/NOTES/
 
 import { MultiVector3 } from "../data/multi-vector-3";
 import { GeonMath } from "./math";
@@ -23,6 +24,74 @@ export class Polynomial {
      */
     static bernstein(t: number, i: number, n: number): number {
         return this.getBicoef(n, i) * Math.pow(t, i) * Math.pow(1 - t, n - i);
+    }
+
+    /**
+     * CoxDeboor's recusion formula.
+     * Basicly bernstein, but for b-splines
+     * NOTE: inefficient calculation: recursive in the dumb sense
+     */
+    static coxdeboor(t: number, i: number, degree: number, knots: Float32Array): number {
+        if (degree == 0) {
+            if (t >= knots[i] && t < knots[i + 1]) {
+                console.log("in between!");
+                return 1;
+            }
+            return 0;
+        }
+        let c1 = (t - knots[i]) / (knots[i + degree] - knots[i]);
+        let c2 = (knots[i + degree + 1] - t) / (knots[i + degree + 1] - knots[i + 1]);
+
+        console.log(c1);
+        console.log(c2);
+        return (
+            c1 * this.coxdeboor(t, i, degree - 1, knots) +
+            c2 * this.coxdeboor(t, i + 1, degree - 1, knots)
+        );
+    }
+
+    /**
+     * CoxDeboor's recusion formula.
+     * Basicly bernstein, but for b-splines
+     * NOTE: this is but a sketch, this is not correct yet...
+     * NOTE: the result will be
+     */
+    static coxdeboorTriangle(t: number, i: number, p: number, knots: Float32Array): Float32Array {
+        let size = knots.length;
+        // console.log(points.count);
+
+        // create the triangle of resulting points
+        let result = new Float32Array(GeonMath.stack(size));
+
+        // triangle iteration is complex :)
+        let tri = Util.iterateTriangle;
+
+        // copy paste the base
+        let basecolumn = size - 1;
+        let j = 0;
+        for (let row = 0; row <= basecolumn; row++) {
+            let idx = tri(basecolumn, row);
+            if (knots[i] <= t || t < knots[i + 1]) {
+                result[idx] = 1;
+            }
+            result[idx] = 0;
+            j++;
+        }
+
+        // iterate over this triangle, starting at the base + 1
+        for (let col = size - 2; col > -1; col -= 1) {
+            for (let row = 0; row <= col; row++) {
+                let idx = tri(col, row);
+                let left = result[tri(col + 1, row)];
+                let right = result[tri(col + 1, row + 1)];
+
+                let c1 = (t - knots[i]) / (knots[i + p] - knots[i]);
+                let c2 = (knots[i + p + 1] - t) / (knots[i + p + 1] - knots[i + 1]);
+                result[idx] = c1 * left + c2 * right;
+            }
+        }
+
+        return result;
     }
 
     /**
@@ -50,5 +119,47 @@ export class Polynomial {
             }
         }
         return pascal;
+    }
+
+    /**
+     *  This function returns the entire castejau piramid.
+     *  the final point is the first: verts[0].
+     *  Hovever, this is slower than the PointAt() method,
+     *  which uses bernstein polynomials
+     *
+     *  useful for:
+     *  Subdividing bezier curves, debugging, and splines
+     */
+    static decastejau(verts: MultiVector3, t: number) {
+        let size = verts.count;
+        // console.log(points.count);
+
+        // create the triangle of resulting points
+        let result = MultiVector3.new(GeonMath.stack(size));
+
+        // triangle iteration is complex :)
+        let tri = Util.iterateTriangle;
+
+        // copy paste the base
+        let basecolumn = size - 1;
+        let i = 0;
+        for (let row = 0; row <= basecolumn; row++) {
+            let idx = tri(basecolumn, row);
+            result.set(idx, verts.get(i));
+            i++;
+        }
+
+        // iterate over this triangle, starting at the base + 1
+        for (let col = size - 2; col > -1; col -= 1) {
+            for (let row = 0; row <= col; row++) {
+                let idx = tri(col, row);
+                let p_a = result.get(tri(col + 1, row));
+                let p_b = result.get(tri(col + 1, row + 1));
+                let q = p_b.scale(t).add(p_a.scale(1 - t));
+                result.set(idx, q);
+            }
+        }
+
+        return result;
     }
 }

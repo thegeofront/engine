@@ -8,15 +8,13 @@ import { Stopwatch } from "../system/stopwatch";
 
 export class Domain {
     // note: including t0, including t1
-
-    t0: number;
-    t1: number;
-
-    constructor(t0: number = 0.0, t1: number = 1.0) {
+    constructor(public t0 = 0.0, public t1 = 1.0) {
         // if (t0 > t1) console.error("created a domain with negative size.");
         // if (t0 == t1) console.warn("created a domain with size is 0.0. could cause problems");
-        this.t0 = t0;
-        this.t1 = t1;
+    }
+
+    static new(t0 = 0, t1 = 1) {
+        return new Domain(t0, t1);
     }
 
     static fromRadius(r: number): Domain {
