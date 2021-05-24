@@ -2,6 +2,7 @@
 // purpose : test with Renderers, Domains & Vectors
 
 import { App, Vector2, Domain2, DotRenderer2, InputState, Context, Camera } from "../../../src/lib";
+import { Random } from "../../../src/math/random";
 
 export class DotApp2 extends App {
     dots: Vector2[] = [];
@@ -24,11 +25,12 @@ export class DotApp2 extends App {
         // additional setup of state
         let normrange = 5;
         let count = 10;
+        let rng = Random.fromSeed(1234);
         const normSpace = Domain2.fromBounds(-normrange, normrange, -normrange, normrange);
 
         for (let i = 0; i < count; i++) {
-            this.dots.push(this.bounds.elevate(Vector2.fromRandom()));
-            this.dirs.push(normSpace.elevate(Vector2.fromRandom()));
+            this.dots.push(this.bounds.elevate(Vector2.fromRandom(rng)));
+            this.dirs.push(normSpace.elevate(Vector2.fromRandom(rng)));
         }
     }
 

@@ -3,6 +3,7 @@
 // notes:   based upon the excellent explainations from Prof. C.-K. Shene: https://pages.mtu.edu/~shene/COURSES/cs3621/NOTES/
 
 import { MultiVector3 } from "../data/multi-vector-3";
+import { Const } from "./const";
 import { GeonMath } from "./math";
 import { Util } from "./util";
 import { Vector3 } from "./vector";
@@ -32,18 +33,32 @@ export class Polynomial {
      * NOTE: inefficient calculation: recursive in the dumb sense
      */
     static coxdeboor(t: number, i: number, degree: number, knots: Float32Array): number {
+        // console.log("t", t, "i", i, "degree", degree);
+
+        // let ui = knots[i];
+        // let ui1 = knots[i+1];
+        // let uip = knots[i+degree];
+        // let uip1 = knots[i + degree + 1];
+
         if (degree == 0) {
+            // console.log("range", knots[i], " to ", knots[i + 1]);
             if (t >= knots[i] && t < knots[i + 1]) {
-                console.log("in between!");
+                // console.log("in between!");
                 return 1;
             }
             return 0;
         }
-        let c1 = (t - knots[i]) / (knots[i + degree] - knots[i]);
-        let c2 = (knots[i + degree + 1] - t) / (knots[i + degree + 1] - knots[i + 1]);
+        let denom1 = knots[i + degree] - knots[i];
+        let denom2 = knots[i + degree + 1] - knots[i + 1];
+        // if (denom1 == 0 || denom2 == 0) {
+        //     console.log("zero");
+        //     return 0;
+        // }
+        let c1 = (t - knots[i]) / denom1;
+        let c2 = (knots[i + degree + 1] - t) / denom2;
 
-        console.log(c1);
-        console.log(c2);
+        // console.log(c1);
+        // console.log(c2);
         return (
             c1 * this.coxdeboor(t, i, degree - 1, knots) +
             c2 * this.coxdeboor(t, i + 1, degree - 1, knots)

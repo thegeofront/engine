@@ -5,6 +5,7 @@
 
 import { Matrix4, MultiVector2, MultiVector3, Vector2, Vector3 } from "../lib";
 import { Stopwatch } from "../system/stopwatch";
+import { Random } from "./random";
 
 export class Domain {
     // note: including t0, including t1
@@ -206,6 +207,17 @@ export class Domain2 {
         }
         return result;
     }
+
+    /**
+     * Generate a bunch of random points
+     */
+    populate(count: number, rng: Random) {
+        let result = MultiVector2.new(count);
+        for (let i = 0; i < result.count; i++) {
+            result.set(i, this.elevate(Vector2.fromRandom(rng)));
+        }
+        return result;
+    }
 }
 
 export class Domain3 {
@@ -331,6 +343,17 @@ export class Domain3 {
                     i++;
                 }
             }
+        }
+        return result;
+    }
+
+    /**
+     * Generate a bunch of random points
+     */
+    populate(count: number, rng: Random) {
+        let result = MultiVector3.new(count);
+        for (let i = 0; i < result.count; i++) {
+            result.set(i, this.elevate(Vector3.fromRandom(rng)));
         }
         return result;
     }

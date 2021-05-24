@@ -417,8 +417,8 @@ export class Vector2 {
         return new Vector2(v1.x + (v2.x - v1.x) * alpha, v1.y + (v2.y - v1.y) * alpha);
     }
 
-    static fromRandom(): Vector2 {
-        return new Vector2(Math.random(), Math.random());
+    static fromRandom(rng: Random): Vector2 {
+        return new Vector2(rng.get(), rng.get());
     }
 
     static fromRandomAngle(): Vector2 {
