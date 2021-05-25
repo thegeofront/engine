@@ -112,6 +112,16 @@ export class MultiVector3 extends Geo {
         return array;
     }
 
+    takeRange(start: number, end: number): MultiVector3 {
+        let array = MultiVector3.new(end - start);
+        let j = 0;
+        for (let i = start; i < end; i++) {
+            array.set(j, this.get(i));
+            j++;
+        }
+        return array;
+    }
+
     map(callbackfn: (value: Vector3, index: number) => any): MultiVector3 {
         let clone = this.clone();
 
