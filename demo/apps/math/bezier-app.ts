@@ -67,6 +67,8 @@ export class BezierApp extends App {
         ui.addParameter(this.params[1], this.start.bind(this));
         this.params.push(Parameter.new("cut", 1, 0, 1, 0.001));
         ui.addParameter(this.params[2], this.start.bind(this));
+        this.params.push(Parameter.new("expand", 0, 0, 1, 0.001));
+        ui.addParameter(this.params[3], this.start.bind(this));
 
         this.params.push(Parameter.new("detail", 50, 2, 100, 1));
         ui.addParameter(this.params[this.params.length - 1], this.start.bind(this));
@@ -80,6 +82,7 @@ export class BezierApp extends App {
         let t = this.params[0].get();
         let sub = this.params[1].get();
         let cut = this.params[2].get();
+        let exp = this.params[3].get();
         let detail = this.params[this.params.length - 1].get();
 
         // 1 - bezier
@@ -97,6 +100,9 @@ export class BezierApp extends App {
         for (let i = 0; i < sub; i++) {
             bezier = bezier.increaseDegree();
         }
+
+        // extend the curve
+        bezier.extend(exp);
 
         // show decastejau triangle
         let tri = Polynomial.decastejau(bezier.verts, t);

@@ -55,11 +55,23 @@ export class Domain {
         return (value - this.t0) / this.size();
     }
 
+    /**
+     * elevate a normalized parameter onto this domain
+     * @param t normalized parameter t in domain 0--1
+     * @returns parameter in domains numerical space
+     */
     elevate(t: number): number {
         // elevate a normalized parameter to the parameter space of this domain
         return t * this.size() + this.t0;
     }
 
+    /**
+     * Exact same thing as elevate
+     */
+    lerp(t: number): number {
+        return this.elevate(t);
+    }
+    
     remap(value: number, other: Domain = new Domain()): number {
         // normalize a value, then elevate it to a new domain
         let norm = this.normalize(value);

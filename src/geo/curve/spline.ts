@@ -13,6 +13,8 @@ import { Matrix4 } from "../../math/matrix";
 import { Polynomial } from "../../math/polynomial";
 import { Vector3 } from "../../math/vector";
 import { MultiLine } from "../../mesh/multi-line";
+import { BezierSquare } from "../surface/bezier-square";
+import { Bezier } from "./bezier";
 import { Curve } from "./curve";
 
 /**
@@ -23,9 +25,9 @@ export class Spline extends Curve {
         verts: MultiVector3,
         degree: number,
         public knots: Float32Array,
-        public domain: Domain,
+        domain: Domain,
     ) {
-        super(verts, degree);
+        super(verts, degree, domain);
     }
 
     static fromList(verts: Vector3[], degree: number) {
@@ -33,6 +35,9 @@ export class Spline extends Curve {
     }
 
     static calcKnots(n: number, degree: number) {
+
+        // TODO incorporate domain parameters in here
+
         let m = n + degree + 1; // m = n + p + 1
         let knots = new Float32Array(m);
         for (let i = 0; i < degree + 1; i++) {
@@ -62,6 +67,21 @@ export class Spline extends Curve {
         }
         let knots = this.calcKnots(n, degree);
         return new Spline(verts, degree, knots, domain);
+    }
+
+    // calculate a piece of bezier which extends this curve
+    getExtention(extra: number) : Bezier {
+        
+        // create the last bit of this curve as a bezier curve
+        let count = this.degree + 1;
+        let points = new Array<Vector3>(count);
+        for (let i = 0 ; i < count; i++) {
+            points[i] = this.verts.get(this.verts.count - i - 1);
+        }
+        let bz = Bezier.fromList(points);
+        
+        // extend that
+        return bz.getExtention(extra);
     }
 
     pointAt(t: number): Vector3 {

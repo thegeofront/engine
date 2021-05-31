@@ -44,7 +44,7 @@ export class Bezier extends Curve {
     /**
      * Return a new curve which is a copy of this curve, but with one added control point
      * Do this recursively, and you have something like decastejau's
-     * However, this process cannot be rewritten as a polynomial, since the i / (n + 1) ratio changes constantly
+     * However, this process cannot be rewritten as a polynomial, since the i / (n + 1) ratio changes every iteration
      */
     increaseDegree(): Bezier {
         // if (degree <= this.degree) {
@@ -84,18 +84,38 @@ export class Bezier extends Curve {
         let tri = Polynomial.decastejau(this.verts, t);
 
         // prepare
-        let left = MultiVector3.new(this.verts.count);
-        let right = MultiVector3.new(this.verts.count);
-
-        // the two edges of the triangle opposite to the base are the vertices we are interested in
-        let i = 0;
-        for (let col = size - 1; col > -1; col -= 1) {
-            left.set(i, tri.get(Util.iterateTriangle(col, 0)));
-            right.set(i, tri.get(Util.iterateTriangle(col, col)));
-            i++;
-        }
+        let left = Util.getTriangleLeft(tri, size);
+        let right = Util.getTriangleRight(tri, size);
 
         return [Bezier.new(left), Bezier.new(right)];
+    }
+
+    /**
+     * Extends the curve
+     * 
+     * ```js
+     * (part1, part2) = whole.split(0.5)
+     * assert_eq!(part1.extend(1) == whole)
+     * ```
+     */
+    extend(extra: number) {
+        // get the decastejau piramid based on extrapolation instead of interpolation
+        let piramid = Polynomial.decastejauExtrapolateEnd(this.verts, extra);
+
+        // the base of the piramid is the whole
+        let size = this.verts.count
+        let base = Util.getTriangleBase(piramid, size);
+        this.verts = base;
+    }
+
+    getExtention(extra: number) : Bezier {
+        // get the decastejau piramid based on extrapolation instead of interpolation
+        let piramid = Polynomial.decastejauExtrapolateEnd(this.verts, extra);
+
+        // the base of the piramid is the whole
+        let size = this.verts.count
+        let right = Util.getTriangleRight(piramid, size);
+        return Bezier.new(right);
     }
 
     /**
@@ -108,6 +128,8 @@ export class Bezier extends Curve {
         }
         return p;
     }
+
+
 
     /**
      * Calculate the tangent at parameter t.

@@ -7,6 +7,7 @@
 
 import { MultiVector3 } from "../../data/multi-vector-3";
 import { GeonMath, Polyline, Util } from "../../lib";
+import { Domain } from "../../math/domain";
 import { Matrix4 } from "../../math/matrix";
 import { Vector3 } from "../../math/vector";
 import { MultiLine } from "../../mesh/multi-line";
@@ -14,7 +15,7 @@ import { Geo } from "../geo";
 
 // domain is always normalzed, from 0 to 1
 export abstract class Curve extends Geo {
-    constructor(public verts: MultiVector3, public readonly degree: number) {
+    constructor(public verts: MultiVector3, public readonly degree: number, public readonly domain = Domain.new(0, 1)) {
         super();
     }
 
@@ -23,7 +24,7 @@ export abstract class Curve extends Geo {
         let verts = MultiVector3.new(count);
         for (let i = 0; i < count; i++) {
             let t = i / segments; // fraction
-            verts.set(i, this.pointAt(t));
+            verts.set(i, this.pointAt(this.domain.elevate(t)));
         }
         return Polyline.new(verts);
     }

@@ -356,11 +356,7 @@ export class Vector3 {
     }
 
     lerp(other: Vector3, alpha: number): Vector3 {
-        return new Vector3(
-            (other.x - this.x) * alpha,
-            (other.y - this.y) * alpha,
-            (other.z - this.z) * alpha,
-        );
+        return Vector3.fromLerp(this, other, alpha);
     }
 
     // #endregion

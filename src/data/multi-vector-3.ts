@@ -226,20 +226,36 @@ export class MultiVector3 extends Geo {
         // // this.data = m.MultiplyM(this).data;
     }
 
+    move(v: Vector3): MultiVector3 {
+        for (let i = 0; i < this.height; i++) {
+            let vec = this.get(i);
+            vec.add(v);
+            this.set(i, vec);
+        }
+        return this;
+    }
+
+    scale(s: Vector3): MultiVector3 {
+        for (let i = 0; i < this.height; i++) {
+            let vec = this.get(i);
+            vec.mul(s);
+            this.set(i, vec);
+        }
+        return this;
+    }
+
     transformed(m: Matrix4): MultiVector3 {
         return new MultiVector3(calc(this.matrix, m));
     }
 
-    move(v: Vector3): MultiVector3 {
-        return this.map((v) => {
-            return v.added(v);
-        });
+    moved(m: Vector3) {
+        let mover = Matrix4.newTranslate(m);
+        return this.transformed(mover);
     }
 
-    scale(s: Vector3): MultiVector3 {
-        return this.map((v) => {
-            return v.multiplied(s);
-        });
+    scaled(s: Vector3) {
+        let scaler = Matrix4.newScaler(s.x, s.y, s.z);
+        return this.transformed(scaler);
     }
 }
 

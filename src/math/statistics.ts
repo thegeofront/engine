@@ -28,6 +28,24 @@ export class Stat {
         return this.sum(x) / x.length;
     }
 
+    // calculate weighted mean
+    static meanWeighted(values: number[] | Float32Array, weights: number[] | Float32Array) {
+
+        if (values.length != weights.length) {
+            throw new Error("values & weights need same length");
+        }
+
+        var sum = 0.0;
+        var sumweight = 0.0;
+
+        for (let i = 0 ; i < values.length; i++) {
+            sum += values[i] * weights[i];
+            sumweight += weights[i];
+        }
+
+        return sum / sumweight;
+    }
+
     // calculate variance
     static variance(x: number[] | Float32Array) {
         //σ^2x = (1/n−1) * n∑i=1 (x[i] – xAvr)^2

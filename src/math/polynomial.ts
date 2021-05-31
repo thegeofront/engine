@@ -177,4 +177,71 @@ export class Polynomial {
 
         return result;
     }
+
+    // calculate the decastejau piramid based on extrapolation
+    static decastejauExtrapolateEnd(verts: MultiVector3, t: number) {
+        
+        let size = verts.count;
+
+        // create the triangle of resulting points
+        let triangle = MultiVector3.new(GeonMath.stack(size));
+
+        // triangle iteration is complex :)
+        let iterTri = Util.iterateTriangle;
+
+        let i = 0;
+        for (let col = size - 1; col > -1; col -= 1) {
+            let idx = iterTri(col, 0)
+            triangle.set(idx, verts.get(i));
+            i++
+        }
+
+        // per triangle of 3 within this triangle (hard to put into words...)
+        for (let col = 1; col < size; col++) {
+            for (let row = 1; row <= col; row++) {
+                let a = iterTri(col-1, row-1);
+                let b = iterTri(col, row-1);
+                let c = iterTri(col, row);
+
+                // set C based upon extrapolation of B past A
+                let C = triangle.get(b).lerp(triangle.get(a), 1 + t);
+                triangle.set(c, C);
+            }
+        }
+        // triangle.map(v => console.log(v));
+        return triangle;
+    }
+
+    static decastejauExtrapolateStart(verts: MultiVector3, t: number) {
+        let size = verts.count;
+        // console.log(points.count);
+
+        // create the triangle of resulting points
+        let result = MultiVector3.new(GeonMath.stack(size));
+
+        // triangle iteration is complex :)
+        let tri = Util.iterateTriangle;
+
+        // copy paste the base
+        let basecolumn = size - 1;
+        let i = 0;
+        for (let row = 0; row <= basecolumn; row++) {
+            let idx = tri(basecolumn, row);
+            result.set(idx, verts.get(i));
+            i++;
+        }
+
+        // iterate over this triangle, starting at the base + 1
+        for (let col = size - 2; col > -1; col -= 1) {
+            for (let row = 0; row <= col; row++) {
+                let idx = tri(col, row);
+                let p_a = result.get(tri(col + 1, row));
+                let p_b = result.get(tri(col + 1, row + 1));
+                let q = p_b.scale(t).add(p_a.scale(1 - t));
+                result.set(idx, q);
+            }
+        }
+
+        return result;
+    }
 }
