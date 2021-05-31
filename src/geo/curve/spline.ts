@@ -69,6 +69,28 @@ export class Spline extends Curve {
         return new Spline(verts, degree, knots, domain);
     }
 
+    extend(extra: number) {
+
+        // create the last bit of this curve as a bezier curve
+        let count = this.degree + 1;
+        let points = new Array<Vector3>(count);
+        for (let i = 0 ; i < count; i++) {
+            let j = this.verts.count - count + i;
+            points[i] = this.verts.get(j);
+        }
+        let bz = Bezier.fromList(points);
+
+        // extend it
+        bz.extend(extra);
+
+        // assign the vertices
+        for (let i = 0 ; i < count; i++) {
+            let j = this.verts.count - count + i;
+            this.verts.set(j, bz.verts.get(i));
+        }
+        return this;
+    }
+
     // calculate a piece of bezier which extends this curve
     getExtention(extra: number) : Bezier {
         
@@ -76,11 +98,11 @@ export class Spline extends Curve {
         let count = this.degree + 1;
         let points = new Array<Vector3>(count);
         for (let i = 0 ; i < count; i++) {
-            points[i] = this.verts.get(this.verts.count - i - 1);
+            points[i] = this.verts.get(this.verts.count - count + i);
         }
         let bz = Bezier.fromList(points);
         
-        // extend that
+        // get an extension from that
         return bz.getExtention(extra);
     }
 
