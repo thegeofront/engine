@@ -3,6 +3,7 @@
 // purpose: mathematical representation of a parametric loft surface
 
 import { MultiVector3 } from "../../data/multi-vector-3";
+import { Const } from "../../lib";
 import { Matrix4 } from "../../math/matrix";
 import { Vector3 } from "../../math/vector";
 import { Mesh } from "../../mesh/mesh";
@@ -19,7 +20,7 @@ export class Loft extends BiSurface {
 
     static new(curves: Bezier[]) {
         // make sure all curves are of the same degree, so we can easely interpolate
-        return new Loft(equalizeCurves(curves));
+        return new Loft(Bezier.equalizeDegrees(curves));
     }
 
     getTransposedCurves(): Bezier[] {
@@ -43,15 +44,15 @@ export class Loft extends BiSurface {
     }
 
     isoCurveV(u: number): Bezier {
-        return this.isoCurve(this.curves, u);
+        return Loft.isoCurve(this.curves, u);
     }
 
     isoCurveU(v: number): Bezier {
         let trans = this.getTransposedCurves();
-        return this.isoCurve(trans, v);
+        return Loft.isoCurve(trans, v);
     }
 
-    private isoCurve(curves: Bezier[], t: number) {
+    private static isoCurve(curves: Bezier[], t: number) {
         let pts = MultiVector3.new(curves.length);
         for (let i = 0; i < curves.length; i++) {
             pts.set(i, curves[i].pointAt(t));
@@ -102,23 +103,4 @@ export class Loft extends BiSurface {
     }
 }
 
-function equalizeCurves(curves: Bezier[]): Bezier[] {
-    // get highest degree
-    let maxDegree = 0;
-    for (let curve of curves) {
-        if (curve.degree > maxDegree) {
-            maxDegree = curve.degree;
-        }
-    }
 
-    for (let i = 0; i < curves.length; i++) {
-        let failsave = 20;
-
-        while (curves[i].degree < maxDegree && failsave < 100) {
-            curves[i] = curves[i].increaseDegree();
-            failsave++;
-        }
-    }
-
-    return curves;
-}

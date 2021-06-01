@@ -92,7 +92,7 @@ export class SurfaceApp extends App {
             });
 
         // create a surface from it
-        let surface = BezierSquare.new(vecs)!;
+        let surface = BezierSquare.new(vecs, degree, degree)!;
         this.drBlue.set(vecs);
 
         // lines

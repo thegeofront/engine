@@ -20,6 +20,8 @@ import { LoftApp } from "./apps/math/loft-app";
 import { StatApp } from "./apps/old/stat-app";
 import { SplineApp } from "./apps/math/spline.app";
 import { PerlinLinesApp } from "./apps/math/perlin-lines-app";
+import { BezierCpApp } from "./apps/math/bezier-cp-app";
+import { SurfaceCpApp } from "./apps/math/surface-cp-app";
 
 var core: Core;
 
@@ -37,6 +39,8 @@ function main() {
         PerlinApp,
         SurfaceApp,
         BezierApp,
+        BezierCpApp,
+        SurfaceCpApp,
         SplineApp,
         LoftApp,
         SphericalOneApp,

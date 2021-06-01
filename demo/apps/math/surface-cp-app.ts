@@ -22,10 +22,11 @@ import {
     MultiVector2,
     Perlin,
     Circle3,
+    Mesh,
 } from "../../../src/lib";
 import { Random } from "../../../src/math/random";
 
-export class TriSurfaceApp extends App {
+export class SurfaceCpApp extends App {
     // ui
     params: Parameter[] = [];
 
@@ -33,15 +34,16 @@ export class TriSurfaceApp extends App {
     seed: number;
     dots: Vector3[];
     lines: MultiLine[];
+    plane = Plane.WorldXY();
+    surface?: BezierSquare;
 
     // render
     camera: Camera;
-    drRed: DotRenderer3;
     lrGrid: LineRenderer;
     lrRed: LineRenderer;
     mr: MeshDebugRenderer;
-    perlin: Perlin;
     drBlue: DotRenderer3;
+    mr2: MeshDebugRenderer;
 
     constructor(gl: WebGLRenderingContext) {
         super(gl);
@@ -50,28 +52,26 @@ export class TriSurfaceApp extends App {
         this.camera = new Camera(canvas, -2, true);
         this.camera.setState([21.926, 11.337, -10.04, -10, 1.12, 1.08]);
 
-        this.perlin = Perlin.new();
         this.seed = Random.randomSeed();
         this.dots = [];
         this.lines = [];
 
-        this.drRed = new DotRenderer3(gl, 10, [1, 0, 0, 1], false);
         this.drBlue = new DotRenderer3(gl, 10, [0, 0, 1, 1], false);
         this.lrRed = new LineRenderer(gl, [1, 0, 0, 1]);
         this.lrGrid = new LineRenderer(gl, [0.3, 0.3, 0.3, 1]);
-        this.mr = new MeshDebugRenderer(gl, [1, 0, 0, 0.5], [1, 1, 1, 0.5]);
+        this.mr = new MeshDebugRenderer(gl, [1, 0, 0, 0.5], [1, 0.5, 0.5, 0.5]);
+        this.mr2 = new MeshDebugRenderer(gl, [0, 1, 1, 0.25], [0, 1, 1, 0.75])
     }
 
     ui(ui: UI) {
-        ui.addText("BEZIER SQUARE");
         this.params.push(Parameter.new("degree", 3, 2, 6, 1));
         ui.addParameter(this.params[0], this.start.bind(this));
-        this.params.push(Parameter.new("displace", 1.5, 0, 5, 0.001));
+        this.params.push(Parameter.new("displace", 4, 0, 10, 0.001));
         ui.addParameter(this.params[1], this.start.bind(this));
-        this.params.push(Parameter.new("detail", 2, 2, 100, 1));
+        this.params.push(Parameter.new("detail", 50, 2, 100, 1));
         ui.addParameter(this.params[2], this.start.bind(this));
-        this.params.push(Parameter.new("select", 0, 0, 20, 1));
-        ui.addParameter(this.params[3], this.start.bind(this));
+        // this.params.push(Parameter.new("select", 0, 0, 20, 1));
+        // ui.addParameter(this.params[3], this.start.bind(this));
     }
 
     start() {
@@ -82,34 +82,32 @@ export class TriSurfaceApp extends App {
         let degree = this.params[0].get();
         let displace = this.params[1].get();
         let detail = this.params[2].get();
-        let select = this.params[3].get();
+        // let select = this.params[3].get();
 
         // get some points
         let rng = Random.fromSeed(this.seed);
-        let vecs = Domain2.fromRadius(11)
-            .spawn(degree + 1, degree + 1)
+        let vecs = Domain2.fromRadius(-11) // span a (-size to size)**2 domain
+            .offset([-22, 22, 0, 0]) // flip it
+            .spawn(degree + 1, degree + 1) // spawn a bunch of points, the exact amound needed for the surface
             .to3D()
             .forEach((v) => {
-                return v.add(Vector3.fromRandomUnit(rng).scale(displace));
+                return v
+                    .add(Vector3.fromRandomUnit(rng).scale(displace))
+                    .add(Vector3.unitZ().scale(5)); // and displace them slightly
             });
 
         // create a surface from it
-        // console.log(vecs.count);
-        // let surface = BezierSquare.new(vecs)!;
-
-        this.drRed.set(vecs);
-
-        // console.log(surface.pointAt(0.5, 0.5));
-        // console.log(surface.buffer(detail, detail));
-        // this.drRed.set(surface.buffer(detail, detail).verts);
+        let surface = BezierSquare.new(vecs, degree, degree)!;
+        this.surface = surface;
+        this.drBlue.set(vecs);
 
         // lines
         this.lines = [];
-        this.lines.push(Circle3.newPlanar(vecs.get(select), 1).buffer());
+        // this.lines.push(Circle3.newPlanar(vecs.get(select), 1).buffer());
 
         // mesh
         // this.drBlue.set(surface.buffer(detail, detail).verts);
-        // this.mr.set(surface.buffer(detail, detail).toRenderable());
+        this.mr.set(surface.buffer(detail, detail).toRenderable());
     }
 
     startGrid() {
@@ -119,6 +117,21 @@ export class TriSurfaceApp extends App {
 
     update(state: InputState) {
         this.camera.update(state);
+        this.updateCursor(state);
+    }
+
+    updateCursor(state: InputState) {
+        // render mouse to world line
+        let ray = this.camera.getMouseWorldRay(state.canvas.width, state.canvas.height);
+        let t = ray.xPlane(this.plane);
+        let point = ray.at(20);
+        let meshes = [];
+        meshes.push(Mesh.newSphere(point, 1, 10,10));
+        let uv = this.surface!.approxClosestPoint(point);
+        let p2 = this.surface!.pointAtUV(uv);
+
+        meshes.push(Mesh.newSphere(p2, 1, 10,10));
+        this.mr2.set(Mesh.fromJoin(meshes).toRenderable(), DrawSpeed.DynamicDraw);
     }
 
     draw(gl: WebGLRenderingContext) {
@@ -128,8 +141,8 @@ export class TriSurfaceApp extends App {
 
         this.lrRed.setAndRender(MultiLine.fromJoin(this.lines), c);
         this.drBlue.render(c);
-        this.drRed.render(c);
         this.lrGrid.render(c);
         this.mr.render(c);
+        this.mr2.render(c);
     }
 }

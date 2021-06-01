@@ -1,5 +1,7 @@
 import { MultiVector3 } from "../data/multi-vector-3";
+import { Domain, Domain2 } from "./domain";
 import { GeonMath } from "./math";
+import { Vector2 } from "./vector";
 
 export class Util {
     static range(n: number): number[] {
@@ -17,6 +19,60 @@ export class Util {
         }
         return arr;
     }
+
+    /** binary-seach an equation, to get the smallest x.
+     * from   : https://stackoverflow.com/questions/2742610/closest-point-on-a-cubic-bezier-curve/57315396#57315396
+     * formatted differently 
+     * ```
+     * minX   : the smallest input value
+     * maxX   : the largest input value
+     * ƒ      : a function that returns a value `y` given an `x`
+     * ε      : how close in `x` the bounds must be before returning
+     * returns: the `x` value that produces the smallest `y`
+     * ```
+     */
+    static lowestScore(domain: Domain, score: (x: number) => number, tol=1e-10) : number {
+        let half = Infinity;
+
+        // binary seach-like procedure:
+        while ((domain.t1 - domain.t0) > tol) {
+            half = (domain.t1 + domain.t0) / 2;
+            if (score(half-tol) < score(half+tol)) {
+                domain.t1 = half;
+            } else {
+                domain.t0 = half;
+            }   
+        }
+        return half;
+    }
+
+    static lowestScoreSquared(domain: Domain2, score: (x: number, y: number) => number, tol=1e-10) : Vector2 {
+        let halfX = Infinity;
+        let halfY = Infinity;
+
+        // binary seach-like procedure:
+        while ((domain.x.t1 - domain.x.t0) > tol || (domain.y.t1 - domain.y.t0) > tol) {
+
+            halfX = (domain.x.t1 + domain.x.t0) / 2;
+            halfY = (domain.y.t1 + domain.y.t0) / 2;
+            
+            // select smallest quadrant
+            if (score(halfX-tol, halfY) < score(halfX+tol, halfY)) {
+                domain.x.t1 = halfX;
+            } else {
+                domain.x.t0 = halfX;
+            }   
+            if (score(halfX, halfY-tol) < score(halfX, halfY+tol)) {
+                domain.y.t1 = halfY;
+            } else {
+                domain.y.t0 = halfY;
+            }
+        }
+        return Vector2.new(halfX, halfY);
+    }
+
+    //      triangle business
+    // ============================
 
     /**
      * ```
