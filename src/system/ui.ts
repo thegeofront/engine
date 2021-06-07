@@ -2,6 +2,7 @@
 // author:  Jos Feenstra
 // purpose: lets create the UI using html & dom api, because why the hell not
 
+import { Domain } from "../math/domain";
 import { GeonMath } from "../math/math";
 
 export class UI {
@@ -238,6 +239,10 @@ export class Parameter {
 
     get(): number {
         return this.state;
+    }
+
+    getDomain() : Domain {
+        return Domain.new(this.min, this.max);
     }
 
     set(state: number, activateOnSet = true) {

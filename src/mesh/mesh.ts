@@ -163,6 +163,15 @@ export class Mesh {
         return rend;
     }
 
+    static fromRectangle(rect: Rectangle3): Mesh {
+        let verts = rect.getCorners();
+
+        // we cant handle quads yet
+        let faces: number[] = [];
+        faces.push(...quadToTri(cubeFaces[0]));
+        return this.fromLists(verts, faces);
+    }
+
     static newQuad(corners: Vector3[]) {
         let faces = [...quadToTri(cubeFaces[0])];
         return this.fromLists(corners, faces);

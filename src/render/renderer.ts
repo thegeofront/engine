@@ -76,17 +76,24 @@ export abstract class Renderer<T> {
         }
     }
 
-    static initWebglContext(canvas: HTMLCanvasElement) {
+    static initWebglContext(canvas: HTMLCanvasElement, blend=false) {
         let possiblyGl = canvas.getContext("webgl");
         if (possiblyGl == undefined) {
             console.log("webgl unavailable...");
         }
+        
         let gl = possiblyGl!;
-
-        gl.enable(gl.BLEND);
-        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         gl.enable(gl.CULL_FACE);
-        gl.enable(gl.DEPTH_TEST);
+
+        if (blend) {
+            gl.enable(gl.BLEND);
+            gl.disable(gl.DEPTH_TEST);
+            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+        } else {
+            gl.disable(gl.BLEND);
+            gl.enable(gl.DEPTH_TEST);
+            gl.depthFunc(gl.LEQUAL);
+        }
 
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.clearDepth(1);

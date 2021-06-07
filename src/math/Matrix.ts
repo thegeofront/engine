@@ -36,7 +36,10 @@ export class Matrix3 extends FloatMatrix {
     }
 
     static newScalar(sx: number, sy: number) {
-        return new Matrix3([sx, 0, 0, 0, sy, 0, 0, 0, 1]);
+        return new Matrix3(
+            [sx, 0, 0, 
+            0,   sy, 0, 
+            0,   0, 1]);
     }
 
     toMat4(): Matrix4 {

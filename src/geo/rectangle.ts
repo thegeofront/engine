@@ -53,6 +53,10 @@ export class Rectangle3 {
         this.domain = domain;
     }
 
+    static new(plane: Plane, domain: Domain2) {
+        return new Rectangle3(plane, domain);
+    }
+
     getCorners(): Vector3[] {
         let corners = this.domain.corners();
         let corners3 = corners.map((c) => this.plane.pushToWorld(c.to3D()));
