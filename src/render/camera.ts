@@ -20,7 +20,7 @@ export class Camera {
     // camera matrix properties
     fov = (20 * Math.PI) / 100;
     zFar = 10000;
-    zNear = 0.1;
+    zNear = 0.01;
 
     // other consts
     speed = 1;
