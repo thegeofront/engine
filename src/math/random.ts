@@ -76,3 +76,23 @@ function xmur3(str: string) {
         return (h ^= h >>> 16) >>> 0;
     };
 }
+
+/**
+ * https://www.tutorialspoint.com/how-to-create-guid-uuid-in-javascript
+ * @returns guid
+ */
+export function createGUID(rng: Random) {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+       var r = rng.get() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+       return v.toString(16);
+    });
+}
+
+/**
+ * https://www.tutorialspoint.com/how-to-create-guid-uuid-in-javascript
+ * @returns guid
+ */
+export function createRandomGUID() {
+    let rng = Random.fromRandom();
+    return createGUID(rng);
+}

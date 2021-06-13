@@ -47,8 +47,8 @@ export class Core {
         app.start();
     }
 
-    update() {
-        this.state.preUpdate();
+    update(time: number) {
+        this.state.preUpdate(time);
         this.fpsCounter.update(this.state);
         this.apps.forEach((app) => {
             app.update(this.state);

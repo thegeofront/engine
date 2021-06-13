@@ -22,6 +22,11 @@ export class Rectangle2 {
         this.domain = domain;
     }
 
+    static new(startX: number, startY: number, width: number, height: number) {
+        let pose = Matrix3.newTranslation(startX, startY);
+        let domain = Domain2.fromBounds(0,0,width, height);
+    }
+
     center(): Vector2 {
         return this.pose.transformVector(new Vector2(0, 0));
     }

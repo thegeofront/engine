@@ -13,6 +13,10 @@ export class UI {
         this.currentContext = frame;
     }
 
+    static new(frame: HTMLDivElement) {
+        return new UI(frame);
+    }
+
     // the context system makes sure that ui additions appear under the currently active,
     // selected app, and that these ui elements are removed when switching to another app.
 
@@ -22,6 +26,13 @@ export class UI {
             this.show();
         } else {
             this.hide();
+        }
+    }
+
+    clear() {
+        let context = this.currentContext;
+        while (context.hasChildNodes()) {
+            context.removeChild(context.lastChild!);
         }
     }
 
