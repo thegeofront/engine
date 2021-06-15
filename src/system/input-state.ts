@@ -96,11 +96,11 @@ export class InputState {
 
     mouseLeftDown = false;
     mouseLeftPressed = false;
-    private mouseLeftPrev = false;
+    mouseLeftPrev = false;
 
     mouseRightDown = false;
     mouseRightPressed = false;
-    private mouseRightPrev = false;
+    mouseRightPrev = false;
 
     mouseMiddleDown = false;
     mouseMiddlePressed = false;
@@ -114,8 +114,12 @@ export class InputState {
     mouseScrollDelta = 0;
     private mouseScrollBuffered = 0;
 
-    // delegate functions
+    // TODO: build a full range of delegate functions
+    
     onMouseWheelScroll?: Function;
+    onMouseLeftUp?: Function;
+
+
     constructor(canvas: HTMLCanvasElement) {
         // link
         this.canvas = canvas;
@@ -179,10 +183,6 @@ export class InputState {
         this.mouseMiddlePressed =
             this.mouseMiddlePrev != this.mouseMiddleDown && this.mouseMiddleDown;
 
-        this.mouseLeftPrev = this.mouseLeftDown;
-        this.mouseRightPrev = this.mouseRightDown;
-        this.mouseMiddlePrev = this.mouseMiddleDown;
-
         // update scrolling
         
         // normalize all scrolling behaviour
@@ -206,14 +206,15 @@ export class InputState {
     public postUpdate() {
         // this also must be called for keyIsPressed to work
 
+        this.mouseLeftPrev = this.mouseLeftDown;
+        this.mouseRightPrev = this.mouseRightDown;
+        this.mouseMiddlePrev = this.mouseMiddleDown;
+        
         // refresh keypresses
         this.keysPressed = [];
     }
 
     public IsKeyDown(key: string): boolean {
-        if (key == "shift") {
-            console.log(key, "is down: ", this.keysDown[key]);
-        }
         return this.keysDown[key];
     }
 
@@ -229,16 +230,13 @@ export class InputState {
     public onKeyDown(e: KeyboardEvent) {
         let key = e.key.toLowerCase();
         if (this.keysDown[key] == true) return;
-        console.log(key);
+        // console.log(key);
         this.keysDown[key] = true;
         this.keysPressed.push(key);
     }
 
     public onKeyUp(e: KeyboardEvent) {
         let key = e.key.toLowerCase();
-        if (key == "shift") {
-            console.log(key, "up");
-        }
         this.keysDown[key] = false;
     }
 
@@ -281,6 +279,7 @@ export class InputState {
         }
         if (code < 1) {
             this.mouseLeftDown = false;
+            if (this.onMouseLeftUp) this.onMouseLeftUp();
         }
     }
 
