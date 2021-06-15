@@ -6,7 +6,10 @@
 /out-tsc
 /data
 index.js
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0a2c058 (ignore index.js)
 # Runtime data
 pids
 *.pid
