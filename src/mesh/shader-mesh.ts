@@ -31,7 +31,7 @@ export enum NormalKind {
 
 // RENAME : SHADABLEMESH or something...
 // ShadableMesh
-export class Renderable {
+export class ShaderMesh {
     // this desperately calls for an overhaul...
 
     mesh: Mesh;
@@ -73,19 +73,19 @@ export class Renderable {
         faceCount: number,
         texture: ImageData | undefined = undefined,
     ) {
-        return new Renderable(vertCount, normCount, uvCount, faceCount, texture);
+        return new ShaderMesh(vertCount, normCount, uvCount, faceCount, texture);
     }
 
-    static fromMesh(mesh: Mesh): Renderable {
-        let r = new Renderable(mesh.verts.count, 0, 0, mesh.links.count());
+    static fromMesh(mesh: Mesh): ShaderMesh {
+        let r = new ShaderMesh(mesh.verts.count, 0, 0, mesh.links.count());
         r.mesh = mesh;
         return r;
     }
 
-    static fromData(verts: number[], norms: number[], uvs: number[], faces: number[]): Renderable {
+    static fromData(verts: number[], norms: number[], uvs: number[], faces: number[]): ShaderMesh {
         // NOTE : this type of parsing makes my life easy, but is dangerous. This is why i created the
         // Array class.
-        let r = new Renderable(
+        let r = new ShaderMesh(
             verts.length / 3,
             norms.length / 3,
             uvs.length / 2,
@@ -101,7 +101,7 @@ export class Renderable {
 
     static fromGraph(graph: Graph) {
         let mesh = graph.toMesh();
-        let r = Renderable.fromMesh(mesh);
+        let r = ShaderMesh.fromMesh(mesh);
         r.norms = MultiVector3.fromList(graph.allNorms());
         r._normKind = NormalKind.Vertex; // fix this!!
         return r;
@@ -203,7 +203,7 @@ export class Renderable {
 
 // ================ Obj ===================
 
-export function meshFromObj(text: string): Renderable {
+export function meshFromObj(text: string): ShaderMesh {
     // This is not a full .obj parser.
     // see http://paulbourke.net/dataformats/obj/
     // INDEXES ORIGINALLY REFER TO LINES, so -1 is needed
@@ -265,7 +265,7 @@ export function meshFromObj(text: string): Renderable {
     // console.log("number of uvs: " + uvs.length / 2);
     // console.log("number of norms: " + norms.length / 3);
 
-    let mesh = Renderable.fromData(verts, norms, uvs, faces);
+    let mesh = ShaderMesh.fromData(verts, norms, uvs, faces);
 
     return mesh;
 }

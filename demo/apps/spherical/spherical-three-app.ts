@@ -6,10 +6,10 @@
 import {
     App,
     Camera,
-    ShadedMeshRenderer,
+    ShadedMeshShader,
     Parameter,
     Graph,
-    Renderable,
+    ShaderMesh,
     Vector3,
     UI,
     InputState,
@@ -23,7 +23,7 @@ import {
     VertIndex,
     EdgeIndex,
     EnumParameter,
-    GraphDebugRenderer,
+    GraphDebugShader,
     IntMatrix,
     Context,
 } from "../../../src/lib";
@@ -56,16 +56,16 @@ export class SphericalThreeApp extends App {
     avEdgeLength!: number;
     smoothlimit = 0;
     cca?: number;
-    world!: Renderable;
-    worldFloor!: Renderable;
+    world!: ShaderMesh;
+    worldFloor!: ShaderMesh;
 
     // render data
     camera: Camera;
-    meshRend: ShadedMeshRenderer;
-    floorRend: ShadedMeshRenderer;
+    meshRend: ShadedMeshShader;
+    floorRend: ShadedMeshShader;
 
     debugRend: MeshDebugShader;
-    graphRend: GraphDebugRenderer;
+    graphRend: GraphDebugShader;
 
     tiles!: IntMatrix;
 
@@ -76,11 +76,11 @@ export class SphericalThreeApp extends App {
         this.camera = new Camera(canvas, 1, true);
         this.camera.set(-2, 1.24, -0.71);
 
-        this.meshRend = new ShadedMeshRenderer(gl);
-        this.floorRend = new ShadedMeshRenderer(gl);
+        this.meshRend = new ShadedMeshShader(gl);
+        this.floorRend = new ShadedMeshShader(gl);
         // this.meshRend = new MeshDebugRenderer(gl, [0, 0, 0, 1], [0.3, 0.3, 0.3, 1], false);
         this.debugRend = new MeshDebugShader(gl, [0.5, 0, 0, 1], [0, 0, 0, 1], false);
-        this.graphRend = new GraphDebugRenderer(gl, [0.5, 0.5, 0.5, 1], [1, 1, 1, 1]);
+        this.graphRend = new GraphDebugShader(gl, [0.5, 0.5, 0.5, 1], [1, 1, 1, 1]);
     }
 
     ui(ui: UI) {

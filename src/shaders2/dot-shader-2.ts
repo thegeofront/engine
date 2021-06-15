@@ -4,7 +4,7 @@ import { Vector2 } from "../math/vector";
 import { Context } from "../render/context";
 import { Shader } from "../render/shader";
 
-export class DotRenderer2 extends Shader<Vector2[]> {
+export class DotShader2 extends Shader<Vector2[]> {
     // attribute & uniform locations
     a_position: number;
     a_position_buffer: WebGLBuffer;

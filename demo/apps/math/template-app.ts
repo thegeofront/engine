@@ -1,7 +1,7 @@
 import {
     App,
-    DotRenderer3,
-    LineRenderer,
+    DotShader,
+    LineShader,
     Camera,
     Vector3,
     MultiLine,
@@ -25,8 +25,8 @@ export class TemplateApp extends App {
 
     // render
     camera: Camera;
-    drRed: DotRenderer3;
-    gridRenderer: LineRenderer;
+    drRed: DotShader;
+    gridRenderer: LineShader;
 
     constructor(gl: WebGLRenderingContext) {
         super(gl);
@@ -35,8 +35,8 @@ export class TemplateApp extends App {
         this.camera = new Camera(canvas, -2, true);
         this.camera.set(-2, 1, 1);
 
-        this.drRed = new DotRenderer3(gl, 10, [1, 0, 0, 1], false);
-        this.gridRenderer = new LineRenderer(gl, [0.3, 0.3, 0.3, 1]);
+        this.drRed = new DotShader(gl, 10, [1, 0, 0, 1], false);
+        this.gridRenderer = new LineShader(gl, [0.3, 0.3, 0.3, 1]);
     }
 
     start() {

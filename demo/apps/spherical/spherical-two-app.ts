@@ -3,10 +3,10 @@
 import {
     App,
     Camera,
-    ShadedMeshRenderer,
+    ShadedMeshShader,
     Parameter,
     Graph,
-    Renderable,
+    ShaderMesh,
     Vector3,
     UI,
     InputState,
@@ -20,7 +20,7 @@ import {
     VertIndex,
     EdgeIndex,
     EnumParameter,
-    GraphDebugRenderer,
+    GraphDebugShader,
     Context,
 } from "../../../src/lib";
 
@@ -33,7 +33,7 @@ export class SphericalTwoApp extends App {
     c: Context;
     meshRend: MeshDebugShader;
     debugRend: MeshDebugShader;
-    graphRend: GraphDebugRenderer;
+    graphRend: GraphDebugShader;
 
     rotate!: Parameter;
     inner!: Parameter;
@@ -45,15 +45,15 @@ export class SphericalTwoApp extends App {
     radius = 0.1;
 
     graph!: Graph;
-    rend!: Renderable;
+    rend!: ShaderMesh;
     average!: number;
     smooth!: Parameter;
     smoothlimit = 0;
     cca?: number;
 
-    world!: Renderable;
-    world2!: Renderable;
-    world3!: Renderable;
+    world!: ShaderMesh;
+    world2!: ShaderMesh;
+    world3!: ShaderMesh;
 
     constructor(gl: WebGLRenderingContext) {
         super(gl, "Multiple Layers of spherical geometry");
@@ -64,7 +64,7 @@ export class SphericalTwoApp extends App {
         // this.meshRend = new ShadedMeshRenderer(gl);
         this.meshRend = new MeshDebugShader(gl, [0, 0, 0, 1], [0.3, 0.3, 0.3, 1], false);
         this.debugRend = new MeshDebugShader(gl, [0.5, 0, 0, 1], [0, 0, 0, 1], false);
-        this.graphRend = new GraphDebugRenderer(gl, [0.5, 0.5, 0.5, 1], [1, 1, 1, 1]);
+        this.graphRend = new GraphDebugShader(gl, [0.5, 0.5, 0.5, 1], [1, 1, 1, 1]);
     }
 
     ui(ui: UI) {
@@ -170,21 +170,21 @@ export class SphericalTwoApp extends App {
             0,
             0.1,
             0.6,
-        ).toRenderable();
+        ).ToShaderMesh();
         this.world2 = constructMeshFromSphereGraph(
             this.graph,
             this.radius,
             0.1,
             0.2,
             0.4,
-        ).toRenderable();
+        ).ToShaderMesh();
         this.world3 = constructMeshFromSphereGraph(
             this.graph,
             this.radius,
             0.2,
             0.3,
             0.2,
-        ).toRenderable();
+        ).ToShaderMesh();
     }
 
     update(state: InputState) {

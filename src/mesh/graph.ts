@@ -20,7 +20,7 @@ import { Const } from "../math/const";
 import { Matrix4 } from "../math/matrix";
 import { Vector3 } from "../math/vector";
 import { Mesh } from "./mesh";
-import { MeshType, Renderable } from "./render-mesh";
+import { MeshType, ShaderMesh } from "./shader-mesh";
 
 export type EdgeIndex = number;
 export type VertIndex = number;
@@ -151,8 +151,8 @@ export class Graph {
         return Mesh.newLines(this.allVertPositions(), this.allUniqueEdgeVerts());
     }
 
-    toRenderable(): Renderable {
-        return Renderable.fromGraph(this);
+    toShaderMesh(): ShaderMesh {
+        return ShaderMesh.fromGraph(this);
     }
 
     // public getters

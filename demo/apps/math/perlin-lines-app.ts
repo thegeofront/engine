@@ -9,8 +9,8 @@ import {
     Vector3,
     MultiLine,
     Camera,
-    DotRenderer3,
-    LineRenderer,
+    DotShader,
+    LineShader,
     UI,
     Polyline,
     Plane,
@@ -40,8 +40,8 @@ export class PerlinLinesApp extends App {
     // render
     camera: Camera;
     drRed: DotShaderWithHeight;
-    lrGrid: LineRenderer;
-    lrRed: LineRenderer;
+    lrGrid: LineShader;
+    lrRed: LineShader;
 
     constructor(gl: WebGLRenderingContext) {
         super(gl);
@@ -54,8 +54,8 @@ export class PerlinLinesApp extends App {
         this.seed = Random.randomSeed();
 
         this.drRed = new DotShaderWithHeight(gl, 15, [1, 0, 0, 1], 5, false);
-        this.lrGrid = new LineRenderer(gl, [0.3, 0.3, 0.3, 1]);
-        this.lrRed = new LineRenderer(gl, [1, 0, 0, 1]);
+        this.lrGrid = new LineShader(gl, [0.3, 0.3, 0.3, 1]);
+        this.lrRed = new LineShader(gl, [1, 0, 0, 1]);
     }
 
     ui(ui: UI) {

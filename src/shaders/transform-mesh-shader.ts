@@ -2,10 +2,10 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of a mesh.
 
-import { DrawSpeed, IntMatrix, Matrix4, Renderable, Shader, MultiVector3 } from "../lib";
+import { DrawSpeed, IntMatrix, Matrix4, ShaderMesh, Shader, MultiVector3 } from "../lib";
 import { Context } from "../render/context";
 
-export class TransformMeshRenderer extends Shader<Renderable> {
+export class TransformMeshShader extends Shader<ShaderMesh> {
     // attribute & uniform locations
     a_position: number;
     a_position_buffer: WebGLBuffer;
@@ -67,7 +67,7 @@ export class TransformMeshRenderer extends Shader<Renderable> {
         this.color = color;
     }
 
-    set(data: Renderable, speed: DrawSpeed = DrawSpeed.StaticDraw) {
+    set(data: ShaderMesh, speed: DrawSpeed = DrawSpeed.StaticDraw) {
         let gl = this.gl;
         let mesh = data.mesh;
         this.color = data.color;
@@ -111,7 +111,7 @@ export class TransformMeshRenderer extends Shader<Renderable> {
         gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
     }
 
-    setAndRender(r: Renderable, context: Context): void {
+    setAndRender(r: ShaderMesh, context: Context): void {
         this.set(r, DrawSpeed.DynamicDraw);
         this.render(context);
     }

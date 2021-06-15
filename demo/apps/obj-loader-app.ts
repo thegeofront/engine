@@ -4,11 +4,11 @@
 
 import {
     App,
-    DotRenderer3,
-    LineRenderer,
+    DotShader,
+    LineShader,
     MeshDebugShader,
     Camera,
-    Renderable,
+    ShaderMesh,
     MultiLine,
     addDropFileEventListeners,
     InputState,
@@ -22,19 +22,19 @@ import {
 } from "../../src/lib";
 
 export class ObjLoaderApp extends App {
-    dotRenderer: DotRenderer3;
-    lineRenderer: LineRenderer;
+    dotRenderer: DotShader;
+    lineRenderer: LineShader;
     meshRenderer: MeshDebugShader;
     camera: Camera;
 
-    obj?: Renderable;
+    obj?: ShaderMesh;
     renderable?: MultiLine;
 
     constructor(gl: WebGLRenderingContext) {
         super(gl);
         let canvas = gl.canvas as HTMLCanvasElement;
-        this.dotRenderer = new DotRenderer3(gl, 4, [0, 0, 1, 1], false);
-        this.lineRenderer = new LineRenderer(gl, [0, 0, 1, 0.5]);
+        this.dotRenderer = new DotShader(gl, 4, [0, 0, 1, 1], false);
+        this.lineRenderer = new LineShader(gl, [0, 0, 1, 0.5]);
         this.meshRenderer = new MeshDebugShader(gl, [0, 0, 1, 0.25]);
         this.camera = new Camera(canvas);
 

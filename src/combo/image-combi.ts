@@ -4,11 +4,11 @@ import { GeonImage } from "../img/Image";
 import { Domain2 } from "../math/domain";
 import { Vector3 } from "../math/vector";
 import { Mesh } from "../mesh/mesh";
-import { Renderable } from "../mesh/render-mesh";
+import { ShaderMesh } from "../mesh/shader-mesh";
 import { TextureMeshShader } from "../shaders/texture-mesh-shader";
 import { Combi, Combo } from "./combo";
 
-export class ImageCombi extends Combi<GeonImage, Renderable, TextureMeshShader> {
+export class ImageCombi extends Combi<GeonImage, ShaderMesh, TextureMeshShader> {
     private constructor(gl: WebGLRenderingContext) {
         super(gl, [], TextureMeshShader.new);
     }

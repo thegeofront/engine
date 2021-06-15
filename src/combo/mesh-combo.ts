@@ -1,23 +1,23 @@
 import { Matrix4 } from "../math/matrix";
 import { Mesh } from "../mesh/mesh";
-import { Renderable } from "../mesh/render-mesh";
+import { ShaderMesh } from "../mesh/shader-mesh";
 import { Context } from "../render/context";
 import { DrawSpeed } from "../render/shader";
 import { MeshDebugShader } from "../shaders/mesh-debug-shader";
-import { TransformLineRenderer } from "../shaders/transform-line-shader";
-import { TransformMeshRenderer } from "../shaders/transform-mesh-shader";
+import { TransformLineShader } from "../shaders/transform-line-shader";
+import { TransformMeshShader } from "../shaders/transform-mesh-shader";
 import { Combo } from "./combo";
 
-export class StaticMeshCombo extends Combo<Mesh, Renderable, TransformLineRenderer> {
+export class StaticMeshCombo extends Combo<Mesh, ShaderMesh, TransformLineShader> {
     color: number[];
     linecolor: number[];
-    renderer2: TransformMeshRenderer;
+    renderer2: TransformMeshShader;
 
     private constructor(gl: WebGLRenderingContext) {
-        super(gl, Mesh.newEmpty(0, 0, 0), TransformLineRenderer.new);
+        super(gl, Mesh.newEmpty(0, 0, 0), TransformLineShader.new);
         this.color = [0, 0, 0, 0.8];
         this.linecolor = [0.3, 0.3, 0.3, 1];
-        this.renderer2 = new TransformMeshRenderer(gl);
+        this.renderer2 = new TransformMeshShader(gl);
     }
 
     static new(gl: WebGLRenderingContext): StaticMeshCombo {
@@ -31,7 +31,7 @@ export class StaticMeshCombo extends Combo<Mesh, Renderable, TransformLineRender
 
     // how to convert from state to buffered
     buffer() {
-        this.buffered = this.state.toRenderable();
+        this.buffered = this.state.ToShaderMesh();
         this.buffered.calculateFaceNormals();
         this.buffered.color = this.color;
         this.buffered.linecolor = this.linecolor;

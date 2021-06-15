@@ -4,7 +4,7 @@
 
 import {
     Shader,
-    Renderable,
+    ShaderMesh,
     DrawSpeed,
     MultiVector3,
     NormalKind,
@@ -13,7 +13,7 @@ import {
     Context,
 } from "../lib";
 
-export class NormalRenderer extends Shader<Renderable> {
+export class NormalShader extends Shader<ShaderMesh> {
     a_position: number;
     a_position_buffer: WebGLBuffer;
     index_buffer: WebGLBuffer;
@@ -78,7 +78,7 @@ export class NormalRenderer extends Shader<Renderable> {
     }
 
     // take a general render mesh, and extract normals
-    set(rend: Renderable, speed = DrawSpeed.StaticDraw) {
+    set(rend: ShaderMesh, speed = DrawSpeed.StaticDraw) {
         // save how many verts need to be drawn
         let gl = this.gl;
         gl.useProgram(this.program);

@@ -121,10 +121,10 @@ export class Camera {
         let deltaScroll = state.scrollValue * 1.2;
 
         this.offset.z = Math.min(-0.001, this.z_offset - deltaScroll);
-        if (state.IsKeyPressed("Shift")) {
+        if (state.IsKeyPressed("shift")) {
             this.speed *= 2;
         }
-        if (state.IsKeyPressed("Control")) {
+        if (state.IsKeyPressed("control")) {
             this.speed = Math.max(this.speed * 0.5, 0.1);
         }
 

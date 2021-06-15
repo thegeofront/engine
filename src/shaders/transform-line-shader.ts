@@ -3,11 +3,11 @@
 // purpose: WebGL based rendering of lines.
 
 import { Matrix4 } from "../math/matrix";
-import { Renderable } from "../mesh/render-mesh";
+import { ShaderMesh } from "../mesh/shader-mesh";
 import { Context } from "../render/context";
 import { Shader, DrawSpeed } from "../render/shader";
 
-export class TransformLineRenderer extends Shader<Renderable> {
+export class TransformLineShader extends Shader<ShaderMesh> {
     private a_position: number;
     private a_position_buffer: WebGLBuffer;
     private index_buffer: WebGLBuffer;
@@ -73,10 +73,10 @@ export class TransformLineRenderer extends Shader<Renderable> {
     }
 
     static new(gl: WebGLRenderingContext, color = [1, 0, 0, 0.5]) {
-        return new TransformLineRenderer(gl, color);
+        return new TransformLineShader(gl, color);
     }
 
-    set(data: Renderable, speed = DrawSpeed.StaticDraw) {
+    set(data: ShaderMesh, speed = DrawSpeed.StaticDraw) {
         // save how many faces need to be drawn
         let gl = this.gl;
         let links;

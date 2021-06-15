@@ -5,10 +5,10 @@
 import {
     App,
     Camera,
-    ShadedMeshRenderer,
+    ShadedMeshShader,
     Parameter,
     Graph,
-    Renderable,
+    ShaderMesh,
     Vector3,
     UI,
     InputState,
@@ -22,7 +22,7 @@ import {
     VertIndex,
     EdgeIndex,
     EnumParameter,
-    GraphDebugRenderer,
+    GraphDebugShader,
     Context,
 } from "../../../src/lib";
 
@@ -31,9 +31,9 @@ import { averageEdgeLength, laPlacian, quadification, squarification } from "./s
 
 export class SphericalOneApp extends App {
     camera: Camera;
-    meshRend: ShadedMeshRenderer;
+    meshRend: ShadedMeshShader;
     debugRend: MeshDebugShader;
-    graphRend: GraphDebugRenderer;
+    graphRend: GraphDebugShader;
 
     rotate!: Parameter;
     inner!: Parameter;
@@ -45,7 +45,7 @@ export class SphericalOneApp extends App {
     radius = 0.1;
 
     graph!: Graph;
-    rend!: Renderable;
+    rend!: ShaderMesh;
     average!: number;
     smooth!: Parameter;
     smoothlimit = 0;
@@ -60,9 +60,9 @@ export class SphericalOneApp extends App {
         this.camera = new Camera(canvas, 1, true);
         this.camera.set(-4.48, 1.24, -0.71);
 
-        this.meshRend = new ShadedMeshRenderer(gl);
+        this.meshRend = new ShadedMeshShader(gl);
         this.debugRend = new MeshDebugShader(gl, [0.5, 0, 0, 1], [1, 0, 0, 1], false);
-        this.graphRend = new GraphDebugRenderer(gl, [0.5, 0, 0, 1], [255 / 255, 69 / 255, 0, 1]);
+        this.graphRend = new GraphDebugShader(gl, [0.5, 0, 0, 1], [255 / 255, 69 / 255, 0, 1]);
     }
 
     ui(ui: UI) {
@@ -210,11 +210,11 @@ export class SphericalOneApp extends App {
                 this.radius * 0.99,
                 6,
                 10,
-            ).toRenderable();
+            ).ToShaderMesh();
             somesphere.calculateVertexNormals();
             this.meshRend.set(somesphere, DrawSpeed.StaticDraw);
         } else if (liftType == 0) {
-            let something = mesh.toRenderable();
+            let something = mesh.ToShaderMesh();
             something.transform(Matrix4.newScaler(0.99, 0.99, 0.99));
             something.calculateFaceNormals();
             this.meshRend.set(something, DrawSpeed.StaticDraw);

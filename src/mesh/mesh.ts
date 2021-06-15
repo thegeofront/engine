@@ -11,7 +11,7 @@ import {
     MultiVector3,
     Plane,
     Rectangle3,
-    Renderable,
+    ShaderMesh,
     TriSurface,
     Vector3,
 } from "../lib";
@@ -146,13 +146,13 @@ export class Mesh {
         return new Mesh(verts, links);
     }
 
-    static fromRect(rect: Rectangle3): Renderable {
+    static fromRect(rect: Rectangle3): ShaderMesh {
         let verts = rect.getCorners();
 
         // we cant handle quads yet
         let faces: number[] = [];
         faces.push(...quadToTri(cubeFaces[0]));
-        let rend = new Renderable(4, 0, 0, 2);
+        let rend = new ShaderMesh(4, 0, 0, 2);
         rend.mesh.verts.fillFromList(verts);
         rend.mesh.links.setData(faces);
 
@@ -471,8 +471,8 @@ export class Mesh {
         }
     }
 
-    toRenderable(): Renderable {
-        return Renderable.fromMesh(this);
+    ToShaderMesh(): ShaderMesh {
+        return ShaderMesh.fromMesh(this);
     }
 
     toGraph(): Graph {

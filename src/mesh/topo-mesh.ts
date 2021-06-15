@@ -6,11 +6,11 @@ import {
     MultiVector3,
     Triangle2,
     Triangle3,
-    Renderable,
+    ShaderMesh,
 } from "../lib";
 
 // a mesh with topological information
-export class TopoMesh extends Renderable {
+export class TopoMesh extends ShaderMesh {
     lastTouched = 0; // needed for triangle walk
     neighborMap: IntMatrix;
 
@@ -26,7 +26,7 @@ export class TopoMesh extends Renderable {
         this.neighborMap = new IntMatrix(this.mesh.links.count(), 3);
     }
 
-    static copyFromRenderable(rend: Renderable): TopoMesh {
+    static copyFromShaderMesh(rend: ShaderMesh): TopoMesh {
         let topoMesh = new TopoMesh(
             rend.mesh.verts.count,
             rend.norms.count,

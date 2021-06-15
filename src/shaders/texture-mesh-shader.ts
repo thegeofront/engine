@@ -2,11 +2,11 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of a mesh.
 
-import { Renderable } from "../mesh/render-mesh";
+import { ShaderMesh } from "../mesh/shader-mesh";
 import { DrawSpeed, Shader } from "../render/shader";
 import { Context } from "../render/context";
 
-export class TextureMeshShader extends Shader<Renderable> {
+export class TextureMeshShader extends Shader<ShaderMesh> {
     // attribute & uniform locations
     a_position: number;
     a_position_buffer: WebGLBuffer;
@@ -81,7 +81,7 @@ export class TextureMeshShader extends Shader<Renderable> {
         return new TextureMeshShader(gl);
     }
 
-    set(r: Renderable, speed: DrawSpeed) {
+    set(r: ShaderMesh, speed: DrawSpeed) {
         let gl = this.gl;
 
         if (!r.texture) {
@@ -156,7 +156,7 @@ export class TextureMeshShader extends Shader<Renderable> {
         gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
     }
 
-    setAndRender(r: Renderable, context: Context) {
+    setAndRender(r: ShaderMesh, context: Context) {
         this.set(r, DrawSpeed.DynamicDraw);
         this.render(context);
     }

@@ -4,7 +4,7 @@
 // credits to : https://webglfundamentals.org/
 // note: im still figuring out how to organize this
 
-import { Renderable } from "../mesh/render-mesh";
+import { ShaderMesh } from "../mesh/shader-mesh";
 import { Camera } from "./camera";
 import { Context } from "./context";
 

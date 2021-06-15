@@ -1,10 +1,10 @@
 import {
     App,
-    DotRenderer3,
-    LineRenderer,
+    DotShader,
+    LineShader,
     SimpleMeshShader,
     Camera,
-    Renderable,
+    ShaderMesh,
     Vector3,
     MultiLine,
     FloatMatrix,
@@ -39,11 +39,11 @@ export class LeastSquaresApp extends App {
 
     // render
     camera: Camera;
-    drRed: DotRenderer3;
-    drBlue: DotRenderer3;
-    lineRenderer: LineRenderer;
+    drRed: DotShader;
+    drBlue: DotShader;
+    lineRenderer: LineShader;
     count = 2;
-    drGreen: DotRenderer3;
+    drGreen: DotShader;
 
     constructor(gl: WebGLRenderingContext) {
         super(gl);
@@ -52,10 +52,10 @@ export class LeastSquaresApp extends App {
         this.rng = Random.fromSeed(1234);
         this.camera = new Camera(canvas, -2, true);
 
-        this.drRed = new DotRenderer3(gl, 10, [1, 0, 0, 1], false);
-        this.drGreen = new DotRenderer3(gl, 10, [0, 1, 0, 1], false);
-        this.drBlue = new DotRenderer3(gl, 10, [0, 0, 1, 1], false);
-        this.lineRenderer = new LineRenderer(gl, [0.3, 0.3, 0.3, 1]);
+        this.drRed = new DotShader(gl, 10, [1, 0, 0, 1], false);
+        this.drGreen = new DotShader(gl, 10, [0, 1, 0, 1], false);
+        this.drBlue = new DotShader(gl, 10, [0, 0, 1, 1], false);
+        this.lineRenderer = new LineShader(gl, [0.3, 0.3, 0.3, 1]);
 
         this.points = createRandomPoints(16, 1, this.rng);
 

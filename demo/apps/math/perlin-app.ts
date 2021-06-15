@@ -7,8 +7,8 @@ import {
     Vector3,
     MultiLine,
     Camera,
-    DotRenderer3,
-    LineRenderer,
+    DotShader,
+    LineShader,
     UI,
     Polyline,
     Plane,
@@ -37,7 +37,7 @@ export class PerlinApp extends App {
     // render
     camera: Camera;
     drRed: DotShaderWithHeight;
-    lrGrid: LineRenderer;
+    lrGrid: LineShader;
 
     constructor(gl: WebGLRenderingContext) {
         super(gl);
@@ -50,7 +50,7 @@ export class PerlinApp extends App {
         this.seed = Random.randomSeed();
 
         this.drRed = new DotShaderWithHeight(gl, 15, [1, 0, 0, 1], 5, false);
-        this.lrGrid = new LineRenderer(gl, [0.3, 0.3, 0.3, 1]);
+        this.lrGrid = new LineShader(gl, [0.3, 0.3, 0.3, 1]);
     }
 
     ui(ui: UI) {
@@ -76,6 +76,7 @@ export class PerlinApp extends App {
         let displace = this.params[1].get();
 
         // get some points
+        // BUG: something's wrong here....
         let rng = Random.fromSeed(this.seed);
         let vecs3 = Domain2.fromRadius(11)
             .spawn(degree + 1, degree + 1)

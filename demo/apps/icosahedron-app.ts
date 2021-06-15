@@ -5,24 +5,24 @@
 import {
     App,
     Camera,
-    ShadedMeshRenderer,
+    ShadedMeshShader,
     Parameter,
     Graph,
-    Renderable,
+    ShaderMesh,
     Vector3,
     UI,
     InputState,
     Matrix4,
     DrawSpeed,
     Mesh,
-    NormalRenderer,
+    NormalShader,
     Context,
 } from "../../src/lib";
 
 export class IcosahedronApp extends App {
     camera: Camera;
-    meshRend: ShadedMeshRenderer;
-    normalRend: NormalRenderer;
+    meshRend: ShadedMeshShader;
+    normalRend: NormalShader;
 
     rotate!: Parameter;
     inner!: Parameter;
@@ -30,14 +30,14 @@ export class IcosahedronApp extends App {
     detail = 6; // detail!: Parameter;
 
     graph!: Graph;
-    mesh!: Renderable;
+    mesh!: ShaderMesh;
 
     constructor(gl: WebGLRenderingContext) {
         super(gl);
         let canvas = gl.canvas as HTMLCanvasElement;
         this.camera = new Camera(canvas, 8, true);
-        this.meshRend = new ShadedMeshRenderer(gl);
-        this.normalRend = new NormalRenderer(gl);
+        this.meshRend = new ShadedMeshShader(gl);
+        this.normalRend = new NormalShader(gl);
     }
 
     getIcosahedron(): Graph {
@@ -151,7 +151,7 @@ export function graphToMultiMesh(
     detail: number,
     inner: boolean,
     balls = true,
-): Renderable {
+): ShaderMesh {
     let meshes: Mesh[] = [];
 
     if (balls) {
@@ -172,7 +172,7 @@ export function graphToMultiMesh(
         meshes.push(Mesh.fromGraph(graph));
     }
 
-    let rmesh = Mesh.fromJoin(meshes).toRenderable();
+    let rmesh = Mesh.fromJoin(meshes).ToShaderMesh();
     rmesh.calculateFaceNormals();
     return rmesh;
 }

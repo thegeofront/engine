@@ -2,7 +2,7 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of a mesh.
 
-import { DrawSpeed, IntMatrix, Matrix4, Mesh, Renderable, Shader, MultiVector3 } from "../lib";
+import { DrawSpeed, IntMatrix, Matrix4, Mesh, ShaderMesh, Shader, MultiVector3 } from "../lib";
 import { Context } from "../render/context";
 
 export class SimpleMeshShader extends Shader<Mesh> {

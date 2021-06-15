@@ -18,7 +18,7 @@
 
 import { Context } from "../render/context";
 import { DrawSpeed, Shader } from "../render/shader";
-import { MeshPickRenderer } from "../shaders/pick-shader";
+import { MeshPickShader } from "../shaders/pick-shader";
 import { MultiShader } from "../render/multi-shader";
 
 // staticcombo

@@ -2,16 +2,16 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of a mesh.
 
-import { Renderable, Matrix4, DrawSpeed, MultiLine, Context } from "../lib";
+import { ShaderMesh, Matrix4, DrawSpeed, MultiLine, Context } from "../lib";
 import { MultiShader } from "../render/multi-shader";
-import { LineRenderer } from "./line-shader";
-import { NormalRenderer } from "./mesh-normals-shader";
+import { LineShader } from "./line-shader";
+import { NormalShader } from "./mesh-normals-shader";
 import { SimpleMeshShader } from "./simple-mesh-shader";
 
-export class MeshDebugShader extends MultiShader<Renderable> {
+export class MeshDebugShader extends MultiShader<ShaderMesh> {
     faceRend: SimpleMeshShader;
-    lineRend: LineRenderer;
-    normRend?: NormalRenderer;
+    lineRend: LineShader;
+    normRend?: NormalShader;
     personal: Matrix4;
 
     constructor(
@@ -22,9 +22,9 @@ export class MeshDebugShader extends MultiShader<Renderable> {
     ) {
         super();
         this.faceRend = new SimpleMeshShader(gl, faceColor);
-        this.lineRend = new LineRenderer(gl, edgeColor);
+        this.lineRend = new LineShader(gl, edgeColor);
         this.personal = Matrix4.newIdentity();
-        if (renderNormal) this.normRend = new NormalRenderer(gl);
+        if (renderNormal) this.normRend = new NormalShader(gl);
     }
 
     static new(
@@ -36,7 +36,7 @@ export class MeshDebugShader extends MultiShader<Renderable> {
         return new MeshDebugShader(gl, faceColor, edgeColor, renderNormal);
     }
 
-    set(data: Renderable, speed: DrawSpeed = DrawSpeed.StaticDraw) {
+    set(data: ShaderMesh, speed: DrawSpeed = DrawSpeed.StaticDraw) {
         this.personal = data.position;
         this.faceRend.set(data.mesh);
         this.lineRend.set(MultiLine.fromMesh(data), speed);
@@ -49,7 +49,7 @@ export class MeshDebugShader extends MultiShader<Renderable> {
         this.normRend?.render(c);
     }
 
-    setAndRender(r: Renderable, c: Context) {
+    setAndRender(r: ShaderMesh, c: Context) {
         this.set(r, DrawSpeed.DynamicDraw);
         this.render(c);
     }

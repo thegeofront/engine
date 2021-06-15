@@ -4,7 +4,7 @@ import { Rectangle2 } from "../geo/rectangle";
 import { Context } from "../render/context";
 import { Shader } from "../render/shader";
 
-export class RectangleRenderer extends Shader<Rectangle2[]> {
+export class RectangleShader extends Shader<Rectangle2[]> {
     // attribute & uniform locations
     a_position: number;
     a_position_buffer: WebGLBuffer;

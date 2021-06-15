@@ -28,7 +28,7 @@ export * from "./math/vector";
 export * from "./mesh/graph";
 export * from "./mesh/multi-line";
 export * from "./mesh/mesh";
-export * from "./mesh/render-mesh";
+export * from "./mesh/shader-mesh";
 export * from "./mesh/topo-mesh";
 
 export * from "./geo/geo";

@@ -5,7 +5,7 @@
 
 import {
     Domain3,
-    DotRenderer3,
+    DotShader,
     Camera,
     Vector3,
     InputState,

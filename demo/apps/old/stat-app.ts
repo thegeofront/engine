@@ -1,10 +1,10 @@
 import {
     App,
-    DotRenderer3,
-    LineRenderer,
+    DotShader,
+    LineShader,
     SimpleMeshShader,
     Camera,
-    Renderable,
+    ShaderMesh,
     Vector3,
     MultiLine,
     FloatMatrix,
@@ -17,13 +17,13 @@ import {
 // http://textbooks.math.gatech.edu/ila/least-squares.html
 
 export class StatApp extends App {
-    dotRenderer: DotRenderer3;
-    lineRenderer: LineRenderer;
+    dotRenderer: DotShader;
+    lineRenderer: LineShader;
     meshRenderer: SimpleMeshShader;
 
     camera: Camera;
 
-    obj?: Renderable;
+    obj?: ShaderMesh;
     dots: Vector3[] = [];
     renderable?: MultiLine;
 
@@ -32,8 +32,8 @@ export class StatApp extends App {
 
         let canvas = gl.canvas as HTMLCanvasElement;
 
-        this.dotRenderer = new DotRenderer3(gl, 4, [0, 0, 1, 1], false);
-        this.lineRenderer = new LineRenderer(gl, [0, 0, 1, 0.5]);
+        this.dotRenderer = new DotShader(gl, 4, [0, 0, 1, 1], false);
+        this.lineRenderer = new LineShader(gl, [0, 0, 1, 0.5]);
         this.meshRenderer = new SimpleMeshShader(gl, [0, 0, 1, 0.25]);
         this.camera = new Camera(canvas);
     }

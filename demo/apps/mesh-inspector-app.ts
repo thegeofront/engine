@@ -5,13 +5,13 @@
 import {
     App,
     Camera,
-    DotRenderer3,
-    LineRenderer,
+    DotShader,
+    LineShader,
     MeshDebugShader,
-    ShadedMeshRenderer,
+    ShadedMeshShader,
     Plane,
     MultiLine,
-    Renderable,
+    ShaderMesh,
     Parameter,
     UI,
     Vector3,
@@ -24,15 +24,15 @@ import {
 export class MeshInspectorApp extends App {
     // renderinfo
     camera: Camera;
-    dotRenderer: DotRenderer3;
-    lineRenderer: LineRenderer;
+    dotRenderer: DotShader;
+    lineRenderer: LineShader;
     meshRenderer: MeshDebugShader;
-    shadedMeshRenderer: ShadedMeshRenderer;
+    shadedMeshRenderer: ShadedMeshShader;
 
     // geo data
     plane: Plane = Plane.WorldXY();
     grid?: MultiLine;
-    geo: Renderable[] = [];
+    geo: ShaderMesh[] = [];
 
     // logic data
     size = 10;
@@ -54,10 +54,10 @@ export class MeshInspectorApp extends App {
         this.camera.angleAlpha = 0.4;
         this.camera.angleBeta = 0.5;
 
-        this.dotRenderer = new DotRenderer3(gl, 4, [0, 1, 0, 1]);
+        this.dotRenderer = new DotShader(gl, 4, [0, 1, 0, 1]);
         this.meshRenderer = new MeshDebugShader(gl, [0.6, 0, 0, 1], [1, 0, 0, 1]);
-        this.lineRenderer = new LineRenderer(gl, [0.3, 0.3, 0.3, 1]);
-        this.shadedMeshRenderer = new ShadedMeshRenderer(gl);
+        this.lineRenderer = new LineShader(gl, [0.3, 0.3, 0.3, 1]);
+        this.shadedMeshRenderer = new ShadedMeshShader(gl);
     }
 
     ui(ui: UI) {
@@ -109,7 +109,7 @@ export class MeshInspectorApp extends App {
             ),
             Mesh.newCylinder(new Vector3(0, 0, -rad), new Vector3(0, 0, rad), rad, det),
         ]);
-        let rend = mesh.toRenderable();
+        let rend = mesh.ToShaderMesh();
         rend.calculateVertexNormals();
 
         // TODO abstract this to scene
