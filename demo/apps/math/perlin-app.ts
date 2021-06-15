@@ -116,7 +116,7 @@ export class PerlinApp extends App {
     draw(gl: WebGLRenderingContext) {
         let c = new Context(this.camera);
 
-        this.drRed.render(c);
         this.lrGrid.render(c);
+        this.drRed.render(c);
     }
 }
