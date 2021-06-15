@@ -7,9 +7,9 @@ import {
     Vector3,
     MultiLine,
     Camera,
-    DotRenderer3,
-    LineRenderer,
-    MeshDebugRenderer,
+    DotShader,
+    LineShader,
+    MeshDebugShader,
     UI,
     Polyline,
     Plane,
@@ -38,13 +38,13 @@ export class BezierCpApp extends App {
 
     // render
     camera: Camera;
-    drRed: DotRenderer3;
-    lrGrid: LineRenderer;
-    lrRed: LineRenderer;
-    mr: MeshDebugRenderer;
-    lrBlue: LineRenderer;
-    drBlue: DotRenderer3;
-    lrWhite: LineRenderer;
+    drRed: DotShader;
+    lrGrid: LineShader;
+    lrRed: LineShader;
+    mr: MeshDebugShader;
+    lrBlue: LineShader;
+    drBlue: DotShader;
+    lrWhite: LineShader;
 
     constructor(gl: WebGLRenderingContext) {
         super(gl);
@@ -56,13 +56,13 @@ export class BezierCpApp extends App {
         this.dots = [];
         this.lines = [];
 
-        this.drRed = new DotRenderer3(gl, 10, [1, 0, 0, 1], false);
-        this.drBlue = new DotRenderer3(gl, 10, [0, 0, 1, 1], false);
-        this.lrRed = new LineRenderer(gl, [1, 0, 0, 1]);
-        this.lrBlue = new LineRenderer(gl, [0, 0, 1, 1]);
-        this.lrWhite = new LineRenderer(gl, [1, 1, 1, 1]);
-        this.lrGrid = new LineRenderer(gl, [0.3, 0.3, 0.3, 1]);
-        this.mr = new MeshDebugRenderer(gl, [1, 0, 0, 0.5], [1, 1, 1, 0.5]);
+        this.drRed = new DotShader(gl, 10, [1, 0, 0, 1], false);
+        this.drBlue = new DotShader(gl, 10, [0, 0, 1, 1], false);
+        this.lrRed = new LineShader(gl, [1, 0, 0, 1]);
+        this.lrBlue = new LineShader(gl, [0, 0, 1, 1]);
+        this.lrWhite = new LineShader(gl, [1, 1, 1, 1]);
+        this.lrGrid = new LineShader(gl, [0.3, 0.3, 0.3, 1]);
+        this.mr = new MeshDebugShader(gl, [1, 0, 0, 0.5], [1, 1, 1, 0.5]);
     }
 
     ui(ui: UI) {

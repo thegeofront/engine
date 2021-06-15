@@ -7,9 +7,9 @@ import {
     Vector3,
     MultiLine,
     Camera,
-    DotRenderer3,
-    LineRenderer,
-    MeshDebugRenderer,
+    DotShader,
+    LineShader,
+    MeshDebugShader,
     UI,
     Polyline,
     Plane,
@@ -39,11 +39,11 @@ export class SurfaceCpApp extends App {
 
     // render
     camera: Camera;
-    lrGrid: LineRenderer;
-    lrRed: LineRenderer;
-    mr: MeshDebugRenderer;
-    drBlue: DotRenderer3;
-    mr2: MeshDebugRenderer;
+    lrGrid: LineShader;
+    lrRed: LineShader;
+    mr: MeshDebugShader;
+    drBlue: DotShader;
+    mr2: MeshDebugShader;
 
     constructor(gl: WebGLRenderingContext) {
         super(gl);
@@ -56,11 +56,11 @@ export class SurfaceCpApp extends App {
         this.dots = [];
         this.lines = [];
 
-        this.drBlue = new DotRenderer3(gl, 10, [0, 0, 1, 1], false);
-        this.lrRed = new LineRenderer(gl, [1, 0, 0, 1]);
-        this.lrGrid = new LineRenderer(gl, [0.3, 0.3, 0.3, 1]);
-        this.mr = new MeshDebugRenderer(gl, [1, 0, 0, 0.5], [1, 0.5, 0.5, 0.5]);
-        this.mr2 = new MeshDebugRenderer(gl, [0, 1, 1, 0.25], [0, 1, 1, 0.75])
+        this.drBlue = new DotShader(gl, 10, [0, 0, 1, 1], false);
+        this.lrRed = new LineShader(gl, [1, 0, 0, 1]);
+        this.lrGrid = new LineShader(gl, [0.3, 0.3, 0.3, 1]);
+        this.mr = new MeshDebugShader(gl, [1, 0, 0, 0.5], [1, 0.5, 0.5, 0.5]);
+        this.mr2 = new MeshDebugShader(gl, [0, 1, 1, 0.25], [0, 1, 1, 0.75])
     }
 
     ui(ui: UI) {
@@ -107,7 +107,7 @@ export class SurfaceCpApp extends App {
 
         // mesh
         // this.drBlue.set(surface.buffer(detail, detail).verts);
-        this.mr.set(surface.buffer(detail, detail).toRenderable());
+        this.mr.set(surface.buffer(detail, detail).ToShaderMesh());
     }
 
     startGrid() {
@@ -126,12 +126,13 @@ export class SurfaceCpApp extends App {
         let t = ray.xPlane(this.plane);
         let point = ray.at(20);
         let meshes = [];
+        
         meshes.push(Mesh.newSphere(point, 1, 10,10));
         let uv = this.surface!.approxClosestPoint(point);
         let p2 = this.surface!.pointAtUV(uv);
 
         meshes.push(Mesh.newSphere(p2, 1, 10,10));
-        this.mr2.set(Mesh.fromJoin(meshes).toRenderable(), DrawSpeed.DynamicDraw);
+        this.mr2.set(Mesh.fromJoin(meshes).ToShaderMesh(), DrawSpeed.DynamicDraw);
     }
 
     draw(gl: WebGLRenderingContext) {
