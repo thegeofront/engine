@@ -8,14 +8,22 @@ export class FpsCounter {
 
     constructor() {}
 
-    update(state: InputState) {
+    static new() {
+        return new FpsCounter();
+    }
+
+    _update(dt: number) {
         this.frames += 1;
-        this.elapsed += state.tick;
+        this.elapsed += dt;
         if (this.elapsed > this.updateEveryXTicks) {
             this.setFps();
             this.elapsed = 0;
             this.frames = 0;
-        }
+        } 
+    }
+
+    update(state: InputState) {
+        this._update(state.tick);
     }
 
     setFps() {

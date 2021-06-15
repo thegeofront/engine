@@ -8,32 +8,32 @@ import {
     Context,
     Cube,
     Domain3,
-    DotRenderer3,
+    DotShader,
     DrawSpeed,
     InputState,
     IntCube,
     MultiLine,
-    LineRenderer,
+    LineShader,
     Matrix4,
     Mesh,
-    MeshDebugRenderer,
+    MeshDebugShader,
     Parameter,
     Plane,
     Ray,
-    Renderable,
-    ShadedMeshRenderer,
+    ShaderMesh,
+    ShadedMeshShader,
     UI,
     Vector3,
 } from "../../src/lib";
 
 export class GeometryApp extends App {
     // renderinfo
-    dotRenderer: DotRenderer3;
-    whiteLineRenderer: LineRenderer;
-    greyLineRenderer: LineRenderer;
-    redLineRenderer: LineRenderer;
-    meshRenderer: ShadedMeshRenderer;
-    transMeshRenderer: MeshDebugRenderer;
+    dotRenderer: DotShader;
+    whiteLineRenderer: LineShader;
+    greyLineRenderer: LineShader;
+    redLineRenderer: LineShader;
+    meshRenderer: ShadedMeshShader;
+    transMeshRenderer: MeshDebugShader;
     camera: Camera;
 
     // geo data
@@ -41,8 +41,8 @@ export class GeometryApp extends App {
     gridLarge!: MultiLine;
     gridSmall!: MultiLine;
     dots: Vector3[] = [];
-    geo: Renderable[] = [];
-    mapGeo: Renderable[] = [];
+    geo: ShaderMesh[] = [];
+    mapGeo: ShaderMesh[] = [];
     cursorVisual?: MultiLine;
 
     // logic data
@@ -56,12 +56,12 @@ export class GeometryApp extends App {
         // setup render env
         super(gl);
         this.camera = new Camera(gl.canvas! as HTMLCanvasElement, 10, true);
-        this.dotRenderer = new DotRenderer3(gl, 4, [1, 0, 0, 1], false);
-        this.whiteLineRenderer = new LineRenderer(gl, [1, 1, 1, 1]);
-        this.greyLineRenderer = new LineRenderer(gl, [0.2, 0, 1, 0.5]);
-        this.redLineRenderer = new LineRenderer(gl, [0.8, 0, 0, 1]);
-        this.meshRenderer = new ShadedMeshRenderer(gl);
-        this.transMeshRenderer = new MeshDebugRenderer(gl, [1, 1, 1, 0.25], [1, 1, 1, 0.25]);
+        this.dotRenderer = new DotShader(gl, 4, [1, 0, 0, 1], false);
+        this.whiteLineRenderer = new LineShader(gl, [1, 1, 1, 1]);
+        this.greyLineRenderer = new LineShader(gl, [0.2, 0, 1, 0.5]);
+        this.redLineRenderer = new LineShader(gl, [0.8, 0, 0, 1]);
+        this.meshRenderer = new ShadedMeshShader(gl);
+        this.transMeshRenderer = new MeshDebugShader(gl, [1, 1, 1, 0.25], [1, 1, 1, 0.25]);
     }
 
     // called after init
@@ -147,7 +147,7 @@ export class GeometryApp extends App {
     addPreviewCube(point: Vector3) {
         let cubeCenter = this.mapToWorld(point);
         let cube = this.createCube(cubeCenter);
-        this.geo.push(Mesh.fromCube(cube).toRenderable());
+        this.geo.push(Mesh.fromCube(cube).ToShaderMesh());
     }
 
     flushPreviewCubes() {
@@ -304,7 +304,7 @@ export class GeometryApp extends App {
             }
         });
 
-        let m = Mesh.fromJoin(mapGeo).toRenderable();
+        let m = Mesh.fromJoin(mapGeo).ToShaderMesh();
         m.calculateFaceNormals();
         this.meshRenderer.set(m);
     }

@@ -7,9 +7,9 @@ import {
     Vector3,
     MultiLine,
     Camera,
-    DotRenderer3,
-    LineRenderer,
-    MeshDebugRenderer,
+    DotShader,
+    LineShader,
+    MeshDebugShader,
     UI,
     Polyline,
     Plane,
@@ -36,12 +36,12 @@ export class TriSurfaceApp extends App {
 
     // render
     camera: Camera;
-    drRed: DotRenderer3;
-    lrGrid: LineRenderer;
-    lrRed: LineRenderer;
-    mr: MeshDebugRenderer;
+    drRed: DotShader;
+    lrGrid: LineShader;
+    lrRed: LineShader;
+    mr: MeshDebugShader;
     perlin: Perlin;
-    drBlue: DotRenderer3;
+    drBlue: DotShader;
 
     constructor(gl: WebGLRenderingContext) {
         super(gl);
@@ -55,11 +55,11 @@ export class TriSurfaceApp extends App {
         this.dots = [];
         this.lines = [];
 
-        this.drRed = new DotRenderer3(gl, 10, [1, 0, 0, 1], false);
-        this.drBlue = new DotRenderer3(gl, 10, [0, 0, 1, 1], false);
-        this.lrRed = new LineRenderer(gl, [1, 0, 0, 1]);
-        this.lrGrid = new LineRenderer(gl, [0.3, 0.3, 0.3, 1]);
-        this.mr = new MeshDebugRenderer(gl, [1, 0, 0, 0.5], [1, 1, 1, 0.5]);
+        this.drRed = new DotShader(gl, 10, [1, 0, 0, 1], false);
+        this.drBlue = new DotShader(gl, 10, [0, 0, 1, 1], false);
+        this.lrRed = new LineShader(gl, [1, 0, 0, 1]);
+        this.lrGrid = new LineShader(gl, [0.3, 0.3, 0.3, 1]);
+        this.mr = new MeshDebugShader(gl, [1, 0, 0, 0.5], [1, 1, 1, 0.5]);
     }
 
     ui(ui: UI) {
@@ -95,7 +95,7 @@ export class TriSurfaceApp extends App {
 
         // create a surface from it
         // console.log(vecs.count);
-        // let surface = BezierSquare.new(vecs)!;
+        let surface = BezierSquare.new(vecs, degree+1, degree+1)!;
 
         this.drRed.set(vecs);
 
@@ -109,7 +109,7 @@ export class TriSurfaceApp extends App {
 
         // mesh
         // this.drBlue.set(surface.buffer(detail, detail).verts);
-        // this.mr.set(surface.buffer(detail, detail).toRenderable());
+        this.mr.set(surface.buffer(detail, detail).ToShaderMesh());
     }
 
     startGrid() {

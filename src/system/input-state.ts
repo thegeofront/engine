@@ -89,26 +89,37 @@ export class InputState {
     minimumTick: number;
 
     mousePos: Vector2 = Vector2.zero();
+    private mousePosBuffered: Vector2 = Vector2.zero();
+
+    private mousePosPrev: Vector2 = Vector2.zero();
     mouseDelta: Vector2 = Vector2.zero();
+
     mouseLeftDown = false;
     mouseLeftPressed = false;
-    private mouseLeftPrev = false;
+    mouseLeftPrev = false;
 
     mouseRightDown = false;
     mouseRightPressed = false;
-    private mouseRightPrev = false;
+    mouseRightPrev = false;
 
     mouseMiddleDown = false;
     mouseMiddlePressed = false;
     private mouseMiddlePrev = false;
 
-    private keysDown: IKeys = {};
+    public keysDown: IKeys = {};
     private keysPressed: string[] = [];
 
     scrollValue = 0;
+    private scrollValuePrevious = 0;
+    mouseScrollDelta = 0;
+    private mouseScrollBuffered = 0;
 
-    // delegate functions
+    // TODO: build a full range of delegate functions
+    
     onMouseWheelScroll?: Function;
+    onMouseLeftUp?: Function;
+
+
     constructor(canvas: HTMLCanvasElement) {
         // link
         this.canvas = canvas;
@@ -127,13 +138,13 @@ export class InputState {
             e.preventDefault();
             e.stopPropagation();
         });
-        document.addEventListener("mousemove", this.setMousePos.bind(this));
+        document.addEventListener("mousemove", this.onMouseMove.bind(this));
         canvas.addEventListener("wheel", this.setMouseScroll.bind(this));
 
         document.addEventListener("touchmove", this.setTouch.bind(this));
         canvas.addEventListener("touchstart", this.setTouch.bind(this));
         canvas.addEventListener("touchend", this.setTouchUp.bind(this));
-        for (let i = 0; i < 223; i++) this.keysDown[i] = false;
+        // for (let i = 0; i < 223; i++) this.keysDown[i] = false;
 
         // keyboard
         canvas.addEventListener("keydown", this.onKeyDown.bind(this));
@@ -144,28 +155,61 @@ export class InputState {
         canvas.focus();
     }
 
-    public preUpdate() {
+    static new(canvas: HTMLCanvasElement) {
+        return new InputState(canvas)
+    }
+
+    public preUpdate(tick: number) {
         // this must be called every tick within whatever context this is used
 
         // update time
         this.newTime = Date.now();
-        this.tick = this.newTime - this.oldTime;
         this.oldTime = this.newTime;
+        this.tick = tick;
+   
+        // update mouse pos 
+        if (!this.mousePosBuffered.equals(this.mousePos)) {
+            // mouse has moved during previous frame
+            this.mousePos = this.mousePosBuffered.clone();
+            this.mouseDelta = this.mousePos.subbed(this.mousePosPrev);
+            this.mousePosPrev = this.mousePos.clone();
+        } else {
+            this.mouseDelta =Vector2.zero();
+        }
 
-        // update mouse
+        // update mouse buttons
         this.mouseLeftPressed = this.mouseLeftPrev != this.mouseLeftDown && this.mouseLeftDown;
         this.mouseRightPressed = this.mouseRightPrev != this.mouseRightDown && this.mouseRightDown;
         this.mouseMiddlePressed =
             this.mouseMiddlePrev != this.mouseMiddleDown && this.mouseMiddleDown;
 
-        this.mouseLeftPrev = this.mouseLeftDown;
-        this.mouseRightPrev = this.mouseRightDown;
-        this.mouseMiddlePrev = this.mouseMiddleDown;
+        // update scrolling
+        
+        // normalize all scrolling behaviour
+        if (this.mouseScrollBuffered != 0) {
+            // we are scrolling
+            let value = 0.1;
+            if (this.mouseScrollBuffered < 0) value = -0.1;
+            this.scrollValue = Math.max(0, this.scrollValue + value);
+            this.mouseScrollDelta = value;
+            this.mouseScrollBuffered = 0;
+        } else {
+            // this.mouseScrollBuffered = 0;
+            this.mouseScrollDelta = 0;
+        }
+    }
+
+    public setScrollValue(value: number) {
+        this.scrollValue = Math.max(0, value);
     }
 
     public postUpdate() {
         // this also must be called for keyIsPressed to work
 
+        this.mouseLeftPrev = this.mouseLeftDown;
+        this.mouseRightPrev = this.mouseRightDown;
+        this.mouseMiddlePrev = this.mouseMiddleDown;
+        
         // refresh keypresses
         this.keysPressed = [];
     }
@@ -175,18 +219,25 @@ export class InputState {
     }
 
     public IsKeyPressed(key: string): boolean {
-        return this.keysPressed.includes(key);
+        for (let k of this.keysPressed) {
+            if (k === key) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public onKeyDown(e: KeyboardEvent) {
-        if (this.keysDown[e.key] == true) return;
-        console.log(e.key);
-        this.keysDown[e.key.toLowerCase()] = true;
-        this.keysPressed.push(e.key);
+        let key = e.key.toLowerCase();
+        if (this.keysDown[key] == true) return;
+        // console.log(key);
+        this.keysDown[key] = true;
+        this.keysPressed.push(key);
     }
 
     public onKeyUp(e: KeyboardEvent) {
-        this.keysDown[e.key.toLowerCase()] = false;
+        let key = e.key.toLowerCase();
+        this.keysDown[key] = false;
     }
 
     public onKeyPressed(e: KeyboardEvent) {
@@ -206,19 +257,16 @@ export class InputState {
     }
 
     private setMouseScroll(e: WheelEvent) {
-        // console.log("we be scrollin' now...")
-
-        // normalize all scrolling behaviour
-        let value = 0.1;
-        if (e.deltaY < 0) value = -0.1;
-
-        // we dont want negative scroll values...
-        this.scrollValue = Math.max(0, this.scrollValue + value);
+        this.mouseScrollBuffered = e.deltaY;
     }
 
-    private setMousePos(e: MouseEvent) {
+    private onMouseMove(e: MouseEvent) {
         // this is a bit messy, BUT, multiply by camera parameters
-        this.mousePos = new Vector2(e.clientX, e.clientY);
+        this.setMousePos(e.clientX, e.clientY);
+    }
+
+    private setMousePos(x: number, y: number) {
+        this.mousePosBuffered = new Vector2(x,y);
     }
 
     private setMouseUp(e: MouseEvent) {
@@ -231,6 +279,7 @@ export class InputState {
         }
         if (code < 1) {
             this.mouseLeftDown = false;
+            if (this.onMouseLeftUp) this.onMouseLeftUp();
         }
     }
 

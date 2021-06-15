@@ -2,7 +2,7 @@
 
 import { Mesh } from "../mesh/mesh";
 
-export class MeshPickRenderer {
+export class MeshPickShader {
     constructor() {}
 
     pickMesh(meshes: Mesh[]): number {

@@ -2,25 +2,17 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of lines.
 
-import { Matrix4 } from "../math/matrix";
-import { Renderable } from "../mesh/render-mesh";
-import { Context } from "../render/context";
-import { Renderer, DrawSpeed } from "../render/renderer";
+import { Shader, MultiLine, Mesh, DrawSpeed, Matrix4, Context } from "../lib";
 
-export class TransformLineRenderer extends Renderer<Renderable> {
-    private a_position: number;
-    private a_position_buffer: WebGLBuffer;
-    private index_buffer: WebGLBuffer;
-    private u_transform: WebGLUniformLocation;
-    private u_color: WebGLUniformLocation;
-    private count: number;
-    private vertCount: number;
-    private u_personal: WebGLUniformLocation;
-
-    private personal: Matrix4;
-    private color: number[];
-
-    constructor(gl: WebGLRenderingContext, color = [1, 0, 0, 0.5]) {
+export class LineShader extends Shader<MultiLine | Mesh> {
+    a_position: number;
+    a_position_buffer: WebGLBuffer;
+    index_buffer: WebGLBuffer;
+    u_transform: WebGLUniformLocation;
+    u_color: WebGLUniformLocation;
+    count: number;
+    vertCount: number;
+    constructor(gl: WebGLRenderingContext, color = [1, 1, 1, 0.5]) {
         // note: I like vertex & fragments to be included in the script itself.
         // when you change vertex or fragment, this class has to deal with it.
         // putting them somewhere else doesnt make sense to me,
@@ -31,11 +23,10 @@ export class TransformLineRenderer extends Renderer<Renderable> {
 
         attribute vec4 a_position;
         uniform mat4 u_transform;
-        uniform mat4 u_personal;
         uniform vec4 u_color;
 
         void main() {
-            gl_Position = u_transform * u_personal * a_position;
+            gl_Position = u_transform * a_position;
         }
         `;
 
@@ -53,7 +44,6 @@ export class TransformLineRenderer extends Renderer<Renderable> {
         // setup program
         super(gl, vs, fs);
         this.u_transform = gl.getUniformLocation(this.program, "u_transform")!;
-        this.u_personal = gl.getUniformLocation(this.program, "u_personal")!;
         this.u_color = gl.getUniformLocation(this.program, "u_color")!;
 
         // we need 2 buffers
@@ -64,41 +54,36 @@ export class TransformLineRenderer extends Renderer<Renderable> {
 
         // set uniforms which wont change
         gl.useProgram(this.program);
-
+        gl.uniform4f(this.u_color, color[0], color[1], color[2], color[3]);
         this.count = 0;
         this.vertCount = 0;
-
-        this.personal = Matrix4.newIdentity();
-        this.color = color;
     }
 
-    static new(gl: WebGLRenderingContext, color = [1, 0, 0, 0.5]) {
-        return new TransformLineRenderer(gl, color);
-    }
-
-    set(data: Renderable, speed = DrawSpeed.StaticDraw) {
+    set(data: MultiLine | Mesh, speed = DrawSpeed.StaticDraw, personal = Matrix4.newIdentity()) {
         // save how many faces need to be drawn
         let gl = this.gl;
         let links;
         let verts;
+        if (data instanceof Mesh) {
+            verts = data.verts.slice();
+            links = data.links.getData();
+        } else {
+            verts = data.verts;
+            links = data.links;
+        }
 
-        // extract
-        verts = data.mesh.verts;
-        links = data.mesh.toLines().links.getData();
-        this.personal = data.position;
-        this.color = data.linecolor;
+        // console.log(links);
 
-        // set it
         gl.useProgram(this.program);
         this.count = links.length;
-        this.vertCount = verts.slice().width;
+        this.vertCount = verts.width;
         let drawspeed = this.convertDrawSpeed(speed);
 
         // vertices
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
         gl.enableVertexAttribArray(this.a_position);
         gl.vertexAttribPointer(this.a_position, this.vertCount, gl.FLOAT, false, 0, 0);
-        gl.bufferData(gl.ARRAY_BUFFER, verts.slice().data, drawspeed);
+        gl.bufferData(gl.ARRAY_BUFFER, verts.data, drawspeed);
 
         // indices
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
@@ -112,20 +97,23 @@ export class TransformLineRenderer extends Renderer<Renderable> {
         // POINTERS MUST ALSO BE SET, DO EVERYTHING EXCEPT GL.BUFFERDATA
         gl.useProgram(this.program);
 
-        //
+        // buffer 1
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
         gl.enableVertexAttribArray(this.a_position);
         gl.vertexAttribPointer(this.a_position, this.vertCount, gl.FLOAT, false, 0, 0);
 
-        //
+        // index
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
-        gl.uniform4f(this.u_color, this.color[0], this.color[1], this.color[2], this.color[3]);
 
         // set uniforms
         gl.uniformMatrix4fv(this.u_transform, false, matrix.data);
-        gl.uniformMatrix4fv(this.u_personal, false, this.personal.data);
 
         // Draw the point.
         gl.drawElements(gl.LINES, this.count, gl.UNSIGNED_SHORT, 0);
+    }
+
+    setAndRender(data: MultiLine, c: Context) {
+        this.set(data, DrawSpeed.DynamicDraw);
+        this.render(c);
     }
 }

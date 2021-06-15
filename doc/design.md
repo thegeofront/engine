@@ -5,7 +5,11 @@
 - use ```calculate``` to signify something happening to the entire structure of the object
 
 
-# renderers
+# rendering
+- I recently renamed `Renderer` to `Shader`, since they essentially are shader wrappers
+- A renderer means the entire process of feeding something to a `shader`. Once the `shader` name is established, I will rename things like `Combo` to `Renderer`.
+
+
 - All Renderers should not ask for anything interesting in the constructors: they should be factory-able.
 - All renderers must have different 'setState' functions, to be called separately from 'render' function.
 

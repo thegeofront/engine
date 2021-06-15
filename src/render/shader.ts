@@ -3,8 +3,9 @@
 // author: Jos Feenstra
 // credits to : https://webglfundamentals.org/
 // note: im still figuring out how to organize this
+// TODO: remove all the WebGl wrappers
 
-import { Renderable } from "../mesh/render-mesh";
+import { ShaderMesh } from "../mesh/shader-mesh";
 import { Camera } from "./camera";
 import { Context } from "./context";
 
@@ -13,19 +14,22 @@ import { Context } from "./context";
 var nextTextureId = 0;
 var rendercallsperframe = 0;
 
+export type WebGl = WebGLRenderingContext;
+
+
 export enum DrawSpeed {
     StaticDraw, // if you plan on using the 'set' method only a couple of times / once
     DynamicDraw, // if you plan on using the 'set' method every frame
 }
 
 // @param T = data to feed the renderer at 'set'
-export abstract class Renderer<T> {
+export abstract class Shader<T> {
     gl: WebGLRenderingContext;
     program: WebGLProgram;
 
     constructor(gl: WebGLRenderingContext, vertexScript: string, fragmentScript: string) {
         this.gl = gl;
-        this.program = Renderer.createProgramFromScripts(gl, vertexScript, fragmentScript);
+        this.program = Shader.createProgramFromScripts(gl, vertexScript, fragmentScript);
     }
 
     abstract set(r: T, speed: DrawSpeed): void;
@@ -137,9 +141,9 @@ export abstract class Renderer<T> {
         vertexScript: string,
         fragmentScript: string,
     ): WebGLProgram {
-        let vertexShader = Renderer.compileShader(gl, vertexScript, gl.VERTEX_SHADER);
-        let fragmentShader = Renderer.compileShader(gl, fragmentScript, gl.FRAGMENT_SHADER);
-        return Renderer.createProgram(gl, vertexShader, fragmentShader);
+        let vertexShader = Shader.compileShader(gl, vertexScript, gl.VERTEX_SHADER);
+        let fragmentShader = Shader.compileShader(gl, fragmentScript, gl.FRAGMENT_SHADER);
+        return Shader.createProgram(gl, vertexShader, fragmentShader);
     }
 
     //#endregion

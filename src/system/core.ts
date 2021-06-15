@@ -6,7 +6,7 @@ import { InputState } from "./input-state";
 import { App } from "../app/app";
 import { FpsCounter } from "./fps-counter";
 import { UI } from "./ui";
-import { Renderer } from "../render/renderer";
+import { Shader } from "../render/shader";
 
 export class Core {
     canvas: HTMLCanvasElement;
@@ -47,8 +47,8 @@ export class Core {
         app.start();
     }
 
-    update() {
-        this.state.preUpdate();
+    update(time: number) {
+        this.state.preUpdate(time);
         this.fpsCounter.update(this.state);
         this.apps.forEach((app) => {
             app.update(this.state);

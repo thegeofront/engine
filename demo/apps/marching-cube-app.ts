@@ -4,14 +4,14 @@
 
 import {
     App,
-    DotRenderer3,
-    LineRenderer,
-    MeshDebugRenderer,
+    DotShader,
+    LineShader,
+    MeshDebugShader,
     Camera,
     Plane,
     MultiLine,
     Vector3,
-    Renderable,
+    ShaderMesh,
     IntCube,
     Perlin,
     InputState,
@@ -34,12 +34,12 @@ import {
 
 export class MarchingCubeApp extends App {
     // renderinfo
-    dotRenderer: DotRenderer3;
-    whiteLineRenderer: LineRenderer;
-    greyLineRenderer: LineRenderer;
-    redLineRenderer: LineRenderer;
-    meshRenderer: MeshDebugRenderer;
-    transMeshRenderer: MeshDebugRenderer;
+    dotRenderer: DotShader;
+    whiteLineRenderer: LineShader;
+    greyLineRenderer: LineShader;
+    redLineRenderer: LineShader;
+    meshRenderer: MeshDebugShader;
+    transMeshRenderer: MeshDebugShader;
     camera: Camera;
 
     // geo data
@@ -47,8 +47,8 @@ export class MarchingCubeApp extends App {
     gridLarge!: MultiLine;
     gridSmall!: MultiLine;
     dots: Vector3[] = [];
-    geo: Renderable[] = [];
-    mapGeo: Renderable[] = [];
+    geo: ShaderMesh[] = [];
+    mapGeo: ShaderMesh[] = [];
     cursorVisual?: MultiLine;
 
     // logic data
@@ -60,12 +60,12 @@ export class MarchingCubeApp extends App {
         // setup render env
         super(gl);
         this.camera = new Camera(canvas);
-        this.dotRenderer = new DotRenderer3(gl, 4, [1, 0, 0, 1], false);
-        this.whiteLineRenderer = new LineRenderer(gl, [1, 1, 1, 1]);
-        this.greyLineRenderer = new LineRenderer(gl, [0.2, 0, 1, 0.5]);
-        this.redLineRenderer = new LineRenderer(gl, [0.8, 0, 0, 1]);
-        this.meshRenderer = new MeshDebugRenderer(gl, [0.9, 0.9, 0.9, 1], [0.7, 0.7, 0.7, 1]);
-        this.transMeshRenderer = new MeshDebugRenderer(gl, [1, 1, 1, 0.1], [1, 1, 1, 0.1]);
+        this.dotRenderer = new DotShader(gl, 4, [1, 0, 0, 1], false);
+        this.whiteLineRenderer = new LineShader(gl, [1, 1, 1, 1]);
+        this.greyLineRenderer = new LineShader(gl, [0.2, 0, 1, 0.5]);
+        this.redLineRenderer = new LineShader(gl, [0.8, 0, 0, 1]);
+        this.meshRenderer = new MeshDebugShader(gl, [0.9, 0.9, 0.9, 1], [0.7, 0.7, 0.7, 1]);
+        this.transMeshRenderer = new MeshDebugShader(gl, [1, 1, 1, 0.1], [1, 1, 1, 0.1]);
     }
 
     start() {
@@ -132,7 +132,7 @@ export class MarchingCubeApp extends App {
     addPreviewCube(point: Vector3) {
         let cubeCenter = this.mapToWorld(point);
         let cube = this.createCube(cubeCenter);
-        this.geo.push(Mesh.fromCube(cube).toRenderable());
+        this.geo.push(Mesh.fromCube(cube).ToShaderMesh());
     }
 
     flushPreviewCubes() {
@@ -286,7 +286,7 @@ export class MarchingCubeApp extends App {
                 mapGeo.push(Mesh.fromCube(cube));
             }
         });
-        this.meshRenderer.set(Mesh.fromJoin(mapGeo).toRenderable());
+        this.meshRenderer.set(Mesh.fromJoin(mapGeo).ToShaderMesh());
     }
 
     worldToMap(coord: Vector3): Vector3 {

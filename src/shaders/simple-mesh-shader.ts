@@ -2,13 +2,10 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of a mesh.
 
-import { DrawSpeed, IntMatrix, Matrix4, Mesh, Renderable, Renderer, MultiVector3 } from "../lib";
+import { DrawSpeed, IntMatrix, Matrix4, Mesh, ShaderMesh, Shader, MultiVector3 } from "../lib";
 import { Context } from "../render/context";
 
-/**
- * Draw a mesh on top of all other meshes
- */
-export class SimpleMeshOverlayRenderer extends Renderer<Renderable> {
+export class SimpleMeshShader extends Shader<Mesh> {
     // attribute & uniform locations
     a_position: number;
     a_position_buffer: WebGLBuffer;
@@ -29,7 +26,6 @@ export class SimpleMeshOverlayRenderer extends Renderer<Renderable> {
 
         void main() {
             gl_Position = u_transform * a_position;
-            gl_Position.z = 0.0001;
         }
         `;
 
@@ -63,17 +59,12 @@ export class SimpleMeshOverlayRenderer extends Renderer<Renderable> {
         this.index_buffer = gl.createBuffer()!;
     }
 
-    set(rend: Renderable, speed: DrawSpeed = DrawSpeed.StaticDraw) {
+    set(mesh: Mesh, speed: DrawSpeed = DrawSpeed.StaticDraw) {
         let gl = this.gl;
-        let mesh = rend.mesh;
 
         // save how many faces need to be drawn
         gl.useProgram(this.program);
         this.count = mesh.links.data.length;
-
-        // color 
-        let color = rend.color;
-        gl.uniform4f(this.u_color, color[0], color[1], color[2], color[3]);
 
         // vertices
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
@@ -107,7 +98,7 @@ export class SimpleMeshOverlayRenderer extends Renderer<Renderable> {
         gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
     }
 
-    setAndRender(r: Renderable, context: Context): void {
+    setAndRender(r: Mesh, context: Context): void {
         this.set(r, DrawSpeed.DynamicDraw);
         this.render(context);
     }

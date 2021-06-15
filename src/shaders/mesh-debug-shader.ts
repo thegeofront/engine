@@ -2,16 +2,16 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of a mesh.
 
-import { Renderable, Matrix4, DrawSpeed, MultiLine, Context } from "../lib";
-import { MetaRenderer } from "../render/meta-renderer";
-import { LineRenderer } from "./line-renderer";
-import { NormalRenderer } from "./mesh-normals-renderer";
-import { SimpleMeshRenderer } from "./simple-mesh-renderer";
+import { ShaderMesh, Matrix4, DrawSpeed, MultiLine, Context } from "../lib";
+import { MultiShader } from "../render/multi-shader";
+import { LineShader } from "./line-shader";
+import { NormalShader } from "./mesh-normals-shader";
+import { SimpleMeshShader } from "./simple-mesh-shader";
 
-export class MeshDebugRenderer extends MetaRenderer<Renderable> {
-    faceRend: SimpleMeshRenderer;
-    lineRend: LineRenderer;
-    normRend?: NormalRenderer;
+export class MeshDebugShader extends MultiShader<ShaderMesh> {
+    faceRend: SimpleMeshShader;
+    lineRend: LineShader;
+    normRend?: NormalShader;
     personal: Matrix4;
 
     constructor(
@@ -21,10 +21,10 @@ export class MeshDebugRenderer extends MetaRenderer<Renderable> {
         renderNormal = true,
     ) {
         super();
-        this.faceRend = new SimpleMeshRenderer(gl, faceColor);
-        this.lineRend = new LineRenderer(gl, edgeColor);
+        this.faceRend = new SimpleMeshShader(gl, faceColor);
+        this.lineRend = new LineShader(gl, edgeColor);
         this.personal = Matrix4.newIdentity();
-        if (renderNormal) this.normRend = new NormalRenderer(gl);
+        if (renderNormal) this.normRend = new NormalShader(gl);
     }
 
     static new(
@@ -33,10 +33,10 @@ export class MeshDebugRenderer extends MetaRenderer<Renderable> {
         edgeColor = [1, 0, 0, 1],
         renderNormal = true,
     ) {
-        return new MeshDebugRenderer(gl, faceColor, edgeColor, renderNormal);
+        return new MeshDebugShader(gl, faceColor, edgeColor, renderNormal);
     }
 
-    set(data: Renderable, speed: DrawSpeed = DrawSpeed.StaticDraw) {
+    set(data: ShaderMesh, speed: DrawSpeed = DrawSpeed.StaticDraw) {
         this.personal = data.position;
         this.faceRend.set(data.mesh);
         this.lineRend.set(MultiLine.fromMesh(data), speed);
@@ -49,7 +49,7 @@ export class MeshDebugRenderer extends MetaRenderer<Renderable> {
         this.normRend?.render(c);
     }
 
-    setAndRender(r: Renderable, c: Context) {
+    setAndRender(r: ShaderMesh, c: Context) {
         this.set(r, DrawSpeed.DynamicDraw);
         this.render(c);
     }

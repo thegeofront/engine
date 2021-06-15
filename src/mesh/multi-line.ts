@@ -17,7 +17,7 @@ import {
     Polyline,
     Bezier,
     Cube,
-    Renderable,
+    ShaderMesh,
 } from "../lib";
 
 // represents a collection of multiple lines. These could form 1 polyline, but this is not a requirement
@@ -41,7 +41,7 @@ export class MultiLine {
     }
 
     // get all lines from a mesh
-    static fromMesh(rend: Renderable, uv = false): MultiLine {
+    static fromMesh(rend: ShaderMesh, uv = false): MultiLine {
         // 3 edges per face, 2 indices per edge
         let mesh = rend.mesh;
         let count = mesh.links.count() * 6;

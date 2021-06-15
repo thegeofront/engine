@@ -3,8 +3,8 @@
 // purpose: A shader wrapper for rendering shaded, textured, meshes
 
 import {
-    Renderer,
-    Renderable,
+    Shader,
+    ShaderMesh,
     DrawSpeed,
     NormalKind,
     MultiVector3,
@@ -15,7 +15,7 @@ import {
     Vector3,
 } from "../lib";
 
-export class ShadedMeshRenderer extends Renderer<Renderable> {
+export class ShadedMeshShader extends Shader<ShaderMesh> {
     // attribute & uniform locations
     a_vertex_position: number;
     a_vertex_postition_buffer: WebGLBuffer;
@@ -124,7 +124,7 @@ export class ShadedMeshRenderer extends Renderer<Renderable> {
         this.index_buffer = gl.createBuffer()!;
     }
 
-    set(rend: Renderable, speed: DrawSpeed = DrawSpeed.StaticDraw) {
+    set(rend: ShaderMesh, speed: DrawSpeed = DrawSpeed.StaticDraw) {
         // NOTE: processing time is longer: we use DrawArray instead of DrawElements, to deal with normals & uv data
         let gl = this.gl;
         this.setShallow(gl, rend);
@@ -220,7 +220,7 @@ export class ShadedMeshRenderer extends Renderer<Renderable> {
     // set only the basic elements.
     // use this to dynamicly alter things like position and color,
     // without refilling all buffers with it
-    setShallow(gl: WebGLRenderingContext, rend: Renderable) {
+    setShallow(gl: WebGLRenderingContext, rend: ShaderMesh) {
         // use the program
         gl.useProgram(this.program);
 

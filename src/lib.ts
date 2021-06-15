@@ -28,7 +28,7 @@ export * from "./math/vector";
 export * from "./mesh/graph";
 export * from "./mesh/multi-line";
 export * from "./mesh/mesh";
-export * from "./mesh/render-mesh";
+export * from "./mesh/shader-mesh";
 export * from "./mesh/topo-mesh";
 
 export * from "./geo/geo";
@@ -58,19 +58,20 @@ export * from "./render/camera";
 export * from "./combo/combo";
 export * from "./render/light";
 export * from "./render/context";
-export * from "./render/renderer";
+export * from "./render/shader";
 
-export * from "./renderers/billboard-renderer";
-export * from "./renderers/dot-renderer2";
-export * from "./renderers/dot-renderer3";
-export * from "./renderers/line-renderer";
-export * from "./renderers/mesh-debug-renderer";
-export * from "./renderers/mesh-normals-renderer";
-export * from "./renderers/rectangle-renderer";
-export * from "./renderers/shaded-mesh-renderer";
-export * from "./renderers/simple-mesh-renderer";
-export * from "./renderers/texture-mesh-renderer";
-export * from "./renderers/graph-debug-renderer";
+// export * from "./shaders/billboard-renderer";
+export * from "./shaders/dot-shader";
+export * from "./shaders/line-shader";
+export * from "./shaders/mesh-debug-shader";
+export * from "./shaders/mesh-normals-shader";
+export * from "./shaders/rectangle-shader";
+export * from "./shaders/shaded-mesh-shader";
+export * from "./shaders/simple-mesh-shader";
+export * from "./shaders/texture-mesh-shader";
+export * from "./shaders/graph-debug-shader";
+
+export * from "./shaders2/dot-shader-2";
 
 export * from "./system/domwrappers";
 export * from "./system/fps-counter";

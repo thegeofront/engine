@@ -616,6 +616,13 @@ export class Vector2 {
         return this;
     }
 
+    rounded(): Vector2 {
+        return Vector2.new(
+            Math.round(this.x),
+            Math.round(this.y)
+        );
+    }
+
     roundToZero(): Vector2 {
         this.x = this.x < 0 ? Math.ceil(this.x) : Math.floor(this.x);
         this.y = this.y < 0 ? Math.ceil(this.y) : Math.floor(this.y);

@@ -3,17 +3,17 @@
 // purpose: WebGL based rendering of a mesh.
 
 import { Graph, DrawSpeed, Context } from "../lib";
-import { MetaRenderer } from "../render/meta-renderer";
-import { DotRenderer3 } from "./dot-renderer3";
-import { LineRenderer } from "./line-renderer";
-import { NormalRenderer } from "./mesh-normals-renderer";
-import { SimpleMeshRenderer } from "./simple-mesh-renderer";
+import { MultiShader } from "../render/multi-shader";
+import { DotShader } from "./dot-shader";
+import { LineShader } from "./line-shader";
+import { NormalShader } from "./mesh-normals-shader";
+import { SimpleMeshShader } from "./simple-mesh-shader";
 
-export class GraphDebugRenderer extends MetaRenderer<Graph> {
-    faceRend: SimpleMeshRenderer;
-    lineRend: LineRenderer;
-    pointRend: DotRenderer3;
-    normRend?: NormalRenderer;
+export class GraphDebugShader extends MultiShader<Graph> {
+    faceRend: SimpleMeshShader;
+    lineRend: LineShader;
+    pointRend: DotShader;
+    normRend?: NormalShader;
 
     constructor(
         gl: WebGLRenderingContext,
@@ -22,10 +22,10 @@ export class GraphDebugRenderer extends MetaRenderer<Graph> {
         renderNormal = true,
     ) {
         super();
-        this.faceRend = new SimpleMeshRenderer(gl, faceColor);
-        this.lineRend = new LineRenderer(gl, edgeColor);
-        this.pointRend = new DotRenderer3(gl, 7, edgeColor, false);
-        if (renderNormal) this.normRend = new NormalRenderer(gl);
+        this.faceRend = new SimpleMeshShader(gl, faceColor);
+        this.lineRend = new LineShader(gl, edgeColor);
+        this.pointRend = new DotShader(gl, 7, edgeColor, false);
+        if (renderNormal) this.normRend = new NormalShader(gl);
     }
 
     set(graph: Graph, speed: DrawSpeed = DrawSpeed.StaticDraw) {

@@ -16,7 +16,7 @@ export abstract class Surface extends Geo {}
 export abstract class BiSurface extends Surface {
     abstract pointAt(u: number, v: number): Vector3;
 
-    buffer(uSegments: number, vSegments: number): Mesh {
+    buffer(uSegments=100, vSegments=100): Mesh {
         return Mesh.fromBiSurface(this, uSegments, vSegments);
     }
 }

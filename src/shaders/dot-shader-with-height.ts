@@ -5,14 +5,10 @@ import {
     DrawSpeed,
     ToFloatMatrix,
     MultiVector,
-    MultiVector2,
-    MultiVector3,
-    Renderer,
-    Vector2,
-    Vector3,
+    Shader,
 } from "../lib";
 
-export class DotRendererHeight extends Renderer<MultiVector> {
+export class DotShaderWithHeight extends Shader<MultiVector> {
     // attribute & uniform locations
     a_position: number;
     a_position_buffer: WebGLBuffer;

@@ -144,6 +144,10 @@ export class Domain2 {
         return new Domain2(new Domain(x0, x1), new Domain(y0, y1));
     }
 
+    static fromWH(x: number, y: number, w: number, h: number): Domain2 {
+        return new Domain2(new Domain(x, x+w), new Domain(y, y+h));
+    }
+
     static fromInclude(data: MultiVector2): Domain2 {
         // note : could be quicker by going verbose, this now iterates over data 4 times
         let mat = data.toMatrixSlice();

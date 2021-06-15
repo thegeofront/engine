@@ -5,7 +5,7 @@
 
 import {
     Domain3,
-    DotRenderer3,
+    DotShader,
     Camera,
     Vector3,
     InputState,
@@ -20,8 +20,8 @@ export class DotApp3 extends App {
     dirs: Vector3[] = [];
 
     bounds: Domain3;
-    whiteDotRend: DotRenderer3;
-    redDotRend: DotRenderer3;
+    whiteDotRend: DotShader;
+    redDotRend: DotShader;
     camera: Camera;
 
     constructor(gl: WebGLRenderingContext) {
@@ -30,8 +30,8 @@ export class DotApp3 extends App {
         let canvas = gl.canvas as HTMLCanvasElement;
         let n = 1;
         this.bounds = Domain3.fromBounds(-n, n, -n, n, -n, n);
-        this.whiteDotRend = new DotRenderer3(gl, 10, [1, 1, 1, 1], false);
-        this.redDotRend = new DotRenderer3(gl, 10, [1, 0, 0, 1], false);
+        this.whiteDotRend = new DotShader(gl, 10, [1, 1, 1, 1], false);
+        this.redDotRend = new DotShader(gl, 10, [1, 0, 0, 1], false);
         this.camera = new Camera(canvas);
     }
 

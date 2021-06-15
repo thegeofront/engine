@@ -9,9 +9,8 @@ import {
     Vector3,
     MultiLine,
     Camera,
-    DotRenderer3,
-    LineRenderer,
-    MeshDebugRenderer,
+    DotShader,
+    LineShader,
     UI,
     Polyline,
     Plane,
@@ -27,7 +26,7 @@ import {
     Spline,
 } from "../../../src/lib";
 import { Random } from "../../../src/math/random";
-import { DotRendererHeight } from "../../../src/renderers/dot-renderer-height";
+import { DotShaderWithHeight } from "../../../src/shaders/dot-shader-with-height";
 
 export class PerlinLinesApp extends App {
     // ui
@@ -40,9 +39,9 @@ export class PerlinLinesApp extends App {
 
     // render
     camera: Camera;
-    drRed: DotRendererHeight;
-    lrGrid: LineRenderer;
-    lrRed: LineRenderer;
+    drRed: DotShaderWithHeight;
+    lrGrid: LineShader;
+    lrRed: LineShader;
 
     constructor(gl: WebGLRenderingContext) {
         super(gl);
@@ -54,9 +53,9 @@ export class PerlinLinesApp extends App {
         this.perlin = Perlin.new();
         this.seed = Random.randomSeed();
 
-        this.drRed = new DotRendererHeight(gl, 15, [1, 0, 0, 1], 5, false);
-        this.lrGrid = new LineRenderer(gl, [0.3, 0.3, 0.3, 1]);
-        this.lrRed = new LineRenderer(gl, [1, 0, 0, 1]);
+        this.drRed = new DotShaderWithHeight(gl, 15, [1, 0, 0, 1], 5, false);
+        this.lrGrid = new LineShader(gl, [0.3, 0.3, 0.3, 1]);
+        this.lrRed = new LineShader(gl, [1, 0, 0, 1]);
     }
 
     ui(ui: UI) {

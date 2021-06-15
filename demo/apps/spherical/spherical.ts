@@ -1,4 +1,4 @@
-import { EdgeIndex, Graph, IntMatrix, Mesh, Plane, Renderable, Vector3 } from "../../../src/lib";
+import { EdgeIndex, Graph, IntMatrix, Mesh, Plane, ShaderMesh, Vector3 } from "../../../src/lib";
 
 export function createGraph(
     liftType: number,
@@ -82,7 +82,7 @@ export function createTileWorld(count: number, height: number): IntMatrix {
     return m;
 }
 
-export function meshifyGraphSurface(graph: Graph): Renderable {
+export function meshifyGraphSurface(graph: Graph): ShaderMesh {
     // init result
     let meshes: Mesh[] = [];
 
@@ -100,7 +100,7 @@ export function meshifyGraphSurface(graph: Graph): Renderable {
         meshes.push(m);
     }
 
-    let rend = Mesh.fromJoin(meshes).toRenderable();
+    let rend = Mesh.fromJoin(meshes).ToShaderMesh();
     rend.calculateVertexNormals();
     return rend;
 }
@@ -110,7 +110,7 @@ export function meshifyTileWorld(
     tiles: IntMatrix,
     radius: number, // base
     storeyHeight: number, //
-): Renderable {
+): ShaderMesh {
     // init result
     let meshes: Mesh[] = [];
 
@@ -149,7 +149,7 @@ export function meshifyTileWorld(
         }
     }
 
-    let rend = Mesh.fromJoin(meshes).toRenderable();
+    let rend = Mesh.fromJoin(meshes).ToShaderMesh();
     rend.calculateVertexNormals();
     return rend;
 }
