@@ -3,13 +3,13 @@
 // purpose: WebGL based rendering of a mesh.
 
 import { Renderable, Matrix4, DrawSpeed, MultiLine, Context } from "../lib";
-import { MetaRenderer } from "../render/meta-renderer";
-import { LineRenderer } from "./line-renderer";
-import { NormalRenderer } from "./mesh-normals-renderer";
-import { SimpleMeshRenderer } from "./simple-mesh-renderer";
+import { MultiShader } from "../render/multi-shader";
+import { LineRenderer } from "./line-shader";
+import { NormalRenderer } from "./mesh-normals-shader";
+import { SimpleMeshShader } from "./simple-mesh-shader";
 
-export class MeshDebugRenderer extends MetaRenderer<Renderable> {
-    faceRend: SimpleMeshRenderer;
+export class MeshDebugShader extends MultiShader<Renderable> {
+    faceRend: SimpleMeshShader;
     lineRend: LineRenderer;
     normRend?: NormalRenderer;
     personal: Matrix4;
@@ -21,7 +21,7 @@ export class MeshDebugRenderer extends MetaRenderer<Renderable> {
         renderNormal = true,
     ) {
         super();
-        this.faceRend = new SimpleMeshRenderer(gl, faceColor);
+        this.faceRend = new SimpleMeshShader(gl, faceColor);
         this.lineRend = new LineRenderer(gl, edgeColor);
         this.personal = Matrix4.newIdentity();
         if (renderNormal) this.normRend = new NormalRenderer(gl);
@@ -33,7 +33,7 @@ export class MeshDebugRenderer extends MetaRenderer<Renderable> {
         edgeColor = [1, 0, 0, 1],
         renderNormal = true,
     ) {
-        return new MeshDebugRenderer(gl, faceColor, edgeColor, renderNormal);
+        return new MeshDebugShader(gl, faceColor, edgeColor, renderNormal);
     }
 
     set(data: Renderable, speed: DrawSpeed = DrawSpeed.StaticDraw) {

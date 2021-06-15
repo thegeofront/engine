@@ -16,7 +16,7 @@ import {
     LineRenderer,
     Matrix4,
     Mesh,
-    MeshDebugRenderer,
+    MeshDebugShader,
     Parameter,
     Plane,
     Ray,
@@ -33,7 +33,7 @@ export class GeometryApp extends App {
     greyLineRenderer: LineRenderer;
     redLineRenderer: LineRenderer;
     meshRenderer: ShadedMeshRenderer;
-    transMeshRenderer: MeshDebugRenderer;
+    transMeshRenderer: MeshDebugShader;
     camera: Camera;
 
     // geo data
@@ -61,7 +61,7 @@ export class GeometryApp extends App {
         this.greyLineRenderer = new LineRenderer(gl, [0.2, 0, 1, 0.5]);
         this.redLineRenderer = new LineRenderer(gl, [0.8, 0, 0, 1]);
         this.meshRenderer = new ShadedMeshRenderer(gl);
-        this.transMeshRenderer = new MeshDebugRenderer(gl, [1, 1, 1, 0.25], [1, 1, 1, 0.25]);
+        this.transMeshRenderer = new MeshDebugShader(gl, [1, 1, 1, 0.25], [1, 1, 1, 0.25]);
     }
 
     // called after init

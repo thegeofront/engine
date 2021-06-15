@@ -18,7 +18,7 @@ import {
     Cube,
     Plane,
     Domain3,
-    MeshDebugRenderer,
+    MeshDebugShader,
     VertIndex,
     EdgeIndex,
     EnumParameter,

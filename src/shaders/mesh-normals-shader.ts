@@ -3,7 +3,7 @@
 // purpose: WebGL based rendering of lines.
 
 import {
-    Renderer,
+    Shader,
     Renderable,
     DrawSpeed,
     MultiVector3,
@@ -13,7 +13,7 @@ import {
     Context,
 } from "../lib";
 
-export class NormalRenderer extends Renderer<Renderable> {
+export class NormalRenderer extends Shader<Renderable> {
     a_position: number;
     a_position_buffer: WebGLBuffer;
     index_buffer: WebGLBuffer;

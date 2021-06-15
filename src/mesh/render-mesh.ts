@@ -1,13 +1,13 @@
 // Name: render-mesh.ts
 // Author: Jos Feenstra
 // Purpose:
-// a mesh representation with the sole purpose of to be renderer.
+// a mesh representation which can be feed to a shader.
 // - fixed length attributes
 // - can represent:
 //   - pointcloud (links = null)
 //   - graph (links.width = 2)
 //   - triangles (links.width = 3)
-//   - quads (links.width = 4. will need to be converted to triangles)
+//   - quads (links.width = 4. will need to be converted to triangles for now...)
 
 import { Graph, Matrix4, Mesh, MultiVector2, MultiVector3 } from "../lib";
 
@@ -29,6 +29,8 @@ export enum NormalKind {
     MultiVertex,
 }
 
+// RENAME : SHADABLEMESH or something...
+// ShadableMesh
 export class Renderable {
     // this desperately calls for an overhaul...
 
@@ -123,7 +125,7 @@ export class Renderable {
         let faces: faceID[] = [];
         let count = this.mesh.links.count();
         for (let i = 0; i < count; i++) {
-            if (this.mesh.links.getRow(i).includes(v)) {
+            if (this.mesh.links.getRow(i).find(j => j == v)) {
                 faces.push(i);
             }
         }

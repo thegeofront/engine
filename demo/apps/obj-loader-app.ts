@@ -6,7 +6,7 @@ import {
     App,
     DotRenderer3,
     LineRenderer,
-    SimpleMeshRenderer,
+    MeshDebugShader,
     Camera,
     Renderable,
     MultiLine,
@@ -24,7 +24,7 @@ import {
 export class ObjLoaderApp extends App {
     dotRenderer: DotRenderer3;
     lineRenderer: LineRenderer;
-    meshRenderer: SimpleMeshRenderer;
+    meshRenderer: MeshDebugShader;
     camera: Camera;
 
     obj?: Renderable;
@@ -35,7 +35,7 @@ export class ObjLoaderApp extends App {
         let canvas = gl.canvas as HTMLCanvasElement;
         this.dotRenderer = new DotRenderer3(gl, 4, [0, 0, 1, 1], false);
         this.lineRenderer = new LineRenderer(gl, [0, 0, 1, 0.5]);
-        this.meshRenderer = new SimpleMeshRenderer(gl, [0, 0, 1, 0.25]);
+        this.meshRenderer = new MeshDebugShader(gl, [0, 0, 1, 0.25]);
         this.camera = new Camera(canvas);
 
         addDropFileEventListeners(canvas, processFiles.bind(this));

@@ -2,7 +2,7 @@ import {
     App,
     DotRenderer3,
     LineRenderer,
-    SimpleMeshRenderer,
+    SimpleMeshShader,
     Camera,
     Renderable,
     Vector3,
@@ -19,7 +19,7 @@ import {
 export class StatApp extends App {
     dotRenderer: DotRenderer3;
     lineRenderer: LineRenderer;
-    meshRenderer: SimpleMeshRenderer;
+    meshRenderer: SimpleMeshShader;
 
     camera: Camera;
 
@@ -34,7 +34,7 @@ export class StatApp extends App {
 
         this.dotRenderer = new DotRenderer3(gl, 4, [0, 0, 1, 1], false);
         this.lineRenderer = new LineRenderer(gl, [0, 0, 1, 0.5]);
-        this.meshRenderer = new SimpleMeshRenderer(gl, [0, 0, 1, 0.25]);
+        this.meshRenderer = new SimpleMeshShader(gl, [0, 0, 1, 0.25]);
         this.camera = new Camera(canvas);
     }
 

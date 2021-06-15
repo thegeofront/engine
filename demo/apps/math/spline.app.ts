@@ -9,7 +9,7 @@ import {
     Camera,
     DotRenderer3,
     LineRenderer,
-    MeshDebugRenderer,
+    MeshDebugShader,
     UI,
     Polyline,
     Plane,
@@ -40,7 +40,7 @@ export class SplineApp extends App {
     drRed: DotRenderer3;
     lrGrid: LineRenderer;
     lrRed: LineRenderer;
-    mr: MeshDebugRenderer;
+    mr: MeshDebugShader;
     lrBlue: LineRenderer;
     drBlue: DotRenderer3;
 
@@ -59,7 +59,7 @@ export class SplineApp extends App {
         this.lrRed = new LineRenderer(gl, [1, 0, 0, 1]);
         this.lrBlue = new LineRenderer(gl, [0, 0, 1, 1]);
         this.lrGrid = new LineRenderer(gl, [0.3, 0.3, 0.3, 1]);
-        this.mr = new MeshDebugRenderer(gl, [1, 0, 0, 0.5], [1, 1, 1, 0.5]);
+        this.mr = new MeshDebugShader(gl, [1, 0, 0, 0.5], [1, 1, 1, 0.5]);
     }
 
     ui(ui: UI) {

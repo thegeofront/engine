@@ -2,7 +2,7 @@ import {
     App,
     DotRenderer3,
     LineRenderer,
-    SimpleMeshRenderer,
+    SimpleMeshShader,
     Camera,
     Renderable,
     Vector3,

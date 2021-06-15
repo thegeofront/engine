@@ -6,7 +6,7 @@ import { InputState } from "./input-state";
 import { App } from "../app/app";
 import { FpsCounter } from "./fps-counter";
 import { UI } from "./ui";
-import { Renderer } from "../render/renderer";
+import { Shader } from "../render/shader";
 
 export class Core {
     canvas: HTMLCanvasElement;

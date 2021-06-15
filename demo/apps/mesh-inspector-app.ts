@@ -7,7 +7,7 @@ import {
     Camera,
     DotRenderer3,
     LineRenderer,
-    MeshDebugRenderer,
+    MeshDebugShader,
     ShadedMeshRenderer,
     Plane,
     MultiLine,
@@ -26,7 +26,7 @@ export class MeshInspectorApp extends App {
     camera: Camera;
     dotRenderer: DotRenderer3;
     lineRenderer: LineRenderer;
-    meshRenderer: MeshDebugRenderer;
+    meshRenderer: MeshDebugShader;
     shadedMeshRenderer: ShadedMeshRenderer;
 
     // geo data
@@ -55,7 +55,7 @@ export class MeshInspectorApp extends App {
         this.camera.angleBeta = 0.5;
 
         this.dotRenderer = new DotRenderer3(gl, 4, [0, 1, 0, 1]);
-        this.meshRenderer = new MeshDebugRenderer(gl, [0.6, 0, 0, 1], [1, 0, 0, 1]);
+        this.meshRenderer = new MeshDebugShader(gl, [0.6, 0, 0, 1], [1, 0, 0, 1]);
         this.lineRenderer = new LineRenderer(gl, [0.3, 0.3, 0.3, 1]);
         this.shadedMeshRenderer = new ShadedMeshRenderer(gl);
     }

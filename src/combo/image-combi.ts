@@ -5,12 +5,12 @@ import { Domain2 } from "../math/domain";
 import { Vector3 } from "../math/vector";
 import { Mesh } from "../mesh/mesh";
 import { Renderable } from "../mesh/render-mesh";
-import { TextureMeshRenderer } from "../renderers/texture-mesh-renderer";
+import { TextureMeshShader } from "../shaders/texture-mesh-shader";
 import { Combi, Combo } from "./combo";
 
-export class ImageCombi extends Combi<GeonImage, Renderable, TextureMeshRenderer> {
+export class ImageCombi extends Combi<GeonImage, Renderable, TextureMeshShader> {
     private constructor(gl: WebGLRenderingContext) {
-        super(gl, [], TextureMeshRenderer.new);
+        super(gl, [], TextureMeshShader.new);
     }
 
     static new(gl: WebGLRenderingContext): ImageCombi {

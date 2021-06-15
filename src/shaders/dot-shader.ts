@@ -7,12 +7,12 @@ import {
     MultiVector,
     MultiVector2,
     MultiVector3,
-    Renderer,
+    Shader,
     Vector2,
     Vector3,
 } from "../lib";
 
-export class DotRenderer3 extends Renderer<MultiVector> {
+export class DotRenderer3 extends Shader<MultiVector> {
     // attribute & uniform locations
     a_position: number;
     a_position_buffer: WebGLBuffer;

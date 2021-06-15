@@ -17,9 +17,9 @@
 // todo: force buffering a bit more. make a way that requiers this.buffered to be filled
 
 import { Context } from "../render/context";
-import { DrawSpeed, Renderer } from "../render/renderer";
-import { MeshPickRenderer } from "../renderers/pick-renderer";
-import { MetaRenderer } from "../render/meta-renderer";
+import { DrawSpeed, Shader } from "../render/shader";
+import { MeshPickRenderer } from "../shaders/pick-shader";
+import { MultiShader } from "../render/multi-shader";
 
 // staticcombo
 
@@ -28,7 +28,7 @@ import { MetaRenderer } from "../render/meta-renderer";
 // multistaic combo
 // Vector3 & dotrenderer
 
-export class Combi<S, B, R extends Renderer<B> | MetaRenderer<B>> {
+export class Combi<S, B, R extends Shader<B> | MultiShader<B>> {
     public state: S[];
     public buffered: B[] = [];
     public renderer: R;
@@ -53,7 +53,7 @@ export class Combi<S, B, R extends Renderer<B> | MetaRenderer<B>> {
     }
 }
 
-export class Combo<S, B, R extends Renderer<B> | MetaRenderer<B>> {
+export class Combo<S, B, R extends Shader<B> | MultiShader<B>> {
     public state: S;
     public buffered!: B;
     public renderer: R;

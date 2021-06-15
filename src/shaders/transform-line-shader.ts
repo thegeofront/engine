@@ -5,9 +5,9 @@
 import { Matrix4 } from "../math/matrix";
 import { Renderable } from "../mesh/render-mesh";
 import { Context } from "../render/context";
-import { Renderer, DrawSpeed } from "../render/renderer";
+import { Shader, DrawSpeed } from "../render/shader";
 
-export class TransformLineRenderer extends Renderer<Renderable> {
+export class TransformLineRenderer extends Shader<Renderable> {
     private a_position: number;
     private a_position_buffer: WebGLBuffer;
     private index_buffer: WebGLBuffer;

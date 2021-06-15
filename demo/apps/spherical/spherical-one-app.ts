@@ -18,7 +18,7 @@ import {
     Cube,
     Plane,
     Domain3,
-    MeshDebugRenderer,
+    MeshDebugShader,
     VertIndex,
     EdgeIndex,
     EnumParameter,
@@ -32,7 +32,7 @@ import { averageEdgeLength, laPlacian, quadification, squarification } from "./s
 export class SphericalOneApp extends App {
     camera: Camera;
     meshRend: ShadedMeshRenderer;
-    debugRend: MeshDebugRenderer;
+    debugRend: MeshDebugShader;
     graphRend: GraphDebugRenderer;
 
     rotate!: Parameter;
@@ -61,7 +61,7 @@ export class SphericalOneApp extends App {
         this.camera.set(-4.48, 1.24, -0.71);
 
         this.meshRend = new ShadedMeshRenderer(gl);
-        this.debugRend = new MeshDebugRenderer(gl, [0.5, 0, 0, 1], [1, 0, 0, 1], false);
+        this.debugRend = new MeshDebugShader(gl, [0.5, 0, 0, 1], [1, 0, 0, 1], false);
         this.graphRend = new GraphDebugRenderer(gl, [0.5, 0, 0, 1], [255 / 255, 69 / 255, 0, 1]);
     }
 

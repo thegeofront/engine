@@ -19,13 +19,13 @@ export enum DrawSpeed {
 }
 
 // @param T = data to feed the renderer at 'set'
-export abstract class Renderer<T> {
+export abstract class Shader<T> {
     gl: WebGLRenderingContext;
     program: WebGLProgram;
 
     constructor(gl: WebGLRenderingContext, vertexScript: string, fragmentScript: string) {
         this.gl = gl;
-        this.program = Renderer.createProgramFromScripts(gl, vertexScript, fragmentScript);
+        this.program = Shader.createProgramFromScripts(gl, vertexScript, fragmentScript);
     }
 
     abstract set(r: T, speed: DrawSpeed): void;
@@ -130,9 +130,9 @@ export abstract class Renderer<T> {
         vertexScript: string,
         fragmentScript: string,
     ): WebGLProgram {
-        let vertexShader = Renderer.compileShader(gl, vertexScript, gl.VERTEX_SHADER);
-        let fragmentShader = Renderer.compileShader(gl, fragmentScript, gl.FRAGMENT_SHADER);
-        return Renderer.createProgram(gl, vertexShader, fragmentShader);
+        let vertexShader = Shader.compileShader(gl, vertexScript, gl.VERTEX_SHADER);
+        let fragmentShader = Shader.compileShader(gl, fragmentScript, gl.FRAGMENT_SHADER);
+        return Shader.createProgram(gl, vertexShader, fragmentShader);
     }
 
     //#endregion

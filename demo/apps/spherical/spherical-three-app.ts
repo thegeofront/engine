@@ -19,7 +19,7 @@ import {
     Cube,
     Plane,
     Domain3,
-    MeshDebugRenderer,
+    MeshDebugShader,
     VertIndex,
     EdgeIndex,
     EnumParameter,
@@ -64,7 +64,7 @@ export class SphericalThreeApp extends App {
     meshRend: ShadedMeshRenderer;
     floorRend: ShadedMeshRenderer;
 
-    debugRend: MeshDebugRenderer;
+    debugRend: MeshDebugShader;
     graphRend: GraphDebugRenderer;
 
     tiles!: IntMatrix;
@@ -79,7 +79,7 @@ export class SphericalThreeApp extends App {
         this.meshRend = new ShadedMeshRenderer(gl);
         this.floorRend = new ShadedMeshRenderer(gl);
         // this.meshRend = new MeshDebugRenderer(gl, [0, 0, 0, 1], [0.3, 0.3, 0.3, 1], false);
-        this.debugRend = new MeshDebugRenderer(gl, [0.5, 0, 0, 1], [0, 0, 0, 1], false);
+        this.debugRend = new MeshDebugShader(gl, [0.5, 0, 0, 1], [0, 0, 0, 1], false);
         this.graphRend = new GraphDebugRenderer(gl, [0.5, 0.5, 0.5, 1], [1, 1, 1, 1]);
     }
 

@@ -6,7 +6,7 @@ import {
     App,
     DotRenderer3,
     LineRenderer,
-    MeshDebugRenderer,
+    MeshDebugShader,
     Camera,
     Plane,
     MultiLine,
@@ -38,8 +38,8 @@ export class MarchingCubeApp extends App {
     whiteLineRenderer: LineRenderer;
     greyLineRenderer: LineRenderer;
     redLineRenderer: LineRenderer;
-    meshRenderer: MeshDebugRenderer;
-    transMeshRenderer: MeshDebugRenderer;
+    meshRenderer: MeshDebugShader;
+    transMeshRenderer: MeshDebugShader;
     camera: Camera;
 
     // geo data
@@ -64,8 +64,8 @@ export class MarchingCubeApp extends App {
         this.whiteLineRenderer = new LineRenderer(gl, [1, 1, 1, 1]);
         this.greyLineRenderer = new LineRenderer(gl, [0.2, 0, 1, 0.5]);
         this.redLineRenderer = new LineRenderer(gl, [0.8, 0, 0, 1]);
-        this.meshRenderer = new MeshDebugRenderer(gl, [0.9, 0.9, 0.9, 1], [0.7, 0.7, 0.7, 1]);
-        this.transMeshRenderer = new MeshDebugRenderer(gl, [1, 1, 1, 0.1], [1, 1, 1, 0.1]);
+        this.meshRenderer = new MeshDebugShader(gl, [0.9, 0.9, 0.9, 1], [0.7, 0.7, 0.7, 1]);
+        this.transMeshRenderer = new MeshDebugShader(gl, [1, 1, 1, 0.1], [1, 1, 1, 0.1]);
     }
 
     start() {

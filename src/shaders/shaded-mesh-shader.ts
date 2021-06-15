@@ -3,7 +3,7 @@
 // purpose: A shader wrapper for rendering shaded, textured, meshes
 
 import {
-    Renderer,
+    Shader,
     Renderable,
     DrawSpeed,
     NormalKind,
@@ -15,7 +15,7 @@ import {
     Vector3,
 } from "../lib";
 
-export class ShadedMeshRenderer extends Renderer<Renderable> {
+export class ShadedMeshRenderer extends Shader<Renderable> {
     // attribute & uniform locations
     a_vertex_position: number;
     a_vertex_postition_buffer: WebGLBuffer;

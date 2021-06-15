@@ -2,10 +2,10 @@ import { Matrix4 } from "../math/matrix";
 import { Mesh } from "../mesh/mesh";
 import { Renderable } from "../mesh/render-mesh";
 import { Context } from "../render/context";
-import { DrawSpeed } from "../render/renderer";
-import { MeshDebugRenderer } from "../renderers/mesh-debug-renderer";
-import { TransformLineRenderer } from "../renderers/transform-line-renderer";
-import { TransformMeshRenderer } from "../renderers/transform-mesh-renderer";
+import { DrawSpeed } from "../render/shader";
+import { MeshDebugShader } from "../shaders/mesh-debug-shader";
+import { TransformLineRenderer } from "../shaders/transform-line-shader";
+import { TransformMeshRenderer } from "../shaders/transform-mesh-shader";
 import { Combo } from "./combo";
 
 export class StaticMeshCombo extends Combo<Mesh, Renderable, TransformLineRenderer> {

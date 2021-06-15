@@ -3,10 +3,10 @@
 // purpose: WebGL based rendering of a mesh.
 
 import { Renderable } from "../mesh/render-mesh";
-import { DrawSpeed, Renderer } from "../render/renderer";
+import { DrawSpeed, Shader } from "../render/shader";
 import { Context } from "../render/context";
 
-export class TextureMeshRenderer extends Renderer<Renderable> {
+export class TextureMeshShader extends Shader<Renderable> {
     // attribute & uniform locations
     a_position: number;
     a_position_buffer: WebGLBuffer;
@@ -73,12 +73,12 @@ export class TextureMeshRenderer extends Renderer<Renderable> {
         this.index_buffer = gl.createBuffer()!;
 
         // init texture
-        this.texture_id = Renderer.getNextTextureID();
+        this.texture_id = Shader.getNextTextureID();
         this.texture = gl.createTexture();
     }
 
-    static new(gl: WebGLRenderingContext): TextureMeshRenderer {
-        return new TextureMeshRenderer(gl);
+    static new(gl: WebGLRenderingContext): TextureMeshShader {
+        return new TextureMeshShader(gl);
     }
 
     set(r: Renderable, speed: DrawSpeed) {
