@@ -12,7 +12,7 @@ export class LineShader extends Shader<MultiLine | Mesh> {
     u_color: WebGLUniformLocation;
     count: number;
     vertCount: number;
-    constructor(gl: WebGLRenderingContext, color = [1, 0, 0, 0.5]) {
+    constructor(gl: WebGLRenderingContext, color = [1, 1, 1, 0.5]) {
         // note: I like vertex & fragments to be included in the script itself.
         // when you change vertex or fragment, this class has to deal with it.
         // putting them somewhere else doesnt make sense to me,

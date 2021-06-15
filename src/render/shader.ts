@@ -3,6 +3,7 @@
 // author: Jos Feenstra
 // credits to : https://webglfundamentals.org/
 // note: im still figuring out how to organize this
+// TODO: remove all the WebGl wrappers
 
 import { ShaderMesh } from "../mesh/shader-mesh";
 import { Camera } from "./camera";
@@ -12,6 +13,9 @@ import { Context } from "./context";
 
 var nextTextureId = 0;
 var rendercallsperframe = 0;
+
+export type WebGl = WebGLRenderingContext;
+
 
 export enum DrawSpeed {
     StaticDraw, // if you plan on using the 'set' method only a couple of times / once

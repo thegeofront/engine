@@ -20,6 +20,7 @@ import { LoftApp } from "./apps/math/loft-app";
 import { StatApp } from "./apps/old/stat-app";
 import { SplineApp } from "./apps/math/spline.app";
 import { PerlinLinesApp } from "./apps/math/perlin-lines-app";
+import { MultiRendererApp } from "./apps/util/renderer-app";
 
 var core: Core;
 
@@ -34,6 +35,7 @@ function main() {
 
     // init swap app
     let appCollection = [
+        MultiRendererApp,
         PerlinApp,
         SurfaceApp,
         BezierApp,

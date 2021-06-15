@@ -7,6 +7,7 @@
 
 import { MultiVector3 } from "../../data/multi-vector-3";
 import { GeonMath, Polyline, Util } from "../../lib";
+import { Const } from "../../math/const";
 import { Matrix4 } from "../../math/matrix";
 import { Vector3 } from "../../math/vector";
 import { MultiLine } from "../../mesh/multi-line";
@@ -28,7 +29,7 @@ export abstract class Curve extends Geo {
         return Polyline.new(verts);
     }
 
-    buffer(segments: number): MultiLine {
+    buffer(segments=Const.BEZIER_SEGMENTS): MultiLine {
         return MultiLine.fromPolyline(this.toPolyline(segments));
     }
 
