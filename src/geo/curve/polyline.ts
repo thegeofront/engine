@@ -23,6 +23,25 @@ export class Polyline extends Curve {
         return new Polyline(verts);
     }
 
+    // ----- Special
+
+    /**
+     * create a new, filleted polyline
+     */
+    fillet(radius: number) : Polyline {
+
+        let count = this.verts.count + (this.verts.count - 2);
+        let verts = MultiVector3.new(count);
+        for (let i = 0 ; i < count; i++) {
+            let j = Math.ceil(i / 2) // index in original 
+            verts.set(i, this.verts.get(j));
+        }
+
+        return Polyline.new(verts);
+    }
+
+    // -----
+
     pointAt(t: number): Vector3 {
         let count = this.verts.count - 1;
 
