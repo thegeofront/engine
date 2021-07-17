@@ -7,8 +7,9 @@ Think barebones three.js, but with a focus on parametric design / procedural gen
 
 
 ## Demo
-[repo](https://github.com/josfeenstra/geon-demo)
-http://josfeenstra.nl/demo/geon/
+[repo](https://github.com/josfeenstra/geon-demo/)
+
+[online](http://josfeenstra.nl/demo/geon/)
 
 
 ## Install 
