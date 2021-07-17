@@ -24,6 +24,8 @@ export * from "./math/ray";
 export * from "./math/statistics";
 export * from "./math/util";
 export * from "./math/vector";
+export * from "./math/random";
+export * from "./math/polynomial";
 
 export * from "./mesh/graph";
 export * from "./mesh/multi-line";
@@ -59,6 +61,8 @@ export * from "./combo/combo";
 export * from "./render/light";
 export * from "./render/context";
 export * from "./render/shader";
+
+export * from "./render/multi-renderer";
 
 // export * from "./shaders/billboard-renderer";
 export * from "./shaders/dot-shader";
