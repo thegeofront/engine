@@ -18,3 +18,10 @@ npm install
 npm run build
 ```
 This will produce ```index.js``` within the build folder. To use it, run a local web server like [live server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) or [web server for chrome](https://chrome.google.com/webstore/detail/web-server-for-chrome/ofhbbkphhbklhfoeikjpcbhemlocgigb).
+
+## TODO
+
+
+
+_____________________________________________________________
+⚙️ = Busy | ✔️= DONE 
