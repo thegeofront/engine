@@ -10,6 +10,7 @@ import {
     Shader,
     Vector2,
     Vector3,
+    HelpGl,
 } from "../lib";
 
 export class DotShader extends Shader<MultiVector> {
@@ -117,7 +118,7 @@ export class DotShader extends Shader<MultiVector> {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
         gl.enableVertexAttribArray(this.a_position);
         gl.vertexAttribPointer(this.a_position, array.width, gl.FLOAT, false, 0, 0);
-        gl.bufferData(gl.ARRAY_BUFFER, array.data, super.convertDrawSpeed(speed));
+        gl.bufferData(gl.ARRAY_BUFFER, array.data, HelpGl.convertDrawSpeed(gl, speed));
     }
 
     render(c: Context) {

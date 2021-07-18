@@ -61,8 +61,9 @@ export * from "./combo/combo";
 export * from "./render/light";
 export * from "./render/context";
 export * from "./render/shader";
+export * from "./render/webgl";
 
-export * from "./render/multi-renderer";
+export * from "./renderers/multi-renderer";
 
 // export * from "./shaders/billboard-renderer";
 export * from "./shaders/dot-shader";

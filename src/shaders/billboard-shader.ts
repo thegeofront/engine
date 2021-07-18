@@ -1,68 +1,146 @@
-// // name:    billboard-renderer.ts
-// // author:  Jos Feenstra
-// // purpose: Renderer images as billboards.
+// https://webgl.brown37.net/12_advanced_rendering/07_rendering_points.html
 
-// import { GeonImage, MultiVector3, MultiVector2, Renderer, DrawSpeed, Context } from "../lib";
+// name:    billboard-renderer.ts
+// author:  Jos Feenstra
+// purpose: Renderer textures as billboards.
 
-// // mooi font om te gebruiken
-// // https://datagoblin.itch.io/monogram
+// NOTE: make sure to include something like a center offset, to gain control of if the point is rendered centered, as topleft, etc. etc.
 
-// type RenderPackage = {
-//     texture: GeonImage;
-//     dots: MultiVector3;
-//     textureDots: MultiVector2;
-// };
+import { GeonImage, MultiVector3, MultiVector2, Shader, Context } from "../lib";
+import { ToFloatMatrix } from "../data/multi-vector";
+import { DrawSpeed, HelpGl } from "../render/webgl";
 
-// // this is just a template for copy-pasting
-// export class TemplateRenderer extends Renderer<RenderPackage> {
-//     constructor(gl: WebGLRenderingContext) {
-//         let vs = "";
-//         let fs = "";
+// mooi font om te gebruiken
+// https://datagoblin.itch.io/monogram
 
-//         super(gl, vs, fs);
-//     }
+/**
+ * This is all data we need to render
+ */
+export type BillboardPayload = {
+    texture: GeonImage; // texture atlas to use
+    positions: MultiVector3; // position in the world to render this
+    // positionUvs: MultiVector2; // the coordinate of the 'center point', from the perspective of a billboard
+    uvs: MultiVector2; //
+    uvSizes: MultiVector2;
+};
 
-//     static new(gl: WebGLRenderingContext): TemplateRenderer {
-//         return new TemplateRenderer(gl);
-//     }
+/**
+ * Used to render multiple billboards.
+ * One Texture per billboard.
+ */
+export class BillboardShader extends Shader<BillboardPayload> {
+    // TODO can we do something intelligent with this stuff ?
 
-//     set(p: RenderPackage, speed: DrawSpeed) {
-//         // TODO
-//     }
+    // attribute & uniform locations
+    a_position: number;
+    a_position_buffer: WebGLBuffer;
 
-//     render(context: Context) {
-//         // TODO
-//     }
+    a_uv_data: number;
+    a_uv_data_buffer: WebGLBuffer;
 
-//     setAndRender(pack: RenderPackage, context: Context) {
-//         this.set(pack, DrawSpeed.StaticDraw);
-//         this.render(context);
-//     }
-// }
+    u_transform: WebGLUniformLocation;
+    u_color: WebGLUniformLocation;
+    u_size: WebGLUniformLocation;
 
-// // export class TextRenderer {
-// //     // TODO
+    color: number[];
+    size: number;
+    count: number;
 
-// //     // use the billboard renderer to render series of ascii characters,
-// //     // by using standard positions of certain font images.
+    constructor(gl: WebGLRenderingContext) {
+        // note: I like vertex & fragments to be included in the script itself.
+        // when you change vertex or fragment, this class has to deal with it.
+        // putting them somewhere else doesnt make sense to me,
+        // they are coupled 1 to 1.
+        let vertexSource: string = `
+        precision mediump int;
+        precision mediump float;
 
-// //     br: BillBoardRenderer;
+        uniform mat4 u_transform;
+        uniform vec4 u_color;
+        uniform float u_size;
 
-// //     // todo horizontal justification
-// //     // todo vertical justification
+        attribute vec3 a_vertex;
+        attribute vec4 a_uv_data; // u, v, w, h, 
+    
+        void main() {
+            // Set the size of a rendered point.
+            gl_PointSize = u_size;
 
-// //     constructor(gl: WebGLRenderingContext) {
-// //         this.br = new BillBoardRenderer(gl);
-// //     }
+            // Transform the location of the vertex.
+            gl_Position = u_transform * vec4(a_vertex, 1.0);
+        }
 
-// //     set(strings: string[], locations: Vector3Array) {
-// //         if (strings.length != locations.count()) {
-// //             console.warn("couldnt set TextRenderer: strings not equal to locations...");
-// //         }
-// //         let length = strings.length;
+        `;
+        let fragmentSource: string = `
+        precision mediump int;
+        precision mediump float;
 
-// //         // TODO: set a whole bunch of stuff
-// //     }
+        uniform vec4 u_color;
+        // vec2 center = vec2(0.5, 0.5);
 
-// //     render() {}
-// // }
+        void main() {
+            gl_FragColor = u_color;
+        }
+        `;
+
+        // setup program
+        super(gl, vertexSource, fragmentSource);
+
+        this.u_transform = gl.getUniformLocation(this.program, "u_transform")!;
+        this.u_size = gl.getUniformLocation(this.program, "u_size")!;
+        this.u_color = gl.getUniformLocation(this.program, "u_color")!;
+
+        // init buffer 1
+        this.a_position = gl.getAttribLocation(this.program, "a_vertex");
+        this.a_position_buffer = gl.createBuffer()!;
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
+
+        // init buffer 2
+        this.a_position = gl.getAttribLocation(this.program, "a_uv_data");
+        this.a_position_buffer = gl.createBuffer()!;
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
+    }
+
+    set(payload: BillboardPayload, speed: DrawSpeed = DrawSpeed.StaticDraw) {
+        let gl = this.gl;
+        gl.useProgram(this.program);
+
+        // convert all possible entries to a general entry
+        let array = ToFloatMatrix(payload.positions);
+
+        // from some other thing
+        this.count = array.count();
+
+        // // Bind the position buffer
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
+        gl.enableVertexAttribArray(this.a_position);
+        gl.vertexAttribPointer(this.a_position, array.width, gl.FLOAT, false, 0, 0);
+        gl.bufferData(gl.ARRAY_BUFFER, array.data, HelpGl.convertDrawSpeed(gl, speed));
+    }
+
+    render(c: Context) {
+        let gl = this.gl;
+        let matrix = c.camera.totalMatrix;
+        // Tell it to use our program (pair of shaders)
+        gl.useProgram(this.program);
+
+        // set uniforms
+        // console.log(matrix.data);
+        gl.uniformMatrix4fv(this.u_transform, false, matrix.data);
+        gl.uniform1f(this.u_size, this.size);
+        gl.uniform4f(this.u_color, this.color[0], this.color[1], this.color[2], this.color[3]);
+
+        // // Bind the position buffer.
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
+        gl.enableVertexAttribArray(this.a_position);
+        gl.vertexAttribPointer(this.a_position, 3, gl.FLOAT, false, 0, 0);
+
+        // Draw the point.
+        gl.drawArrays(gl.POINTS, 0, this.count);
+    }
+
+    setAndRender(data: BillboardPayload, c: Context) {
+        this.set(data, DrawSpeed.DynamicDraw);
+        this.render(c);
+    }
+}

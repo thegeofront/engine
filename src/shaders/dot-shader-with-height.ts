@@ -1,12 +1,7 @@
 // jos feenstra
 
-import {
-    Context,
-    DrawSpeed,
-    ToFloatMatrix,
-    MultiVector,
-    Shader,
-} from "../lib";
+import { Context, DrawSpeed, ToFloatMatrix, MultiVector, Shader } from "../lib";
+import { HelpGl } from "../render/webgl";
 
 export class DotShaderWithHeight extends Shader<MultiVector> {
     // attribute & uniform locations
@@ -128,7 +123,7 @@ export class DotShaderWithHeight extends Shader<MultiVector> {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
         gl.enableVertexAttribArray(this.a_position);
         gl.vertexAttribPointer(this.a_position, array.width, gl.FLOAT, false, 0, 0);
-        gl.bufferData(gl.ARRAY_BUFFER, array.data, super.convertDrawSpeed(speed));
+        gl.bufferData(gl.ARRAY_BUFFER, array.data, HelpGl.convertDrawSpeed(gl, speed));
     }
 
     render(c: Context) {

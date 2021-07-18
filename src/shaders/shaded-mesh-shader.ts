@@ -14,6 +14,7 @@ import {
     Matrix4,
     Vector3,
 } from "../lib";
+import { HelpGl } from "../render/webgl";
 
 export class ShadedMeshShader extends Shader<ShaderMesh> {
     // attribute & uniform locations
@@ -173,13 +174,13 @@ export class ShadedMeshShader extends Shader<ShaderMesh> {
             gl.bufferData(
                 gl.ELEMENT_ARRAY_BUFFER,
                 getDefaultIndices(this.count),
-                this.convertDrawSpeed(speed),
+                HelpGl.convertDrawSpeed(gl, speed),
             );
         } else if (normalType == NormalKind.Vertex) {
             // save how many verts need to be drawn
             gl.useProgram(this.program);
 
-            let ds = this.convertDrawSpeed(speed);
+            let ds = HelpGl.convertDrawSpeed(gl, speed);
 
             // convert to non-indexed verts & norms
             let ambi = rend.ambi;
@@ -211,10 +212,12 @@ export class ShadedMeshShader extends Shader<ShaderMesh> {
         }
 
         // never render more than possible
-        if (this.count > Const.MAX_U16) {
-            this.count = Const.MAX_U16;
-            console.warn("mesh max reached.");
-        }
+        // NOTE : THIS IS INCORRECT. OFTEN WE CAN JUST RENDER IT NO PROBLEM
+        // TODO : CREATE SOMETHING LIKE AN AUTOMATIC OVERFLOW SHADER WHICH RENDERS THE REST
+        // if (this.count > Const.MAX_U16) {
+        //     this.count = Const.MAX_U16;
+        //     console.warn("mesh max reached.");
+        // }
     }
 
     // set only the basic elements.
