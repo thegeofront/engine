@@ -3,9 +3,9 @@
 import { DrawSpeed, HelpGl, WebGl } from "./webgl";
 
 /**
- * Wrapper for a webgl attibute
+ * Wrapper for a webgl buffer attibute
  */
-export class Attribute {
+export class AttributeBuffer {
     private constructor(
         public gl: WebGl,
         public buffer: WebGLBuffer,
@@ -17,7 +17,7 @@ export class Attribute {
     static new(gl: WebGl, program: WebGLProgram, name: string, matrixWidth: number) {
         let position = gl.getAttribLocation(program, name);
         let buffer = gl.createBuffer()!;
-        return new Attribute(gl, buffer, position, matrixWidth, gl.FLOAT);
+        return new AttributeBuffer(gl, buffer, position, matrixWidth, gl.FLOAT);
     }
 
     set(gl: WebGl, data: BufferSource, speed: DrawSpeed) {
@@ -35,4 +35,29 @@ export class Attribute {
     }
 }
 
-export class IndexAttribute {}
+/**
+ * Wrapper for a webgl index buffer
+ */
+export class IndexAttribute {
+    private constructor(
+        public gl: WebGl,
+        public buffer: WebGLBuffer,
+        public width: number,
+        public type: number,
+    ) {}
+
+    static new(gl: WebGl, matrixWidth: number) {
+        let buffer = gl.createBuffer()!;
+        return new IndexAttribute(gl, buffer, matrixWidth, gl.FLOAT);
+    }
+
+    set(gl: WebGl, data: BufferSource, speed: DrawSpeed) {
+        // experiment with switching these two
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, data, HelpGl.convertDrawSpeed(gl, speed));
+    }
+
+    preRender(gl: WebGl) {
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffer);
+    }
+}

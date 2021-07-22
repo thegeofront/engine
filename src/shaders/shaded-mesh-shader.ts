@@ -136,7 +136,7 @@ export class ShadedMeshShader extends Shader<ShaderMesh> {
 
             gl.useProgram(this.program);
             this.count = rend.mesh.links.data.length;
-            let ds = this.convertDrawSpeed(speed);
+            let ds = HelpGl.convertDrawSpeed(gl, speed);
 
             // convert to non-indexed verts & norms
             let verts = MultiVector3.new(this.count);
@@ -287,6 +287,12 @@ export class ShadedMeshShader extends Shader<ShaderMesh> {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
 
         // draw!
+
+        // NOTE: We can increase the number of triangles we can maximally draw!!!!
+        // https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements
+        // When using the OES_element_index_uint extension:
+        // gl.UNSIGNED_INT;
+
         gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
     }
 }

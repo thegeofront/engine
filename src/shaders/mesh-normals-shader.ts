@@ -12,6 +12,7 @@ import {
     getDefaultIndices,
     Context,
 } from "../lib";
+import { HelpGl } from "../render/webgl";
 
 export class NormalShader extends Shader<ShaderMesh> {
     a_position: number;
@@ -82,7 +83,7 @@ export class NormalShader extends Shader<ShaderMesh> {
         // save how many verts need to be drawn
         let gl = this.gl;
         gl.useProgram(this.program);
-        let drawspeed = this.convertDrawSpeed(speed);
+        let drawspeed = HelpGl.convertDrawSpeed(gl, speed);
         this.vertCount = 3;
 
         let lineverts: MultiVector3;

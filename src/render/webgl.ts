@@ -76,11 +76,7 @@ export class HelpGl {
         return gl;
     }
 
-    static compileShader(
-        gl: WebGLRenderingContext,
-        shaderSource: string,
-        shaderType: number,
-    ): WebGLShader {
+    static compileShader(gl: WebGl, shaderSource: string, shaderType: number): WebGLShader {
         let shader = gl.createShader(shaderType)!;
         gl.shaderSource(shader, shaderSource);
         gl.compileShader(shader);
@@ -91,11 +87,7 @@ export class HelpGl {
         return shader;
     }
 
-    static createProgram(
-        gl: WebGLRenderingContext,
-        vertexShader: WebGLShader,
-        fragmentShader: WebGLShader,
-    ) {
+    static createProgram(gl: WebGl, vertexShader: WebGLShader, fragmentShader: WebGLShader) {
         let program = gl.createProgram()!;
         gl.attachShader(program, vertexShader);
         gl.attachShader(program, fragmentShader);
@@ -108,7 +100,7 @@ export class HelpGl {
     }
 
     static createProgramFromScripts(
-        gl: WebGLRenderingContext,
+        gl: WebGl,
         vertexScript: string,
         fragmentScript: string,
     ): WebGLProgram {

@@ -17,7 +17,7 @@
 // todo: force buffering a bit more. make a way that requiers this.buffered to be filled
 
 import { Context } from "../render/context";
-import { DrawSpeed, Shader } from "../render/shader";
+import { Shader } from "../render/shader";
 import { MeshPickShader } from "../shaders/pick-shader";
 import { MultiShader } from "../render/multi-shader";
 

@@ -1,8 +1,8 @@
+import { DrawSpeed } from "../lib";
 import { Matrix4 } from "../math/matrix";
 import { Mesh } from "../mesh/mesh";
 import { ShaderMesh } from "../mesh/shader-mesh";
 import { Context } from "../render/context";
-import { DrawSpeed } from "../render/shader";
 import { MeshDebugShader } from "../shaders/mesh-debug-shader";
 import { TransformLineShader } from "../shaders/transform-line-shader";
 import { TransformMeshShader } from "../shaders/transform-mesh-shader";

@@ -2,7 +2,7 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of lines.
 
-import { Shader, MultiLine, Mesh, DrawSpeed, Matrix4, Context } from "../lib";
+import { Shader, MultiLine, Mesh, DrawSpeed, Matrix4, Context, HelpGl } from "../lib";
 
 export class LineShader extends Shader<MultiLine | Mesh> {
     a_position: number;
@@ -77,7 +77,7 @@ export class LineShader extends Shader<MultiLine | Mesh> {
         gl.useProgram(this.program);
         this.count = links.length;
         this.vertCount = verts.width;
-        let drawspeed = this.convertDrawSpeed(speed);
+        let drawspeed = HelpGl.convertDrawSpeed(gl, speed);
 
         // vertices
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
