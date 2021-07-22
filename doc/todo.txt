@@ -6,7 +6,7 @@ OPERATION : HALFMESH ✔️
 - Create Icosahedron as HalfMesh ✔️  
 
 
-OPERATION : SUBDIVIDE ⚙️
+OPERATION : SUBDIVIDE ✔️
 - Create Subdivide app ✔️
 - Render Icosahedron debug-mode ✔️
 - Graph From Mesh ✔️
@@ -24,6 +24,14 @@ OPERATION : BREP ⚙️
 - Create Loft to polyline ✔️ 
 - Create ThreeEdge & FourEdge ✔️
 - Create BREP as a graph-like object.
+
+OPERATION : TEXT ⚙️
+> We want to be able to render images & text to the screen, billboard style
+- create a billboard renderer
+- make tooling which makes it easier to design new shaders
+- 
+- 
+- 
 
 _____________________________________________________________
 ⚙️ = Busy | ✔️= DONE 

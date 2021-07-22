@@ -9,6 +9,8 @@
 import { GeonImage, MultiVector3, MultiVector2, Shader, Context } from "../lib";
 import { ToFloatMatrix } from "../data/multi-vector";
 import { DrawSpeed, HelpGl } from "../render/webgl";
+import { Attribute } from "../render/attribute";
+import { Uniform, UniformType } from "../render/uniform";
 
 // mooi font om te gebruiken
 // https://datagoblin.itch.io/monogram
@@ -29,22 +31,9 @@ export type BillboardPayload = {
  * One Texture per billboard.
  */
 export class BillboardShader extends Shader<BillboardPayload> {
-    // TODO can we do something intelligent with this stuff ?
-
-    // attribute & uniform locations
-    a_position: number;
-    a_position_buffer: WebGLBuffer;
-
-    a_uv_data: number;
-    a_uv_data_buffer: WebGLBuffer;
-
-    u_transform: WebGLUniformLocation;
-    u_color: WebGLUniformLocation;
-    u_size: WebGLUniformLocation;
-
-    color: number[];
-    size: number;
-    count: number;
+    // exposed Uniforms like this can be use to statically change certain properties
+    color: Uniform;
+    radius: Uniform;
 
     constructor(gl: WebGLRenderingContext) {
         // note: I like vertex & fragments to be included in the script itself.
@@ -55,13 +44,14 @@ export class BillboardShader extends Shader<BillboardPayload> {
         precision mediump int;
         precision mediump float;
 
+        attribute vec3 a_vertex;
+        attribute vec2 a_uv_pos; // u, v 
+        attribute vec2 a_uv_size; // w, h
+
         uniform mat4 u_transform;
         uniform vec4 u_color;
         uniform float u_size;
 
-        attribute vec3 a_vertex;
-        attribute vec4 a_uv_data; // u, v, w, h, 
-    
         void main() {
             // Set the size of a rendered point.
             gl_PointSize = u_size;
@@ -85,37 +75,25 @@ export class BillboardShader extends Shader<BillboardPayload> {
 
         // setup program
         super(gl, vertexSource, fragmentSource);
+        this.newUniform("u_transform", 16);
+        this.radius = this.newUniform("u_size", 1);
+        this.color = this.newUniform("u_color", 4);
 
-        this.u_transform = gl.getUniformLocation(this.program, "u_transform")!;
-        this.u_size = gl.getUniformLocation(this.program, "u_size")!;
-        this.u_color = gl.getUniformLocation(this.program, "u_color")!;
-
-        // init buffer 1
-        this.a_position = gl.getAttribLocation(this.program, "a_vertex");
-        this.a_position_buffer = gl.createBuffer()!;
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
-
-        // init buffer 2
-        this.a_position = gl.getAttribLocation(this.program, "a_uv_data");
-        this.a_position_buffer = gl.createBuffer()!;
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
+        this.newAttribute("a_vertex", 3);
+        this.newAttribute("a_uv_pos", 2);
+        this.newAttribute("a_uv_size", 2);
     }
 
     set(payload: BillboardPayload, speed: DrawSpeed = DrawSpeed.StaticDraw) {
         let gl = this.gl;
         gl.useProgram(this.program);
 
-        // convert all possible entries to a general entry
-        let array = ToFloatMatrix(payload.positions);
+        // Bind the position buffer
+        this.setAttribute("a_vertex", ToFloatMatrix(payload.positions).data, speed);
+        this.setAttribute("a_uv_pos", ToFloatMatrix(payload.uvs).data, speed);
+        this.setAttribute("a_uv_size", ToFloatMatrix(payload.uvSizes).data, speed);
 
-        // from some other thing
-        this.count = array.count();
-
-        // // Bind the position buffer
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
-        gl.enableVertexAttribArray(this.a_position);
-        gl.vertexAttribPointer(this.a_position, array.width, gl.FLOAT, false, 0, 0);
-        gl.bufferData(gl.ARRAY_BUFFER, array.data, HelpGl.convertDrawSpeed(gl, speed));
+        this.setCycles(payload.positions.count);
     }
 
     render(c: Context) {
@@ -125,18 +103,14 @@ export class BillboardShader extends Shader<BillboardPayload> {
         gl.useProgram(this.program);
 
         // set uniforms
-        // console.log(matrix.data);
-        gl.uniformMatrix4fv(this.u_transform, false, matrix.data);
-        gl.uniform1f(this.u_size, this.size);
-        gl.uniform4f(this.u_color, this.color[0], this.color[1], this.color[2], this.color[3]);
+        this.setUniformMatrix4("u_transform", matrix);
+        this.loadUniforms();
 
-        // // Bind the position buffer.
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
-        gl.enableVertexAttribArray(this.a_position);
-        gl.vertexAttribPointer(this.a_position, 3, gl.FLOAT, false, 0, 0);
+        // ready attributes
+        this.loadAttributes();
 
         // Draw the point.
-        gl.drawArrays(gl.POINTS, 0, this.count);
+        this.gl.drawArrays(gl.POINTS, 0, this.cycles);
     }
 
     setAndRender(data: BillboardPayload, c: Context) {
