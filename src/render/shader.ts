@@ -1,37 +1,44 @@
-// webgl-helpers.ts
-//
+// shader.ts
 // author: Jos Feenstra
 // credits to : https://webglfundamentals.org/
 // note: im still figuring out how to organize this
-// TODO: remove all the WebGl wrappers
 // TODO: incorrect terminology: this is not a Shader, this is a ShaderSet, ShaderDuo, or something like that
 // still tho, within a larger context, the whole of a fragment & vertex shader can be named Shader for the time being...
 
-import { Matrix3, Matrix4 } from "../math/matrix";
-import { Vector2, Vector3 } from "../math/vector";
-import { ShaderMesh } from "../mesh/shader-mesh";
-import { Attribute } from "./attribute";
-import { Camera } from "./camera";
+import { Attributes } from "./attributes";
 import { Context } from "./context";
-import { Uniform, UniformType } from "./uniform";
-import { DrawSpeed, HelpGl } from "./webgl";
+import { Uniforms } from "./uniforms";
+import { DrawSpeed, HelpGl, WebGl } from "./webgl";
 
-// import { Scene } from "./scene";
-
+/**
+ * An implementation of 'Shader' needs to define 3 methods:
+ *
+ * 1. `constructor`
+ *    - state the vertex & fragment shader
+ *    - init all uniforms, state which ones should be exposed publicly (TODO could be automated...)
+ *    - init all attributes (TODO could be automated...)
+ * 2. `Set`
+ *    - explain how 'T' set the attributes
+ *    - give a number to 'this.drawCount'
+ * 3. `Render`
+ *    - explain how 'Context' needs to be loaded into this shader
+ *    - call 'loadAll()' on both attributes & uniforms
+ *    - render using either 'DrawArrays()' or 'DrawElements()' (TODO could get some more automation)
+ */
 // @param T = data to feed the renderer at 'set'
 export abstract class Shader<T> {
-    protected gl: WebGLRenderingContext;
+    protected gl: WebGl;
     protected program: WebGLProgram;
-    protected uniforms: Map<string, Uniform>;
-    protected attributes: Map<string, Attribute>;
-    protected cycles: number; // number of times the shaders need to render
+    protected uniforms: Uniforms;
+    protected attributes: Attributes;
+    protected drawCount: number; // number of times the shaders need to render
 
-    constructor(gl: WebGLRenderingContext, vertexScript: string, fragmentScript: string) {
+    constructor(gl: WebGl, vertexScript: string, fragmentScript: string) {
         this.gl = gl;
         this.program = HelpGl.createProgramFromScripts(gl, vertexScript, fragmentScript);
-        this.uniforms = new Map();
-        this.attributes = new Map();
-        this.cycles = 0;
+        this.uniforms = new Uniforms(this.gl, this.program);
+        this.attributes = new Attributes(this.gl, this.program);
+        this.drawCount = 0;
     }
 
     abstract set(r: T, speed: DrawSpeed): void;
@@ -43,66 +50,7 @@ export abstract class Shader<T> {
         this.render(context);
     }
 
-    setCycles(cycles: number) {
-        this.cycles = cycles;
-    }
-
-    // ---------------------------------------
-
-    newUniform(name: string, size: number, state: number[] = [], type = UniformType.Float) {
-        let uniform = Uniform.new(this.gl, this.program, name, type, size, state);
-        this.uniforms.set(name, uniform);
-        return uniform;
-    }
-
-    /**
-     * WebGl wrapping
-     */
-    setUniform(name: string, value: number) {
-        this.getUniform(name).set([value]);
-    }
-
-    setUniform2(name: string, value: Vector2) {
-        this.getUniform(name).set([value.x, value.y]);
-    }
-
-    setUniform3(name: string, value: Vector3) {
-        this.getUniform(name).set([value.x, value.y, value.z]);
-    }
-
-    setUniform4(name: string, value: number[]) {
-        this.getUniform(name).set(value);
-    }
-
-    setUniformMatrix3(name: string, value: Matrix3) {
-        this.getUniform(name).set(value.data);
-    }
-
-    setUniformMatrix4(name: string, value: Matrix4) {
-        this.getUniform(name).set(value.data);
-    }
-
-    getUniform(name: string) {
-        return this.uniforms.get(name)!;
-    }
-
-    loadUniforms() {
-        for (let [k, v] of this.uniforms) {
-            v.load(this.gl);
-        }
-    }
-
-    newAttribute(name: string, width: number) {
-        this.attributes.set(name, Attribute.new(this.gl, this.program, name, width));
-    }
-
-    setAttribute(name: string, data: BufferSource, speed: DrawSpeed) {
-        this.attributes.get(name)!.set(this.gl, data, speed);
-    }
-
-    loadAttributes() {
-        for (let [k, v] of this.attributes) {
-            v.load(this.gl);
-        }
+    setDrawCount(drawCount: number) {
+        this.drawCount = drawCount;
     }
 }

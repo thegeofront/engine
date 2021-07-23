@@ -1,22 +1,13 @@
 // jos feenstra
 
 import { Context, DrawSpeed, ToFloatMatrix, MultiVector, Shader } from "../lib";
+import { Uniform } from "../render/uniform";
 import { HelpGl } from "../render/webgl";
 
 export class DotShaderWithHeight extends Shader<MultiVector> {
-    // attribute & uniform locations
-    a_position: number;
-    a_position_buffer: WebGLBuffer;
-
-    u_transform: WebGLUniformLocation;
-    u_color: WebGLUniformLocation;
-    u_size: WebGLUniformLocation;
-
-    color: number[];
-    size: number;
-    count: number;
-    u_range: WebGLUniformLocation;
-    height: number;
+    height: Uniform;
+    color: Uniform;
+    size: Uniform;
 
     constructor(
         gl: WebGLRenderingContext,
@@ -92,60 +83,27 @@ export class DotShaderWithHeight extends Shader<MultiVector> {
             super(gl, vertexSource, fragmentSourceRound);
         }
 
-        this.u_transform = gl.getUniformLocation(this.program, "u_transform")!;
-        this.u_size = gl.getUniformLocation(this.program, "u_size")!;
-        this.u_color = gl.getUniformLocation(this.program, "u_color")!;
-        this.u_range = gl.getUniformLocation(this.program, "u_range")!;
-
-        this.color = color;
-        this.size = radius;
-        this.count = 0;
-        this.height = height;
-
-        // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
-        // look up where the vertex data needs to go.
-        this.a_position = gl.getAttribLocation(this.program, "a_vertex");
-        this.a_position_buffer = gl.createBuffer()!;
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
+        this.uniforms.add("u_transform", 16);
+        this.size = this.uniforms.add("u_size", 1, [radius]);
+        this.color = this.uniforms.add("u_color", 4, color);
+        this.height = this.uniforms.add("u_range", 1, [height]);
+        this.attributes.add("a_vertex", 3);
     }
 
     set(points: MultiVector, speed: DrawSpeed = DrawSpeed.StaticDraw) {
         let gl = this.gl;
         gl.useProgram(this.program);
-
-        // convert all possible entries to a general entry
         let array = ToFloatMatrix(points);
-
-        // from some other thing
-        this.count = array.count();
-
-        // // Bind the position buffer
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
-        gl.enableVertexAttribArray(this.a_position);
-        gl.vertexAttribPointer(this.a_position, array.width, gl.FLOAT, false, 0, 0);
-        gl.bufferData(gl.ARRAY_BUFFER, array.data, HelpGl.convertDrawSpeed(gl, speed));
+        this.attributes.set("a_vertex", array.data, speed);
+        this.setDrawCount(array.count());
     }
 
     render(c: Context) {
-        let gl = this.gl;
-        let matrix = c.camera.totalMatrix;
-        // Tell it to use our program (pair of shaders)
-        gl.useProgram(this.program);
-
-        // set uniforms
-        // console.log(matrix.data);
-        gl.uniformMatrix4fv(this.u_transform, false, matrix.data);
-        gl.uniform1f(this.u_size, this.size);
-        gl.uniform1f(this.u_range, this.height);
-        gl.uniform4f(this.u_color, this.color[0], this.color[1], this.color[2], this.color[3]);
-
-        // // Bind the position buffer.
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
-        gl.enableVertexAttribArray(this.a_position);
-        gl.vertexAttribPointer(this.a_position, 3, gl.FLOAT, false, 0, 0);
-
-        // Draw the point.
-        gl.drawArrays(gl.POINTS, 0, this.count);
+        this.gl.useProgram(this.program);
+        this.uniforms.setMatrix4("u_transform", c.camera.totalMatrix);
+        this.uniforms.loadAll();
+        this.attributes.loadAll();
+        this.gl.drawArrays(this.gl.POINTS, 0, this.drawCount);
     }
 
     setAndRender(data: MultiVector, c: Context) {

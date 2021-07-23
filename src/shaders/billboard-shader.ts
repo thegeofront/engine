@@ -75,13 +75,13 @@ export class BillboardShader extends Shader<BillboardPayload> {
 
         // setup program
         super(gl, vertexSource, fragmentSource);
-        this.newUniform("u_transform", 16);
-        this.radius = this.newUniform("u_size", 1);
-        this.color = this.newUniform("u_color", 4);
+        this.uniforms.add("u_transform", 16);
+        this.radius = this.uniforms.add("u_size", 1);
+        this.color = this.uniforms.add("u_color", 4);
 
-        this.newAttribute("a_vertex", 3);
-        this.newAttribute("a_uv_pos", 2);
-        this.newAttribute("a_uv_size", 2);
+        this.attributes.add("a_vertex", 3);
+        this.attributes.add("a_uv_pos", 2);
+        this.attributes.add("a_uv_size", 2);
     }
 
     set(payload: BillboardPayload, speed: DrawSpeed = DrawSpeed.StaticDraw) {
@@ -89,28 +89,24 @@ export class BillboardShader extends Shader<BillboardPayload> {
         gl.useProgram(this.program);
 
         // Bind the position buffer
-        this.setAttribute("a_vertex", ToFloatMatrix(payload.positions).data, speed);
-        this.setAttribute("a_uv_pos", ToFloatMatrix(payload.uvs).data, speed);
-        this.setAttribute("a_uv_size", ToFloatMatrix(payload.uvSizes).data, speed);
+        this.attributes.set("a_vertex", ToFloatMatrix(payload.positions).data, speed);
+        this.attributes.set("a_uv_pos", ToFloatMatrix(payload.uvs).data, speed);
+        this.attributes.set("a_uv_size", ToFloatMatrix(payload.uvSizes).data, speed);
 
-        this.setCycles(payload.positions.count);
+        // set the count
+        this.setDrawCount(payload.positions.count);
     }
 
     render(c: Context) {
         let gl = this.gl;
         let matrix = c.camera.totalMatrix;
-        // Tell it to use our program (pair of shaders)
         gl.useProgram(this.program);
 
-        // set uniforms
-        this.setUniformMatrix4("u_transform", matrix);
-        this.loadUniforms();
+        this.uniforms.setMatrix4("u_transform", matrix);
+        this.uniforms.loadAll();
+        this.attributes.loadAll();
 
-        // ready attributes
-        this.loadAttributes();
-
-        // Draw the point.
-        this.gl.drawArrays(gl.POINTS, 0, this.cycles);
+        this.gl.drawArrays(gl.POINTS, 0, this.drawCount);
     }
 
     setAndRender(data: BillboardPayload, c: Context) {

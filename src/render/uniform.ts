@@ -39,29 +39,29 @@ export class Uniform {
 
 function determineSetter(gl: WebGl, type: UniformType, size: number): Function {
     switch (size) {
-        case 0:
-            if (type == UniformType.Float) {
-                return (gl: WebGl, loc: WebGLUniformLocation, state: Iterable<number>) => {
-                    gl.uniform1fv(loc, state);
-                };
-            } else {
-                return (gl: WebGl, loc: WebGLUniformLocation, state: Iterable<number>) => {
-                    gl.uniform1fv(loc, state);
-                };
-            }
         case 1:
             if (type == UniformType.Float) {
                 return (gl: WebGl, loc: WebGLUniformLocation, state: Iterable<number>) => {
-                    gl.uniform2fv(loc, state);
+                    gl.uniform1fv(loc, state);
                 };
             } else {
                 return (gl: WebGl, loc: WebGLUniformLocation, state: Iterable<number>) => {
-                    gl.uniform2fv(loc, state);
+                    gl.uniform1fv(loc, state);
                 };
             }
         case 2:
             if (type == UniformType.Float) {
                 return (gl: WebGl, loc: WebGLUniformLocation, state: Iterable<number>) => {
+                    gl.uniform2fv(loc, state);
+                };
+            } else {
+                return (gl: WebGl, loc: WebGLUniformLocation, state: Iterable<number>) => {
+                    gl.uniform2fv(loc, state);
+                };
+            }
+        case 3:
+            if (type == UniformType.Float) {
+                return (gl: WebGl, loc: WebGLUniformLocation, state: Iterable<number>) => {
                     gl.uniform3fv(loc, state);
                 };
             } else {
@@ -69,7 +69,7 @@ function determineSetter(gl: WebGl, type: UniformType, size: number): Function {
                     gl.uniform3fv(loc, state);
                 };
             }
-        case 3:
+        case 4:
             if (type == UniformType.Float) {
                 return (gl: WebGl, loc: WebGLUniformLocation, state: Iterable<number>) => {
                     gl.uniform4fv(loc, state);
@@ -79,21 +79,17 @@ function determineSetter(gl: WebGl, type: UniformType, size: number): Function {
                     gl.uniform4fv(loc, state);
                 };
             }
-        case 8:
+        case 9:
             return (gl: WebGl, loc: WebGLUniformLocation, state: Iterable<number>) => {
                 gl.uniformMatrix3fv(loc, false, state);
             };
-        case 15:
+        case 16:
             return (gl: WebGl, loc: WebGLUniformLocation, state: Iterable<number>) => {
                 gl.uniformMatrix4fv(loc, false, state);
             };
         default:
-            return (gl: WebGl, loc: WebGLUniformLocation, state: Iterable<number>) => {};
+            return (gl: WebGl, loc: WebGLUniformLocation, state: Iterable<number>) => {
+                console.error("could not set a certain uniform...");
+            };
     }
-}
-
-function determineMatrixSetter() {
-    // WebGLRenderingContext.uniformMatrix2fv(location, transpose, value);
-    // WebGLRenderingContext.uniformMatrix3fv(location, transpose, value);
-    // WebGLRenderingContext.uniformMatrix4fv(location, transpose, value);
 }
