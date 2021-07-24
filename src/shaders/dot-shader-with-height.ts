@@ -2,10 +2,12 @@
 
 import { MultiVector, DrawSpeed, ToFloatMatrix, Context } from "../lib";
 import { DrawMode } from "../render-low/constants";
+import { Program } from "../render-low/program";
 import { Shader } from "../render-low/shader";
 import { Uniform } from "../render-low/uniform";
 
-export class DotShaderWithHeight extends Shader<MultiVector> {
+
+export class DotShaderWithHeight extends Program<MultiVector> {
     height: Uniform;
     color: Uniform;
     size: Uniform;
@@ -88,26 +90,11 @@ export class DotShaderWithHeight extends Shader<MultiVector> {
         this.size = this.uniforms.add("u_size", 1, [radius]);
         this.color = this.uniforms.add("u_color", 4, color);
         this.height = this.uniforms.add("u_range", 1, [height]);
-        this.attributes.add("a_vertex", 3);
-    }
-
-    set(points: MultiVector, speed: DrawSpeed = DrawSpeed.StaticDraw) {
-        let gl = this.gl;
-        gl.useProgram(this.program);
-        let array = ToFloatMatrix(points);
-        this.attributes.set("a_vertex", array.data, speed);
-        this.setDrawCount(array.count());
-    }
-
-    render(c: Context) {
-        this.gl.useProgram(this.program);
-        this.uniforms.setMatrix4("u_transform", c.camera.totalMatrix);
-        this.uniforms.loadAll();
-        this.attributes.loadAll();
-        this.gl.drawArrays(this.gl.POINTS, 0, this.drawCount);
+        
     }
 
     onInit() {
+        this.attributes.add("a_vertex", 3);
         return DrawMode.Points;
     }
 

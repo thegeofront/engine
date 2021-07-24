@@ -12,9 +12,16 @@ import { Attribute } from "../render-low/attribute";
 import { Shader } from "../render-low/shader";
 import { DrawSpeed } from "../render-low/webgl";
 import { Uniform } from "../render-low/uniform";
+import { Program } from "../render-low/program";
+import { DrawMode } from "../render-low/constants";
 
 // mooi font om te gebruiken
 // https://datagoblin.itch.io/monogram
+
+export type billboardSettings = {
+    color?: number[],
+    radius?: number,
+}
 
 /**
  * This is all data we need to render
@@ -30,12 +37,15 @@ export type BillboardPayload = {
  * Used to render multiple billboards.
  * One Texture per billboard.
  */
-export class BillboardShader extends Shader<BillboardPayload> {
-    // exposed Uniforms like this can be use to statically change certain properties
-    color: Uniform;
-    radius: Uniform;
+export class BillboardShader extends Program<BillboardPayload> {
 
-    constructor(gl: WebGLRenderingContext) {
+    // exposed Uniforms like this can be use to statically change certain properties
+    color!: Uniform;
+    radius!: Uniform;
+
+    constructor(gl: WebGLRenderingContext, 
+        color = [1,1,1,1],
+        radius= 5) {
         let vertexSource: string = `
         // Vertex Shader
         precision mediump int;
@@ -97,43 +107,26 @@ export class BillboardShader extends Shader<BillboardPayload> {
 
         // setup program
         super(gl, vertexSource, fragmentSource);
-        this.uniforms.add("u_transform", 16);
-        this.radius = this.uniforms.add("u_size", 1);
-        this.color = this.uniforms.add("u_color", 4);
 
+        this.uniforms.add("u_transform", 16);
+        this.radius = this.uniforms.add("u_size", 1, [radius]);
+        this.color = this.uniforms.add("u_color", 4, color);
+    }
+
+    protected onInit(): DrawMode {
         this.attributes.add("a_vertex", 3);
         this.attributes.add("a_uv", 2);
         this.attributes.add("u_Texture_unit", 0); // TODO figure out how to add a texture...
-        // this.attributes.add("a_uv_size", 2);
+        return DrawMode.Points;
     }
 
-    set(payload: BillboardPayload, speed: DrawSpeed = DrawSpeed.StaticDraw) {
-        let gl = this.gl;
-        gl.useProgram(this.program);
-
-        // Bind the position buffer
+    protected onSet(payload: BillboardPayload, speed: DrawSpeed): number {
         this.attributes.set("a_vertex", ToFloatMatrix(payload.positions).data, speed);
         this.attributes.set("a_uv", ToFloatMatrix(payload.uvs).data, speed);
-        // this.attributes.set("a_uv", ToFloatMatrix(payload.uvSizes).data, speed);
-
-        // set the count
-        this.setDrawCount(payload.positions.count);
+        return payload.positions.count;
     }
 
-    render(c: Context) {
-        let gl = this.gl;
-        let matrix = c.camera.totalMatrix;
-        gl.useProgram(this.program);
-
-        this.uniforms.setMatrix4("u_transform", matrix);
-        this.uniforms.loadAll();
-        this.attributes.loadAll();
-
-        this.gl.drawArrays(gl.POINTS, 0, this.drawCount);
-    }
-
-    setAndRender(data: BillboardPayload, c: Context) {
-        this.set(data, DrawSpeed.DynamicDraw);
-        this.render(c);
+    protected onRender(c: Context): void {
+        this.uniforms.setMatrix4("u_transform", c.camera.totalMatrix);
     }
 }
