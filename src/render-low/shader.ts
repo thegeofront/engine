@@ -9,7 +9,7 @@ import { Attributes } from "./attributes";
 import { Context } from "../render/context";
 import { Uniforms } from "./uniforms";
 import { DrawSpeed, HelpGl, WebGl } from "./webgl";
-import { DrawElementsType, DrawMethod, DrawMode, IndexBufferName } from "./constants";
+import { DrawElementsType, DrawMethod, DrawMode, INDEX_BUFFER_NAME } from "./constants";
 
 /**
  * An implementation of 'Shader' needs to define 3 methods:

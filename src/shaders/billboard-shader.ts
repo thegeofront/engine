@@ -31,6 +31,7 @@ export type BillboardPayload = {
     // positionUvs: MultiVector2; // the coordinate of the 'center point', from the perspective of a billboard
     uvs: MultiVector2; //
     uvSizes: MultiVector2;
+    texture: GeonImage;
 };
 
 /**
@@ -45,15 +46,18 @@ export class BillboardShader extends Program<BillboardPayload> {
 
     constructor(gl: WebGLRenderingContext, 
         color = [1,1,1,1],
-        radius= 5) {
+        radius= 100) {
         let vertexSource: string = `
         // Vertex Shader
         precision mediump int;
         precision mediump float;
         
         uniform mat4      u_transform;
+        uniform vec3      u_camera_position;
         uniform float     u_size;
         
+        
+
         attribute vec3 a_vertex;
         attribute vec2 a_uv;
         
@@ -62,17 +66,18 @@ export class BillboardShader extends Program<BillboardPayload> {
         
         void main() {
         
-          // Pass the point's texture coordinate to the fragment shader
-          uv = a_uv;
-        
-          // Pass the point's size to the fragment shader
-          point_size = u_size;
-        
-          // Set the size of a rendered point.
-          gl_PointSize = u_size;
-        
-          // Transform the location of the vertex.
-          gl_Position = u_transform * vec4(a_vertex, 1.0);
+            // edit size based on distance from camera
+            float value = 15.0; // TODO how to derrive this???
+            float dis = distance(a_vertex, u_camera_position);
+            float size = u_size / (dis / value);
+            gl_PointSize = size;
+            point_size = size;
+
+            // Pass the point's texture coordinate to the fragment shader
+            uv = a_uv;
+            
+            // Transform the location of the vertex.
+            gl_Position = u_transform * vec4(a_vertex, 1.0);
         }
 
         `;
@@ -82,8 +87,8 @@ export class BillboardShader extends Program<BillboardPayload> {
         precision mediump float;
         
         // The texture unit to use for the color lookup
-        uniform sampler2D u_Texture_unit;
-        uniform vec2      u_Texture_delta;  // delta_s, delta_t
+        uniform sampler2D u_texture;
+        uniform vec2      u_texture_delta;  // delta_s, delta_t
         
         varying vec2  uv;
         varying float point_size; // can this be replaced with u_size ??
@@ -91,17 +96,20 @@ export class BillboardShader extends Program<BillboardPayload> {
         vec2 center = vec2(0.5, 0.5);
         
         void main() {
-          // How much does gl_PointCoord values change between pixels?
-          float point_delta = 1.0 / (point_size - 1.0);
-        
-          // Integer offset to adjacent pixels, based on gl_PointCoord.
-          ivec2 offset = ivec2((gl_PointCoord - center) / point_delta);
-        
-          // Offset the texture coordinates to an adjacent pixel.
-          vec2 coords = uv + (vec2(offset) * u_Texture_delta);
-        
-          // Look up the color from the texture map.
-          gl_FragColor = texture2D(u_Texture_unit, coords);
+
+            // gl_FragColor = texture2D(u_texture, gl_PointCoord);
+
+            // How much does gl_PointCoord values change between pixels?
+            float point_delta = 1.0 / (point_size - 1.0);
+            
+            // // Integer offset to adjacent pixels, based on gl_PointCoord.
+            ivec2 offset = ivec2((gl_PointCoord - center) / point_delta);
+            
+            // // Offset the texture coordinates to an adjacent pixel.
+            vec2 coords = uv + (vec2(offset) * u_texture_delta);
+            
+            // // Look up the color from the texture map.
+            gl_FragColor = texture2D(u_texture, coords);
         }
         `;
 
@@ -111,22 +119,27 @@ export class BillboardShader extends Program<BillboardPayload> {
         this.uniforms.add("u_transform", 16);
         this.radius = this.uniforms.add("u_size", 1, [radius]);
         this.color = this.uniforms.add("u_color", 4, color);
+        
+        this.uniforms.add("u_camera_position", 3);
+        this.uniforms.add("u_texture_delta", 2, [16, 16]);
+        this.uniforms.addTexture("u_texture");
     }
 
     protected onInit(): DrawMode {
         this.attributes.add("a_vertex", 3);
         this.attributes.add("a_uv", 2);
-        this.attributes.add("u_Texture_unit", 0); // TODO figure out how to add a texture...
         return DrawMode.Points;
     }
 
     protected onSet(payload: BillboardPayload, speed: DrawSpeed): number {
         this.attributes.set("a_vertex", ToFloatMatrix(payload.positions).data, speed);
         this.attributes.set("a_uv", ToFloatMatrix(payload.uvs).data, speed);
+        this.uniforms.setTexture("u_texture", payload.texture);
         return payload.positions.count;
     }
 
     protected onRender(c: Context): void {
+        this.uniforms.set3("u_camera_position", c.camera.pos.scaled(-1));
         this.uniforms.setMatrix4("u_transform", c.camera.totalMatrix);
     }
 }

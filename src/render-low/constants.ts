@@ -37,4 +37,6 @@ export enum DataType {
     Float = 0x1406,
 }
 
-export const IndexBufferName = "__index__";
+export const TEXTURE_2D = 0x0DE1;
+
+export const INDEX_BUFFER_NAME = "__index__";

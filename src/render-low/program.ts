@@ -9,7 +9,7 @@ import { Attributes } from "./attributes";
 import { Context } from "../render/context";
 import { Uniforms } from "./uniforms";
 import { DrawSpeed, HelpGl, WebGl } from "./webgl";
-import { DrawElementsType, DrawMethod, DrawMode, IndexBufferName } from "./constants";
+import { DrawElementsType, DrawMethod, DrawMode, INDEX_BUFFER_NAME } from "./constants";
 
 /**
  * An implementation of 'program' needs to define 4 methods:
@@ -94,7 +94,7 @@ export abstract class Program<T> {
     // ---------------------------------------------------------------------------
 
     private setDrawMethod() {
-        if (this.attributes.has(IndexBufferName)) {
+        if (this.attributes.has(INDEX_BUFFER_NAME)) {
             this.method = DrawMethod.Elements;
             this.draw = this.drawElements;
         } else {

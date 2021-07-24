@@ -1,5 +1,5 @@
 import { Attribute, IndexAttribute } from "./attribute";
-import { DrawElementsType, IndexBufferName } from "./constants";
+import { DrawElementsType, INDEX_BUFFER_NAME } from "./constants";
 import { DrawSpeed, WebGl } from "./webgl";
 
 /**
@@ -21,7 +21,7 @@ export class Attributes {
     }
 
     addIndex(type: DrawElementsType) {
-        this.attributes.set(IndexBufferName, IndexAttribute.new(this.gl, type));
+        this.attributes.set(INDEX_BUFFER_NAME, IndexAttribute.new(this.gl, type));
     }
 
     set(name: string, data: BufferSource, speed: DrawSpeed) {
