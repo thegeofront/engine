@@ -3,12 +3,14 @@
 var nextTextureId = 0;
 var rendercallsperframe = 0;
 
-export enum DrawSpeed {
-    StaticDraw, // if you plan on using the 'set' method only a couple of times / once
-    DynamicDraw, // if you plan on using the 'set' method every frame
-}
-
 export type WebGl = WebGLRenderingContext;
+
+// TODO move this to 'constants.ts' and refactor everything again :)
+export enum DrawSpeed {
+    StreamDraw = 0x88e0,
+    StaticDraw = 0x88e4, // if you plan on using the 'set' method only a couple of times / once
+    DynamicDraw = 0x88e8, // if you plan on using the 'set' method every frame
+}
 
 export class HelpGl {
     private constructor() {}

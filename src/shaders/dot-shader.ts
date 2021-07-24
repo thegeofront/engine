@@ -108,7 +108,7 @@ export class DotShader extends Shader<MultiVector> {
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
         gl.enableVertexAttribArray(this.a_position);
         gl.vertexAttribPointer(this.a_position, array.width, gl.FLOAT, false, 0, 0);
-        gl.bufferData(gl.ARRAY_BUFFER, array.data, HelpGl.convertDrawSpeed(gl, speed));
+        gl.bufferData(gl.ARRAY_BUFFER, array.data, speed);
     }
 
     render(c: Context) {

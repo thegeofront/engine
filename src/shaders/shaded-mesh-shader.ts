@@ -136,7 +136,6 @@ export class ShadedMeshShader extends Shader<ShaderMesh> {
 
             gl.useProgram(this.program);
             this.count = rend.mesh.links.data.length;
-            let ds = HelpGl.convertDrawSpeed(gl, speed);
 
             // convert to non-indexed verts & norms
             let verts = MultiVector3.new(this.count);
@@ -157,12 +156,12 @@ export class ShadedMeshShader extends Shader<ShaderMesh> {
             // buffer 1
             gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_postition_buffer);
             gl.vertexAttribPointer(this.a_vertex_position, 3, gl.FLOAT, false, 0, 0);
-            gl.bufferData(gl.ARRAY_BUFFER, verts.slice().data.buffer, ds);
+            gl.bufferData(gl.ARRAY_BUFFER, verts.slice().data.buffer, speed);
 
             // buffer 2
             gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_normal_buffer);
             gl.vertexAttribPointer(this.a_vertex_normal, 3, gl.FLOAT, false, 0, 0);
-            gl.bufferData(gl.ARRAY_BUFFER, norms.slice().data.buffer, ds);
+            gl.bufferData(gl.ARRAY_BUFFER, norms.slice().data.buffer, speed);
 
             // buffer 3
             // gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_ambi_buffer);
@@ -171,16 +170,12 @@ export class ShadedMeshShader extends Shader<ShaderMesh> {
 
             // index
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
-            gl.bufferData(
-                gl.ELEMENT_ARRAY_BUFFER,
-                getDefaultIndices(this.count),
-                HelpGl.convertDrawSpeed(gl, speed),
-            );
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, getDefaultIndices(this.count), speed);
         } else if (normalType == NormalKind.Vertex) {
             // save how many verts need to be drawn
             gl.useProgram(this.program);
 
-            let ds = HelpGl.convertDrawSpeed(gl, speed);
+            let ds = speed;
 
             // convert to non-indexed verts & norms
             let ambi = rend.ambi;

@@ -9,6 +9,7 @@ import { Attributes } from "./attributes";
 import { Context } from "../render/context";
 import { Uniforms } from "./uniforms";
 import { DrawSpeed, HelpGl, WebGl } from "./webgl";
+import { DrawElementsType, DrawMethod, DrawMode, IndexBufferName } from "./constants";
 
 /**
  * An implementation of 'Shader' needs to define 3 methods:
@@ -29,9 +30,18 @@ import { DrawSpeed, HelpGl, WebGl } from "./webgl";
 export abstract class Shader<T> {
     protected gl: WebGl;
     protected program: WebGLProgram;
+
     protected uniforms: Uniforms;
     protected attributes: Attributes;
-    protected drawCount: number; // number of times the shaders need to render
+
+    // auto set
+    protected draw = () => {};
+    protected method = DrawMethod.Arrays;
+    protected elementType?: DrawElementsType;
+
+    protected mode = DrawMode.Triangles;
+    protected drawCount = 0; // number of times the shaders need to render
+    protected drawOffset = 0;
 
     constructor(gl: WebGl, vertexScript: string, fragmentScript: string) {
         this.gl = gl;
@@ -39,10 +49,13 @@ export abstract class Shader<T> {
         this.uniforms = new Uniforms(this.gl, this.program);
         this.attributes = new Attributes(this.gl, this.program);
         this.drawCount = 0;
+        gl.useProgram(this.program);
     }
 
+    // TODO refactor to 'onSet()'
     abstract set(r: T, speed: DrawSpeed): void;
 
+    // TODO refactor to 'onRender()'
     abstract render(context: Context): void;
 
     setAndRender(r: T, context: Context) {
@@ -52,5 +65,56 @@ export abstract class Shader<T> {
 
     setDrawCount(drawCount: number) {
         this.drawCount = drawCount;
+    }
+
+    // -------------------------------------------------------------
+
+    onInit(): DrawMode {
+        return DrawMode.Triangles;
+    }
+
+    onSet(r: T, speed: DrawSpeed): number {
+        return 0;
+    }
+
+    onRender(c: Context): void {
+        return;
+    }
+
+    protected _init() {
+        this.mode = this.onInit();
+        this.setDrawMethod();
+    }
+
+    protected _set(r: T, speed: DrawSpeed) {
+        this.gl.useProgram(this.program);
+        this.drawCount = this.onSet(r, speed);
+    }
+
+    protected _render(c: Context) {
+        this.gl.useProgram(this.program);
+        this.onRender(c);
+        this.uniforms.loadAll();
+        this.attributes.loadAll();
+        this.draw();
+    }
+
+    // should be called after 'set'
+    setDrawMethod() {
+        if (this.attributes.has(IndexBufferName)) {
+            this.method = DrawMethod.Elements;
+            this.draw = this.drawElements;
+        } else {
+            this.method = DrawMethod.Arrays;
+            this.draw = this.drawArrays;
+        }
+    }
+
+    private drawElements() {
+        this.gl.drawElements(this.mode, this.drawCount, this.elementType!, this.drawOffset);
+    }
+
+    private drawArrays() {
+        this.gl.drawArrays(this.mode, this.drawOffset, this.drawCount);
     }
 }

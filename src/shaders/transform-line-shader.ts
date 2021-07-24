@@ -89,7 +89,7 @@ export class TransformLineShader extends Shader<ShaderMesh> {
         gl.useProgram(this.program);
         this.count = links.length;
         this.vertCount = verts.slice().width;
-        let drawspeed = HelpGl.convertDrawSpeed(gl, speed);
+        let drawspeed = speed;
 
         // vertices
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);

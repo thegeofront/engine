@@ -78,7 +78,7 @@ export class LineShader extends Shader<MultiLine | Mesh> {
         gl.useProgram(this.program);
         this.count = links.length;
         this.vertCount = verts.width;
-        let drawspeed = HelpGl.convertDrawSpeed(gl, speed);
+        let drawspeed = speed;
 
         // vertices
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);

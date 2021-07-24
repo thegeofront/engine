@@ -94,28 +94,16 @@ export class TextureMeshShader extends Shader<ShaderMesh> {
         // buffer 1
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
         gl.vertexAttribPointer(this.a_position, 3, gl.FLOAT, false, 0, 0);
-        gl.bufferData(
-            gl.ARRAY_BUFFER,
-            r.mesh.verts.slice().data,
-            HelpGl.convertDrawSpeed(gl, speed),
-        );
+        gl.bufferData(gl.ARRAY_BUFFER, r.mesh.verts.slice().data, speed);
 
         // buffer 2
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_texcoord_buffer);
         gl.vertexAttribPointer(this.a_texcoord, 2, gl.FLOAT, false, 0, 0);
-        gl.bufferData(
-            gl.ARRAY_BUFFER,
-            r.uvs.toMatrixSlice().data,
-            HelpGl.convertDrawSpeed(gl, speed),
-        );
+        gl.bufferData(gl.ARRAY_BUFFER, r.uvs.toMatrixSlice().data, speed);
 
         // buffer 3
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
-        gl.bufferData(
-            gl.ELEMENT_ARRAY_BUFFER,
-            new Uint16Array(r.mesh.links.data),
-            HelpGl.convertDrawSpeed(gl, speed),
-        );
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(r.mesh.links.data), speed);
 
         // texture
         gl.activeTexture(gl.TEXTURE0 + this.texture_id);

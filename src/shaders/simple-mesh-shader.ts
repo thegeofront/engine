@@ -73,11 +73,11 @@ export class SimpleMeshShader extends Shader<Mesh> {
         var type = gl.FLOAT;
         var normalize = false;
         gl.vertexAttribPointer(this.a_position, this.size, gl.FLOAT, false, 0, 0);
-        gl.bufferData(gl.ARRAY_BUFFER, mesh.verts.slice().data, HelpGl.convertDrawSpeed(gl, speed));
+        gl.bufferData(gl.ARRAY_BUFFER, mesh.verts.slice().data, speed);
 
         // indices
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, mesh.links.data, HelpGl.convertDrawSpeed(gl, speed));
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, mesh.links.data, speed);
     }
 
     // render 1 image to the screen

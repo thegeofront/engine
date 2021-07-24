@@ -83,7 +83,7 @@ export class NormalShader extends Shader<ShaderMesh> {
         // save how many verts need to be drawn
         let gl = this.gl;
         gl.useProgram(this.program);
-        let drawspeed = HelpGl.convertDrawSpeed(gl, speed);
+        let drawspeed = speed;
         this.vertCount = 3;
 
         let lineverts: MultiVector3;

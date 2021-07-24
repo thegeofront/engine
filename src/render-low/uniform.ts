@@ -1,4 +1,3 @@
-import { Shader } from "./shader";
 import { WebGl } from "./webgl";
 
 export enum UniformType {
@@ -35,6 +34,16 @@ export class Uniform {
     load(gl: WebGl) {
         this.setter(gl, this.loc, this.state);
     }
+}
+
+export class UniformTexture {
+    private constructor() {}
+
+    static new<T>() {}
+
+    set(state: Iterable<number>) {}
+
+    load(gl: WebGl) {}
 }
 
 function determineSetter(gl: WebGl, type: UniformType, size: number): Function {

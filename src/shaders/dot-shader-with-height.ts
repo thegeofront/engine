@@ -1,6 +1,7 @@
 // jos feenstra
 
 import { MultiVector, DrawSpeed, ToFloatMatrix, Context } from "../lib";
+import { DrawMode } from "../render-low/constants";
 import { Shader } from "../render-low/shader";
 import { Uniform } from "../render-low/uniform";
 
@@ -106,8 +107,17 @@ export class DotShaderWithHeight extends Shader<MultiVector> {
         this.gl.drawArrays(this.gl.POINTS, 0, this.drawCount);
     }
 
-    setAndRender(data: MultiVector, c: Context) {
-        this.set(data, DrawSpeed.DynamicDraw);
-        this.render(c);
+    onInit() {
+        return DrawMode.Points;
+    }
+
+    onSet(points: MultiVector, speed: DrawSpeed) {
+        let array = ToFloatMatrix(points);
+        this.attributes.set("a_vertex", array.data, speed);
+        return array.count();
+    }
+
+    onRender(c: Context) {
+        this.uniforms.setMatrix4("u_transform", c.camera.totalMatrix);
     }
 }
