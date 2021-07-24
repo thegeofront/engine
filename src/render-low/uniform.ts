@@ -14,7 +14,7 @@ export class Uniform {
         public state: Iterable<number>,
     ) {}
 
-    static new<T>(
+    static new(
         gl: WebGl,
         program: WebGLProgram,
         name: string,

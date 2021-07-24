@@ -90,7 +90,6 @@ export class DotShaderWithHeight extends Program<MultiVector> {
         this.size = this.uniforms.add("u_size", 1, [radius]);
         this.color = this.uniforms.add("u_color", 4, color);
         this.height = this.uniforms.add("u_range", 1, [height]);
-        
     }
 
     onInit() {
