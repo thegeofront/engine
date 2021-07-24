@@ -3,16 +3,16 @@
 // purpose: WebGL based rendering of lines.
 
 import {
-    Shader,
     ShaderMesh,
     DrawSpeed,
+    HelpGl,
     MultiVector3,
     NormalKind,
     Vector3,
     getDefaultIndices,
     Context,
 } from "../lib";
-import { HelpGl } from "../render/webgl";
+import { Shader } from "../render-low/shader";
 
 export class NormalShader extends Shader<ShaderMesh> {
     a_position: number;

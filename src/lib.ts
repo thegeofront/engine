@@ -60,12 +60,16 @@ export * from "./render/camera";
 export * from "./combo/combo";
 export * from "./render/light";
 export * from "./render/context";
-export * from "./render/shader";
-export * from "./render/webgl";
+
+export * from "./render-low/attribute";
+export * from "./render-low/attributes";
+export * from "./render-low/shader";
+export * from "./render-low/uniform";
+export * from "./render-low/uniforms";
+export * from "./render-low/webgl";
 
 export * from "./renderers/multi-renderer";
 
-// export * from "./shaders/billboard-renderer";
 export * from "./shaders/dot-shader";
 export * from "./shaders/line-shader";
 export * from "./shaders/mesh-debug-shader";
@@ -75,6 +79,7 @@ export * from "./shaders/shaded-mesh-shader";
 export * from "./shaders/simple-mesh-shader";
 export * from "./shaders/texture-mesh-shader";
 export * from "./shaders/graph-debug-shader";
+export * from "./shaders/billboard-shader";
 
 export * from "./shaders2/dot-shader-2";
 

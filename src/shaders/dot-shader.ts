@@ -1,17 +1,7 @@
 // jos feenstra
 
-import {
-    Context,
-    DrawSpeed,
-    ToFloatMatrix,
-    MultiVector,
-    MultiVector2,
-    MultiVector3,
-    Shader,
-    Vector2,
-    Vector3,
-    HelpGl,
-} from "../lib";
+import { MultiVector, DrawSpeed, ToFloatMatrix, HelpGl, Context } from "../lib";
+import { Shader } from "../render-low/shader";
 
 export class DotShader extends Shader<MultiVector> {
     // attribute & uniform locations

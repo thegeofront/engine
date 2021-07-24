@@ -2,12 +2,7 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of lines.
 
-import { DrawSpeed } from "../lib";
-import { Matrix4 } from "../math/matrix";
-import { ShaderMesh } from "../mesh/shader-mesh";
-import { Context } from "../render/context";
-import { Shader } from "../render/shader";
-import { HelpGl } from "../render/webgl";
+import { ShaderMesh, Matrix4, DrawSpeed, HelpGl, Context, Shader } from "../lib";
 
 export class TransformLineShader extends Shader<ShaderMesh> {
     private a_position: number;

@@ -6,7 +6,7 @@
 // still tho, within a larger context, the whole of a fragment & vertex shader can be named Shader for the time being...
 
 import { Attributes } from "./attributes";
-import { Context } from "./context";
+import { Context } from "../render/context";
 import { Uniforms } from "./uniforms";
 import { DrawSpeed, HelpGl, WebGl } from "./webgl";
 

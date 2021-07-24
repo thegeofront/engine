@@ -1,4 +1,4 @@
-import { Attribute } from "./attribute";
+import { Attribute, IndexAttribute } from "./attribute";
 import { DrawSpeed, WebGl } from "./webgl";
 
 /**
@@ -8,11 +8,15 @@ export class Attributes {
     constructor(
         private gl: WebGl,
         private program: WebGLProgram,
-        private attributes: Map<string, Attribute> = new Map(),
+        private attributes: Map<string, Attribute | IndexAttribute> = new Map(),
     ) {}
 
     add(name: string, width: number) {
         this.attributes.set(name, Attribute.new(this.gl, this.program, name, width));
+    }
+
+    addIndex() {
+        this.attributes.set("__index__", IndexAttribute.new(this.gl));
     }
 
     set(name: string, data: BufferSource, speed: DrawSpeed) {

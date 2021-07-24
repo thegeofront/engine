@@ -1,8 +1,8 @@
 // jos feenstra
 
-import { Context, DrawSpeed, ToFloatMatrix, MultiVector, Shader } from "../lib";
-import { Uniform } from "../render/uniform";
-import { HelpGl } from "../render/webgl";
+import { MultiVector, DrawSpeed, ToFloatMatrix, Context } from "../lib";
+import { Shader } from "../render-low/shader";
+import { Uniform } from "../render-low/uniform";
 
 export class DotShaderWithHeight extends Shader<MultiVector> {
     height: Uniform;

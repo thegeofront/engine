@@ -14,7 +14,7 @@ import {
     Matrix4,
     Vector3,
 } from "../lib";
-import { HelpGl } from "../render/webgl";
+import { HelpGl } from "../render-low/webgl";
 
 export class ShadedMeshShader extends Shader<ShaderMesh> {
     // attribute & uniform locations

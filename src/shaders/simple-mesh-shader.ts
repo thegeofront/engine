@@ -4,7 +4,7 @@
 
 import { DrawSpeed, IntMatrix, Matrix4, Mesh, ShaderMesh, Shader, MultiVector3 } from "../lib";
 import { Context } from "../render/context";
-import { HelpGl } from "../render/webgl";
+import { HelpGl } from "../render-low/webgl";
 
 export class SimpleMeshShader extends Shader<Mesh> {
     // attribute & uniform locations

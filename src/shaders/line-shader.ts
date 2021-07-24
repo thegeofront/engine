@@ -2,7 +2,8 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of lines.
 
-import { Shader, MultiLine, Mesh, DrawSpeed, Matrix4, Context, HelpGl } from "../lib";
+import { MultiLine, Mesh, DrawSpeed, Matrix4, HelpGl, Context } from "../lib";
+import { Shader } from "../render-low/shader";
 
 export class LineShader extends Shader<MultiLine | Mesh> {
     a_position: number;

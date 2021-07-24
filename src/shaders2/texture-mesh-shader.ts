@@ -2,10 +2,7 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of a mesh.
 
-import { ShaderMesh } from "../mesh/shader-mesh";
-import { Shader } from "../render/shader";
-import { Context } from "../render/context";
-import { DrawSpeed, HelpGl } from "../render/webgl";
+import { Shader, ShaderMesh, HelpGl, DrawSpeed, Context } from "../lib";
 
 export class TextureMeshShader extends Shader<ShaderMesh> {
     // attribute & uniform locations

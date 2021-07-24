@@ -1,8 +1,6 @@
 // jos feenstra
 
-import { Vector2 } from "../math/vector";
-import { Context } from "../render/context";
-import { Shader } from "../render/shader";
+import { Shader, Vector2, Context } from "../lib";
 
 export class DotShader2 extends Shader<Vector2[]> {
     // attribute & uniform locations

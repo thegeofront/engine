@@ -6,11 +6,12 @@
 
 // NOTE: make sure to include something like a center offset, to gain control of if the point is rendered centered, as topleft, etc. etc.
 
-import { GeonImage, MultiVector3, MultiVector2, Shader, Context } from "../lib";
+import { GeonImage, MultiVector3, MultiVector2, Context } from "../lib";
 import { ToFloatMatrix } from "../data/multi-vector";
-import { DrawSpeed, HelpGl } from "../render/webgl";
-import { Attribute } from "../render/attribute";
-import { Uniform, UniformType } from "../render/uniform";
+import { Attribute } from "../render-low/attribute";
+import { Shader } from "../render-low/shader";
+import { DrawSpeed } from "../render-low/webgl";
+import { Uniform } from "../render-low/uniform";
 
 // mooi font om te gebruiken
 // https://datagoblin.itch.io/monogram
@@ -19,7 +20,6 @@ import { Uniform, UniformType } from "../render/uniform";
  * This is all data we need to render
  */
 export type BillboardPayload = {
-    texture: GeonImage; // texture atlas to use
     positions: MultiVector3; // position in the world to render this
     // positionUvs: MultiVector2; // the coordinate of the 'center point', from the perspective of a billboard
     uvs: MultiVector2; //
@@ -36,40 +36,62 @@ export class BillboardShader extends Shader<BillboardPayload> {
     radius: Uniform;
 
     constructor(gl: WebGLRenderingContext) {
-        // note: I like vertex & fragments to be included in the script itself.
-        // when you change vertex or fragment, this class has to deal with it.
-        // putting them somewhere else doesnt make sense to me,
-        // they are coupled 1 to 1.
         let vertexSource: string = `
+        // Vertex Shader
         precision mediump int;
         precision mediump float;
-
+        
+        uniform mat4      u_transform;
+        uniform float     u_size;
+        
         attribute vec3 a_vertex;
-        attribute vec2 a_uv_pos; // u, v 
-        attribute vec2 a_uv_size; // w, h
-
-        uniform mat4 u_transform;
-        uniform vec4 u_color;
-        uniform float u_size;
-
+        attribute vec2 a_uv;
+        
+        varying vec2  uv;
+        varying float point_size;
+        
         void main() {
-            // Set the size of a rendered point.
-            gl_PointSize = u_size;
-
-            // Transform the location of the vertex.
-            gl_Position = u_transform * vec4(a_vertex, 1.0);
+        
+          // Pass the point's texture coordinate to the fragment shader
+          uv = a_uv;
+        
+          // Pass the point's size to the fragment shader
+          point_size = u_size;
+        
+          // Set the size of a rendered point.
+          gl_PointSize = u_size;
+        
+          // Transform the location of the vertex.
+          gl_Position = u_transform * vec4(a_vertex, 1.0);
         }
 
         `;
         let fragmentSource: string = `
+        // Fragment shader program
         precision mediump int;
         precision mediump float;
-
-        uniform vec4 u_color;
-        // vec2 center = vec2(0.5, 0.5);
-
+        
+        // The texture unit to use for the color lookup
+        uniform sampler2D u_Texture_unit;
+        uniform vec2      u_Texture_delta;  // delta_s, delta_t
+        
+        varying vec2  uv;
+        varying float point_size; // can this be replaced with u_size ??
+        
+        vec2 center = vec2(0.5, 0.5);
+        
         void main() {
-            gl_FragColor = u_color;
+          // How much does gl_PointCoord values change between pixels?
+          float point_delta = 1.0 / (point_size - 1.0);
+        
+          // Integer offset to adjacent pixels, based on gl_PointCoord.
+          ivec2 offset = ivec2((gl_PointCoord - center) / point_delta);
+        
+          // Offset the texture coordinates to an adjacent pixel.
+          vec2 coords = uv + (vec2(offset) * u_Texture_delta);
+        
+          // Look up the color from the texture map.
+          gl_FragColor = texture2D(u_Texture_unit, coords);
         }
         `;
 
@@ -80,8 +102,9 @@ export class BillboardShader extends Shader<BillboardPayload> {
         this.color = this.uniforms.add("u_color", 4);
 
         this.attributes.add("a_vertex", 3);
-        this.attributes.add("a_uv_pos", 2);
-        this.attributes.add("a_uv_size", 2);
+        this.attributes.add("a_uv", 2);
+        this.attributes.add("u_Texture_unit", 0); // TODO figure out how to add a texture...
+        // this.attributes.add("a_uv_size", 2);
     }
 
     set(payload: BillboardPayload, speed: DrawSpeed = DrawSpeed.StaticDraw) {
@@ -90,8 +113,8 @@ export class BillboardShader extends Shader<BillboardPayload> {
 
         // Bind the position buffer
         this.attributes.set("a_vertex", ToFloatMatrix(payload.positions).data, speed);
-        this.attributes.set("a_uv_pos", ToFloatMatrix(payload.uvs).data, speed);
-        this.attributes.set("a_uv_size", ToFloatMatrix(payload.uvSizes).data, speed);
+        this.attributes.set("a_uv", ToFloatMatrix(payload.uvs).data, speed);
+        // this.attributes.set("a_uv", ToFloatMatrix(payload.uvSizes).data, speed);
 
         // set the count
         this.setDrawCount(payload.positions.count);

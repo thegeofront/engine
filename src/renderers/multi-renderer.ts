@@ -13,8 +13,8 @@ import { LineShader } from "../shaders/line-shader";
 import { MeshDebugShader } from "../shaders/mesh-debug-shader";
 import { ShadedMeshShader } from "../shaders/shaded-mesh-shader";
 import { Context } from "../render/context";
-import { Shader } from "../render/shader";
-import { WebGl } from "../render/webgl";
+import { Shader } from "../render-low/shader";
+import { WebGl } from "../render-low/webgl";
 
 // NOTE: I think this type of polymorphism is better than regular polymorphism
 export type RenderableUnit =

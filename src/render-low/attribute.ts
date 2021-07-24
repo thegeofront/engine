@@ -47,16 +47,11 @@ export class Attribute {
  * Wrapper for a webgl index buffer
  */
 export class IndexAttribute {
-    private constructor(
-        public gl: WebGl,
-        public buffer: WebGLBuffer,
-        public width: number,
-        public type: number,
-    ) {}
+    private constructor(public gl: WebGl, public buffer: WebGLBuffer) {}
 
-    static new(gl: WebGl, matrixWidth: number) {
+    static new(gl: WebGl) {
         let buffer = gl.createBuffer()!;
-        return new IndexAttribute(gl, buffer, matrixWidth, gl.FLOAT);
+        return new IndexAttribute(gl, buffer);
     }
 
     set(gl: WebGl, data: BufferSource, speed: DrawSpeed) {

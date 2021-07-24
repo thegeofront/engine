@@ -15,6 +15,9 @@ export class HelpGl {
 
     static new() {}
 
+    /**
+     * We need to keep track of all textures in the entire webgl application
+     */
     static getNextTextureID() {
         let id = nextTextureId;
         nextTextureId += 1;
@@ -69,6 +72,9 @@ export class HelpGl {
             gl.enable(gl.DEPTH_TEST);
             gl.depthFunc(gl.LEQUAL);
         }
+
+        // extensions
+        let ext = gl.getExtension("OES_element_index_uint");
 
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.clearDepth(1);
