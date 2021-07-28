@@ -79,7 +79,7 @@ export * from "./shaders/shaded-mesh-shader";
 export * from "./shaders/simple-mesh-shader";
 export * from "./shaders/texture-mesh-shader";
 export * from "./shaders/graph-debug-shader";
-export * from "./shaders/billboard-shader";
+export * from "./shaderprograms/billboard-shader";
 
 export * from "./shaders2/dot-shader-2";
 

@@ -26,7 +26,7 @@ export class Uniforms {
         this.textures.set(name, texture);
         return texture;
     }
-    
+
     setTexture(name: string, source: GeonImage) {
         this.textures.get(name)!.set(source.toImageData());
     }

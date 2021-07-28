@@ -13,27 +13,26 @@ import { DrawElementsType, DrawMethod, DrawMode, INDEX_BUFFER_NAME } from "./con
 
 /**
  * An implementation of 'program' needs to define 4 methods:
- *
+ * @param T = data to feed the renderer at 'set'
  * 1. `constructor`
  *    - state the vertex & fragment shader
  *    - init all uniforms, state which ones should be exposed publicly
- *    - explain how 'S' set the uniforms, possibly  
+ *    - explain how 'S' set the uniforms, possibly
  *    - DO NOT INIT ATTRIBUTES IN HERE
- * 
+ *
  * 2. `onInit`
  *    - init all attributes
  *    - return the 'DrawMode' which needs to be used to draw this shader
- * 
+ *
  * 2. `onSet`
  *    - explain how 'T' set the attributes
  *    - return a number representing how many 'drawmode' features need to be drawn
- * 
+ *
  * 3. `onRender`
  *    - explain how 'Context' needs to be loaded into this shader
  *    - call 'loadAll()' on both attributes & uniforms
  *    - render using either 'DrawArrays()' or 'DrawElements()' (TODO could get some more automation)
  */
-// @param T = data to feed the renderer at 'set'
 export abstract class Program<T> {
     protected gl: WebGl;
     protected program: WebGLProgram;

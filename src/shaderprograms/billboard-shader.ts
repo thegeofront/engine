@@ -19,9 +19,9 @@ import { DrawMode } from "../render-low/constants";
 // https://datagoblin.itch.io/monogram
 
 export type billboardSettings = {
-    color?: number[],
-    radius?: number,
-}
+    color?: number[];
+    radius?: number;
+};
 
 /**
  * This is all data we need to render
@@ -39,14 +39,11 @@ export type BillboardPayload = {
  * One Texture per billboard.
  */
 export class BillboardShader extends Program<BillboardPayload> {
-
     // exposed Uniforms like this can be use to statically change certain properties
     color!: Uniform;
     radius!: Uniform;
 
-    constructor(gl: WebGLRenderingContext, 
-        color = [1,1,1,1],
-        radius= 100) {
+    constructor(gl: WebGLRenderingContext, color = [1, 1, 1, 1], radius = 100) {
         let vertexSource: string = `
         // Vertex Shader
         precision mediump int;
@@ -58,8 +55,10 @@ export class BillboardShader extends Program<BillboardPayload> {
  
         attribute vec3 a_vertex;
         attribute vec2 a_uv;
+        attribute vec2 a_uv_wh;
         
         varying vec2  uv;
+        varying vec2  uv_size;
         varying float point_size;
         
         void main() {
@@ -73,6 +72,7 @@ export class BillboardShader extends Program<BillboardPayload> {
 
             // Pass the point's texture coordinate to the fragment shader
             uv = a_uv;
+            uv_size = a_uv_wh;
             
             // Transform the location of the vertex.
             gl_Position = u_transform * vec4(a_vertex, 1.0);
@@ -80,60 +80,57 @@ export class BillboardShader extends Program<BillboardPayload> {
 
         `;
         let fragmentSource: string = `
-        // Fragment shader program
+
         precision mediump int;
         precision mediump float;
-        
-        // The texture unit to use for the color lookup
+    
         uniform sampler2D u_texture;
-        uniform vec2      u_texture_delta;  // delta_s, delta_t
+        uniform vec2      u_texture_size;  // delta_s, delta_t
         
         varying vec2  uv;
+        varying vec2  uv_size;
         varying float point_size; // can this be replaced with u_size ??
         
         vec2 center = vec2(0.5, 0.5);
         
         void main() {
 
-            // gl_FragColor = texture2D(u_texture, gl_PointCoord);
+            vec2 texture_fraction = 1.0 / u_texture_size;
+            vec2 sprite_fraction = 1.0 / uv_size;
+            vec2 tex_origin = uv * texture_fraction;
 
-            // How much does gl_PointCoord values change between pixels?
-            float point_delta = 1.0 / (point_size - 1.0);
-            
-            // Integer offset to adjacent pixels, based on gl_PointCoord.
-            ivec2 offset = ivec2((gl_PointCoord - center) / point_delta);
-            
-            // Offset the texture coordinates to an adjacent pixel.
-            vec2 coords = uv + (vec2(offset) * u_texture_delta);
-            
-            // Look up the color from the texture map.
-            gl_FragColor = texture2D(u_texture, coords);
+            vec2 coord = tex_origin + gl_PointCoord * sprite_fraction;
+            gl_FragColor = texture2D(u_texture, coord);
         }
         `;
 
         // setup program
         super(gl, vertexSource, fragmentSource);
-
         this.uniforms.add("u_transform", 16);
         this.radius = this.uniforms.add("u_size", 1, [radius]);
         this.color = this.uniforms.add("u_color", 4, color);
-        
+
         this.uniforms.add("u_camera_position", 3);
-        this.uniforms.add("u_texture_delta", 2, [16, 16]);
+        this.uniforms.add("u_texture_size", 2, [16, 16]);
         this.uniforms.addTexture("u_texture");
     }
 
     protected onInit(): DrawMode {
         this.attributes.add("a_vertex", 3);
         this.attributes.add("a_uv", 2);
+        this.attributes.add("a_uv_wh", 2);
         return DrawMode.Points;
     }
 
     protected onSet(payload: BillboardPayload, speed: DrawSpeed): number {
         this.attributes.set("a_vertex", ToFloatMatrix(payload.positions).data, speed);
         this.attributes.set("a_uv", ToFloatMatrix(payload.uvs).data, speed);
+        this.attributes.set("a_uv_wh", ToFloatMatrix(payload.uvSizes).data, speed);
         this.uniforms.setTexture("u_texture", payload.texture);
-        this.uniforms.set2("u_texture_delta", Vector2.new(payload.texture.width, payload.texture.height));
+        this.uniforms.set2(
+            "u_texture_size",
+            Vector2.new(payload.texture.width, payload.texture.height),
+        );
         return payload.positions.count;
     }
 
