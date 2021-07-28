@@ -48,14 +48,6 @@ export class HelpGl {
         return needResize;
     }
 
-    static convertDrawSpeed(gl: WebGl, speed: DrawSpeed): number {
-        if (speed == DrawSpeed.DynamicDraw) {
-            return gl.DYNAMIC_DRAW;
-        } else {
-            return gl.STATIC_DRAW;
-        }
-    }
-
     static initWebglContext(canvas: HTMLCanvasElement, blend = false): WebGl {
         let possiblyGl = canvas.getContext("webgl");
         if (possiblyGl == undefined) {

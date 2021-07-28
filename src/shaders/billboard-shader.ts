@@ -6,7 +6,7 @@
 
 // NOTE: make sure to include something like a center offset, to gain control of if the point is rendered centered, as topleft, etc. etc.
 
-import { GeonImage, MultiVector3, MultiVector2, Context } from "../lib";
+import { GeonImage, MultiVector3, MultiVector2, Context, Vector2 } from "../lib";
 import { ToFloatMatrix } from "../data/multi-vector";
 import { Attribute } from "../render-low/attribute";
 import { Shader } from "../render-low/shader";
@@ -52,12 +52,10 @@ export class BillboardShader extends Program<BillboardPayload> {
         precision mediump int;
         precision mediump float;
         
-        uniform mat4      u_transform;
-        uniform vec3      u_camera_position;
-        uniform float     u_size;
-        
-        
-
+        uniform mat4  u_transform;
+        uniform vec3  u_camera_position;
+        uniform float u_size;
+ 
         attribute vec3 a_vertex;
         attribute vec2 a_uv;
         
@@ -102,13 +100,13 @@ export class BillboardShader extends Program<BillboardPayload> {
             // How much does gl_PointCoord values change between pixels?
             float point_delta = 1.0 / (point_size - 1.0);
             
-            // // Integer offset to adjacent pixels, based on gl_PointCoord.
+            // Integer offset to adjacent pixels, based on gl_PointCoord.
             ivec2 offset = ivec2((gl_PointCoord - center) / point_delta);
             
-            // // Offset the texture coordinates to an adjacent pixel.
+            // Offset the texture coordinates to an adjacent pixel.
             vec2 coords = uv + (vec2(offset) * u_texture_delta);
             
-            // // Look up the color from the texture map.
+            // Look up the color from the texture map.
             gl_FragColor = texture2D(u_texture, coords);
         }
         `;
@@ -135,6 +133,7 @@ export class BillboardShader extends Program<BillboardPayload> {
         this.attributes.set("a_vertex", ToFloatMatrix(payload.positions).data, speed);
         this.attributes.set("a_uv", ToFloatMatrix(payload.uvs).data, speed);
         this.uniforms.setTexture("u_texture", payload.texture);
+        this.uniforms.set2("u_texture_delta", Vector2.new(payload.texture.width, payload.texture.height));
         return payload.positions.count;
     }
 

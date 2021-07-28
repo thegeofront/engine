@@ -30,7 +30,7 @@ export class Attribute {
         gl.enableVertexAttribArray(this.position);
 
         gl.vertexAttribPointer(this.position, this.width, this.type, false, 0, 0);
-        gl.bufferData(gl.ARRAY_BUFFER, data, HelpGl.convertDrawSpeed(this.gl, speed));
+        gl.bufferData(gl.ARRAY_BUFFER, data, speed);
     }
 
     /**
