@@ -4,6 +4,7 @@
 // note: im still figuring out how to organize this
 // TODO: incorrect terminology: this is not a Shader, this is a ShaderSet, ShaderDuo, or something like that
 // still tho, within a larger context, the whole of a fragment & vertex shader can be named Shader for the time being...
+// This is old, not needed anymore
 
 import { Attributes } from "./attributes";
 import { Context } from "../render/context";

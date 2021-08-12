@@ -1,4 +1,5 @@
 // https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants
+// I will add everything eventually
 
 export enum ClearBufferBit {
     Depth = 0x00000100,
