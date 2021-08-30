@@ -9,12 +9,12 @@ Think barebones three.js, but with a focus on parametric design / procedural gen
 ## Demo
 [repo](https://github.com/josfeenstra/geon-demo/)
 
-[online](http://josfeenstra.nl/demo/geon/)
+[online](http://josfeenstra.nl/project/geon/)
 
 
 ## Install 
 ```
-git clone https://github.com/josfeenstra/eyefinder-ts
+git clone https://github.com/josfeenstra/geon-engine
 cd geon-engine 
 npm install 
 npm run build
