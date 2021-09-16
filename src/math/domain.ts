@@ -45,6 +45,11 @@ export class Domain {
         return value >= this.t0 && value <= this.t1;
     }
 
+    includesEx(value: number): boolean {
+        // note: including t0, excluding t1
+        return value >= this.t0 && value < this.t1;
+    }
+
     size(): number {
         // the size or length of this domain
         return this.t1 - this.t0;
@@ -171,6 +176,10 @@ export class Domain2 {
         return this.x.includes(value.x) && this.y.includes(value.y);
     }
 
+    includesEx(value: Vector2): boolean {
+        // note: including t0, including t1
+        return this.x.includesEx(value.x) && this.y.includesEx(value.y);
+    }
     size(): Vector2 {
         // the size or length of this domain
         return new Vector2(this.x.size(), this.y.size());

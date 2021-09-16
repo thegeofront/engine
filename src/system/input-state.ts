@@ -131,9 +131,15 @@ export class InputState {
         this.startTime = Date.now();
         this.minimumTick = 1000 / 144;
 
-        // mouse
-        canvas.addEventListener("mousedown", this.setMouseDown.bind(this));
-        canvas.addEventListener("mouseup", this.setMouseUp.bind(this));
+        // pointer
+        // if (window.PointerEvent) {
+        //     console.log("pointer events")
+        //     canvas.addEventListener("pointerdown", this.onPointerDown.bind(this));
+        //     canvas.addEventListener("pointerup", this.onPointerUp.bind(this));
+        //     canvas.addEventListener("pointermove", this.onPointerMove.bind(this));
+        // } else {
+        canvas.addEventListener("mousedown", this.onMouseDown.bind(this));
+        canvas.addEventListener("mouseup", this.onMouseUp.bind(this));
         canvas.addEventListener("contextmenu", (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -141,9 +147,12 @@ export class InputState {
         document.addEventListener("mousemove", this.onMouseMove.bind(this));
         canvas.addEventListener("wheel", this.setMouseScroll.bind(this));
 
-        document.addEventListener("touchmove", this.setTouch.bind(this));
-        canvas.addEventListener("touchstart", this.setTouch.bind(this));
-        canvas.addEventListener("touchend", this.setTouchUp.bind(this));
+        canvas.addEventListener("touchstart", this.onTouchDown.bind(this));
+        canvas.addEventListener("touchend", this.onTouchUp.bind(this));
+        canvas.addEventListener("touchmove", this.onTouchMove.bind(this));
+
+        // }
+
         // for (let i = 0; i < 223; i++) this.keysDown[i] = false;
 
         // keyboard
@@ -244,32 +253,15 @@ export class InputState {
         // NOTE: i made a different system to handle this, see onKeyDown
     }
 
-    private setTouch(e: TouchEvent) {
-        e.preventDefault();
-
-        this.mousePos = new Vector2(e.touches[0].clientX, e.touches[0].clientY);
-        this.mouseLeftDown = true;
-    }
-
-    private setTouchUp(e: TouchEvent) {
-        e.preventDefault();
-        this.mouseLeftDown = false;
-    }
-
     private setMouseScroll(e: WheelEvent) {
         this.mouseScrollBuffered = e.deltaY;
-    }
-
-    private onMouseMove(e: MouseEvent) {
-        // this is a bit messy, BUT, multiply by camera parameters
-        this.setMousePos(e.clientX, e.clientY);
     }
 
     private setMousePos(x: number, y: number) {
         this.mousePosBuffered = new Vector2(x,y);
     }
 
-    private setMouseUp(e: MouseEvent) {
+    private onMouseUp(e: MouseEvent) {
         let code = e.buttons;
         if (code < 4) {
             this.mouseMiddleDown = false;
@@ -283,9 +275,14 @@ export class InputState {
         }
     }
 
-    private setMouseDown(e: MouseEvent) {
+    private onMouseMove(e: MouseEvent) {
+        // this is a bit messy, BUT, multiply by camera parameters
+        this.setMousePos(e.clientX, e.clientY);
+    }
+
+    private onMouseDown(e: MouseEvent) {
         e.preventDefault();
-        e.stopPropagation();
+        // e.stopPropagation();
         this.canvas.focus();
         let code = e.buttons;
         if (code >= 4) {
@@ -302,4 +299,60 @@ export class InputState {
         }
         return false;
     }
+
+    private onTouchDown(e: TouchEvent) {
+        let buttons = 0;
+        if (e.touches.length > 0) {
+            buttons += 1;
+        }
+        if (e.touches.length >11) {
+            buttons += 2;
+        }
+        let mouseEvent = new MouseEvent("mousedown", {buttons});
+        this.canvas.dispatchEvent(mouseEvent)
+        let clientX = e.touches[0].clientX;
+        let clientY = e.touches[0].clientY;
+        let mouseEvent2 = new MouseEvent("mousemove", {clientX, clientY});
+        this.canvas.dispatchEvent(mouseEvent2)
+        e.stopPropagation();
+    }
+
+    private onTouchMove(e: TouchEvent) {
+        let clientX = e.touches[0].clientX;
+        let clientY = e.touches[0].clientY;
+        let mouseEvent = new MouseEvent("mousemove", {clientX, clientY});
+        this.canvas.dispatchEvent(mouseEvent)
+    }
+
+    private onTouchUp(e: TouchEvent) {
+        let mouseEvent = new MouseEvent("mouseup", {});
+        this.canvas.dispatchEvent(mouseEvent)
+    }
+
+    // private onPointerDown(e: PointerEvent) {
+    //     console.log("down", e.buttons);
+    //     let buttons = e.buttons;
+
+    //     if (e.pointerType == "touch") {
+    //         e.stopPropagation();
+    //         buttons += 1;
+            
+    //     }
+
+    //     let mouseEvent = new MouseEvent("mousedown", {buttons});
+    //     this.canvas.dispatchEvent(mouseEvent)
+    // }
+
+    // private onPointerMove(e: PointerEvent ) {
+    //     console.log("move");
+    //     let clientX = e.screenX;
+    //     let clientY = e.screenY;
+    //     let mouseEvent = new MouseEvent("mousemove", {clientX, clientY});
+    //     this.canvas.dispatchEvent(mouseEvent)
+    // }
+
+    // private onPointerUp(e: PointerEvent ) {
+    //     let mouseEvent = new MouseEvent("mouseup", {});
+    //     this.canvas.dispatchEvent(mouseEvent)
+    // }
 }
