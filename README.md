@@ -7,12 +7,14 @@ Think barebones three.js, but with a focus on parametric design / procedural gen
 
 
 ## Demo
-http://josfeenstra.nl/demo/geon/
+[repo](https://github.com/josfeenstra/geon-demo/)
+
+[online](http://josfeenstra.nl/project/geon/)
 
 
 ## Install 
 ```
-git clone https://github.com/josfeenstra/eyefinder-ts
+git clone https://github.com/josfeenstra/geon-engine
 cd geon-engine 
 npm install 
 npm run build
@@ -25,3 +27,4 @@ This will produce ```index.js``` within the build folder. To use it, run a local
 
 _____________________________________________________________
 ⚙️ = Busy | ✔️= DONE 
+
