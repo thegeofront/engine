@@ -114,7 +114,11 @@ export class GeonImage {
         // determine kernel size
         let size = kernel.count();
         let radius = size / 2 - 0.5;
-        let image = new GeonImage(this.width - radius * 2, this.height - radius * 2, this.pixelSize);
+        let image = new GeonImage(
+            this.width - radius * 2,
+            this.height - radius * 2,
+            this.pixelSize,
+        );
 
         // old image space
         for (let i = radius; i < this.width - radius; i++) {

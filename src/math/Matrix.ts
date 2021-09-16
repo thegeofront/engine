@@ -8,11 +8,16 @@ import { MultiVector3 } from "../data/multi-vector-3";
 import { Quaternion } from "./quaternion";
 import { Vector2, Vector3 } from "./vector";
 
+// NOTE: maybe matrix 3 should be removed...
 // 3x3 matrix of floats used for 2d math
 // inspired by Gregg Tavares.
 export class Matrix3 extends FloatMatrix {
     constructor(data: number[] = []) {
         super(3, 3, data);
+    }
+
+    static new(data = [1, 0, 0, 0, 1, 0, 0, 0, 1]) {
+        return new Matrix3(data);
     }
 
     static newIdentity(): Matrix3 {
@@ -36,10 +41,7 @@ export class Matrix3 extends FloatMatrix {
     }
 
     static newScalar(sx: number, sy: number) {
-        return new Matrix3(
-            [sx, 0, 0, 
-            0,   sy, 0, 
-            0,   0, 1]);
+        return new Matrix3([sx, 0, 0, 0, sy, 0, 0, 0, 1]);
     }
 
     toMat4(): Matrix4 {
@@ -165,7 +167,7 @@ export class Matrix4 extends FloatMatrix {
         super(4, 4, data);
     }
 
-    static new(data: number[]) {
+    static new(data = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]) {
         return new Matrix4(data);
     }
 
@@ -627,7 +629,6 @@ export class Matrix4 extends FloatMatrix {
      * @param {number} sx x scale.
      * @param {number} sy y scale.
      * @param {number} sz z scale.
-     * @param {Matrix4} [dst] optional matrix to store result
      * @return {Matrix4} dst or a new matrix if none provided
      * @memberOf module:webgl-3d-math
      */
@@ -664,15 +665,10 @@ export class Matrix4 extends FloatMatrix {
 
     /**
      * creates a matrix from translation, quaternion, scale
-     * @param {Number[]} translation [x, y, z] translation
-     * @param {Number[]} quaternion [x, y, z, z] quaternion rotation
-     * @param {Number[]} scale [x, y, z] scale
-     * @param {Matrix4} [dst] optional matrix to store result
-     * @return {Matrix4} dst or a new matrix if none provided
      */
     newCompose(translation: Vector3, quaternion: Quaternion, scale: Vector3): Matrix4 {
         let matrix = new Matrix4();
-        let dst = matrix.data;
+        let d = matrix.data;
 
         const x = quaternion.x;
         const y = quaternion.y;
@@ -699,112 +695,74 @@ export class Matrix4 extends FloatMatrix {
         const sy = scale.y;
         const sz = scale.z;
 
-        dst[0] = (1 - (yy + zz)) * sx;
-        dst[1] = (xy + wz) * sx;
-        dst[2] = (xz - wy) * sx;
-        dst[3] = 0;
+        d[0] = (1 - (yy + zz)) * sx;
+        d[1] = (xy + wz) * sx;
+        d[2] = (xz - wy) * sx;
+        d[3] = 0;
 
-        dst[4] = (xy - wz) * sy;
-        dst[5] = (1 - (xx + zz)) * sy;
-        dst[6] = (yz + wx) * sy;
-        dst[7] = 0;
+        d[4] = (xy - wz) * sy;
+        d[5] = (1 - (xx + zz)) * sy;
+        d[6] = (yz + wx) * sy;
+        d[7] = 0;
 
-        dst[8] = (xz + wy) * sz;
-        dst[9] = (yz - wx) * sz;
-        dst[10] = (1 - (xx + yy)) * sz;
-        dst[11] = 0;
+        d[8] = (xz + wy) * sz;
+        d[9] = (yz - wx) * sz;
+        d[10] = (1 - (xx + yy)) * sz;
+        d[11] = 0;
 
-        dst[12] = translation.x;
-        dst[13] = translation.y;
-        dst[14] = translation.z;
-        dst[15] = 1;
+        d[12] = translation.x;
+        d[13] = translation.y;
+        d[14] = translation.z;
+        d[15] = 1;
 
         return matrix;
     }
 
-    // quatFromRotationMatrix() {
-    //     // http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/index.htm
+    decompose() {
+        const d = this.data;
 
-    //     // assumes the upper 3x3 of m is a pure rotation matrix (i.e, unscaled)
-    //     const m11 = m[0];
-    //     const m12 = m[4];
-    //     const m13 = m[8];
-    //     const m21 = m[1];
-    //     const m22 = m[5];
-    //     const m23 = m[9];
-    //     const m31 = m[2];
-    //     const m32 = m[6];
-    //     const m33 = m[10];
+        // get position
+        let position = Vector3.new();
+        position.x = d[12];
+        position.y = d[13];
+        position.z = d[14];
 
-    //     const trace = m11 + m22 + m33;
+        // get scale
+        let sx = _dv.set(d[0], d[1], d[2]).length();
+        let sy = _dv.set(d[4], d[5], d[6]).length();
+        let sz = _dv.set(d[8], d[9], d[10]).length();
 
-    //     if (trace > 0) {
-    //         const s = 0.5 / Math.sqrt(trace + 1);
-    //         dst[3] = 0.25 / s;
-    //         dst[0] = (m32 - m23) * s;
-    //         dst[1] = (m13 - m31) * s;
-    //         dst[2] = (m21 - m12) * s;
-    //     } else if (m11 > m22 && m11 > m33) {
-    //         const s = 2 * Math.sqrt(1 + m11 - m22 - m33);
-    //         dst[3] = (m32 - m23) / s;
-    //         dst[0] = 0.25 * s;
-    //         dst[1] = (m12 + m21) / s;
-    //         dst[2] = (m13 + m31) / s;
-    //     } else if (m22 > m33) {
-    //         const s = 2 * Math.sqrt(1 + m22 - m11 - m33);
-    //         dst[3] = (m13 - m31) / s;
-    //         dst[0] = (m12 + m21) / s;
-    //         dst[1] = 0.25 * s;
-    //         dst[2] = (m23 + m32) / s;
-    //     } else {
-    //         const s = 2 * Math.sqrt(1 + m33 - m11 - m22);
-    //         dst[3] = (m21 - m12) / s;
-    //         dst[0] = (m13 + m31) / s;
-    //         dst[1] = (m23 + m32) / s;
-    //         dst[2] = 0.25 * s;
-    //     }
-    // }
+        // if determine is negative, we need to invert one scale
+        const det = this.determinate();
+        if (det < 0) sx = -sx;
 
-    // decompose(mat, translation, quaternion, scale) {
-    //     let sx = m4.length(mat.slice(0, 3));
-    //     const sy = m4.length(mat.slice(4, 7));
-    //     const sz = m4.length(mat.slice(8, 11));
+        let scale = Vector3.new();
+        scale.x = sx;
+        scale.y = sy;
+        scale.z = sz;
 
-    //     // if determinate is negative, we need to invert one scale
-    //     const det = determinate(mat);
-    //     if (det < 0) {
-    //         sx = -sx;
-    //     }
+        // get rotation
+        let rotation = Matrix4.new();
+        let rd = rotation.data;
 
-    //     translation[0] = mat[12];
-    //     translation[1] = mat[13];
-    //     translation[2] = mat[14];
+        const invSX = 1 / sx;
+        const invSY = 1 / sy;
+        const invSZ = 1 / sz;
 
-    //     // scale the rotation part
-    //     const matrix = m4.copy(mat);
+        rd[0] *= invSX;
+        rd[1] *= invSX;
+        rd[2] *= invSX;
 
-    //     const invSX = 1 / sx;
-    //     const invSY = 1 / sy;
-    //     const invSZ = 1 / sz;
+        rd[4] *= invSY;
+        rd[5] *= invSY;
+        rd[6] *= invSY;
 
-    //     matrix[0] *= invSX;
-    //     matrix[1] *= invSX;
-    //     matrix[2] *= invSX;
+        rd[8] *= invSZ;
+        rd[9] *= invSZ;
+        rd[10] *= invSZ;
 
-    //     matrix[4] *= invSY;
-    //     matrix[5] *= invSY;
-    //     matrix[6] *= invSY;
-
-    //     matrix[8] *= invSZ;
-    //     matrix[9] *= invSZ;
-    //     matrix[10] *= invSZ;
-
-    //     quatFromRotationMatrix(matrix, quaternion);
-
-    //     scale[0] = sx;
-    //     scale[1] = sy;
-    //     scale[2] = sz;
-    // }
+        return [position, rotation, scale];
+    }
 
     determinate(): number {
         let m = this.data;
@@ -1074,3 +1032,6 @@ export class Matrix4 extends FloatMatrix {
     //     return dst;
     // }
 }
+
+const _dv = Vector3.new();
+const _dm = Matrix4.new();

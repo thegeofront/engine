@@ -13,4 +13,8 @@ export class Quaternion {
         this.z = z;
         this.w = w;
     }
+
+    static new() {
+        return new Quaternion(0, 0, 0, 1);
+    }
 }
