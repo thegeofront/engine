@@ -728,9 +728,9 @@ export class Matrix4 extends FloatMatrix {
         position.z = d[14];
 
         // get scale
-        let sx = _dv.set(d[0], d[1], d[2]).length();
-        let sy = _dv.set(d[4], d[5], d[6]).length();
-        let sz = _dv.set(d[8], d[9], d[10]).length();
+        let sx = Vector3.new(d[0], d[1], d[2]).length();
+        let sy = Vector3.new(d[4], d[5], d[6]).length();
+        let sz = Vector3.new(d[8], d[9], d[10]).length();
 
         // if determine is negative, we need to invert one scale
         const det = this.determinate();
@@ -1032,6 +1032,3 @@ export class Matrix4 extends FloatMatrix {
     //     return dst;
     // }
 }
-
-const _dv = Vector3.new();
-const _dm = Matrix4.new();

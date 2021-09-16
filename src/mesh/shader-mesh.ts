@@ -29,8 +29,6 @@ export enum NormalKind {
     MultiVertex,
 }
 
-// RENAME : SHADABLEMESH or something...
-// ShadableMesh
 export class ShaderMesh {
     // this desperately calls for an overhaul...
 
@@ -74,6 +72,10 @@ export class ShaderMesh {
         texture: ImageData | undefined = undefined,
     ) {
         return new ShaderMesh(vertCount, normCount, uvCount, faceCount, texture);
+    }
+
+    static fromImage() {
+        // TODO
     }
 
     static fromMesh(mesh: Mesh): ShaderMesh {

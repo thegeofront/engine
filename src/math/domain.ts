@@ -195,7 +195,6 @@ export class Domain2 {
     corners(): Vector2[] {
         // render the extends of this boundary / domain
         let dim = 2;
-        let corners = 2 ** dim;
         let data = [];
         for (let x of [this.x.t0, this.x.t1]) {
             for (let y of [this.y.t0, this.y.t1]) {

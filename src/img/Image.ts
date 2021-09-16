@@ -25,6 +25,10 @@ export class GeonImage {
         this.data.fill(0);
     }
 
+    static new(width: number, height: number) {
+        return new GeonImage(width, height);
+    }
+
     static fromImageData(id: ImageData): GeonImage {
         let image = new GeonImage(id.width, id.height);
         image.setData(id.data);
@@ -66,6 +70,14 @@ export class GeonImage {
             }
         }
         return this;
+    }
+
+    forEach(filler: (x: number, y: number) => number[]) {
+        for (let i = 0; i < this.height; i++) {
+            for (let j = 0; j < this.width; j++) {
+                this.set(j, i, filler(j, i));
+            }
+        }
     }
 
     includes(x: number, y: number): boolean {
@@ -110,7 +122,7 @@ export class GeonImage {
         return image;
     }
 
-    public applyKernel(kernel: FloatMatrix): GeonImage {
+    applyKernel(kernel: FloatMatrix): GeonImage {
         // determine kernel size
         let size = kernel.count();
         let radius = size / 2 - 0.5;
@@ -265,7 +277,7 @@ export class GeonImage {
 
     // add borders till this size is achieved
     buffer(width: number, height: number): GeonImage {
-        // resize the image to a new width and height, using nearest neighbour
+
         const image = new GeonImage(width, height, this.pixelSize);
         const old = this;
 

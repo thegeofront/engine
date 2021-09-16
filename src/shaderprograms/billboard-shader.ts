@@ -6,7 +6,7 @@
 
 // NOTE: make sure to include something like a center offset, to gain control of if the point is rendered centered, as topleft, etc. etc.
 
-import { GeonImage, MultiVector3, MultiVector2, Context, Vector2 } from "../lib";
+import { GeonImage, MultiVector3, MultiVector2, Context, Vector2, Vector3 } from "../lib";
 import { ToFloatMatrix } from "../data/multi-vector";
 import { Attribute } from "../render-low/attribute";
 import { Shader } from "../render-low/shader";
@@ -35,10 +35,33 @@ export type BillboardPayload = {
 };
 
 /**
+ * A single billboard
+ */
+export class Billboard {
+    constructor(
+        public position: Vector3,
+        public image: GeonImage,
+    ) {}
+
+    static new(position: Vector3, image: GeonImage) {
+        return new Billboard(position, image);
+    }
+
+    toPayload() : BillboardPayload {
+        return {
+            positions: MultiVector3.fromList([this.position]),
+            uvs: MultiVector2.fromData([0,0]),
+            uvSizes: MultiVector2.fromData([this.image.width, this.image.height]),
+            texture: this.image,
+        }
+    }
+}
+
+/**
  * Used to render multiple billboards.
  * One Texture per billboard.
  */
-export class BillboardShader extends Program<BillboardPayload> {
+export class BillboardShader extends Program<BillboardPayload | Billboard> {
     // exposed Uniforms like this can be use to statically change certain properties
     color!: Uniform;
     radius!: Uniform;
@@ -122,7 +145,12 @@ export class BillboardShader extends Program<BillboardPayload> {
         return DrawMode.Points;
     }
 
-    protected onSet(payload: BillboardPayload, speed: DrawSpeed): number {
+    protected onSet(payload: BillboardPayload | Billboard, speed: DrawSpeed): number {
+
+        if (payload instanceof Billboard) {
+            payload = payload.toPayload();
+        } 
+
         this.attributes.set("a_vertex", ToFloatMatrix(payload.positions).data, speed);
         this.attributes.set("a_uv", ToFloatMatrix(payload.uvs).data, speed);
         this.attributes.set("a_uv_wh", ToFloatMatrix(payload.uvSizes).data, speed);

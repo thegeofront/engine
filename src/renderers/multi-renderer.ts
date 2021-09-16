@@ -3,7 +3,7 @@
 import { MultiVector3 } from "../data/multi-vector-3";
 import { Curve } from "../geo/curve/curve";
 import { Polyline } from "../geo/curve/polyline";
-import { BiSurface, Plane } from "../lib";
+import { BiSurface, Plane, TextureMeshShader } from "../lib";
 import { createRandomGUID } from "../math/random";
 import { Mesh } from "../mesh/mesh";
 import { MultiLine } from "../mesh/multi-line";
@@ -14,7 +14,9 @@ import { MeshDebugShader } from "../shaders/mesh-debug-shader";
 import { ShadedMeshShader } from "../shaders/shaded-mesh-shader";
 import { Context } from "../render/context";
 import { Shader } from "../render-low/shader";
-import { WebGl } from "../render-low/webgl";
+import { DrawSpeed, WebGl } from "../render-low/webgl";
+import { Billboard, BillboardPayload, BillboardShader } from "../shaderprograms/billboard-shader";
+import { ImageMesh } from "../geometry/ImageMesh";
 
 // NOTE: I think this type of polymorphism is better than regular polymorphism
 export type RenderableUnit =
@@ -26,8 +28,8 @@ export type RenderableUnit =
     | Polyline
     | Plane
     | MultiLine
-    | any;
-type AcceptableShader = DotShader | ShadedMeshShader | MeshDebugShader | LineShader;
+    | ImageMesh
+type AcceptableShader = DotShader | ShadedMeshShader | MeshDebugShader | LineShader | TextureMeshShader;
 
 export class MultiRenderer {
     private constructor(private gl: WebGl, private shaders: Map<string, AcceptableShader>) {}
@@ -94,6 +96,9 @@ export class MultiRenderer {
         } else if (unit instanceof MultiLine) {
             shader = new LineShader(gl);
             shader.set(unit);
+        } else if (unit instanceof ImageMesh) {
+            shader = new TextureMeshShader(gl);
+            shader.set(unit.buffer(), DrawSpeed.StaticDraw);
         } else {
             console.error("MultiRenderer cannot render: ", unit);
             return undefined;
