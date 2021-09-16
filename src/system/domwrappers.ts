@@ -118,6 +118,16 @@ export function loadImageFromBlob(blob: Blob): Promise<ImageData> {
     });
 }
 
+export function loadImageFromSrc(src: string): Promise<ImageData> {
+    return new Promise(function (resolve, reject) {
+        let img = document.createElement("img") as HTMLImageElement;
+        img.src = src;
+
+        img.onload = () => resolve(loadImageHelper2(img));
+        img.onerror = () => reject(new Error(`Script load error for ${img}`));
+    });
+}
+
 function loadImageHelper1(fileReader: FileReader): Promise<ImageData> {
     return new Promise(function (resolve, reject) {
         let img = document.createElement("img") as HTMLImageElement;

@@ -1,6 +1,5 @@
 // purpose: something that is willing to create new Shaders on the fly, to render whatever it gets
 
-
 import { MultiVector3 } from "../data/multi-vector-3";
 import { Curve } from "../geo/curve/curve";
 import { Polyline } from "../geo/curve/polyline";
@@ -13,25 +12,31 @@ import { DotShader } from "../shaders/dot-shader";
 import { LineShader } from "../shaders/line-shader";
 import { MeshDebugShader } from "../shaders/mesh-debug-shader";
 import { ShadedMeshShader } from "../shaders/shaded-mesh-shader";
-import { Context } from "./context";
-import { Shader, WebGl } from "./shader";
+import { Context } from "../render/context";
+import { Shader } from "../render-low/shader";
+import { WebGl } from "../render-low/webgl";
 
 // NOTE: I think this type of polymorphism is better than regular polymorphism
-export type RenderableUnit = MultiVector3 | ShaderMesh | Mesh | BiSurface | Curve | Polyline | Plane | MultiLine | any;
-type AcceptableShader = DotShader | ShadedMeshShader | MeshDebugShader | LineShader
+export type RenderableUnit =
+    | MultiVector3
+    | ShaderMesh
+    | Mesh
+    | BiSurface
+    | Curve
+    | Polyline
+    | Plane
+    | MultiLine
+    | any;
+type AcceptableShader = DotShader | ShadedMeshShader | MeshDebugShader | LineShader;
 
 export class MultiRenderer {
-    
-    private constructor(
-        private gl: WebGl, 
-        private shaders: Map<string, AcceptableShader>) {} 
+    private constructor(private gl: WebGl, private shaders: Map<string, AcceptableShader>) {}
 
-    static new(gl: WebGl) : MultiRenderer {
+    static new(gl: WebGl): MultiRenderer {
         return new MultiRenderer(gl, new Map());
     }
 
     set(unit: RenderableUnit, key?: string) {
-
         if (!key) {
             key = createRandomGUID();
         }
@@ -82,7 +87,7 @@ export class MultiRenderer {
             shader = new LineShader(gl);
             let multiLine = MultiLine.fromPolyline(unit);
             shader.set(multiLine);
-        } else if (unit instanceof Plane ) {
+        } else if (unit instanceof Plane) {
             shader = new LineShader(gl);
             let multiLine = MultiLine.fromPlane(unit);
             shader.set(multiLine);

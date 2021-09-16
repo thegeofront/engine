@@ -3,15 +3,16 @@
 // purpose: WebGL based rendering of lines.
 
 import {
-    Shader,
     ShaderMesh,
     DrawSpeed,
+    HelpGl,
     MultiVector3,
     NormalKind,
     Vector3,
     getDefaultIndices,
     Context,
 } from "../lib";
+import { Shader } from "../render-low/shader";
 
 export class NormalShader extends Shader<ShaderMesh> {
     a_position: number;
@@ -82,7 +83,7 @@ export class NormalShader extends Shader<ShaderMesh> {
         // save how many verts need to be drawn
         let gl = this.gl;
         gl.useProgram(this.program);
-        let drawspeed = this.convertDrawSpeed(speed);
+        let drawspeed = speed;
         this.vertCount = 3;
 
         let lineverts: MultiVector3;

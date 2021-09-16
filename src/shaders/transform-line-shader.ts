@@ -2,10 +2,7 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of lines.
 
-import { Matrix4 } from "../math/matrix";
-import { ShaderMesh } from "../mesh/shader-mesh";
-import { Context } from "../render/context";
-import { Shader, DrawSpeed } from "../render/shader";
+import { ShaderMesh, Matrix4, DrawSpeed, HelpGl, Context, Shader } from "../lib";
 
 export class TransformLineShader extends Shader<ShaderMesh> {
     private a_position: number;
@@ -92,7 +89,7 @@ export class TransformLineShader extends Shader<ShaderMesh> {
         gl.useProgram(this.program);
         this.count = links.length;
         this.vertCount = verts.slice().width;
-        let drawspeed = this.convertDrawSpeed(speed);
+        let drawspeed = speed;
 
         // vertices
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);

@@ -1,31 +1,29 @@
 {
   "name": "geon-engine",
-  "version": "0.1.0",
+  "version": "0.1.5",
   "author": "Jos Feenstra",
   "license": "MIT",
-  "description": "General purpose 3d geometry library & 3d renderer without external dependencies.",
-  "main": "lib.ts",
+  "description": "Lightweight 3d geometry library + 3d renderer",
+  "main": "build/lib.js",
+  "types": "build/lib.d.ts",
   "scripts": {
-    "build": "webpack --mode=development --config-name demo",
-    "lib": "webpack --mode=development --config-name lib",
-    "production": "webpack --mode=production --config-name demo",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "webpack --watch --config-name demo"
+    "prepublish": "tsc --build",
+    "watch": "tsc --build --watch",
+    "build": "tsc --build",
+    "lib": "webpack --mode=development",
+    "production": "webpack --mode=production",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "geon",
     "geometry",
     "3d",
     "engine",
-    "geomatics",
-    "game"
+    "geomatics"
   ],
   "devDependencies": {
     "ts-loader": ">=8.0.5",
-    "typescript": ">=4.0.3",
-    "webpack": ">=5.1.3",
-    "webpack-cli": ">=4.0.0",
-    "webpack-dev-server": ">=3.11.0"
+    "typescript": "^4.3.5"
   },
   "dependencies": {}
 }

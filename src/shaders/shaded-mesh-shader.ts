@@ -14,6 +14,7 @@ import {
     Matrix4,
     Vector3,
 } from "../lib";
+import { HelpGl } from "../render-low/webgl";
 
 export class ShadedMeshShader extends Shader<ShaderMesh> {
     // attribute & uniform locations
@@ -135,7 +136,6 @@ export class ShadedMeshShader extends Shader<ShaderMesh> {
 
             gl.useProgram(this.program);
             this.count = rend.mesh.links.data.length;
-            let ds = this.convertDrawSpeed(speed);
 
             // convert to non-indexed verts & norms
             let verts = MultiVector3.new(this.count);
@@ -156,12 +156,12 @@ export class ShadedMeshShader extends Shader<ShaderMesh> {
             // buffer 1
             gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_postition_buffer);
             gl.vertexAttribPointer(this.a_vertex_position, 3, gl.FLOAT, false, 0, 0);
-            gl.bufferData(gl.ARRAY_BUFFER, verts.slice().data.buffer, ds);
+            gl.bufferData(gl.ARRAY_BUFFER, verts.slice().data.buffer, speed);
 
             // buffer 2
             gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_normal_buffer);
             gl.vertexAttribPointer(this.a_vertex_normal, 3, gl.FLOAT, false, 0, 0);
-            gl.bufferData(gl.ARRAY_BUFFER, norms.slice().data.buffer, ds);
+            gl.bufferData(gl.ARRAY_BUFFER, norms.slice().data.buffer, speed);
 
             // buffer 3
             // gl.bindBuffer(gl.ARRAY_BUFFER, this.a_vertex_ambi_buffer);
@@ -170,16 +170,12 @@ export class ShadedMeshShader extends Shader<ShaderMesh> {
 
             // index
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
-            gl.bufferData(
-                gl.ELEMENT_ARRAY_BUFFER,
-                getDefaultIndices(this.count),
-                this.convertDrawSpeed(speed),
-            );
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, getDefaultIndices(this.count), speed);
         } else if (normalType == NormalKind.Vertex) {
             // save how many verts need to be drawn
             gl.useProgram(this.program);
 
-            let ds = this.convertDrawSpeed(speed);
+            let ds = speed;
 
             // convert to non-indexed verts & norms
             let ambi = rend.ambi;
@@ -211,10 +207,12 @@ export class ShadedMeshShader extends Shader<ShaderMesh> {
         }
 
         // never render more than possible
-        if (this.count > Const.MAX_U16) {
-            this.count = Const.MAX_U16;
-            console.warn("mesh max reached.");
-        }
+        // NOTE : THIS IS INCORRECT. OFTEN WE CAN JUST RENDER IT NO PROBLEM
+        // TODO : CREATE SOMETHING LIKE AN AUTOMATIC OVERFLOW SHADER WHICH RENDERS THE REST
+        // if (this.count > Const.MAX_U16) {
+        //     this.count = Const.MAX_U16;
+        //     console.warn("mesh max reached.");
+        // }
     }
 
     // set only the basic elements.
@@ -284,6 +282,12 @@ export class ShadedMeshShader extends Shader<ShaderMesh> {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
 
         // draw!
+
+        // NOTE: We can increase the number of triangles we can maximally draw!!!!
+        // https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/drawElements
+        // When using the OES_element_index_uint extension:
+        // gl.UNSIGNED_INT;
+
         gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
     }
 }

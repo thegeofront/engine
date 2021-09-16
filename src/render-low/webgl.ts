@@ -1,56 +1,32 @@
-// webgl-helpers.ts
-//
-// author: Jos Feenstra
-// credits to : https://webglfundamentals.org/
-// note: im still figuring out how to organize this
-// TODO: remove all the WebGl wrappers
-
-import { ShaderMesh } from "../mesh/shader-mesh";
-import { Camera } from "./camera";
-import { Context } from "./context";
-
-// import { Scene } from "./scene";
+// purpose : webgl wrapping & helper functions
 
 var nextTextureId = 0;
 var rendercallsperframe = 0;
 
 export type WebGl = WebGLRenderingContext;
 
-
+// TODO move this to 'constants.ts' and refactor everything again :)
 export enum DrawSpeed {
-    StaticDraw, // if you plan on using the 'set' method only a couple of times / once
-    DynamicDraw, // if you plan on using the 'set' method every frame
+    StreamDraw = 0x88e0,
+    StaticDraw = 0x88e4, // if you plan on using the 'set' method only a couple of times / once
+    DynamicDraw = 0x88e8, // if you plan on using the 'set' method every frame
 }
 
-// @param T = data to feed the renderer at 'set'
-export abstract class Shader<T> {
-    gl: WebGLRenderingContext;
-    program: WebGLProgram;
+export class HelpGl {
+    private constructor() {}
 
-    constructor(gl: WebGLRenderingContext, vertexScript: string, fragmentScript: string) {
-        this.gl = gl;
-        this.program = Shader.createProgramFromScripts(gl, vertexScript, fragmentScript);
-    }
+    static new() {}
 
-    abstract set(r: T, speed: DrawSpeed): void;
-
-    abstract render(context: Context): void;
-
-    setAndRender(r: T, context: Context) {
-        this.set(r, DrawSpeed.DynamicDraw);
-        this.render(context);
-    }
-
-    // helpers. these could live somewhere else... maybe in Context?
-    //#region
-
+    /**
+     * We need to keep track of all textures in the entire webgl application
+     */
     static getNextTextureID() {
         let id = nextTextureId;
         nextTextureId += 1;
         return id;
     }
 
-    static resizeCanvas(gl: WebGLRenderingContext) {
+    static resizeCanvas(gl: WebGl) {
         // Lookup the size the browser is displaying the canvas in CSS pixels.
         let canvas = gl.canvas as HTMLCanvasElement;
 
@@ -72,20 +48,12 @@ export abstract class Shader<T> {
         return needResize;
     }
 
-    convertDrawSpeed(speed: DrawSpeed): number {
-        if (speed == DrawSpeed.DynamicDraw) {
-            return this.gl.DYNAMIC_DRAW;
-        } else {
-            return this.gl.STATIC_DRAW;
-        }
-    }
-
-    static initWebglContext(canvas: HTMLCanvasElement, blend=false) {
+    static initWebglContext(canvas: HTMLCanvasElement, blend = false): WebGl {
         let possiblyGl = canvas.getContext("webgl");
         if (possiblyGl == undefined) {
             console.log("webgl unavailable...");
         }
-        
+
         let gl = possiblyGl!;
         gl.enable(gl.CULL_FACE);
 
@@ -99,17 +67,16 @@ export abstract class Shader<T> {
             gl.depthFunc(gl.LEQUAL);
         }
 
+        // extensions
+        let ext = gl.getExtension("OES_element_index_uint");
+
         gl.clearColor(0.0, 0.0, 0.0, 1.0);
         gl.clearDepth(1);
 
         return gl;
     }
 
-    static compileShader(
-        gl: WebGLRenderingContext,
-        shaderSource: string,
-        shaderType: number,
-    ): WebGLShader {
+    static compileShader(gl: WebGl, shaderSource: string, shaderType: number): WebGLShader {
         let shader = gl.createShader(shaderType)!;
         gl.shaderSource(shader, shaderSource);
         gl.compileShader(shader);
@@ -120,11 +87,7 @@ export abstract class Shader<T> {
         return shader;
     }
 
-    static createProgram(
-        gl: WebGLRenderingContext,
-        vertexShader: WebGLShader,
-        fragmentShader: WebGLShader,
-    ) {
+    static createProgram(gl: WebGl, vertexShader: WebGLShader, fragmentShader: WebGLShader) {
         let program = gl.createProgram()!;
         gl.attachShader(program, vertexShader);
         gl.attachShader(program, fragmentShader);
@@ -137,14 +100,12 @@ export abstract class Shader<T> {
     }
 
     static createProgramFromScripts(
-        gl: WebGLRenderingContext,
+        gl: WebGl,
         vertexScript: string,
         fragmentScript: string,
     ): WebGLProgram {
-        let vertexShader = Shader.compileShader(gl, vertexScript, gl.VERTEX_SHADER);
-        let fragmentShader = Shader.compileShader(gl, fragmentScript, gl.FRAGMENT_SHADER);
-        return Shader.createProgram(gl, vertexShader, fragmentShader);
+        let vertexShader = HelpGl.compileShader(gl, vertexScript, gl.VERTEX_SHADER);
+        let fragmentShader = HelpGl.compileShader(gl, fragmentScript, gl.FRAGMENT_SHADER);
+        return HelpGl.createProgram(gl, vertexShader, fragmentShader);
     }
-
-    //#endregion
 }

@@ -3,6 +3,7 @@
 // purpose: WebGL based rendering of a mesh.
 
 import { DrawSpeed, IntMatrix, Matrix4, Mesh, ShaderMesh, Shader, MultiVector3 } from "../lib";
+import { HelpGl } from "../render-low/webgl";
 import { Context } from "../render/context";
 
 /**
@@ -71,7 +72,7 @@ export class SimpleMeshOverlayRenderer extends Shader<ShaderMesh> {
         gl.useProgram(this.program);
         this.count = mesh.links.data.length;
 
-        // color 
+        // color
         let color = rend.color;
         gl.uniform4f(this.u_color, color[0], color[1], color[2], color[3]);
 
@@ -81,11 +82,11 @@ export class SimpleMeshOverlayRenderer extends Shader<ShaderMesh> {
         var type = gl.FLOAT;
         var normalize = false;
         gl.vertexAttribPointer(this.a_position, this.size, gl.FLOAT, false, 0, 0);
-        gl.bufferData(gl.ARRAY_BUFFER, mesh.verts.slice().data, this.convertDrawSpeed(speed));
+        gl.bufferData(gl.ARRAY_BUFFER, mesh.verts.slice().data, speed);
 
         // indices
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, mesh.links.data, this.convertDrawSpeed(speed));
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, mesh.links.data, speed);
     }
 
     // render 1 image to the screen

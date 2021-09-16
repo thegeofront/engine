@@ -1,8 +1,6 @@
 // jos feenstra
 
-import { Rectangle2 } from "../geo/rectangle";
-import { Context } from "../render/context";
-import { Shader } from "../render/shader";
+import { Shader, Rectangle2, Context } from "../lib";
 
 export class RectangleShader extends Shader<Rectangle2[]> {
     // attribute & uniform locations

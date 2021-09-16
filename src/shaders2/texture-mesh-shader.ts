@@ -2,9 +2,7 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of a mesh.
 
-import { ShaderMesh } from "../mesh/shader-mesh";
-import { DrawSpeed, Shader } from "../render/shader";
-import { Context } from "../render/context";
+import { Shader, ShaderMesh, HelpGl, DrawSpeed, Context } from "../lib";
 
 export class TextureMeshShader extends Shader<ShaderMesh> {
     // attribute & uniform locations
@@ -73,7 +71,7 @@ export class TextureMeshShader extends Shader<ShaderMesh> {
         this.index_buffer = gl.createBuffer()!;
 
         // init texture
-        this.texture_id = Shader.getNextTextureID();
+        this.texture_id = HelpGl.getNextTextureID();
         this.texture = gl.createTexture();
     }
 
@@ -96,20 +94,16 @@ export class TextureMeshShader extends Shader<ShaderMesh> {
         // buffer 1
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_position_buffer);
         gl.vertexAttribPointer(this.a_position, 3, gl.FLOAT, false, 0, 0);
-        gl.bufferData(gl.ARRAY_BUFFER, r.mesh.verts.slice().data, this.convertDrawSpeed(speed));
+        gl.bufferData(gl.ARRAY_BUFFER, r.mesh.verts.slice().data, speed);
 
         // buffer 2
         gl.bindBuffer(gl.ARRAY_BUFFER, this.a_texcoord_buffer);
         gl.vertexAttribPointer(this.a_texcoord, 2, gl.FLOAT, false, 0, 0);
-        gl.bufferData(gl.ARRAY_BUFFER, r.uvs.toMatrixSlice().data, this.convertDrawSpeed(speed));
+        gl.bufferData(gl.ARRAY_BUFFER, r.uvs.toMatrixSlice().data, speed);
 
         // buffer 3
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.index_buffer);
-        gl.bufferData(
-            gl.ELEMENT_ARRAY_BUFFER,
-            new Uint16Array(r.mesh.links.data),
-            this.convertDrawSpeed(speed),
-        );
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(r.mesh.links.data), speed);
 
         // texture
         gl.activeTexture(gl.TEXTURE0 + this.texture_id);
@@ -154,10 +148,5 @@ export class TextureMeshShader extends Shader<ShaderMesh> {
 
         // draw!
         gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
-    }
-
-    setAndRender(r: ShaderMesh, context: Context) {
-        this.set(r, DrawSpeed.DynamicDraw);
-        this.render(context);
     }
 }
