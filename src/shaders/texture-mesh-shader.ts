@@ -39,17 +39,42 @@ export class TextureMeshShader extends Shader<ShaderMesh> {
         }
         `;
 
-        const fs = `
-        precision mediump float;
+        let fs;
+        let pixelPerfext=false;
+        if (pixelPerfext) {
+            fs = `
+            precision mediump float;
+    
+            varying vec2 v_texcoord;
+    
+            uniform sampler2D u_texture;
+    
+            void main() {
+                gl_FragColor = texture2D(u_texture, v_texcoord);
+            }
+            `;
+        } else {
+            fs = `
+            precision mediump float;
+    
+            varying vec2 v_texcoord;
 
-        varying vec2 v_texcoord;
+            vec2 u_texture_size = vec2(1.0,1.0);
+            uniform sampler2D u_texture;
+    
+            void main() {
+                // vec2 texture_fraction = 1.0 / u_texture_size;
+                // vec2 sprite_fraction = 1.0 / uv_size;
+                // vec2 tex_origin = uv * texture_fraction;
 
-        uniform sampler2D u_texture;
-
-        void main() {
-            gl_FragColor = texture2D(u_texture, v_texcoord);
+                gl_FragColor = texture2D(u_texture, v_texcoord);
+            }
+            `;
         }
-        `;
+
+
+
+
 
         // setup program
         super(gl, vs, fs);

@@ -12,3 +12,24 @@
 
 - All shaders should not ask for anything interesting in the constructors: they should be factory-able.
 - All shaders must have different 'setState' functions, to be called separately from 'render' function.
+
+
+# Idea
+
+`Bufferable` trait 
+- means that this object can be buffered into a `Renderable` object.
+- this is not meant to happen every single frame...
+
+`Renderable` trait 
+- means that this object can be rendererd by a shader directly.
+- this could happen every single frame
+
+`Shadable` trait
+- ?? 
+- ?? 
+
+
+
+`Renderer` 
+
+`Shadable`

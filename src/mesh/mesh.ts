@@ -146,23 +146,6 @@ export class Mesh {
         return new Mesh(verts, links);
     }
 
-    static fromRect(rect: Rectangle3): ShaderMesh {
-        let verts = rect.getCorners();
-
-        // we cant handle quads yet
-        let faces: number[] = [];
-        faces.push(...quadToTri(cubeFaces[0]));
-        let rend = new ShaderMesh(4, 0, 0, 2);
-        rend.mesh.verts.fillFromList(verts);
-        rend.mesh.links.setData(faces);
-
-        // console.log(mesh.verts);
-        // console.log(mesh.links);
-
-        rend.setUvs(new Float32Array([0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0]));
-        return rend;
-    }
-
     static fromRectangle(rect: Rectangle3): Mesh {
         let verts = rect.getCorners();
 
@@ -571,6 +554,6 @@ const cubeFaces = [
     [5, 4, 6, 7], // back
 ];
 
-function quadToTri(abcd: number[]): number[] {
+export function quadToTri(abcd: number[]): number[] {
     return [abcd[0], abcd[2], abcd[1], abcd[0], abcd[3], abcd[2]];
 }

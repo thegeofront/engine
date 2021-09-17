@@ -108,4 +108,14 @@ export class HelpGl {
         let fragmentShader = HelpGl.compileShader(gl, fragmentScript, gl.FRAGMENT_SHADER);
         return HelpGl.createProgram(gl, vertexShader, fragmentShader);
     }
+
+    /**
+     * WebGl only allows textures with a width and height of the power of two.
+     * This means `32x512` is valid, while `40x40` is not valid
+     * This function takes a size, lets say `40`, and rounds up to the nearest power of two, in this case `64`  
+     */
+    static fixTextureSizing(size: number) {
+        let base = Math.log2(size);
+        return Math.pow(2, Math.ceil(base));
+    }
 }

@@ -69,6 +69,7 @@ export * from "./render-low/uniforms";
 export * from "./render-low/webgl";
 
 export * from "./renderers/multi-renderer";
+export * from "./renderers/image-renderer";
 
 export * from "./shaders/dot-shader";
 export * from "./shaders/line-shader";
@@ -88,5 +89,3 @@ export * from "./system/fps-counter";
 export * from "./system/input-state";
 export * from "./system/ui";
 export * from "./system/core";
-
-export * from "./combo/image-combi";

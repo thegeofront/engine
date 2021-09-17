@@ -6,6 +6,7 @@ export class ImageRenderer {
 		public gl: WebGl,
 		public stdSize?: Vector3,
 		public gap = 10,
+		public scale = 2,
 		public images: GeonImage[] = [],
 		public shaders: TextureMeshShader[] = [],
 	) {}
@@ -22,30 +23,17 @@ export class ImageRenderer {
 	buffer() {
 		// i was having trouble rendering images... this is a workaround:
 		// convert the this.images[] list into the this.imageMeshes[] list
-		let accumulatedHeight = 0;
+		let accumulatedWidth = 0;
 		this.images.forEach((image, i) => {
 
-			let height = image.height;
-			let width = image.width;
-
-			let rectangle = new Rectangle3(
-				Plane.WorldXY(),
-				Domain2.fromBounds(this.gap, this.gap + width, accumulatedHeight, accumulatedHeight + height),
-			);
-
-			let mesh = Mesh.fromRect(rectangle);
-
-			if (this.stdSize) {
-				image = image.resize(this.stdSize.x, this.stdSize.y);
-			}
-			mesh.setTexture(image.toImageData()); // note: webgl can only work with 2^x * 512 images
+			let mesh = ShaderMesh.fromImage(image, Vector3.new(accumulatedWidth, 0, 0), Vector3.unitZ(), false, 100)
 			this.shaders[i].set(mesh, DrawSpeed.StaticDraw);
 
-			accumulatedHeight += height + this.gap;
+			accumulatedWidth += image.width + this.gap;
 		});
 	}
 
-	draw(c: Context) {
+	render(c: Context) {
 		this.shaders.forEach((shader) => {
 			shader.render(c);
 		});

@@ -466,11 +466,7 @@ export class Vector2 {
         return new Vector2(x, y);
     }
 
-    static getSign(a: Vector2, b: Vector2, c: Vector2): number {
-        // test half plane relationship
-        // <0 : point on first half
-        // 0  : points collinear
-        // >0 : point on second half
+    static sign(a: Vector2, b: Vector2, c: Vector2) {   
         return (a.x - c.x) * (b.y - c.y) - (b.x - c.x) * (a.y - c.y);
     }
 
@@ -700,7 +696,7 @@ export class Vector2 {
 
     // calculate the 'triangle sign' of three points. Can be used to determine clockwise & counter clockwise
     sign(b: Vector2, c: Vector2): number {
-        return (this.x - c.x) * (b.y - c.y) - (b.x - c.x) * (this.y - c.y);
+        return Vector2.sign(this, b, c);
     }
 
     // use dot product to project this vector on the other vector

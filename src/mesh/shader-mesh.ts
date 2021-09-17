@@ -9,7 +9,7 @@
 //   - triangles (links.width = 3)
 //   - quads (links.width = 4. will need to be converted to triangles for now...)
 
-import { Graph, Matrix4, Mesh, MultiVector2, MultiVector3 } from "../lib";
+import { Domain2, GeonImage, Graph, HelpGl, Matrix4, Mesh, MultiVector2, MultiVector3, Plane, quadToTri, Rectangle3, Vector3 } from "../lib";
 
 type vertexID = number;
 type faceID = number;
@@ -74,8 +74,93 @@ export class ShaderMesh {
         return new ShaderMesh(vertCount, normCount, uvCount, faceCount, texture);
     }
 
-    static fromImage() {
-        // TODO
+    static fromRectDoubleSided(rect: Rectangle3, texture?: ImageData) {
+        let verts = rect.getCorners();
+        let faces: number[] = [];
+        faces.push(...[0,1,3, 0,3,2, 0,3,1 , 0,2,3]);
+        let rend = new ShaderMesh(4, 0, 0, 4, texture);
+        rend.setUvs(new Float32Array([
+            0.0, 0.0, 
+            0.0, 1.0, 
+            1.0, 0.0, 
+            1.0, 1.0,
+            0.0, 0.0, 
+            1.0, 0.0, 
+            0.0, 1.0, 
+            1.0, 1.0
+        ]));
+        rend.mesh.verts.fillFromList(verts);
+        rend.mesh.links.setData(faces);
+        return rend;
+    }
+
+    static fromRect(rect: Rectangle3, texture?: ImageData): ShaderMesh {
+        let verts = rect.getCorners();
+        let faces: number[] = [];
+        faces.push(...quadToTri([0, 1, 3, 2]));
+        let rend = new ShaderMesh(4, 0, 0, 2);
+        rend.setUvs(new Float32Array([0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0]));
+        rend.mesh.verts.fillFromList(verts);
+        rend.mesh.links.setData(faces);
+        return rend;
+    }
+
+    static fromImage(image: GeonImage, pos=Vector3.zero(), normal=Vector3.unitZ(), 
+        centered=true, scale=1, fixWebglLimitation=true, bothSides=true) : ShaderMesh {
+    
+        let plane = Plane.fromPN(pos, normal);
+
+            
+        let domain;
+        if (centered) {
+            domain = Domain2.fromWH(-image.width/2*scale, -image.height/2*scale, image.width*scale, image.height*scale);
+        } else {
+            domain = Domain2.fromWH(0, 0, image.width*scale, image.height*scale);
+        }
+        
+        let rectangle = new Rectangle3(plane, domain);
+
+        let mesh: ShaderMesh;
+        if (bothSides) {
+            mesh = ShaderMesh.fromRectDoubleSided(rectangle);
+        } else {
+            mesh = ShaderMesh.fromRect(rectangle);
+        }
+    
+        // note: webgl can only work with 2^x images
+        if (fixWebglLimitation) {
+            let goodWidth = HelpGl.fixTextureSizing(image.width);
+            let goodHeight = HelpGl.fixTextureSizing(image.height);
+            if (goodWidth !== image.width || goodHeight !== image.height) {
+                // we need to perform resizing!
+                console.log("resizing to ", goodWidth, goodHeight);
+                let u = image.width / goodWidth;
+                let v = image.height / goodHeight;
+                
+                image = image.buffer(goodWidth, goodHeight);
+                if (bothSides) {
+                    mesh.setUvs(new Float32Array([
+                        0.0, 0.0, 
+                        0.0, v, 
+                        u, 0.0, 
+                        u, v,
+                        0.0, 0.0, 
+                        u, 0.0, 
+                        0.0, v, 
+                        u, v
+                    ]));
+                } else {
+                    mesh.setUvs(new Float32Array([
+                        0.0, 0.0, 
+                        0.0, v, 
+                        u, 0.0, 
+                        u, v
+                    ]));
+                }
+            }
+        }
+        mesh.setTexture(image.toImageData());
+        return mesh;
     }
 
     static fromMesh(mesh: Mesh): ShaderMesh {
