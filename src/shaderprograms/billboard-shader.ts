@@ -113,17 +113,25 @@ export class BillboardShader extends Program<BillboardPayload | Billboard> {
         varying vec2  uv;
         varying vec2  uv_size;
         varying float point_size; // can this be replaced with u_size ??
-        
-        vec2 center = vec2(0.5, 0.5);
-        
+
         void main() {
+            // NOTE this can be done way easier, we dont need uv sized, we just need to go to pixel space
+            
+            // make pixel-perfect, but round it so it has no artefacts.
+            // coord ~= gp_PointCoord
+            vec2 sprite_uv = gl_PointCoord * uv_size;
+            vec2 alpha = vec2(0.03);
+            vec2 x = fract(sprite_uv);
+            vec2 x_ = clamp(0.5 / alpha * x, 0.0, 0.5) +
+                      clamp(0.5 / alpha * (x - 1.0) + 0.5, 0.0, 0.5);
+            vec2 coord = (floor(sprite_uv) + x_);
 
+            // take the right part of the spritemap
             vec2 texture_fraction = 1.0 / u_texture_size;
-            vec2 sprite_fraction = 1.0 / uv_size;
-            vec2 tex_origin = uv * texture_fraction;
+            vec2 texture_topleft = uv * texture_fraction;
+            vec2 realCoord = texture_topleft + coord / u_texture_size;
 
-            vec2 coord = tex_origin + gl_PointCoord * sprite_fraction;
-            gl_FragColor = texture2D(u_texture, coord);
+            gl_FragColor = texture2D(u_texture, realCoord);
         }
         `;
 

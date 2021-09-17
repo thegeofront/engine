@@ -139,23 +139,23 @@ export class ShaderMesh {
                 
                 image = image.buffer(goodWidth, goodHeight);
                 if (bothSides) {
-                    mesh.setUvs(new Float32Array([
-                        0.0, 0.0, 
-                        0.0, v, 
-                        u, 0.0, 
-                        u, v,
-                        0.0, 0.0, 
-                        u, 0.0, 
-                        0.0, v, 
-                        u, v
-                    ]));
+                    // mesh.setUvs(new Float32Array([
+                    //     0.0, 0.0, 
+                    //     0.0, v, 
+                    //     u, 0.0, 
+                    //     u, v,
+                    //     0.0, 0.0, 
+                    //     u, 0.0, 
+                    //     0.0, v, 
+                    //     u, v
+                    // ]));
                 } else {
-                    mesh.setUvs(new Float32Array([
-                        0.0, 0.0, 
-                        0.0, v, 
-                        u, 0.0, 
-                        u, v
-                    ]));
+                    // mesh.setUvs(new Float32Array([
+                    //     0.0, 0.0, 
+                    //     0.0, v, 
+                    //     u, 0.0, 
+                    //     u, v
+                    // ]));
                 }
             }
         }

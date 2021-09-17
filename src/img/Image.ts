@@ -284,8 +284,9 @@ export class GeonImage {
         for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {
                 // console.log(x, y);
-                let pixel = old.includes(x, y) ? old.get(x, y) : [0, 0, 0, 255];
-                image.set(x, y, pixel);
+                if (old.includes(x, y)) {
+                    image.set(x, y, old.get(x, y));
+                }
             }
         }
 
