@@ -3,7 +3,7 @@
 import { MultiVector3 } from "../../data/MultiVector3";
 import { Const, Util } from "../../lib";
 import { Domain, Domain2 } from "../../math/Domain";
-import { Matrix4 } from "../../math/matrix";
+import { Matrix4 } from "../../math/Matrix4";
 import { Polynomial } from "../../math/Polynomial";
 import { Random } from "../../math/Random";
 import { Vector2 } from "../../math/Vector2";

@@ -17,7 +17,7 @@ import { HashTable } from "../../data/HashTable";
 import { IntMatrix } from "../../data/IntMatrix";
 import { Plane } from "../plane";
 import { Const } from "../../math/Const";
-import { Matrix4 } from "../../math/matrix";
+import { Matrix4 } from "../../math/Matrix4";
 import { Vector3 } from "../../math/Vector3";
 import { Mesh } from "./Mesh";
 import { MeshType, ShaderMesh } from "./ShaderMesh";

@@ -7,7 +7,7 @@ import { MultiVector3 } from "../../data/MultiVector3";
 import { Domain, Domain2 } from "../../lib";
 import { Const } from "../../math/Const";
 import { GeonMath } from "../../math/Math";
-import { Matrix4 } from "../../math/matrix";
+import { Matrix4 } from "../../math/Matrix4";
 import { Polynomial } from "../../math/Polynomial";
 import { Random } from "../../math/Random";
 import { Util } from "../../math/Util";

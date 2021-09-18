@@ -9,7 +9,7 @@ import { MultiVector3 } from "../../data/MultiVector3";
 import { GeonMath, Polyline, Util } from "../../lib";
 import { Domain } from "../../math/Domain";
 import { Const } from "../../math/Const";
-import { Matrix4 } from "../../math/matrix";
+import { Matrix4 } from "../../math/Matrix4";
 import { Vector2 } from "../../math/Vector2";
 import { Vector3 } from "../../math/Vector3";
 import { MultiLine } from "../mesh/MultiLine";

@@ -8,7 +8,7 @@
 
 import { MultiVector3 } from "../../data/MultiVector3";
 import { Domain } from "../../math/Domain";
-import { Matrix4 } from "../../math/matrix";
+import { Matrix4 } from "../../math/Matrix4";
 import { Polynomial } from "../../math/Polynomial";
 import { Vector3 } from "../../math/Vector3";
 import { Bezier } from "./Bezier";

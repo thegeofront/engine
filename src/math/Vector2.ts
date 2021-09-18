@@ -7,7 +7,7 @@
 
 import { Const } from "./Const";
 import { GeonMath } from "./Math";
-import { Matrix4 } from "./matrix";
+import { Matrix4 } from "./Matrix4";
 import { Random } from "./Random";
 import { Util } from "./Util";
 import { Vector3 } from "./Vector3";

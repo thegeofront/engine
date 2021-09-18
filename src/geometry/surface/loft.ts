@@ -4,7 +4,7 @@
 
 import { MultiVector3 } from "../../data/MultiVector3";
 import { Const, Vector3 } from "../../lib";
-import { Matrix4 } from "../../math/matrix";
+import { Matrix4 } from "../../math/Matrix4";
 
 import { Mesh } from "../mesh/Mesh";
 import { Bezier } from "../curve/Bezier";

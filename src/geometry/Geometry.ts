@@ -3,7 +3,7 @@
 // purpose: base class of all 3d geometry
 // note:    TODO
 
-import { Matrix4 } from "../math/matrix";
+import { Matrix4 } from "../math/Matrix4";
 import { Vector3 } from "../math/Vector3";
 
 // i want traits....

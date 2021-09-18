@@ -1,5 +1,5 @@
 import { Geometry } from "../geometry/Geometry";
-import { Matrix4 } from "../math/matrix";
+import { Matrix4 } from "../math/Matrix4";
 
 // generic all-pupose matrix of floats
 export class FloatMatrix {

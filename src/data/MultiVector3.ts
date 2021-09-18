@@ -1,6 +1,6 @@
 import { Geometry } from "../geometry/Geometry";
 import { Domain3, Util } from "../lib";
-import { Matrix4 } from "../math/matrix";
+import { Matrix4 } from "../math/Matrix4";
 import { Random } from "../math/Random";
 import { Vector3 } from "../math/Vector3";
 import { FloatMatrix } from "./FloatMatrix";

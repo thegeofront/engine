@@ -1,7 +1,7 @@
 // purpose: represents a 3d circle
 
 import { Const } from "../math/Const";
-import { Matrix4 } from "../math/matrix";
+import { Matrix4 } from "../math/Matrix4";
 import { Vector3 } from "../math/Vector3";
 import { MultiLine } from "./mesh/MultiLine";
 import { Mesh } from "./mesh/Mesh";

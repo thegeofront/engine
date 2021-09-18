@@ -3,7 +3,7 @@
 
 import { MultiLine } from "../geometry/mesh/MultiLine";
 import { GeonMath } from "../math/Math";
-import { Matrix4 } from "../math/matrix";
+import { Matrix4 } from "../math/Matrix4";
 import { Ray } from "../math/Ray";
 import { Plane, InputState } from "../lib";
 
