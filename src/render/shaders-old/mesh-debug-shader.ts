@@ -2,10 +2,9 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of a mesh.
 
-import { ShaderMesh, Matrix4, MultiLine } from "../../lib";
+import { ShaderMesh, Matrix4, MultiLine, MultiShader } from "../../lib";
 import { Scene } from "../Scene";
 import { DrawSpeed } from "../webgl/HelpGl";
-import { MultiShader } from "../webgl/MultiShader";
 import { LineShader } from "./line-shader";
 import { NormalShader } from "./mesh-normals-shader";
 import { SimpleMeshShader } from "./simple-mesh-shader";

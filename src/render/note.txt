@@ -1,1 +1,14 @@
-right now I'm still unsure about render abstractions 
+right now I'm still unsure about render abstractions. I am quite sure about this: 
+
+1.      state
+          ||
+       (buffer)
+          \/
+2.     buffered
+          ||
+       (render)
+          \/
+3. rendered to screen
+
+Trying to do something with. Renderers + Renderables | Bufferables + Bufferers
+
