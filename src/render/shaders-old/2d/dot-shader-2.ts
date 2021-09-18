@@ -2,9 +2,9 @@
 
 import { Vector2 } from "../../../lib";
 import { Scene } from "../../Scene";
-import { Shader } from "../../webgl/Shader";
+import { OldShader } from "../../OldShader";
 
-export class DotShader2 extends Shader<Vector2[]> {
+export class DotShader2 extends OldShader<Vector2[]> {
     // attribute & uniform locations
     a_position: number;
     a_position_buffer: WebGLBuffer;

@@ -13,7 +13,7 @@ import { Random } from "../../math/Random";
 import { Util } from "../../math/Util";
 import { Vector2 } from "../../math/Vector2";
 import { Vector3 } from "../../math/Vector3";
-import { MultiLine } from "../../mesh/MultiLine";
+import { MultiLine } from "../mesh/MultiLine";
 import { Stopwatch } from "../../util/Stopwatch";
 import { Curve } from "./Curve";
 import { Polyline } from "./Polyline";

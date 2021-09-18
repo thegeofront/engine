@@ -22,8 +22,8 @@ import {
     quadToTri,
     Rectangle3,
     Vector3,
-} from "../lib";
-import { Renderable } from "../render/Renderable";
+} from "../../lib";
+import { Renderable } from "../../render/Renderable";
 
 type vertexID = number;
 type faceID = number;

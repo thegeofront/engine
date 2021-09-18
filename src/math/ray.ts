@@ -2,7 +2,7 @@
 // purpose: infinite Ray used for projection and similar actions
 // notes:   found some nice examples at https://www.cs.princeton.edu/courses/archive/fall00/cs426/lectures/raycast/sld004.htm
 
-import { MultiLine } from "../mesh/MultiLine";
+import { MultiLine } from "../geometry/mesh/MultiLine";
 import { Plane } from "../geometry/plane";
 import { Vector3 } from "./Vector3";
 

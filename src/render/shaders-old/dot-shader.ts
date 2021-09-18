@@ -3,9 +3,9 @@
 import { MultiVector, ToFloatMatrix } from "../../lib";
 import { Scene } from "../Scene";
 import { DrawSpeed } from "../webgl/HelpGl";
-import { Shader } from "../webgl/Shader";
+import { OldShader } from "../OldShader";
 
-export class DotShader extends Shader<MultiVector> {
+export class DotShader extends OldShader<MultiVector> {
     // attribute & uniform locations
     a_position: number;
     a_position_buffer: WebGLBuffer;

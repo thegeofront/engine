@@ -5,12 +5,12 @@
 import { ShaderMesh } from "../../lib";
 import { Scene } from "../Scene";
 import { DrawSpeed } from "../webgl/HelpGl";
-import { Shader } from "../webgl/Shader";
+import { OldShader } from "../OldShader";
 
 /**
  * Draw a mesh on top of all other meshes
  */
-export class SimpleMeshOverlayRenderer extends Shader<ShaderMesh> {
+export class SimpleMeshOverlayRenderer extends OldShader<ShaderMesh> {
     // attribute & uniform locations
     a_position: number;
     a_position_buffer: WebGLBuffer;

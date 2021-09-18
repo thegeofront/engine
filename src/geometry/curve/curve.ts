@@ -12,7 +12,7 @@ import { Const } from "../../math/Const";
 import { Matrix4 } from "../../math/matrix";
 import { Vector2 } from "../../math/Vector2";
 import { Vector3 } from "../../math/Vector3";
-import { MultiLine } from "../../mesh/MultiLine";
+import { MultiLine } from "../mesh/MultiLine";
 import { Geometry } from "../Geometry";
 
 // domain is always normalzed, from 0 to 1

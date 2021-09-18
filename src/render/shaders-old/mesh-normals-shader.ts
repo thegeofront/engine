@@ -5,9 +5,9 @@
 import { ShaderMesh, MultiVector3, NormalKind, Vector3, getDefaultIndices } from "../../lib";
 import { Scene } from "../Scene";
 import { DrawSpeed } from "../webgl/HelpGl";
-import { Shader } from "../webgl/Shader";
+import { OldShader } from "../OldShader";
 
-export class NormalShader extends Shader<ShaderMesh> {
+export class NormalShader extends OldShader<ShaderMesh> {
     a_position: number;
     a_position_buffer: WebGLBuffer;
     index_buffer: WebGLBuffer;

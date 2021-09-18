@@ -11,7 +11,7 @@
  * @param   {number}  l       The lightness
  * @return  {Array}           The RGB representation
  */
-function hslToRgb(h: number, s: number, l: number) {
+export function hslToRgb(h: number, s: number, l: number) {
     let r, g, b;
 
     if (s == 0) {
@@ -47,7 +47,7 @@ function hslToRgb(h: number, s: number, l: number) {
  * @param   {number}  b       The blue color value
  * @return  {Array}           The HSL representation
  */
-function rgbToHsl(r: number, g: number, b: number) {
+export function rgbToHsl(r: number, g: number, b: number) {
     (r /= 255), (g /= 255), (b /= 255);
     let max = Math.max(r, g, b),
         min = Math.min(r, g, b);

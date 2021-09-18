@@ -3,7 +3,7 @@
 // purpose: represents an object which can be fed directly to a linerenderer.
 //          use it to not continuously have to calculate these aspects if the underlying object is unchanged.
 
-import { MultiVector } from "../data/MultiVector";
+import { MultiVector } from "../../data/MultiVector";
 import {
     FloatMatrix,
     Vector2,
@@ -18,8 +18,8 @@ import {
     Bezier,
     Cube,
     ShaderMesh,
-} from "../lib";
-import { Renderable } from "../render/Renderable";
+} from "../../lib";
+import { Renderable } from "../../render/Renderable";
 
 // represents a collection of multiple lines. These could form 1 polyline, but this is not a requirement
 export class MultiLine implements Renderable {

@@ -12,9 +12,9 @@ import {
 } from "../../lib";
 import { Scene } from "../Scene";
 import { DrawSpeed } from "../webgl/HelpGl";
-import { Shader } from "../webgl/Shader";
+import { OldShader } from "../OldShader";
 
-export class ShadedMeshShader extends Shader<ShaderMesh> {
+export class ShadedMeshShader extends OldShader<ShaderMesh> {
     // attribute & uniform locations
     a_vertex_position: number;
     a_vertex_postition_buffer: WebGLBuffer;

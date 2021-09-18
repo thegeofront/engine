@@ -7,7 +7,7 @@ import {
     Triangle2,
     Triangle3,
     ShaderMesh,
-} from "../lib";
+} from "../../lib";
 
 // a mesh with topological information
 export class TopoMesh extends ShaderMesh {

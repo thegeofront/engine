@@ -5,9 +5,9 @@
 import { ShaderMesh } from "../../lib";
 import { Scene } from "../Scene";
 import { HelpGl, DrawSpeed } from "../webgl/HelpGl";
-import { Shader } from "../webgl/Shader";
+import { OldShader } from "../OldShader";
 
-export class TextureMeshShader extends Shader<ShaderMesh> {
+export class TextureMeshShader extends OldShader<ShaderMesh> {
     // attribute & uniform locations
     a_position: number;
     a_position_buffer: WebGLBuffer;

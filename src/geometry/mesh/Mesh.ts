@@ -14,8 +14,8 @@ import {
     ShaderMesh,
     TriSurface,
     Vector3,
-} from "../lib";
-import { GeonMath } from "../math/Math";
+} from "../../lib";
+import { GeonMath } from "../../math/Math";
 
 // a very pure idea of a mesh : Vertices + links between vertices.
 // Could be anything with these properties: lines, triangle-mesh, quads

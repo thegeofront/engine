@@ -4,9 +4,9 @@
 
 import { ShaderMesh, Matrix4, Scene } from "../../lib";
 import { DrawSpeed } from "../webgl/HelpGl";
-import { Shader } from "../webgl/Shader";
+import { OldShader } from "../OldShader";
 
-export class TransformLineShader extends Shader<ShaderMesh> {
+export class TransformLineShader extends OldShader<ShaderMesh> {
     private a_position: number;
     private a_position_buffer: WebGLBuffer;
     private index_buffer: WebGLBuffer;

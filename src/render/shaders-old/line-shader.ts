@@ -5,9 +5,9 @@
 import { MultiLine, Mesh, Matrix4 } from "../../lib";
 import { Scene } from "../Scene";
 import { DrawSpeed } from "../webgl/HelpGl";
-import { Shader } from "../webgl/Shader";
+import { OldShader } from "../OldShader";
 
-export class LineShader extends Shader<MultiLine | Mesh> {
+export class LineShader extends OldShader<MultiLine | Mesh> {
     a_position: number;
     a_position_buffer: WebGLBuffer;
     index_buffer: WebGLBuffer;

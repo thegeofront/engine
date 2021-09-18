@@ -4,6 +4,7 @@ export * from "./algorithms/MarchingCubes";
 export * from "./algorithms/Perlin";
 
 export * from "./app/App";
+export * from "./app/Core";
 export * from "./app/SwapApp";
 
 export * from "./data/FloatMatrix";
@@ -14,25 +15,10 @@ export * from "./data/LinkedList";
 export * from "./data/MultiVector";
 export * from "./data/MultiVector3";
 export * from "./data/MultiVector2";
+export * from "./data/Pool";
 
-export * from "./math/Const";
-export * from "./math/Domain";
-export * from "./math/Math";
-export * from "./math/matrix";
-export * from "./math/Quaternion";
-export * from "./math/Ray";
-export * from "./math/Statistics";
-export * from "./math/Util";
-export * from "./math/Vector2";
-export * from "./math/Vector3";
-export * from "./math/Random";
-export * from "./math/Polynomial";
-
-export * from "./mesh/Graph";
-export * from "./mesh/MultiLine";
-export * from "./mesh/Mesh";
-export * from "./mesh/ShaderMesh";
-export * from "./mesh/TopoMesh";
+export * from "./dom/IO";
+export * from "./dom/UI";
 
 export * from "./geometry/Geometry";
 export * from "./geometry/Circle2";
@@ -41,7 +27,6 @@ export * from "./geometry/Cube";
 export * from "./geometry/Intersect";
 export * from "./geometry/Line";
 export * from "./geometry/plane";
-export * from "./geometry/curve/Polyline";
 export * from "./geometry/Rectangle";
 export * from "./geometry/Triangle";
 
@@ -52,26 +37,69 @@ export * from "./geometry/curve/Spline";
 
 export * from "./geometry/surface/Surface";
 export * from "./geometry/surface/BezierSquare";
+export * from "./geometry/surface/BezierTriangle";
 export * from "./geometry/surface/Loft";
 
+export * from "./geometry/mesh/Graph";
+export * from "./geometry/mesh/MultiLine";
+export * from "./geometry/mesh/Mesh";
+export * from "./geometry/mesh/ShaderMesh";
+export * from "./geometry/mesh/TopoMesh";
+
+// export * from "./geometry/solid";
+
+export * from "./image/Colors";
 export * from "./image/Image";
 export * from "./image/Kernels";
 
-export * from "./render/Camera";
-export * from "./render/Light";
-export * from "./render/Scene";
+export * from "./input/InputState";
+
+export * from "./math/Const";
+export * from "./math/Domain";
+export * from "./math/Math";
+export * from "./math/Matrix";
+export * from "./math/Polynomial";
+export * from "./math/Quaternion";
+export * from "./math/Random";
+export * from "./math/Ray";
+export * from "./math/Statistics";
+export * from "./math/Util";
+export * from "./math/Vector2";
+export * from "./math/Vector3";
+
+export * from "./parametric/EnumParameter";
+export * from "./parametric/Parameter";
+export * from "./parametric/ParametricModel";
+
+export * from "./render/bufferables/ImageMesh";
+export * from "./render/bufferables/VectorCloud";
+
+export * from "./render/bufferers/MeshBufferer";
+
+export * from "./render/renderers/DebugRenderer";
+export * from "./render/renderers/ImageRenderer";
+export * from "./render/renderers/TextRenderer";
+
+export * from "./render/shaders/BillboardShader";
+export * from "./render/shaders/DotShaderWithHeight";
+export * from "./render/shaders/PixelTextureShader";
 
 export * from "./render/webgl/Attribute";
 export * from "./render/webgl/Attributes";
-export * from "./render/webgl/Shader";
+export * from "./render/webgl/Constants";
+export * from "./render/webgl/HelpGl";
+export * from "./render/webgl/IndexAttribute";
 export * from "./render/webgl/Uniform";
 export * from "./render/webgl/Uniforms";
 export * from "./render/webgl/HelpGl";
 
+export * from "./render/OldMultiShader";
+export * from "./render/OldShader";
+export * from "./render/Camera";
+export * from "./render/Light";
+export * from "./render/Scene";
+
 export * from "./render/renderers/DebugRenderer";
 export * from "./render/renderers/ImageRenderer";
 
-export * from "./dom/IO";
 export * from "./util/FpsCounter";
-export * from "./input/InputState";
-export * from "./app/Core";

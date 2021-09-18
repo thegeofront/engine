@@ -6,11 +6,11 @@
 // still tho, within a larger context, the whole of a fragment & vertex shader can be named Shader for the time being...
 // This is old, not needed anymore
 
-import { Attributes } from "./Attributes";
-import { Scene } from "../Scene";
-import { Uniforms } from "./Uniforms";
-import { DrawSpeed, HelpGl, WebGl } from "./HelpGl";
-import { DrawElementsType, DrawMethod, DrawMode, INDEX_BUFFER_NAME } from "./Constants";
+import { Attributes } from "./webgl/Attributes";
+import { Scene } from "./Scene";
+import { Uniforms } from "./webgl/Uniforms";
+import { DrawSpeed, HelpGl, WebGl } from "./webgl/HelpGl";
+import { DrawElementsType, DrawMethod, DrawMode, INDEX_BUFFER_NAME } from "./webgl/Constants";
 
 /**
  * An implementation of 'Shader' needs to define 3 methods:
@@ -28,7 +28,7 @@ import { DrawElementsType, DrawMethod, DrawMode, INDEX_BUFFER_NAME } from "./Con
  *    - render using either 'DrawArrays()' or 'DrawElements()' (TODO could get some more automation)
  */
 // @param T = data to feed the renderer at 'set'
-export abstract class Shader<T> {
+export abstract class OldShader<T> {
     protected gl: WebGl;
     protected program: WebGLProgram;
 

@@ -1,13 +1,13 @@
 import { DrawSpeed } from "../../lib";
 import { Matrix4 } from "../../math/matrix";
-import { Mesh } from "../../mesh/Mesh";
-import { ShaderMesh } from "../../mesh/ShaderMesh";
+import { Mesh } from "../../geometry/mesh/Mesh";
+import { ShaderMesh } from "../../geometry/mesh/ShaderMesh";
 import { Scene } from "../Scene";
-import { Combo } from "../Combo";
+import { Bufferer } from "../Bufferer";
 import { TransformLineShader } from "../shaders-old/transform-line-shader";
 import { TransformMeshShader } from "../shaders-old/transform-mesh-shader";
 
-export class MeshCombo extends Combo<Mesh, ShaderMesh, TransformLineShader> {
+export class MeshBufferer extends Bufferer<Mesh, ShaderMesh, TransformLineShader> {
     color: number[];
     linecolor: number[];
     renderer2: TransformMeshShader;
@@ -19,8 +19,8 @@ export class MeshCombo extends Combo<Mesh, ShaderMesh, TransformLineShader> {
         this.renderer2 = new TransformMeshShader(gl);
     }
 
-    static new(gl: WebGLRenderingContext): MeshCombo {
-        return new MeshCombo(gl);
+    static new(gl: WebGLRenderingContext): MeshBufferer {
+        return new MeshBufferer(gl);
     }
 
     set(mesh: Mesh) {

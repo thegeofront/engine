@@ -2,9 +2,9 @@
 
 import { Rectangle2 } from "../../lib";
 import { Scene } from "../Scene";
-import { Shader } from "../webgl/Shader";
+import { OldShader } from "../OldShader";
 
-export class RectangleShader extends Shader<Rectangle2[]> {
+export class RectangleShader extends OldShader<Rectangle2[]> {
     // attribute & uniform locations
     a_position: number;
     a_position_buffer: WebGLBuffer;

@@ -16,8 +16,8 @@
 // TODO: maybe find a better name, but 'combo' is quite distinct in a way
 // todo: force buffering a bit more. make a way that requiers this.buffered to be filled
 
-import { Scene, Shader } from "../lib";
-import { MultiShader } from "./webgl/MultiShader";
+import { Scene, OldShader } from "../lib";
+import { MultiShader } from "./OldMultiShader";
 
 // staticcombo
 
@@ -27,7 +27,7 @@ import { MultiShader } from "./webgl/MultiShader";
 
 // Vector3 & dotrenderer
 
-export class Combi<S, B, R extends Shader<B> | MultiShader<B>> {
+export class MultiBufferer<S, B, R extends OldShader<B> | MultiShader<B>> {
     public state: S[];
     public buffered: B[] = [];
     public renderer: R;
@@ -52,7 +52,7 @@ export class Combi<S, B, R extends Shader<B> | MultiShader<B>> {
     }
 }
 
-export class Combo<S, B, R extends Shader<B> | MultiShader<B>> {
+export class Bufferer<S, B, R extends OldShader<B> | MultiShader<B>> {
     public state: S;
     public buffered!: B;
     public renderer: R;

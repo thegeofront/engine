@@ -1,4 +1,5 @@
-import { Scene, DrawSpeed } from "../../lib";
+import { DrawSpeed } from "../lib";
+import { Scene } from "./Scene";
 
 export abstract class MultiShader<T> {
     abstract set(r: T, speed: DrawSpeed): void;
