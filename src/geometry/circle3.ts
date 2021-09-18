@@ -3,9 +3,9 @@
 import { Const } from "../math/Const";
 import { Matrix4 } from "../math/matrix";
 import { Vector3 } from "../math/vector";
-import { MultiLine } from "../mesh/multi-line";
-import { Mesh } from "../mesh/mesh";
-import { Circle2 } from "./circle2";
+import { MultiLine } from "../mesh/MultiLine";
+import { Mesh } from "../mesh/Mesh";
+import { Circle2 } from "./Circle2";
 import { Plane } from "./plane";
 
 export class Circle3 {

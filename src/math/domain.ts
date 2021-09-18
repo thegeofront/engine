@@ -4,8 +4,8 @@
 // purpose: general representation of a domain / range / bound of numbers
 
 import { Matrix4, MultiVector2, MultiVector3, Vector2, Vector3 } from "../lib";
-import { Stopwatch } from "../util/stopwatch";
-import { Random } from "./random";
+import { Stopwatch } from "../util/Stopwatch";
+import { Random } from "./Random";
 
 export class Domain {
     // note: including t0, including t1
@@ -71,7 +71,7 @@ export class Domain {
     lerp(t: number): number {
         return this.elevate(t);
     }
-    
+
     remap(value: number, other: Domain = new Domain()): number {
         // normalize a value, then elevate it to a new domain
         let norm = this.normalize(value);
@@ -145,7 +145,7 @@ export class Domain2 {
     }
 
     static fromWH(x: number, y: number, w: number, h: number): Domain2 {
-        return new Domain2(new Domain(x, x+w), new Domain(y, y+h));
+        return new Domain2(new Domain(x, x + w), new Domain(y, y + h));
     }
 
     static fromInclude(data: MultiVector2): Domain2 {

@@ -1,4 +1,4 @@
-import { InputState } from "../input/input-state";
+import { InputState } from "../input/InputState";
 
 export class FpsCounter {
     fps = 0;
@@ -19,7 +19,7 @@ export class FpsCounter {
             this.setFps();
             this.elapsed = 0;
             this.frames = 0;
-        } 
+        }
     }
 
     update(state: InputState) {

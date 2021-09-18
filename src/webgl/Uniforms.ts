@@ -1,4 +1,4 @@
-import { GeonImage } from "../img/Image";
+import { GeonImage } from "../image/Image";
 import { Matrix3, Matrix4 } from "../math/matrix";
 import { Vector2, Vector3 } from "../math/vector";
 import { Uniform, UniformTexture, UniformType } from "./Uniform";

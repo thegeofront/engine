@@ -6,60 +6,59 @@ export * from "./algorithms/Perlin";
 export * from "./app/App";
 export * from "./app/SwapApp";
 
-export * from "./data/float-matrix";
-export * from "./data/hash-table";
-export * from "./data/int-cube";
-export * from "./data/int-matrix";
-export * from "./data/linked-list";
-export * from "./data/multi-vector";
-export * from "./data/multi-vector-3";
-export * from "./data/multi-vector-2";
+export * from "./data/FloatMatrix";
+export * from "./data/HashTable";
+export * from "./data/IntCube";
+export * from "./data/IntMatrix";
+export * from "./data/LinkedList";
+export * from "./data/MultiVector";
+export * from "./data/MultiVector3";
+export * from "./data/MultiVector2";
 
 export * from "./math/Const";
 export * from "./math/Domain";
-export * from "./math/math";
+export * from "./math/Math";
 export * from "./math/matrix";
-export * from "./math/quaternion";
-export * from "./math/ray";
-export * from "./math/statistics";
-export * from "./math/util";
+export * from "./math/Quaternion";
+export * from "./math/Ray";
+export * from "./math/Statistics";
+export * from "./math/Util";
 export * from "./math/vector";
-export * from "./math/random";
-export * from "./math/polynomial";
+export * from "./math/Random";
+export * from "./math/Polynomial";
 
-export * from "./mesh/graph";
-export * from "./mesh/multi-line";
-export * from "./mesh/mesh";
-export * from "./mesh/shader-mesh";
-export * from "./mesh/topo-mesh";
+export * from "./mesh/Graph";
+export * from "./mesh/MultiLine";
+export * from "./mesh/Mesh";
+export * from "./mesh/ShaderMesh";
+export * from "./mesh/TopoMesh";
 
-export * from "./geometry/geo";
-export * from "./geometry/circle2";
-export * from "./geometry/circle3";
-export * from "./geometry/cube";
-export * from "./geometry/intersect";
-export * from "./geometry/line";
+export * from "./geometry/Geometry";
+export * from "./geometry/Circle2";
+export * from "./geometry/Circle3";
+export * from "./geometry/Cube";
+export * from "./geometry/Intersect";
+export * from "./geometry/Line";
 export * from "./geometry/plane";
-export * from "./geometry/curve/polyline";
-export * from "./geometry/rectangle";
-export * from "./geometry/triangle";
+export * from "./geometry/curve/Polyline";
+export * from "./geometry/Rectangle";
+export * from "./geometry/Triangle";
 
-export * from "./geometry/curve/curve";
-export * from "./geometry/curve/bezier";
-export * from "./geometry/curve/polyline";
-export * from "./geometry/curve/spline";
+export * from "./geometry/curve/Curve";
+export * from "./geometry/curve/Bezier";
+export * from "./geometry/curve/Polyline";
+export * from "./geometry/curve/Spline";
 
-export * from "./geometry/surface/surface";
-export * from "./geometry/surface/bezier-square";
-export * from "./geometry/surface/loft";
+export * from "./geometry/surface/Surface";
+export * from "./geometry/surface/BezierSquare";
+export * from "./geometry/surface/Loft";
 
-export * from "./img/Image";
-export * from "./img/kernels";
+export * from "./image/Image";
+export * from "./image/Kernels";
 
-export * from "./render/camera";
-export * from "./render/combos/Combo";
-export * from "./render/light";
-export * from "./render/context";
+export * from "./render/Camera";
+export * from "./render/Light";
+export * from "./render/Context";
 
 export * from "./webgl/Attribute";
 export * from "./webgl/Attributes";
@@ -68,8 +67,8 @@ export * from "./webgl/Uniform";
 export * from "./webgl/Uniforms";
 export * from "./webgl/HelpGl";
 
-export * from "./renderers/multi-renderer";
-export * from "./renderers/image-renderer";
+export * from "./renderers/DebugRenderer";
+export * from "./renderers/ImageRenderer";
 
 export * from "./shaders-old/dot-shader";
 export * from "./shaders-old/line-shader";
@@ -80,12 +79,9 @@ export * from "./shaders-old/shaded-mesh-shader";
 export * from "./shaders-old/simple-mesh-shader";
 export * from "./shaders-old/texture-mesh-shader";
 export * from "./shaders-old/graph-debug-shader";
-export * from "./shaders/billboard-shader";
-
-export * from "./shaders2/dot-shader-2";
+export * from "./shaders/BillboardShader";
 
 export * from "./dom/IO";
-export * from "./util/fps-counter";
-export * from "./input/input-state";
-export * from "./system/ui";
+export * from "./util/FpsCounter";
+export * from "./input/InputState";
 export * from "./app/Core";

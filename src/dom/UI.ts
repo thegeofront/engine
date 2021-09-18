@@ -3,7 +3,7 @@
 // purpose: lets create the UI using html & dom api, because why the hell not
 
 import { Domain } from "../math/Domain";
-import { GeonMath } from "../math/math";
+import { GeonMath } from "../math/Math";
 import { EnumParameter } from "../parametric/EnumParameter";
 import { Parameter } from "../parametric/Parameter";
 

@@ -1,8 +1,8 @@
 import { MultiVector3, Vector3, Matrix4 } from "../../lib";
-import { Polynomial } from "../../math/polynomial";
-import { Bezier } from "../curve/bezier";
-import { BezierSquare } from "./bezier-square";
-import { TriSurface } from "./surface";
+import { Polynomial } from "../../math/Polynomial";
+import { Bezier } from "../curve/Bezier";
+import { BezierSquare } from "./BezierSquare";
+import { TriSurface } from "./Surface";
 
 /**
  * Three sided Bezier Surface

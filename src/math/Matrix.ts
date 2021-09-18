@@ -3,9 +3,9 @@
 // TODO: FIX MATRIX4 !!!
 // NOTE:
 
-import { FloatMatrix } from "../data/float-matrix";
-import { MultiVector3 } from "../data/multi-vector-3";
-import { Quaternion } from "./quaternion";
+import { FloatMatrix } from "../data/FloatMatrix";
+import { MultiVector3 } from "../data/MultiVector3";
+import { Quaternion } from "./Quaternion";
 import { Vector2, Vector3 } from "./vector";
 
 // NOTE: maybe matrix 3 should be removed...

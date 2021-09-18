@@ -13,14 +13,14 @@
 //   - fix the fact that we 'dont' realllly use halfedges, we consistently use pairs of two.
 //   - aka, twins are implicit: 0 -> 1 & 1 -> 0 OR 21 -> 20 & 20 -> 21
 
-import { HashTable } from "../data/hash-table";
-import { IntMatrix } from "../data/int-matrix";
+import { HashTable } from "../data/HashTable";
+import { IntMatrix } from "../data/IntMatrix";
 import { Plane } from "../geometry/plane";
 import { Const } from "../math/Const";
 import { Matrix4 } from "../math/matrix";
 import { Vector3 } from "../math/vector";
-import { Mesh } from "./mesh";
-import { MeshType, ShaderMesh } from "./shader-mesh";
+import { Mesh } from "./Mesh";
+import { MeshType, ShaderMesh } from "./ShaderMesh";
 
 export type EdgeIndex = number;
 export type VertIndex = number;

@@ -2,16 +2,16 @@
 // author:  Jos Feenstra
 // purpose: mathematical representation of a parametric loft surface
 
-import { MultiVector3 } from "../../data/multi-vector-3";
+import { MultiVector3 } from "../../data/MultiVector3";
 import { Const } from "../../lib";
 import { Matrix4 } from "../../math/matrix";
 import { Vector3 } from "../../math/vector";
-import { Mesh } from "../../mesh/mesh";
-import { Bezier } from "../curve/bezier";
-import { Curve } from "../curve/curve";
-import { Polyline } from "../curve/polyline";
-import { Geo } from "../geo";
-import { BiSurface } from "./surface";
+import { Mesh } from "../../mesh/Mesh";
+import { Bezier } from "../curve/Bezier";
+import { Curve } from "../curve/Curve";
+import { Polyline } from "../curve/Polyline";
+import { Geometry } from "../Geometry";
+import { BiSurface } from "./Surface";
 
 export class Loft extends BiSurface {
     private constructor(public curves: Bezier[]) {
@@ -102,5 +102,3 @@ export class Loft extends BiSurface {
         return Loft.new(curves);
     }
 }
-
-

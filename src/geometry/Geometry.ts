@@ -7,12 +7,12 @@ import { Matrix4 } from "../math/matrix";
 import { Vector3 } from "../math/vector";
 
 // i want traits....
-export abstract class Geo {
-    abstract clone(): Geo;
+export abstract class Geometry {
+    abstract clone(): Geometry;
 
-    abstract transform(m: Matrix4): Geo;
+    abstract transform(m: Matrix4): Geometry;
 
-    abstract transformed(m: Matrix4): Geo;
+    abstract transformed(m: Matrix4): Geometry;
 
     rotateX(radians: number) {
         let rotater = Matrix4.newXRotation(radians);

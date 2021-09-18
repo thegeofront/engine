@@ -1,13 +1,12 @@
 // author : Jos Feenstra
 // purpose : contain all logic regarding
 
-import { MultiLine } from "../mesh/multi-line";
-import { Plane } from "../geo/plane";
-import { GeonMath } from "../math/math";
+import { MultiLine } from "../mesh/MultiLine";
+import { GeonMath } from "../math/Math";
 import { Matrix4 } from "../math/matrix";
-import { Ray } from "../math/ray";
+import { Ray } from "../math/Ray";
 import { Vector2, Vector3 } from "../math/vector";
-import { InputState } from "../system/input-state";
+import { Plane, InputState } from "../lib";
 
 export class Camera {
     pos: Vector3;

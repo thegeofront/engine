@@ -3,7 +3,7 @@
 // purpose: WebGL based rendering of a mesh.
 
 import { DrawSpeed, IntMatrix, Matrix4, ShaderMesh, Shader, MultiVector3 } from "../lib";
-import { Context } from "../render/context";
+import { Context } from "../render/Context";
 import { HelpGl } from "../webgl/HelpGl";
 
 export class TransformMeshShader extends Shader<ShaderMesh> {

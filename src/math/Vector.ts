@@ -6,10 +6,10 @@
 // 			these types of consistent vectors are only useful in niche cases, and complitate a lot of common cases.
 
 import { Const } from "./Const";
-import { GeonMath } from "./math";
+import { GeonMath } from "./Math";
 import { Matrix4 } from "./matrix";
-import { Random } from "./random";
-import { Util } from "./util";
+import { Random } from "./Random";
+import { Util } from "./Util";
 
 export class Vector3 {
     // #region constructors
@@ -466,7 +466,7 @@ export class Vector2 {
         return new Vector2(x, y);
     }
 
-    static sign(a: Vector2, b: Vector2, c: Vector2) {   
+    static sign(a: Vector2, b: Vector2, c: Vector2) {
         return (a.x - c.x) * (b.y - c.y) - (b.x - c.x) * (a.y - c.y);
     }
 
@@ -613,10 +613,7 @@ export class Vector2 {
     }
 
     rounded(): Vector2 {
-        return Vector2.new(
-            Math.round(this.x),
-            Math.round(this.y)
-        );
+        return Vector2.new(Math.round(this.x), Math.round(this.y));
     }
 
     roundToZero(): Vector2 {

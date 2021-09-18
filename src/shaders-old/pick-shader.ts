@@ -1,6 +1,6 @@
 // TODO: to select triangles (or quads), use this beautiful thing
 
-import { Mesh } from "../mesh/mesh";
+import { Mesh } from "../mesh/Mesh";
 
 export class MeshPickShader {
     constructor() {}

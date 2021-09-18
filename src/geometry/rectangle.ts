@@ -10,7 +10,7 @@ import { Vector2 } from "../math/vector";
 // purpose: Represents a cube in 3d space, in a certain pose.
 
 import { Vector3 } from "../math/vector";
-import { Geo } from "./geo";
+import { Geometry } from "./Geometry";
 import { Plane } from "./plane";
 
 export class Rectangle2 {
@@ -24,7 +24,7 @@ export class Rectangle2 {
 
     static new(startX: number, startY: number, width: number, height: number) {
         let pose = Matrix3.newTranslation(startX, startY);
-        let domain = Domain2.fromBounds(0,0,width, height);
+        let domain = Domain2.fromBounds(0, 0, width, height);
     }
 
     center(): Vector2 {

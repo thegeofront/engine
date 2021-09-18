@@ -5,18 +5,22 @@
 // - Spline
 // - Polyline (not terminologically correct but in terms of logic it makes sense)
 
-import { MultiVector3 } from "../../data/multi-vector-3";
+import { MultiVector3 } from "../../data/MultiVector3";
 import { GeonMath, Polyline, Util } from "../../lib";
 import { Domain } from "../../math/Domain";
 import { Const } from "../../math/Const";
 import { Matrix4 } from "../../math/matrix";
 import { Vector3 } from "../../math/vector";
-import { MultiLine } from "../../mesh/multi-line";
-import { Geo } from "../geo";
+import { MultiLine } from "../../mesh/MultiLine";
+import { Geometry } from "../Geometry";
 
 // domain is always normalzed, from 0 to 1
-export abstract class Curve extends Geo {
-    constructor(public verts: MultiVector3, public readonly degree: number, public readonly domain = Domain.new(0, 1)) {
+export abstract class Curve extends Geometry {
+    constructor(
+        public verts: MultiVector3,
+        public readonly degree: number,
+        public readonly domain = Domain.new(0, 1),
+    ) {
         super();
     }
 
@@ -30,7 +34,7 @@ export abstract class Curve extends Geo {
         return Polyline.new(verts);
     }
 
-    buffer(segments=Const.BEZIER_SEGMENTS): MultiLine {
+    buffer(segments = Const.BEZIER_SEGMENTS): MultiLine {
         return MultiLine.fromPolyline(this.toPolyline(segments));
     }
 

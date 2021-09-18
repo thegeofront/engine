@@ -7,7 +7,7 @@
 // NOTE: make sure to include something like a center offset, to gain control of if the point is rendered centered, as topleft, etc. etc.
 
 import { GeonImage, MultiVector3, MultiVector2, Context, Vector2, Vector3 } from "../lib";
-import { ToFloatMatrix } from "../data/multi-vector";
+import { ToFloatMatrix } from "../data/MultiVector";
 import { Attribute } from "../webgl/Attribute";
 import { Shader } from "../webgl/Shader";
 import { DrawSpeed } from "../webgl/HelpGl";
@@ -38,22 +38,19 @@ export type BillboardPayload = {
  * A single billboard
  */
 export class Billboard {
-    constructor(
-        public position: Vector3,
-        public image: GeonImage,
-    ) {}
+    constructor(public position: Vector3, public image: GeonImage) {}
 
     static new(position: Vector3, image: GeonImage) {
         return new Billboard(position, image);
     }
 
-    toPayload() : BillboardPayload {
+    toPayload(): BillboardPayload {
         return {
             positions: MultiVector3.fromList([this.position]),
-            uvs: MultiVector2.fromData([0,0]),
+            uvs: MultiVector2.fromData([0, 0]),
             uvSizes: MultiVector2.fromData([this.image.width, this.image.height]),
             texture: this.image,
-        }
+        };
     }
 }
 
@@ -154,10 +151,9 @@ export class BillboardShader extends Program<BillboardPayload | Billboard> {
     }
 
     protected onSet(payload: BillboardPayload | Billboard, speed: DrawSpeed): number {
-
         if (payload instanceof Billboard) {
             payload = payload.toPayload();
-        } 
+        }
 
         this.attributes.set("a_vertex", ToFloatMatrix(payload.positions).data, speed);
         this.attributes.set("a_uv", ToFloatMatrix(payload.uvs).data, speed);

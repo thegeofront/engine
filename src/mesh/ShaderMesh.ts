@@ -9,8 +9,21 @@
 //   - triangles (links.width = 3)
 //   - quads (links.width = 4. will need to be converted to triangles for now...)
 
-import { Domain2, GeonImage, Graph, HelpGl, Matrix4, Mesh, MultiVector2, MultiVector3, Plane, quadToTri, Rectangle3, Vector3 } from "../lib";
-import { Renderable } from "../render-core/Renderable";
+import {
+    Domain2,
+    GeonImage,
+    Graph,
+    HelpGl,
+    Matrix4,
+    Mesh,
+    MultiVector2,
+    MultiVector3,
+    Plane,
+    quadToTri,
+    Rectangle3,
+    Vector3,
+} from "../lib";
+import { Renderable } from "../render/Renderable";
 
 type vertexID = number;
 type faceID = number;
@@ -78,18 +91,13 @@ export class ShaderMesh implements Renderable {
     static fromRectDoubleSided(rect: Rectangle3, texture?: ImageData) {
         let verts = rect.getCorners();
         let faces: number[] = [];
-        faces.push(...[0,1,3, 0,3,2, 0,3,1 , 0,2,3]);
+        faces.push(...[0, 1, 3, 0, 3, 2, 0, 3, 1, 0, 2, 3]);
         let rend = new ShaderMesh(4, 0, 0, 4, texture);
-        rend.setUvs(new Float32Array([
-            0.0, 0.0, 
-            0.0, 1.0, 
-            1.0, 0.0, 
-            1.0, 1.0,
-            0.0, 0.0, 
-            1.0, 0.0, 
-            0.0, 1.0, 
-            1.0, 1.0
-        ]));
+        rend.setUvs(
+            new Float32Array([
+                0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0,
+            ]),
+        );
         rend.mesh.verts.fillFromList(verts);
         rend.mesh.links.setData(faces);
         return rend;
@@ -106,19 +114,29 @@ export class ShaderMesh implements Renderable {
         return rend;
     }
 
-    static fromImage(image: GeonImage, pos=Vector3.zero(), normal=Vector3.unitZ(), 
-        centered=true, scale=1, fixWebglLimitation=true, bothSides=true) : ShaderMesh {
-    
+    static fromImage(
+        image: GeonImage,
+        pos = Vector3.zero(),
+        normal = Vector3.unitZ(),
+        centered = true,
+        scale = 1,
+        fixWebglLimitation = true,
+        bothSides = true,
+    ): ShaderMesh {
         let plane = Plane.fromPN(pos, normal);
 
-            
         let domain;
         if (centered) {
-            domain = Domain2.fromWH(-image.width/2*scale, -image.height/2*scale, image.width*scale, image.height*scale);
+            domain = Domain2.fromWH(
+                (-image.width / 2) * scale,
+                (-image.height / 2) * scale,
+                image.width * scale,
+                image.height * scale,
+            );
         } else {
-            domain = Domain2.fromWH(0, 0, image.width*scale, image.height*scale);
+            domain = Domain2.fromWH(0, 0, image.width * scale, image.height * scale);
         }
-        
+
         let rectangle = new Rectangle3(plane, domain);
 
         let mesh: ShaderMesh;
@@ -127,7 +145,7 @@ export class ShaderMesh implements Renderable {
         } else {
             mesh = ShaderMesh.fromRect(rectangle);
         }
-    
+
         // note: webgl can only work with 2^x images
         if (fixWebglLimitation) {
             let goodWidth = HelpGl.fixTextureSizing(image.width);
@@ -137,24 +155,24 @@ export class ShaderMesh implements Renderable {
                 console.log("resizing to ", goodWidth, goodHeight);
                 let u = image.width / goodWidth;
                 let v = image.height / goodHeight;
-                
+
                 image = image.buffer(goodWidth, goodHeight);
                 if (bothSides) {
                     // mesh.setUvs(new Float32Array([
-                    //     0.0, 0.0, 
-                    //     0.0, v, 
-                    //     u, 0.0, 
+                    //     0.0, 0.0,
+                    //     0.0, v,
+                    //     u, 0.0,
                     //     u, v,
-                    //     0.0, 0.0, 
-                    //     u, 0.0, 
-                    //     0.0, v, 
+                    //     0.0, 0.0,
+                    //     u, 0.0,
+                    //     0.0, v,
                     //     u, v
                     // ]));
                 } else {
                     // mesh.setUvs(new Float32Array([
-                    //     0.0, 0.0, 
-                    //     0.0, v, 
-                    //     u, 0.0, 
+                    //     0.0, 0.0,
+                    //     0.0, v,
+                    //     u, 0.0,
                     //     u, v
                     // ]));
                 }
@@ -213,7 +231,7 @@ export class ShaderMesh implements Renderable {
         let faces: faceID[] = [];
         let count = this.mesh.links.count();
         for (let i = 0; i < count; i++) {
-            if (this.mesh.links.getRow(i).find(j => j == v)) {
+            if (this.mesh.links.getRow(i).find((j) => j == v)) {
                 faces.push(i);
             }
         }

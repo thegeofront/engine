@@ -5,7 +5,7 @@
 // I want to keep side effects to a minimum, so bufferLengths() needs to be called everytime the curve is changed in some way
 
 import { GeonMath, Matrix4, MultiLine, MultiVector3, Vector3 } from "../../lib";
-import { Curve } from "./curve";
+import { Curve } from "./Curve";
 
 export class Polyline extends Curve {
     private _lengths?: number[];
@@ -28,12 +28,11 @@ export class Polyline extends Curve {
     /**
      * create a new, filleted polyline
      */
-    fillet(radius: number) : Polyline {
-
+    fillet(radius: number): Polyline {
         let count = this.verts.count + (this.verts.count - 2);
         let verts = MultiVector3.new(count);
-        for (let i = 0 ; i < count; i++) {
-            let j = Math.ceil(i / 2) // index in original 
+        for (let i = 0; i < count; i++) {
+            let j = Math.ceil(i / 2); // index in original
             verts.set(i, this.verts.get(j));
         }
 

@@ -16,9 +16,8 @@
 // TODO: maybe find a better name, but 'combo' is quite distinct in a way
 // todo: force buffering a bit more. make a way that requiers this.buffered to be filled
 
-
 import { Context, Shader } from "../lib";
-import { MultiShader } from "./multi-shader";
+import { MultiShader } from "../webgl/MultiShader";
 
 // staticcombo
 

@@ -6,7 +6,7 @@
 // still tho, within a larger context, the whole of a fragment & vertex shader can be named Shader for the time being...
 
 import { Attributes } from "./Attributes";
-import { Context } from "../render/context";
+import { Context } from "../render/Context";
 import { Uniforms } from "./Uniforms";
 import { DrawSpeed, HelpGl, WebGl } from "./HelpGl";
 import { DrawElementsType, DrawMethod, DrawMode, INDEX_BUFFER_NAME } from "./Constants";
@@ -89,7 +89,7 @@ export abstract class Program<T> {
 
     // pauze() {
     //     this.active = false;
-    // }    
+    // }
 
     // resume() {
     //     this.active = true;

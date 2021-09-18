@@ -2,10 +2,10 @@
 // note: uses a hardcoded pascal's triangle for performance reasons
 // notes:   based upon the excellent explainations from Prof. C.-K. Shene: https://pages.mtu.edu/~shene/COURSES/cs3621/NOTES/
 
-import { MultiVector3 } from "../data/multi-vector-3";
+import { MultiVector3 } from "../data/MultiVector3";
 import { Const } from "./Const";
-import { GeonMath } from "./math";
-import { Util } from "./util";
+import { GeonMath } from "./Math";
+import { Util } from "./Util";
 import { Vector3 } from "./vector";
 
 export class Polynomial {
@@ -180,7 +180,6 @@ export class Polynomial {
 
     // calculate the decastejau piramid based on extrapolation
     static decastejauExtrapolateEnd(verts: MultiVector3, t: number) {
-        
         let size = verts.count;
 
         // create the triangle of resulting points
@@ -191,16 +190,16 @@ export class Polynomial {
 
         let i = 0;
         for (let col = size - 1; col > -1; col -= 1) {
-            let idx = iterTri(col, 0)
+            let idx = iterTri(col, 0);
             triangle.set(idx, verts.get(i));
-            i++
+            i++;
         }
 
         // per triangle of 3 within this triangle (hard to put into words...)
         for (let col = 1; col < size; col++) {
             for (let row = 1; row <= col; row++) {
-                let a = iterTri(col-1, row-1);
-                let b = iterTri(col, row-1);
+                let a = iterTri(col - 1, row - 1);
+                let b = iterTri(col, row - 1);
                 let c = iterTri(col, row);
 
                 // set C based upon extrapolation of B past A

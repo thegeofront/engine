@@ -2,9 +2,9 @@
 // Purpose: The Core app. This can hold multiple other apps with their own Update and Draw calls.
 // Use this to switch between Apps, or run multiple Apps.
 
-import { InputState } from "../input/input-state";
+import { InputState } from "../input/InputState";
 import { App } from "./App";
-import { FpsCounter } from "../util/fps-counter";
+import { FpsCounter } from "../util/FpsCounter";
 import { UI } from "../dom/UI";
 
 export class Core {

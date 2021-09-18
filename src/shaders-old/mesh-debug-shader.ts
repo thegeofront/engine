@@ -3,7 +3,7 @@
 // purpose: WebGL based rendering of a mesh.
 
 import { ShaderMesh, Matrix4, DrawSpeed, MultiLine, Context } from "../lib";
-import { MultiShader } from "../render/multi-shader";
+import { MultiShader } from "../webgl/MultiShader";
 import { LineShader } from "./line-shader";
 import { NormalShader } from "./mesh-normals-shader";
 import { SimpleMeshShader } from "./simple-mesh-shader";

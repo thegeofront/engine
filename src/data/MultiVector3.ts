@@ -1,13 +1,13 @@
-import { Geo } from "../geometry/geo";
+import { Geometry } from "../geometry/Geometry";
 import { Domain3, Util } from "../lib";
 import { Matrix4 } from "../math/matrix";
-import { Random } from "../math/random";
+import { Random } from "../math/Random";
 import { Vector3 } from "../math/vector";
-import { FloatMatrix } from "./float-matrix";
-import { MultiVector } from "./multi-vector";
-import { MultiVector2 } from "./multi-vector-2";
+import { FloatMatrix } from "./FloatMatrix";
+import { MultiVector } from "./MultiVector";
+import { MultiVector2 } from "./MultiVector2";
 
-export class MultiVector3 extends Geo {
+export class MultiVector3 extends Geometry {
     constructor(private matrix: FloatMatrix) {
         super();
     }

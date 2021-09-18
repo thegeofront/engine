@@ -2,20 +2,18 @@ import { ShaderMesh } from "../lib";
 import { DrawMode } from "../webgl/Constants";
 import { Program } from "../webgl/Program";
 import { DrawSpeed } from "../webgl/HelpGl";
-import { Context } from "../render/context";
+import { Context } from "../render/Context";
 
-export class PixelTextureShader extends Program<ShaderMesh>{
-    
+export class PixelTextureShader extends Program<ShaderMesh> {
     protected onInit(settings?: any): DrawMode {
         throw new Error("Method not implemented.");
     }
-    
+
     protected onSet(data: ShaderMesh, speed: DrawSpeed): number {
         throw new Error("Method not implemented.");
     }
-    
+
     protected onRender(c: Context): void {
         throw new Error("Method not implemented.");
     }
-
 }

@@ -7,7 +7,7 @@
 // This is old, not needed anymore
 
 import { Attributes } from "./Attributes";
-import { Context } from "../render/context";
+import { Context } from "../render/Context";
 import { Uniforms } from "./Uniforms";
 import { DrawSpeed, HelpGl, WebGl } from "./HelpGl";
 import { DrawElementsType, DrawMethod, DrawMode, INDEX_BUFFER_NAME } from "./Constants";

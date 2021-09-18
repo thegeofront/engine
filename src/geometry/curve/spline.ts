@@ -6,16 +6,16 @@
 //                I am forced to create knots with very slight tolerances.
 //                This could create trouble down the road...
 
-import { MultiVector3 } from "../../data/multi-vector-3";
+import { MultiVector3 } from "../../data/MultiVector3";
 import { Const } from "../../math/Const";
 import { Domain } from "../../math/Domain";
 import { Matrix4 } from "../../math/matrix";
-import { Polynomial } from "../../math/polynomial";
+import { Polynomial } from "../../math/Polynomial";
 import { Vector3 } from "../../math/vector";
-import { MultiLine } from "../../mesh/multi-line";
-import { BezierSquare } from "../surface/bezier-square";
-import { Bezier } from "./bezier";
-import { Curve } from "./curve";
+import { MultiLine } from "../../mesh/MultiLine";
+import { BezierSquare } from "../surface/BezierSquare";
+import { Bezier } from "./Bezier";
+import { Curve } from "./Curve";
 
 /**
  * B-Spline
@@ -35,7 +35,6 @@ export class Spline extends Curve {
     }
 
     static calcKnots(n: number, degree: number) {
-
         // TODO incorporate domain parameters in here
 
         let m = n + degree + 1; // m = n + p + 1
@@ -70,11 +69,10 @@ export class Spline extends Curve {
     }
 
     extend(extra: number) {
-
         // create the last bit of this curve as a bezier curve
         let count = this.degree + 1;
         let points = new Array<Vector3>(count);
-        for (let i = 0 ; i < count; i++) {
+        for (let i = 0; i < count; i++) {
             let j = this.verts.count - count + i;
             points[i] = this.verts.get(j);
         }
@@ -84,7 +82,7 @@ export class Spline extends Curve {
         bz.extend(extra);
 
         // assign the vertices
-        for (let i = 0 ; i < count; i++) {
+        for (let i = 0; i < count; i++) {
             let j = this.verts.count - count + i;
             this.verts.set(j, bz.verts.get(i));
         }
@@ -92,16 +90,15 @@ export class Spline extends Curve {
     }
 
     // calculate a piece of bezier which extends this curve
-    getExtention(extra: number) : Bezier {
-        
+    getExtention(extra: number): Bezier {
         // create the last bit of this curve as a bezier curve
         let count = this.degree + 1;
         let points = new Array<Vector3>(count);
-        for (let i = 0 ; i < count; i++) {
+        for (let i = 0; i < count; i++) {
             points[i] = this.verts.get(this.verts.count - count + i);
         }
         let bz = Bezier.fromList(points);
-        
+
         // get an extension from that
         return bz.getExtention(extra);
     }

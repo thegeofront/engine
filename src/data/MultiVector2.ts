@@ -1,10 +1,10 @@
-import { Geo } from "../geometry/geo";
+import { Geometry } from "../geometry/Geometry";
 import { Matrix4 } from "../math/matrix";
 import { Vector2 } from "../math/vector";
-import { FloatMatrix } from "./float-matrix";
-import { MultiVector3 } from "./multi-vector-3";
+import { FloatMatrix } from "./FloatMatrix";
+import { MultiVector3 } from "./MultiVector3";
 
-export class MultiVector2 extends Geo {
+export class MultiVector2 extends Geometry {
     private constructor(private matrix: FloatMatrix) {
         super();
     }

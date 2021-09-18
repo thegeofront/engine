@@ -6,7 +6,7 @@
 // note: named GeonImage to not collide with Image classes.
 
 import { Domain2 } from "../math/Domain";
-import { FloatMatrix } from "../data/float-matrix";
+import { FloatMatrix } from "../data/FloatMatrix";
 
 // TODO : x and y are not the same as i and j, and used inconsistently. fix this.
 // TODO : now that GEON is a package, we can use G.Image. the Geon suffix is not needed anymore is not needed anymore!
@@ -277,7 +277,6 @@ export class GeonImage {
 
     // add borders till this size is achieved
     buffer(width: number, height: number): GeonImage {
-
         const image = new GeonImage(width, height, this.pixelSize);
         const old = this;
 

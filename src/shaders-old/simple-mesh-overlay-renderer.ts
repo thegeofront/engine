@@ -4,7 +4,7 @@
 
 import { DrawSpeed, IntMatrix, Matrix4, Mesh, ShaderMesh, Shader, MultiVector3 } from "../lib";
 import { HelpGl } from "../webgl/HelpGl";
-import { Context } from "../render/context";
+import { Context } from "../render/Context";
 
 /**
  * Draw a mesh on top of all other meshes

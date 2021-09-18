@@ -11,7 +11,7 @@
 // notes:   Whats the difference between a Principal Component and an Eigen vector?
 //          "Because eigenvectors trace the principal lines of force, and the axes of greatest variance and covariance illustrate where the data is most susceptible to change."
 
-import { FloatMatrix } from "../data/float-matrix";
+import { FloatMatrix } from "../data/FloatMatrix";
 
 export class Stat {
     // calculate sum
@@ -30,7 +30,6 @@ export class Stat {
 
     // calculate weighted mean
     static meanWeighted(values: number[] | Float32Array, weights: number[] | Float32Array) {
-
         if (values.length != weights.length) {
             throw new Error("values & weights need same length");
         }
@@ -38,7 +37,7 @@ export class Stat {
         var sum = 0.0;
         var sumweight = 0.0;
 
-        for (let i = 0 ; i < values.length; i++) {
+        for (let i = 0; i < values.length; i++) {
             sum += values[i] * weights[i];
             sumweight += weights[i];
         }

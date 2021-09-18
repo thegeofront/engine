@@ -1,4 +1,3 @@
-
 /**
  * Note: this is obsolete, this functionality is build into the console.
  */

@@ -1,20 +1,20 @@
 // purpose: something that is willing to create new Shaders on the fly, to render whatever it gets
 
-import { MultiVector3 } from "../data/multi-vector-3";
-import { Curve } from "../geometry/curve/curve";
-import { Polyline } from "../geometry/curve/polyline";
-import { createRandomGUID } from "../math/random";
-import { Mesh } from "../mesh/mesh";
-import { MultiLine } from "../mesh/multi-line";
-import { ShaderMesh } from "../mesh/shader-mesh";
+import { MultiVector3 } from "../data/MultiVector3";
+import { Curve } from "../geometry/curve/Curve";
+import { Polyline } from "../geometry/curve/Polyline";
+import { createRandomGUID } from "../math/Random";
+import { Mesh } from "../mesh/Mesh";
+import { MultiLine } from "../mesh/MultiLine";
+import { ShaderMesh } from "../mesh/ShaderMesh";
 import { DotShader } from "../shaders-old/dot-shader";
 import { LineShader } from "../shaders-old/line-shader";
 import { MeshDebugShader } from "../shaders-old/mesh-debug-shader";
 import { ShadedMeshShader } from "../shaders-old/shaded-mesh-shader";
-import { Context } from "../render/context";
+import { Context } from "../render/Context";
 import { Shader } from "../webgl/Shader";
 import { DrawSpeed, WebGl } from "../webgl/HelpGl";
-import { Billboard, BillboardPayload, BillboardShader } from "../shaders/billboard-shader";
+import { Billboard, BillboardPayload, BillboardShader } from "../shaders/BillboardShader";
 import { ImageMesh } from "../render/bufferables/ImageMesh";
 import { Parameter } from "../parametric/Parameter";
 import { UI } from "../dom/UI";
@@ -30,18 +30,23 @@ export type RenderableUnit =
     | Polyline
     | Plane
     | MultiLine
-    | ImageMesh
-type AcceptableShader = DotShader | ShadedMeshShader | MeshDebugShader | LineShader | TextureMeshShader;
+    | ImageMesh;
+type AcceptableShader =
+    | DotShader
+    | ShadedMeshShader
+    | MeshDebugShader
+    | LineShader
+    | TextureMeshShader;
 
 /**
- * Renderer which can instantly visualize a large number of geometries. Very useful for looking at intermediate data. 
+ * Renderer which can instantly visualize a large number of geometries. Very useful for looking at intermediate data.
  */
 export class DebugRenderer {
-
     private constructor(
-        private gl: WebGl, 
+        private gl: WebGl,
         private shaders: Map<string, AcceptableShader>,
-        private activeShaders: Set<string>) {}
+        private activeShaders: Set<string>,
+    ) {}
 
     static new(gl: WebGl): DebugRenderer {
         return new DebugRenderer(gl, new Map(), new Set());
@@ -52,7 +57,7 @@ export class DebugRenderer {
      */
     set(unit: RenderableUnit, key?: string) {
         if (!key) {
-            key = createRandomGUID().slice(0,8);
+            key = createRandomGUID().slice(0, 8);
         }
 
         let shader = this.shaders.get(key);
@@ -70,10 +75,10 @@ export class DebugRenderer {
     addUi(ui: UI) {
         ui.clear();
         for (let [key, _] of this.shaders) {
-            let p = Parameter.newBoolean(key, true)
+            let p = Parameter.newBoolean(key, true);
             ui.addBooleanParameter(p, () => {
                 this.onChange(key, p.state !== 0);
-            })
+            });
         }
     }
 

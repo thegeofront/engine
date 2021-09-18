@@ -2,7 +2,7 @@
 // author:  Jos Feenstra
 // purpose: a marching cubes implementation useful for converting scalar discrete fields to contours
 
-import { Mesh } from "../mesh/mesh";
+import { Mesh } from "../mesh/Mesh";
 import { Vector2, Vector3 } from "../math/vector";
 
 // based upon:
