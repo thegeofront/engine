@@ -4,7 +4,7 @@
 // purpose: general representation of a domain / range / bound of numbers
 
 import { Matrix4, MultiVector2, MultiVector3, Vector2, Vector3 } from "../lib";
-import { Stopwatch } from "../system/stopwatch";
+import { Stopwatch } from "../util/stopwatch";
 import { Random } from "./random";
 
 export class Domain {

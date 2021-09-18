@@ -1,5 +1,5 @@
-import { InputState } from "../system/input-state";
-import { UI } from "../system/ui";
+import { InputState } from "../input/input-state";
+import { UI } from "../dom/UI";
 
 export class App {
     gl: WebGLRenderingContext;

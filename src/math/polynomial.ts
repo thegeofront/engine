@@ -3,7 +3,7 @@
 // notes:   based upon the excellent explainations from Prof. C.-K. Shene: https://pages.mtu.edu/~shene/COURSES/cs3621/NOTES/
 
 import { MultiVector3 } from "../data/multi-vector-3";
-import { Const } from "./const";
+import { Const } from "./Const";
 import { GeonMath } from "./math";
 import { Util } from "./util";
 import { Vector3 } from "./vector";

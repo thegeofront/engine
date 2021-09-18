@@ -15,8 +15,8 @@
 
 import { HashTable } from "../data/hash-table";
 import { IntMatrix } from "../data/int-matrix";
-import { Plane } from "../geo/plane";
-import { Const } from "../math/const";
+import { Plane } from "../geometry/plane";
+import { Const } from "../math/Const";
 import { Matrix4 } from "../math/matrix";
 import { Vector3 } from "../math/vector";
 import { Mesh } from "./mesh";

@@ -5,7 +5,7 @@
 // todo: 	BIJ NADER INZIEN: dont go the copy route. rewrite this in a more functional way creating new classes is expensive, but we really need immutable vectors.
 // 			these types of consistent vectors are only useful in niche cases, and complitate a lot of common cases.
 
-import { Const } from "./const";
+import { Const } from "./Const";
 import { GeonMath } from "./math";
 import { Matrix4 } from "./matrix";
 import { Random } from "./random";

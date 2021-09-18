@@ -1,4 +1,4 @@
-import { Geo } from "../geo/geo";
+import { Geo } from "../geometry/geo";
 import { Matrix4 } from "../math/matrix";
 
 // generic all-pupose matrix of floats

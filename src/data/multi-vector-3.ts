@@ -1,9 +1,8 @@
-import { Geo } from "../geo/geo";
+import { Geo } from "../geometry/geo";
 import { Domain3, Util } from "../lib";
 import { Matrix4 } from "../math/matrix";
 import { Random } from "../math/random";
 import { Vector3 } from "../math/vector";
-import { Stopwatch } from "../system/stopwatch";
 import { FloatMatrix } from "./float-matrix";
 import { MultiVector } from "./multi-vector";
 import { MultiVector2 } from "./multi-vector-2";
@@ -276,33 +275,33 @@ function calc(a: FloatMatrix, b: Matrix4) {
     return product;
 }
 
-function benchmark2() {
-    let sw = Stopwatch.new();
+// function benchmark2() {
+//     let sw = Stopwatch.new();
 
-    let count = 1000000;
-    let mv = MultiVector3.new(count);
-    let rng = Random.fromSeed(1337);
-    for (let i = 0; i < count; i++) {
-        mv.set(i, Vector3.fromRandomUnit(rng));
-    }
-    sw.log("v1: init");
+//     let count = 1000000;
+//     let mv = MultiVector3.new(count);
+//     let rng = Random.fromSeed(1337);
+//     for (let i = 0; i < count; i++) {
+//         mv.set(i, Vector3.fromRandomUnit(rng));
+//     }
+//     sw.log("v1: init");
 
-    let vecs = Array<Vector3>(count);
-    for (let i = 0; i < count; i++) {
-        vecs[i] = Vector3.fromRandomUnit(rng);
-    }
+//     let vecs = Array<Vector3>(count);
+//     for (let i = 0; i < count; i++) {
+//         vecs[i] = Vector3.fromRandomUnit(rng);
+//     }
 
-    sw.log("v2: init");
+//     sw.log("v2: init");
 
-    let vecs3 = Array<Vector3>();
-    for (let i = 0; i < count; i++) {
-        vecs3.push(Vector3.fromRandomUnit(rng));
-    }
+//     let vecs3 = Array<Vector3>();
+//     for (let i = 0; i < count; i++) {
+//         vecs3.push(Vector3.fromRandomUnit(rng));
+//     }
 
-    sw.log("v3: init");
+//     sw.log("v3: init");
 
-    // v1: init took: 123 ms
-    // v2: init took: 184 ms
-    // v3: init took: 469 ms
-    // conclusion: MultiVector3 works as intended!
-}
+//     // v1: init took: 123 ms
+//     // v2: init took: 184 ms
+//     // v3: init took: 469 ms
+//     // conclusion: MultiVector3 works as intended!
+// }

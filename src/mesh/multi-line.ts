@@ -19,9 +19,10 @@ import {
     Cube,
     ShaderMesh,
 } from "../lib";
+import { Renderable } from "../render-core/Renderable";
 
 // represents a collection of multiple lines. These could form 1 polyline, but this is not a requirement
-export class MultiLine {
+export class MultiLine implements Renderable {
     verts: FloatMatrix;
     links: Uint16Array;
 

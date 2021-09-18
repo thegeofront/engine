@@ -10,6 +10,7 @@
 //   - quads (links.width = 4. will need to be converted to triangles for now...)
 
 import { Domain2, GeonImage, Graph, HelpGl, Matrix4, Mesh, MultiVector2, MultiVector3, Plane, quadToTri, Rectangle3, Vector3 } from "../lib";
+import { Renderable } from "../render-core/Renderable";
 
 type vertexID = number;
 type faceID = number;
@@ -29,7 +30,7 @@ export enum NormalKind {
     MultiVertex,
 }
 
-export class ShaderMesh {
+export class ShaderMesh implements Renderable {
     // this desperately calls for an overhaul...
 
     mesh: Mesh;

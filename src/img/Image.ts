@@ -5,7 +5,7 @@
 //
 // note: named GeonImage to not collide with Image classes.
 
-import { Domain2 } from "../math/domain";
+import { Domain2 } from "../math/Domain";
 import { FloatMatrix } from "../data/float-matrix";
 
 // TODO : x and y are not the same as i and j, and used inconsistently. fix this.

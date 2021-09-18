@@ -1,4 +1,4 @@
-// purpose: a 'swiss cheese' data structure. When indices need to stay consistent, but you still want to iterate through a list, you need a data structure like this.
+// purpose: an object pool data structure. When indices need to stay consistent, but you still want to iterate through a list, you need a data structure like this.
 
 export class Pool<T> {
     private constructor(

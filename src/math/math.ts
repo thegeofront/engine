@@ -1,6 +1,6 @@
 // purpose: simple operations with only numbers
 
-import { Const } from "./const";
+import { Const } from "./Const";
 
 export class GeonMath {
     // make sure 'value' is more than 'lower', and less than 'upper'

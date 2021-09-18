@@ -1,22 +1,24 @@
 // purpose: something that is willing to create new Shaders on the fly, to render whatever it gets
 
 import { MultiVector3 } from "../data/multi-vector-3";
-import { Curve } from "../geo/curve/curve";
-import { Polyline } from "../geo/curve/polyline";
-import { BiSurface, Plane, TextureMeshShader } from "../lib";
+import { Curve } from "../geometry/curve/curve";
+import { Polyline } from "../geometry/curve/polyline";
 import { createRandomGUID } from "../math/random";
 import { Mesh } from "../mesh/mesh";
 import { MultiLine } from "../mesh/multi-line";
 import { ShaderMesh } from "../mesh/shader-mesh";
-import { DotShader } from "../shaders/dot-shader";
-import { LineShader } from "../shaders/line-shader";
-import { MeshDebugShader } from "../shaders/mesh-debug-shader";
-import { ShadedMeshShader } from "../shaders/shaded-mesh-shader";
+import { DotShader } from "../shaders-old/dot-shader";
+import { LineShader } from "../shaders-old/line-shader";
+import { MeshDebugShader } from "../shaders-old/mesh-debug-shader";
+import { ShadedMeshShader } from "../shaders-old/shaded-mesh-shader";
 import { Context } from "../render/context";
-import { Shader } from "../render-low/shader";
-import { DrawSpeed, WebGl } from "../render-low/webgl";
-import { Billboard, BillboardPayload, BillboardShader } from "../shaderprograms/billboard-shader";
-import { ImageMesh } from "../geometry/ImageMesh";
+import { Shader } from "../webgl/Shader";
+import { DrawSpeed, WebGl } from "../webgl/HelpGl";
+import { Billboard, BillboardPayload, BillboardShader } from "../shaders/billboard-shader";
+import { ImageMesh } from "../render/bufferables/ImageMesh";
+import { Parameter } from "../parametric/Parameter";
+import { UI } from "../dom/UI";
+import { BiSurface, Plane, TextureMeshShader } from "../lib";
 
 // NOTE: I think this type of polymorphism is better than regular polymorphism
 export type RenderableUnit =
@@ -31,21 +33,31 @@ export type RenderableUnit =
     | ImageMesh
 type AcceptableShader = DotShader | ShadedMeshShader | MeshDebugShader | LineShader | TextureMeshShader;
 
-export class MultiRenderer {
-    private constructor(private gl: WebGl, private shaders: Map<string, AcceptableShader>) {}
+/**
+ * Renderer which can instantly visualize a large number of geometries. Very useful for looking at intermediate data. 
+ */
+export class DebugRenderer {
 
-    static new(gl: WebGl): MultiRenderer {
-        return new MultiRenderer(gl, new Map());
+    private constructor(
+        private gl: WebGl, 
+        private shaders: Map<string, AcceptableShader>,
+        private activeShaders: Set<string>) {}
+
+    static new(gl: WebGl): DebugRenderer {
+        return new DebugRenderer(gl, new Map(), new Set());
     }
 
+    /**
+     * Creates a new shader, or updates existing shader
+     */
     set(unit: RenderableUnit, key?: string) {
         if (!key) {
-            key = createRandomGUID();
+            key = createRandomGUID().slice(0,8);
         }
 
         let shader = this.shaders.get(key);
         if (!shader) {
-            return this.addShader(key, unit);
+            return this.add(key, unit);
         }
 
         // If the type definitions above are set correctly
@@ -55,13 +67,32 @@ export class MultiRenderer {
         return shader;
     }
 
-    render(c: Context) {
-        for (let [key, shader] of this.shaders) {
-            shader.render(c);
+    addUi(ui: UI) {
+        ui.clear();
+        for (let [key, _] of this.shaders) {
+            let p = Parameter.newBoolean(key, true)
+            ui.addBooleanParameter(p, () => {
+                this.onChange(key, p.state !== 0);
+            })
         }
     }
 
-    private addShader(key: string, unit: RenderableUnit) {
+    onChange(key: string, state: boolean) {
+        console.log(state);
+        if (state) {
+            this.activeShaders.add(key);
+        } else {
+            this.activeShaders.delete(key);
+        }
+    }
+
+    render(c: Context) {
+        for (let key of this.activeShaders) {
+            this.shaders.get(key)!.render(c);
+        }
+    }
+
+    private add(key: string, unit: RenderableUnit) {
         let shader;
         let gl = this.gl;
 
@@ -105,6 +136,7 @@ export class MultiRenderer {
         }
 
         this.shaders.set(key, shader);
+        this.activeShaders.add(key);
         return shader;
     }
 }

@@ -1,5 +1,5 @@
 import { MultiVector3 } from "../data/multi-vector-3";
-import { Domain, Domain2 } from "./domain";
+import { Domain, Domain2 } from "./Domain";
 import { GeonMath } from "./math";
 import { Vector2 } from "./vector";
 
