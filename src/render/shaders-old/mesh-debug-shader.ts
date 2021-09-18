@@ -2,7 +2,9 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of a mesh.
 
-import { ShaderMesh, Matrix4, DrawSpeed, MultiLine, Context } from "../lib";
+import { ShaderMesh, Matrix4, MultiLine } from "../../lib";
+import { Scene } from "../Scene";
+import { DrawSpeed } from "../webgl/HelpGl";
 import { MultiShader } from "../webgl/MultiShader";
 import { LineShader } from "./line-shader";
 import { NormalShader } from "./mesh-normals-shader";
@@ -43,13 +45,13 @@ export class MeshDebugShader extends MultiShader<ShaderMesh> {
         this.normRend?.set(data, speed);
     }
 
-    render(c: Context) {
+    render(c: Scene) {
         this.faceRend.render(c);
         this.lineRend.render(c);
         this.normRend?.render(c);
     }
 
-    setAndRender(r: ShaderMesh, c: Context) {
+    setAndRender(r: ShaderMesh, c: Scene) {
         this.set(r, DrawSpeed.DynamicDraw);
         this.render(c);
     }

@@ -2,7 +2,7 @@
 // author : Jos Feenstra
 // purpose : handle all input events.
 
-import { Vector2 } from "../math/vector";
+import { Vector2 } from "../math/Vector2";
 
 enum Key {
     A,
@@ -115,10 +115,9 @@ export class InputState {
     private mouseScrollBuffered = 0;
 
     // TODO: build a full range of delegate functions
-    
+
     onMouseWheelScroll?: Function;
     onMouseLeftUp?: Function;
-
 
     constructor(canvas: HTMLCanvasElement) {
         // link
@@ -156,7 +155,7 @@ export class InputState {
     }
 
     static new(canvas: HTMLCanvasElement) {
-        return new InputState(canvas)
+        return new InputState(canvas);
     }
 
     public preUpdate(tick: number) {
@@ -166,15 +165,15 @@ export class InputState {
         this.newTime = Date.now();
         this.oldTime = this.newTime;
         this.tick = tick;
-   
-        // update mouse pos 
+
+        // update mouse pos
         if (!this.mousePosBuffered.equals(this.mousePos)) {
             // mouse has moved during previous frame
             this.mousePos = this.mousePosBuffered.clone();
             this.mouseDelta = this.mousePos.subbed(this.mousePosPrev);
             this.mousePosPrev = this.mousePos.clone();
         } else {
-            this.mouseDelta =Vector2.zero();
+            this.mouseDelta = Vector2.zero();
         }
 
         // update mouse buttons
@@ -184,7 +183,7 @@ export class InputState {
             this.mouseMiddlePrev != this.mouseMiddleDown && this.mouseMiddleDown;
 
         // update scrolling
-        
+
         // normalize all scrolling behaviour
         if (this.mouseScrollBuffered != 0) {
             // we are scrolling
@@ -209,7 +208,7 @@ export class InputState {
         this.mouseLeftPrev = this.mouseLeftDown;
         this.mouseRightPrev = this.mouseRightDown;
         this.mouseMiddlePrev = this.mouseMiddleDown;
-        
+
         // refresh keypresses
         this.keysPressed = [];
     }
@@ -266,7 +265,7 @@ export class InputState {
     }
 
     private setMousePos(x: number, y: number) {
-        this.mousePosBuffered = new Vector2(x,y);
+        this.mousePosBuffered = new Vector2(x, y);
     }
 
     private setMouseUp(e: MouseEvent) {

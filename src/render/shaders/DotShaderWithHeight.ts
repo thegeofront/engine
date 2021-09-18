@@ -1,11 +1,11 @@
 // jos feenstra
 
-import { MultiVector, DrawSpeed, ToFloatMatrix, Context } from "../lib";
+import { MultiVector, ToFloatMatrix } from "../../lib";
+import { Scene } from "../Scene";
 import { DrawMode } from "../webgl/Constants";
+import { DrawSpeed } from "../webgl/HelpGl";
 import { Program } from "../webgl/Program";
-import { Shader } from "../webgl/Shader";
 import { Uniform } from "../webgl/Uniform";
-
 
 export class DotShaderWithHeight extends Program<MultiVector> {
     height: Uniform;
@@ -103,7 +103,7 @@ export class DotShaderWithHeight extends Program<MultiVector> {
         return array.count();
     }
 
-    onRender(c: Context) {
+    onRender(c: Scene) {
         this.uniforms.setMatrix4("u_transform", c.camera.totalMatrix);
     }
 }

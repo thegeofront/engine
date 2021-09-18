@@ -2,7 +2,9 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of a mesh.
 
-import { Graph, DrawSpeed, Context } from "../lib";
+import { Graph } from "../../lib";
+import { Scene } from "../Scene";
+import { DrawSpeed } from "../webgl/HelpGl";
 import { MultiShader } from "../webgl/MultiShader";
 import { DotShader } from "./dot-shader";
 import { LineShader } from "./line-shader";
@@ -37,14 +39,14 @@ export class GraphDebugShader extends MultiShader<Graph> {
     }
 
     // render 1 image to the screen
-    render(c: Context) {
+    render(c: Scene) {
         this.pointRend.render(c);
         // this.faceRend.render(gl, camera.totalMatrix);
         this.lineRend.render(c);
         // this.normRend?.render(gl, camera);
     }
 
-    setAndRender(r: Graph, context: Context): void {
+    setAndRender(r: Graph, context: Scene): void {
         throw new Error("Method not implemented.");
     }
 }

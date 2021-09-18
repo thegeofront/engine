@@ -3,18 +3,16 @@
 // purpose: A shader wrapper for rendering shaded, textured, meshes
 
 import {
-    Shader,
     ShaderMesh,
-    DrawSpeed,
     NormalKind,
     MultiVector3,
     getDefaultIndices,
-    Const,
-    Context,
     Matrix4,
     Vector3,
-} from "../lib";
-import { HelpGl } from "../webgl/HelpGl";
+} from "../../lib";
+import { Scene } from "../Scene";
+import { DrawSpeed } from "../webgl/HelpGl";
+import { Shader } from "../webgl/Shader";
 
 export class ShadedMeshShader extends Shader<ShaderMesh> {
     // attribute & uniform locations
@@ -243,7 +241,7 @@ export class ShadedMeshShader extends Shader<ShaderMesh> {
     }
 
     // render the previous set data to the screen
-    render(c: Context) {
+    render(c: Scene) {
         // console.log("rendering..");
         let gl = this.gl;
         let camera = c.camera;

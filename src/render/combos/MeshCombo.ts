@@ -2,11 +2,10 @@ import { DrawSpeed } from "../../lib";
 import { Matrix4 } from "../../math/matrix";
 import { Mesh } from "../../mesh/Mesh";
 import { ShaderMesh } from "../../mesh/ShaderMesh";
-import { Context } from "../Context";
-import { MeshDebugShader } from "../../shaders-old/mesh-debug-shader";
-import { TransformLineShader } from "../../shaders-old/transform-line-shader";
-import { TransformMeshShader } from "../../shaders-old/transform-mesh-shader";
+import { Scene } from "../Scene";
 import { Combo } from "../Combo";
+import { TransformLineShader } from "../shaders-old/transform-line-shader";
+import { TransformMeshShader } from "../shaders-old/transform-mesh-shader";
 
 export class MeshCombo extends Combo<Mesh, ShaderMesh, TransformLineShader> {
     color: number[];
@@ -45,7 +44,7 @@ export class MeshCombo extends Combo<Mesh, ShaderMesh, TransformLineShader> {
         this.renderer2.set(this.buffered, DrawSpeed.StaticDraw);
     }
 
-    render(context: Context) {
+    render(context: Scene) {
         this.renderer2.render(context);
         this.renderer.render(context);
     }

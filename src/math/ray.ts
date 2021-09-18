@@ -4,7 +4,7 @@
 
 import { MultiLine } from "../mesh/MultiLine";
 import { Plane } from "../geometry/plane";
-import { Vector3 } from "./vector";
+import { Vector3 } from "./Vector3";
 
 export class Ray {
     origin: Vector3;

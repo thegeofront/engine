@@ -1,11 +1,11 @@
-import { Context, DrawSpeed } from "../lib";
+import { Scene, DrawSpeed } from "../../lib";
 
 export abstract class MultiShader<T> {
     abstract set(r: T, speed: DrawSpeed): void;
 
-    abstract render(context: Context): void;
+    abstract render(context: Scene): void;
 
-    setAndRender(r: T, context: Context) {
+    setAndRender(r: T, context: Scene) {
         this.set(r, DrawSpeed.DynamicDraw);
         this.render(context);
     }

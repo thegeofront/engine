@@ -1,19 +1,17 @@
 // https://webgl.brown37.net/12_advanced_rendering/07_rendering_points.html
 
+import { MultiVector3, MultiVector2, GeonImage, Vector3, ToFloatMatrix, Vector2 } from "../../lib";
+import { Scene } from "../Scene";
+import { DrawMode } from "../webgl/Constants";
+import { DrawSpeed } from "../webgl/HelpGl";
+import { Program } from "../webgl/Program";
+import { Uniform } from "../webgl/Uniform";
+
 // name:    billboard-renderer.ts
 // author:  Jos Feenstra
 // purpose: Renderer textures as billboards.
 
 // NOTE: make sure to include something like a center offset, to gain control of if the point is rendered centered, as topleft, etc. etc.
-
-import { GeonImage, MultiVector3, MultiVector2, Context, Vector2, Vector3 } from "../lib";
-import { ToFloatMatrix } from "../data/MultiVector";
-import { Attribute } from "../webgl/Attribute";
-import { Shader } from "../webgl/Shader";
-import { DrawSpeed } from "../webgl/HelpGl";
-import { Uniform } from "../webgl/Uniform";
-import { Program } from "../webgl/Program";
-import { DrawMode } from "../webgl/Constants";
 
 // mooi font om te gebruiken
 // https://datagoblin.itch.io/monogram
@@ -166,7 +164,7 @@ export class BillboardShader extends Program<BillboardPayload | Billboard> {
         return payload.positions.count;
     }
 
-    protected onRender(c: Context): void {
+    protected onRender(c: Scene): void {
         this.uniforms.set3("u_camera_position", c.camera.pos.scaled(-1));
         this.uniforms.setMatrix4("u_transform", c.camera.totalMatrix);
     }

@@ -23,7 +23,8 @@ export * from "./math/Quaternion";
 export * from "./math/Ray";
 export * from "./math/Statistics";
 export * from "./math/Util";
-export * from "./math/vector";
+export * from "./math/Vector2";
+export * from "./math/Vector3";
 export * from "./math/Random";
 export * from "./math/Polynomial";
 
@@ -58,28 +59,17 @@ export * from "./image/Kernels";
 
 export * from "./render/Camera";
 export * from "./render/Light";
-export * from "./render/Context";
+export * from "./render/Scene";
 
-export * from "./webgl/Attribute";
-export * from "./webgl/Attributes";
-export * from "./webgl/Shader";
-export * from "./webgl/Uniform";
-export * from "./webgl/Uniforms";
-export * from "./webgl/HelpGl";
+export * from "./render/webgl/Attribute";
+export * from "./render/webgl/Attributes";
+export * from "./render/webgl/Shader";
+export * from "./render/webgl/Uniform";
+export * from "./render/webgl/Uniforms";
+export * from "./render/webgl/HelpGl";
 
-export * from "./renderers/DebugRenderer";
-export * from "./renderers/ImageRenderer";
-
-export * from "./shaders-old/dot-shader";
-export * from "./shaders-old/line-shader";
-export * from "./shaders-old/mesh-debug-shader";
-export * from "./shaders-old/mesh-normals-shader";
-export * from "./shaders-old/rectangle-shader";
-export * from "./shaders-old/shaded-mesh-shader";
-export * from "./shaders-old/simple-mesh-shader";
-export * from "./shaders-old/texture-mesh-shader";
-export * from "./shaders-old/graph-debug-shader";
-export * from "./shaders/BillboardShader";
+export * from "./render/renderers/DebugRenderer";
+export * from "./render/renderers/ImageRenderer";
 
 export * from "./dom/IO";
 export * from "./util/FpsCounter";

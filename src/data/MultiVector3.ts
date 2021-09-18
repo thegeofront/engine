@@ -2,7 +2,7 @@ import { Geometry } from "../geometry/Geometry";
 import { Domain3, Util } from "../lib";
 import { Matrix4 } from "../math/matrix";
 import { Random } from "../math/Random";
-import { Vector3 } from "../math/vector";
+import { Vector3 } from "../math/Vector3";
 import { FloatMatrix } from "./FloatMatrix";
 import { MultiVector } from "./MultiVector";
 import { MultiVector2 } from "./MultiVector2";

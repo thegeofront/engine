@@ -1,7 +1,7 @@
 import { MultiVector3 } from "../data/MultiVector3";
 import { Domain, Domain2 } from "./Domain";
 import { GeonMath } from "./Math";
-import { Vector2 } from "./vector";
+import { Vector2 } from "./Vector2";
 
 export class Util {
     static range(n: number): number[] {

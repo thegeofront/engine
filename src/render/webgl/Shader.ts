@@ -7,7 +7,7 @@
 // This is old, not needed anymore
 
 import { Attributes } from "./Attributes";
-import { Context } from "../render/Context";
+import { Scene } from "../Scene";
 import { Uniforms } from "./Uniforms";
 import { DrawSpeed, HelpGl, WebGl } from "./HelpGl";
 import { DrawElementsType, DrawMethod, DrawMode, INDEX_BUFFER_NAME } from "./Constants";
@@ -59,9 +59,9 @@ export abstract class Shader<T> {
     abstract set(r: T, speed: DrawSpeed): void;
 
     // TODO refactor to 'onRender()'
-    abstract render(context: Context): void;
+    abstract render(context: Scene): void;
 
-    setAndRender(r: T, context: Context) {
+    setAndRender(r: T, context: Scene) {
         this.set(r, DrawSpeed.DynamicDraw);
         this.render(context);
     }

@@ -1,5 +1,5 @@
 import { Domain, Domain2 } from "../math/Domain";
-import { Vector2 } from "../math/vector";
+import { Vector2 } from "../math/Vector2";
 
 // heavy weight Line class
 export class LineCurve2 {

@@ -6,7 +6,7 @@ import { MultiVector3 } from "../data/MultiVector3";
 import { Const } from "./Const";
 import { GeonMath } from "./Math";
 import { Util } from "./Util";
-import { Vector3 } from "./vector";
+import { Vector3 } from "./Vector3";
 
 export class Polynomial {
     // pascals's triangle. Hardcoded for performance

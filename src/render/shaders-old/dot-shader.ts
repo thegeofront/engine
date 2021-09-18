@@ -1,6 +1,8 @@
 // jos feenstra
 
-import { MultiVector, DrawSpeed, ToFloatMatrix, HelpGl, Context } from "../lib";
+import { MultiVector, ToFloatMatrix } from "../../lib";
+import { Scene } from "../Scene";
+import { DrawSpeed } from "../webgl/HelpGl";
 import { Shader } from "../webgl/Shader";
 
 export class DotShader extends Shader<MultiVector> {
@@ -111,7 +113,7 @@ export class DotShader extends Shader<MultiVector> {
         gl.bufferData(gl.ARRAY_BUFFER, array.data, speed);
     }
 
-    render(c: Context) {
+    render(c: Scene) {
         let gl = this.gl;
         let matrix = c.camera.totalMatrix;
         // Tell it to use our program (pair of shaders)
@@ -132,7 +134,7 @@ export class DotShader extends Shader<MultiVector> {
         gl.drawArrays(gl.POINTS, 0, this.count);
     }
 
-    setAndRender(data: MultiVector, c: Context) {
+    setAndRender(data: MultiVector, c: Scene) {
         this.set(data, DrawSpeed.DynamicDraw);
         this.render(c);
     }

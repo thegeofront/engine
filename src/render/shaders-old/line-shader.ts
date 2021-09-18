@@ -2,7 +2,9 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of lines.
 
-import { MultiLine, Mesh, DrawSpeed, Matrix4, HelpGl, Context } from "../lib";
+import { MultiLine, Mesh, Matrix4 } from "../../lib";
+import { Scene } from "../Scene";
+import { DrawSpeed } from "../webgl/HelpGl";
 import { Shader } from "../webgl/Shader";
 
 export class LineShader extends Shader<MultiLine | Mesh> {
@@ -91,7 +93,7 @@ export class LineShader extends Shader<MultiLine | Mesh> {
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, links.buffer, drawspeed);
     }
 
-    render(c: Context) {
+    render(c: Scene) {
         let gl = this.gl;
         let matrix = c.camera.totalMatrix;
         // Tell it to use our program (pair of shaders)
@@ -113,7 +115,7 @@ export class LineShader extends Shader<MultiLine | Mesh> {
         gl.drawElements(gl.LINES, this.count, gl.UNSIGNED_SHORT, 0);
     }
 
-    setAndRender(data: MultiLine, c: Context) {
+    setAndRender(data: MultiLine, c: Scene) {
         this.set(data, DrawSpeed.DynamicDraw);
         this.render(c);
     }

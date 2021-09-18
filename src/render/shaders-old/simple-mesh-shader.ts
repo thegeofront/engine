@@ -2,9 +2,10 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of a mesh.
 
-import { DrawSpeed, IntMatrix, Matrix4, Mesh, ShaderMesh, Shader, MultiVector3 } from "../lib";
-import { Context } from "../render/Context";
-import { HelpGl } from "../webgl/HelpGl";
+import { Mesh } from "../../lib";
+import { Scene } from "../Scene";
+import { DrawSpeed } from "../webgl/HelpGl";
+import { Shader } from "../webgl/Shader";
 
 export class SimpleMeshShader extends Shader<Mesh> {
     // attribute & uniform locations
@@ -81,7 +82,7 @@ export class SimpleMeshShader extends Shader<Mesh> {
     }
 
     // render 1 image to the screen
-    render(c: Context) {
+    render(c: Scene) {
         let gl = this.gl;
         let matrix = c.camera.totalMatrix;
 
@@ -99,7 +100,7 @@ export class SimpleMeshShader extends Shader<Mesh> {
         gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
     }
 
-    setAndRender(r: Mesh, context: Context): void {
+    setAndRender(r: Mesh, context: Scene): void {
         this.set(r, DrawSpeed.DynamicDraw);
         this.render(context);
     }

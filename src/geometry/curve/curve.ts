@@ -10,7 +10,8 @@ import { GeonMath, Polyline, Util } from "../../lib";
 import { Domain } from "../../math/Domain";
 import { Const } from "../../math/Const";
 import { Matrix4 } from "../../math/matrix";
-import { Vector3 } from "../../math/vector";
+import { Vector2 } from "../../math/Vector2";
+import { Vector3 } from "../../math/Vector3";
 import { MultiLine } from "../../mesh/MultiLine";
 import { Geometry } from "../Geometry";
 

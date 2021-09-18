@@ -3,6 +3,6 @@
 // NOTE:    for now, just the camera lives in here
 import { Camera } from "./Camera";
 
-export class Context {
+export class Scene {
     constructor(public camera: Camera) {}
 }

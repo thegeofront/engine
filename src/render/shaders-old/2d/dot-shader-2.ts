@@ -1,6 +1,8 @@
 // jos feenstra
 
-import { Shader, Vector2, Context } from "../lib";
+import { Vector2 } from "../../../lib";
+import { Scene } from "../../Scene";
+import { Shader } from "../../webgl/Shader";
 
 export class DotShader2 extends Shader<Vector2[]> {
     // attribute & uniform locations
@@ -88,10 +90,10 @@ export class DotShader2 extends Shader<Vector2[]> {
 
     set() {}
 
-    render(context: Context): void {}
+    render(context: Scene): void {}
 
     // render 1 image to the screen
-    setAndRender(dots: Vector2[], context: Context) {
+    setAndRender(dots: Vector2[], context: Scene) {
         let gl = this.gl;
         // Tell it to use our program (pair of shaders)
         gl.useProgram(this.program);

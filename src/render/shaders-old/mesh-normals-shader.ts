@@ -2,16 +2,9 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of lines.
 
-import {
-    ShaderMesh,
-    DrawSpeed,
-    HelpGl,
-    MultiVector3,
-    NormalKind,
-    Vector3,
-    getDefaultIndices,
-    Context,
-} from "../lib";
+import { ShaderMesh, MultiVector3, NormalKind, Vector3, getDefaultIndices } from "../../lib";
+import { Scene } from "../Scene";
+import { DrawSpeed } from "../webgl/HelpGl";
 import { Shader } from "../webgl/Shader";
 
 export class NormalShader extends Shader<ShaderMesh> {
@@ -154,7 +147,7 @@ export class NormalShader extends Shader<ShaderMesh> {
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, getDefaultIndices(this.count), drawspeed);
     }
 
-    render(c: Context) {
+    render(c: Scene) {
         let gl = this.gl;
         let matrix = c.camera.totalMatrix;
         let camera = c.camera;

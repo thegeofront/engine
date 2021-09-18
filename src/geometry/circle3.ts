@@ -2,7 +2,7 @@
 
 import { Const } from "../math/Const";
 import { Matrix4 } from "../math/matrix";
-import { Vector3 } from "../math/vector";
+import { Vector3 } from "../math/Vector3";
 import { MultiLine } from "../mesh/MultiLine";
 import { Mesh } from "../mesh/Mesh";
 import { Circle2 } from "./Circle2";

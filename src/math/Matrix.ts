@@ -6,7 +6,8 @@
 import { FloatMatrix } from "../data/FloatMatrix";
 import { MultiVector3 } from "../data/MultiVector3";
 import { Quaternion } from "./Quaternion";
-import { Vector2, Vector3 } from "./vector";
+import { Vector2 } from "./Vector2";
+import { Vector3 } from "./Vector3";
 
 // NOTE: maybe matrix 3 should be removed...
 // 3x3 matrix of floats used for 2d math

@@ -7,13 +7,10 @@
 //                This could create trouble down the road...
 
 import { MultiVector3 } from "../../data/MultiVector3";
-import { Const } from "../../math/Const";
 import { Domain } from "../../math/Domain";
 import { Matrix4 } from "../../math/matrix";
 import { Polynomial } from "../../math/Polynomial";
-import { Vector3 } from "../../math/vector";
-import { MultiLine } from "../../mesh/MultiLine";
-import { BezierSquare } from "../surface/BezierSquare";
+import { Vector3 } from "../../math/Vector3";
 import { Bezier } from "./Bezier";
 import { Curve } from "./Curve";
 

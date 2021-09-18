@@ -1,6 +1,6 @@
 import { Geometry } from "../geometry/Geometry";
 import { Matrix4 } from "../math/matrix";
-import { Vector2 } from "../math/vector";
+import { Vector2 } from "../math/Vector2";
 import { FloatMatrix } from "./FloatMatrix";
 import { MultiVector3 } from "./MultiVector3";
 

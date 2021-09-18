@@ -4,7 +4,7 @@
 // note:    TODO
 
 import { Matrix4 } from "../math/matrix";
-import { Vector3 } from "../math/vector";
+import { Vector3 } from "../math/Vector3";
 
 // i want traits....
 export abstract class Geometry {

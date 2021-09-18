@@ -5,8 +5,10 @@ import { MultiLine } from "../mesh/MultiLine";
 import { GeonMath } from "../math/Math";
 import { Matrix4 } from "../math/matrix";
 import { Ray } from "../math/Ray";
-import { Vector2, Vector3 } from "../math/vector";
 import { Plane, InputState } from "../lib";
+
+import { Vector2 } from "../math/Vector2";
+import { Vector3 } from "../math/Vector3";
 
 export class Camera {
     pos: Vector3;

@@ -1,4 +1,4 @@
-import { Vector3 } from "../math/vector";
+import { Vector3 } from "../math/Vector3";
 
 // a Cube of voxels
 export class IntCube {
@@ -31,7 +31,8 @@ export class IntCube {
     }
 
     setData(data: number[]) {
-        if (data.length != this.size()) throw "data.length does not match width * height " + data.length.toString();
+        if (data.length != this.size())
+            throw "data.length does not match width * height " + data.length.toString();
         this.data.set(data);
     }
 
@@ -43,7 +44,14 @@ export class IntCube {
     }
 
     inRange(i: number, j: number, k: number): boolean {
-        return !(i < 0 || j < 0 || k < 0 || i > this._width - 1 || j > this._height - 1 || k > this._depth - 1);
+        return !(
+            i < 0 ||
+            j < 0 ||
+            k < 0 ||
+            i > this._width - 1 ||
+            j > this._height - 1 ||
+            k > this._depth - 1
+        );
     }
 
     getIndex(i: number, j: number, k: number): number {

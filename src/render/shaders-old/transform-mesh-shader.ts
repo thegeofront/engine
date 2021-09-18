@@ -2,9 +2,10 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of a mesh.
 
-import { DrawSpeed, IntMatrix, Matrix4, ShaderMesh, Shader, MultiVector3 } from "../lib";
-import { Context } from "../render/Context";
-import { HelpGl } from "../webgl/HelpGl";
+import { ShaderMesh, Matrix4 } from "../../lib";
+import { Scene } from "../Scene";
+import { DrawSpeed } from "../webgl/HelpGl";
+import { Shader } from "../webgl/Shader";
 
 export class TransformMeshShader extends Shader<ShaderMesh> {
     // attribute & uniform locations
@@ -92,7 +93,7 @@ export class TransformMeshShader extends Shader<ShaderMesh> {
     }
 
     // render 1 image to the screen
-    render(c: Context) {
+    render(c: Scene) {
         let gl = this.gl;
         let matrix = c.camera.totalMatrix;
 
@@ -112,7 +113,7 @@ export class TransformMeshShader extends Shader<ShaderMesh> {
         gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
     }
 
-    setAndRender(r: ShaderMesh, context: Context): void {
+    setAndRender(r: ShaderMesh, context: Scene): void {
         this.set(r, DrawSpeed.DynamicDraw);
         this.render(context);
     }

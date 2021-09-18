@@ -1,5 +1,5 @@
 import { Const } from "../math/Const";
-import { Vector2 } from "../math/vector";
+import { Vector2 } from "../math/Vector2";
 
 export class Circle2 {
     center: Vector2;

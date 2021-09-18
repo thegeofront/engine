@@ -2,7 +2,9 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of a mesh.
 
-import { Shader, ShaderMesh, HelpGl, DrawSpeed, Context } from "../lib";
+import { Scene, ShaderMesh } from "../../../lib";
+import { HelpGl, DrawSpeed } from "../../webgl/HelpGl";
+import { Shader } from "../../webgl/Shader";
 
 export class TextureMeshShader extends Shader<ShaderMesh> {
     // attribute & uniform locations
@@ -20,7 +22,6 @@ export class TextureMeshShader extends Shader<ShaderMesh> {
     u_texture: WebGLUniformLocation;
     texture_id: number;
     texture: WebGLTexture | null;
-    u_texture_size: WebGLUniformLocation;
 
     constructor(gl: WebGLRenderingContext) {
         const vs = `
@@ -40,46 +41,17 @@ export class TextureMeshShader extends Shader<ShaderMesh> {
         }
         `;
 
-        let fs;
-        let pixelPerfext=true;
-        if (pixelPerfext) {
-            fs = `
-            precision mediump float;
-    
-            varying vec2 v_texcoord;
+        const fs = `
+        precision mediump float;
 
-            uniform vec2 u_texture_size;
-            uniform sampler2D u_texture;
-    
-            // make pixel-perfect, but round it so it has no artefacts.
-            vec2 snapPixel(vec2 uv, vec2 size, vec2 alpha) {
-                vec2 pixel_uv = uv * size;
-                vec2 x = fract(pixel_uv);
-                vec2 x_ = clamp(0.5 / alpha * x, 0.0, 0.5) +
-                          clamp(0.5 / alpha * (x - 1.0) + 0.5, 0.0, 0.5);
-                return clamp((floor(pixel_uv) + x_) / size, 0.0, 0.9999);
-            } 
+        varying vec2 v_texcoord;
 
-            void main() {
-                vec2 coord = snapPixel(v_texcoord, u_texture_size, vec2(0.02));
-                gl_FragColor = texture2D(u_texture, coord);
-            }
-            `;
+        uniform sampler2D u_texture;
 
-        } else {
-            fs = `
-            precision mediump float;
-    
-            varying vec2 v_texcoord;
-    
-            uniform vec2 u_texture_size;
-            uniform sampler2D u_texture;
-    
-            void main() {
-                gl_FragColor = texture2D(u_texture, v_texcoord);
-            }
-            `;
+        void main() {
+            gl_FragColor = texture2D(u_texture, v_texcoord);
         }
+        `;
 
         // setup program
         super(gl, vs, fs);
@@ -89,7 +61,6 @@ export class TextureMeshShader extends Shader<ShaderMesh> {
 
         // init uniforms
         this.u_transform = gl.getUniformLocation(this.program, "u_transform")!;
-        this.u_texture_size = gl.getUniformLocation(this.program, "u_texture_size")!;
         this.u_texture = gl.getUniformLocation(this.program, "u_texture")!;
 
         // init three buffers: verts | uvs | links
@@ -140,7 +111,6 @@ export class TextureMeshShader extends Shader<ShaderMesh> {
         gl.activeTexture(gl.TEXTURE0 + this.texture_id);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, r.texture);
-        gl.uniform2f(this.u_texture_size, r.texture.width, r.texture.height);
         // alternative texture -> Fill the texture with a 1x1 blue pixel.
         // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([0, 128, 128, 255]));
         // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, mesh.texture.data);
@@ -148,7 +118,7 @@ export class TextureMeshShader extends Shader<ShaderMesh> {
         gl.generateMipmap(gl.TEXTURE_2D);
     }
 
-    render(context: Context) {
+    render(context: Scene) {
         let gl = this.gl;
         let camera = context.camera;
         let matrix = camera.totalMatrix;
@@ -159,7 +129,6 @@ export class TextureMeshShader extends Shader<ShaderMesh> {
 
         // set uniforms
         gl.uniformMatrix4fv(this.u_transform, false, matrix.data);
-        
 
         // set texture
         gl.uniform1i(this.u_texture, this.texture_id);
@@ -181,10 +150,5 @@ export class TextureMeshShader extends Shader<ShaderMesh> {
 
         // draw!
         gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
-    }
-
-    setAndRender(r: ShaderMesh, context: Context) {
-        this.set(r, DrawSpeed.DynamicDraw);
-        this.render(context);
     }
 }

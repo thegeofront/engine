@@ -3,9 +3,9 @@
 // purpose: mathematical representation of a parametric loft surface
 
 import { MultiVector3 } from "../../data/MultiVector3";
-import { Const } from "../../lib";
+import { Const, Vector3 } from "../../lib";
 import { Matrix4 } from "../../math/matrix";
-import { Vector3 } from "../../math/vector";
+
 import { Mesh } from "../../mesh/Mesh";
 import { Bezier } from "../curve/Bezier";
 import { Curve } from "../curve/Curve";

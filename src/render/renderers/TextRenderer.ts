@@ -2,7 +2,8 @@
 // take a bitmap with standardized positions, or some json stating the position
 // frank already made this!!
 
-import { Vector2, Vector3 } from "../math/vector";
+import { Vector2 } from "../../math/Vector2";
+import { Vector3 } from "../../math/Vector3";
 
 export class TextRenderer {
     // mapping of text characters to data: texturePosition, textureExtend

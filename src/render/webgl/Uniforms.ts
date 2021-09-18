@@ -1,8 +1,9 @@
-import { GeonImage } from "../image/Image";
-import { Matrix3, Matrix4 } from "../math/matrix";
-import { Vector2, Vector3 } from "../math/vector";
+import { GeonImage } from "../../image/Image";
+import { Matrix3, Matrix4 } from "../../math/matrix";
+import { Vector2 } from "../../math/Vector2";
 import { Uniform, UniformTexture, UniformType } from "./Uniform";
 import { WebGl } from "./HelpGl";
+import { Vector3 } from "../../math/Vector3";
 
 /**
  * all uniforms corresponding to one GL program.

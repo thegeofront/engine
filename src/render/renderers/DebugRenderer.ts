@@ -1,24 +1,25 @@
 // purpose: something that is willing to create new Shaders on the fly, to render whatever it gets
 
-import { MultiVector3 } from "../data/MultiVector3";
-import { Curve } from "../geometry/curve/Curve";
-import { Polyline } from "../geometry/curve/Polyline";
-import { createRandomGUID } from "../math/Random";
-import { Mesh } from "../mesh/Mesh";
-import { MultiLine } from "../mesh/MultiLine";
-import { ShaderMesh } from "../mesh/ShaderMesh";
+import { MultiVector3 } from "../../data/MultiVector3";
+import { Curve } from "../../geometry/curve/Curve";
+import { Polyline } from "../../geometry/curve/Polyline";
+import { createRandomGUID } from "../../math/Random";
+import { Mesh } from "../../mesh/Mesh";
+import { MultiLine } from "../../mesh/MultiLine";
+import { ShaderMesh } from "../../mesh/ShaderMesh";
 import { DotShader } from "../shaders-old/dot-shader";
 import { LineShader } from "../shaders-old/line-shader";
 import { MeshDebugShader } from "../shaders-old/mesh-debug-shader";
 import { ShadedMeshShader } from "../shaders-old/shaded-mesh-shader";
-import { Context } from "../render/Context";
+import { Scene } from "../Scene";
 import { Shader } from "../webgl/Shader";
 import { DrawSpeed, WebGl } from "../webgl/HelpGl";
 import { Billboard, BillboardPayload, BillboardShader } from "../shaders/BillboardShader";
-import { ImageMesh } from "../render/bufferables/ImageMesh";
-import { Parameter } from "../parametric/Parameter";
-import { UI } from "../dom/UI";
-import { BiSurface, Plane, TextureMeshShader } from "../lib";
+import { ImageMesh } from "../bufferables/ImageMesh";
+import { Parameter } from "../../parametric/Parameter";
+import { UI } from "../../dom/UI";
+import { BiSurface, Plane } from "../../lib";
+import { TextureMeshShader } from "../shaders-old/texture-mesh-shader";
 
 // NOTE: I think this type of polymorphism is better than regular polymorphism
 export type RenderableUnit =
@@ -91,7 +92,7 @@ export class DebugRenderer {
         }
     }
 
-    render(c: Context) {
+    render(c: Scene) {
         for (let key of this.activeShaders) {
             this.shaders.get(key)!.render(c);
         }

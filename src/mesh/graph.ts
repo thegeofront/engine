@@ -18,7 +18,7 @@ import { IntMatrix } from "../data/IntMatrix";
 import { Plane } from "../geometry/plane";
 import { Const } from "../math/Const";
 import { Matrix4 } from "../math/matrix";
-import { Vector3 } from "../math/vector";
+import { Vector3 } from "../math/Vector3";
 import { Mesh } from "./Mesh";
 import { MeshType, ShaderMesh } from "./ShaderMesh";
 

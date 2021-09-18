@@ -16,8 +16,8 @@
 // TODO: maybe find a better name, but 'combo' is quite distinct in a way
 // todo: force buffering a bit more. make a way that requiers this.buffered to be filled
 
-import { Context, Shader } from "../lib";
-import { MultiShader } from "../webgl/MultiShader";
+import { Scene, Shader } from "../lib";
+import { MultiShader } from "./webgl/MultiShader";
 
 // staticcombo
 
@@ -44,7 +44,7 @@ export class Combi<S, B, R extends Shader<B> | MultiShader<B>> {
 
     protected buffer() {}
 
-    render(context: Context) {
+    render(context: Scene) {
         for (let i = 0; i < this.buffered.length; i++) {
             const b = this.buffered[i];
             this.renderer.setAndRender(b, context);
@@ -69,7 +69,7 @@ export class Combo<S, B, R extends Shader<B> | MultiShader<B>> {
 
     protected buffer() {}
 
-    render(context: Context) {
+    render(context: Scene) {
         this.renderer.render(context);
     }
 }

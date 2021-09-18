@@ -6,7 +6,7 @@
 // still tho, within a larger context, the whole of a fragment & vertex shader can be named Shader for the time being...
 
 import { Attributes } from "./Attributes";
-import { Context } from "../render/Context";
+import { Scene } from "../Scene";
 import { Uniforms } from "./Uniforms";
 import { DrawSpeed, HelpGl, WebGl } from "./HelpGl";
 import { DrawElementsType, DrawMethod, DrawMode, INDEX_BUFFER_NAME } from "./Constants";
@@ -71,7 +71,7 @@ export abstract class Program<T> {
         this.drawCount = this.onSet(r, speed);
     }
 
-    render(c: Context) {
+    render(c: Scene) {
         // if (!this.active) {
         //     return;
         // }
@@ -82,7 +82,7 @@ export abstract class Program<T> {
         this.draw();
     }
 
-    setAndRender(r: T, context: Context) {
+    setAndRender(r: T, context: Scene) {
         this.set(r, DrawSpeed.DynamicDraw);
         this.render(context);
     }
@@ -101,7 +101,7 @@ export abstract class Program<T> {
 
     protected abstract onSet(data: T, speed: DrawSpeed): number;
 
-    protected abstract onRender(c: Context): void;
+    protected abstract onRender(c: Scene): void;
 
     // ---------------------------------------------------------------------------
 

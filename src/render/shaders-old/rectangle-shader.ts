@@ -1,6 +1,8 @@
 // jos feenstra
 
-import { Shader, Rectangle2, Context } from "../lib";
+import { Rectangle2 } from "../../lib";
+import { Scene } from "../Scene";
+import { Shader } from "../webgl/Shader";
 
 export class RectangleShader extends Shader<Rectangle2[]> {
     // attribute & uniform locations
@@ -65,7 +67,7 @@ export class RectangleShader extends Shader<Rectangle2[]> {
         throw "not used!";
     }
 
-    setAndRender(rs: Rectangle2[], c: Context) {
+    setAndRender(rs: Rectangle2[], c: Scene) {
         // Clear the canvas
         let gl = this.gl;
         gl.clearColor(0, 0, 0, 0);
