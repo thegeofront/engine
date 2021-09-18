@@ -27,7 +27,7 @@ export class Circle3 {
 
     static fromCircle2(circle2: Circle2, plane = Plane.WorldXY()) {
         // elevate center of circle, make it the center of a plane
-        let center3d = plane.pushToWorld(circle2.center.to3D());
+        let center3d = plane.pushToWorld(Vector3.from2d(circle2.center));
         plane = plane.clone();
         plane.center = center3d;
         return new Circle3(plane, circle2.radius);

@@ -65,7 +65,7 @@ export class Rectangle3 {
 
     getCorners(): Vector3[] {
         let corners = this.domain.corners();
-        let corners3 = corners.map((c) => this.plane.pushToWorld(c.to3D()));
+        let corners3 = corners.map((c) => this.plane.pushToWorld(Vector3.from2d(c)));
         return corners3;
     }
 }

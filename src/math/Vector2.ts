@@ -10,7 +10,6 @@ import { GeonMath } from "./Math";
 import { Matrix4 } from "./Matrix4";
 import { Random } from "./Random";
 import { Util } from "./Util";
-import { Vector3 } from "./Vector3";
 
 export class Vector2 {
     x: number;
@@ -93,10 +92,6 @@ export class Vector2 {
     }
 
     // --- basics
-
-    to3D(): Vector3 {
-        return new Vector3(this.x, this.y, 0);
-    }
 
     set(x: number, y: number): Vector2 {
         this.x = x;

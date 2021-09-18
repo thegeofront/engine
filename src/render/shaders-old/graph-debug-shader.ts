@@ -2,7 +2,8 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of a mesh.
 
-import { Graph, MultiShader } from "../../lib";
+import { Graph } from "../../geometry/mesh/Graph";
+import { MultiShader } from "../OldMultiShader";
 import { Scene } from "../Scene";
 import { DrawSpeed } from "../webgl/HelpGl";
 import { DotShader } from "./dot-shader";

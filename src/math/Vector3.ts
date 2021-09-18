@@ -13,6 +13,10 @@ export class Vector3 {
         return new Vector3(x, y, z);
     }
 
+    static from2d(v: Vector2) {
+        return new Vector3(v.x, v.y, 0);
+    }
+
     static calculateWheelOrder(vectors: Vector3[], ihat: Vector3, jhat: Vector3): number[] {
         // console.log("wheel order");
         // console.log("hats", ihat, jhat)

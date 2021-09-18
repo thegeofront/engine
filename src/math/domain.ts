@@ -3,7 +3,8 @@
 // author: Jos Feenstra
 // purpose: general representation of a domain / range / bound of numbers
 
-import { Matrix4, MultiVector2, MultiVector3, Vector2, Vector3 } from "../lib";
+import { Matrix4, MultiVector2, MultiVector3, Vector3 } from "../lib";
+import { Vector2 } from "./Vector2";
 import { Stopwatch } from "../util/Stopwatch";
 import { Random } from "./Random";
 

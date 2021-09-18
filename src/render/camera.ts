@@ -2,10 +2,11 @@
 // purpose : contain all logic regarding
 
 import { MultiLine } from "../geometry/mesh/MultiLine";
+import { Plane } from "../geometry/plane";
+import { InputState } from "../input/InputState";
 import { GeonMath } from "../math/Math";
 import { Matrix4 } from "../math/Matrix4";
 import { Ray } from "../math/Ray";
-import { Plane, InputState } from "../lib";
 
 import { Vector2 } from "../math/Vector2";
 import { Vector3 } from "../math/Vector3";

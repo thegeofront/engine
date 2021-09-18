@@ -1,5 +1,11 @@
 // purpose: make sure the entire library is callable from one point.
 
+// I dont know why, but I had to move these up, otherwise some weird dependency interlinking bug creeps up in the ts compiler
+export * from "./math/Const";
+export * from "./math/Util";
+export * from "./image/Kernels";
+export * from "./render/OldMultiShader";
+
 export * from "./algorithms/MarchingCubes";
 export * from "./algorithms/Perlin";
 
@@ -50,11 +56,10 @@ export * from "./geometry/mesh/TopoMesh";
 
 export * from "./image/Colors";
 export * from "./image/Image";
-export * from "./image/Kernels";
 
 export * from "./input/InputState";
 
-export * from "./math/Const";
+
 export * from "./math/Domain";
 export * from "./math/Math";
 export * from "./math/Matrix3";
@@ -64,7 +69,7 @@ export * from "./math/Quaternion";
 export * from "./math/Random";
 export * from "./math/Ray";
 export * from "./math/Statistics";
-export * from "./math/Util";
+
 export * from "./math/Vector2";
 export * from "./math/Vector3";
 
@@ -94,7 +99,6 @@ export * from "./render/webgl/Uniform";
 export * from "./render/webgl/Uniforms";
 export * from "./render/webgl/HelpGl";
 
-export * from "./render/OldMultiShader";
 export * from "./render/OldShader";
 export * from "./render/Camera";
 export * from "./render/Light";

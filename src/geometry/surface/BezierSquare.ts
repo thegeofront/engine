@@ -187,7 +187,7 @@ function test(times = 1000) {
     sw.log("creation");
 
     for (let i = 0; i < times; i++) {
-        let randomVec = domain.elevate(Vector2.fromRandom(rng)).to3D();
+        let randomVec = Vector3.from2d(domain.elevate(Vector2.fromRandom(rng)));
         s.approxClosestPoint(randomVec);
     }
 
