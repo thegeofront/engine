@@ -2,9 +2,6 @@
 A no-dependency 3D engine for delivering interactive 3d experiences on the web. 
 Think barebones three.js, but with a focus on parametric design / procedural generation.
 
-## Current Project within Geon
-- Irregular quadrilateral partition of space
-
 
 ## Demo
 [repo](https://github.com/josfeenstra/geon-demo/)
@@ -23,8 +20,11 @@ This will produce ```index.js``` within the build folder. To use it, run a local
 
 ## TODO
 
-
-
+- [✔️] Refactor entire codebase to make it look more like `three.js`
+- [ ] Build a blender-style glossy mesh shader with filleted edges
+- [ ] Create a maze using marching cubes
+- [ ] 
+- [ ]  
 _____________________________________________________________
 ⚙️ = Busy | ✔️= DONE 
 
