@@ -29,7 +29,7 @@ export class MultiVector3 extends Geometry {
     }
 
     static fromData(data: number[] | Float32Array): MultiVector3 {
-        let multi = MultiVector3.new(data.length / 2);
+        let multi = MultiVector3.new(data.length / 3);
         multi.matrix.fillWith(data);
         return multi;
     }
