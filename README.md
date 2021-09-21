@@ -24,7 +24,18 @@ This will produce ```index.js``` within the build folder. To use it, run a local
 - [ ] Build a blender-style glossy mesh shader with filleted edges
 - [ ] Create a maze using marching cubes
 - [ ] 
-- [ ]  
+- [ ]
+
+
+## Notes
+
+- We need things like a `Entity`, which has a `Model`, which has a `Material` + `Mesh`, which should include all needed info for a `Shader`.
+- `Shaders` know what data to feed them. how should the rest of the code know this? 
+- Entity needs a Model and Shader. 
+- We need a `Shader` interface which enables us to only update that which needs updating.
+  - can be done by decoupled loaders, like: `shader.loadCamera` / `shader.loadModel` / `shader.loadMaterial`. 
+- TODO: create an InstanceRenderer(), which accepts 1 model and a whole bunch of position matrices.
+  - Try to render a whole forest with them
 _____________________________________________________________
 ⚙️ = Busy | ✔️= DONE 
 
