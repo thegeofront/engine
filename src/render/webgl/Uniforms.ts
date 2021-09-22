@@ -5,6 +5,7 @@ import { Uniform, UniformTexture, UniformType } from "./Uniform";
 import { WebGl } from "./HelpGl";
 import { Vector3 } from "../../math/Vector3";
 import { Matrix3 } from "../../math/Matrix3";
+import { Color } from "../../image/Color";
 
 /**
  * all uniforms corresponding to one GL program.
@@ -68,6 +69,10 @@ export class Uniforms {
 
     load4(name: string, value: number[]) {
         this.get(name).load(value);
+    }
+
+    loadColor(name: string, value: Color) {
+        this.get(name).load(value.data);
     }
 
     loadMatrix3(name: string, value: Matrix3) {

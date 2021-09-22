@@ -2,30 +2,20 @@
 // Purpose: Experiment: a collection of renderers, things to render, and Camera's, as common as many 3d engines
 // NOTE:    for now, just the camera lives in here
 
+import { Color } from "../../image/Color";
 import { Vector3 } from "../../lib";
 import { Camera } from "./Camera";
 import { Light } from "./Light";
 
-export class Sun {
-    
-    constructor(
-        public direction: Vector3,
-        public color: number[],
-    ) {}
-
-    static new(direction=Vector3.new(1,1,1).normalize(), color=[0,1,1,1]) {
-        return new Sun(direction, color);
-    }
-}
 
 export class Scene {
     constructor(
         public camera: Camera, 
-        public sun: Sun= Sun.new(),
+        public sun: Light = Light.new(Vector3.new(50,50,50), Color.fromHSL(0.1)),
         public lights: Light[]=[], 
         ) {}
 
-    static new(camera: Camera, sun = Sun.new(), lights=[]) {
+    static new(camera: Camera, sun: Light, lights: Light[]) {
         return new Scene(camera, sun, lights);
     }
 }

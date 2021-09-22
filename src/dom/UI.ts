@@ -164,6 +164,37 @@ export class UI {
         return slider;
     }
 
+    addColorParameter(name: string, startState: string, onInput: (v: string) => void = () => {}) {
+                // create hacky button
+        // <label class="check-container">
+        //   <input type="checkbox" checked="checked">
+        //   <span class="checkmark"></span>
+        // </label>
+
+        console.log("default", startState);
+
+        let picker = this.addElement("input", "colorpicker") as HTMLInputElement;
+        picker.type = "color";
+        picker.value = startState;
+        picker.addEventListener("change", () => {
+            let state = picker.checked;
+            onInput(picker.value);
+        });
+
+        // text
+        let text1 = this.addElement("p", "control-text");
+        text1.innerText = name;
+
+        // TODO update beyond our control
+        // param.onset = () => {
+        //     // console.log("TODO");
+        // };
+
+        this.addDiv("control", [text1, picker]);
+
+        return picker;
+    }
+
     addRangeInput(param: Parameter, onInput: (v: number) => void = () => {}) {
         // a slider looks like this : <input type="range" min="1" max="100" step="1" value="50">
         let slider = this.addElement("input", "control-slider") as HTMLInputElement;

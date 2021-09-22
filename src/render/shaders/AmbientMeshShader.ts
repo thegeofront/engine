@@ -1,3 +1,4 @@
+import { Color } from "../../image/Color";
 import { Matrix4, Mesh, meshFromObj, ShaderMesh } from "../../lib";
 import { Scene } from "../basics/Scene";
 import { DrawElementsType, DrawMode } from "../webgl/Constants";
@@ -46,9 +47,9 @@ export class AmbientMeshShader extends ShaderProgram<Mesh> {
         return mesh.links.data.length;
     }
 
-    public loadColor(color: number[]) {
+    public loadColor(color: Color) {
         this.useProgram();
-        this.uniforms.load4("ambientColor", color);
+        this.uniforms.loadColor("ambientColor", color);
     }
 
     protected onDraw(c: Scene) {
