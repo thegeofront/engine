@@ -14,4 +14,8 @@ export class Light {
     static new(pos: Vector3, color = [1, 1, 1, 1]) {
         return new Light(pos, color, false, Vector3.zero());
     }
+
+    static newDirectional(pos: Vector3, dir: Vector3, color = [1, 1, 1, 1]) {
+        return new Light(pos, color, false, Vector3.zero());
+    }
 }

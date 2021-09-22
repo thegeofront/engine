@@ -88,7 +88,6 @@ export * from "./render/renderers/TextRenderer";
 
 export * from "./render/shaders/BillboardShader";
 export * from "./render/shaders/DotShaderWithHeight";
-export * from "./render/shaders/PixelTextureShader";
 
 export * from "./render/webgl/Attribute";
 export * from "./render/webgl/Attributes";

@@ -4,7 +4,7 @@ import { MultiVector3, MultiVector2, GeonImage, Vector3, ToFloatMatrix, Vector2 
 import { Scene } from "../Scene";
 import { DrawMode } from "../webgl/Constants";
 import { DrawSpeed } from "../webgl/HelpGl";
-import { Program } from "../webgl/Program";
+import { ShaderProgram } from "../webgl/ShaderProgram";
 import { Uniform } from "../webgl/Uniform";
 
 // name:    billboard-renderer.ts
@@ -56,7 +56,7 @@ export class Billboard {
  * Used to render multiple billboards.
  * One Texture per billboard.
  */
-export class BillboardShader extends Program<BillboardPayload | Billboard> {
+export class BillboardShader extends ShaderProgram<BillboardPayload | Billboard> {
     // exposed Uniforms like this can be use to statically change certain properties
     color!: Uniform;
     radius!: Uniform;
@@ -148,16 +148,16 @@ export class BillboardShader extends Program<BillboardPayload | Billboard> {
         return DrawMode.Points;
     }
 
-    protected onSet(payload: BillboardPayload | Billboard, speed: DrawSpeed): number {
+    protected onLoad(payload: BillboardPayload | Billboard, speed: DrawSpeed): number {
         if (payload instanceof Billboard) {
             payload = payload.toPayload();
         }
 
-        this.attributes.set("a_vertex", ToFloatMatrix(payload.positions).data, speed);
-        this.attributes.set("a_uv", ToFloatMatrix(payload.uvs).data, speed);
-        this.attributes.set("a_uv_wh", ToFloatMatrix(payload.uvSizes).data, speed);
-        this.uniforms.setTexture("u_texture", payload.texture);
-        this.uniforms.set2(
+        this.attributes.load("a_vertex", ToFloatMatrix(payload.positions).data, speed);
+        this.attributes.load("a_uv", ToFloatMatrix(payload.uvs).data, speed);
+        this.attributes.load("a_uv_wh", ToFloatMatrix(payload.uvSizes).data, speed);
+        this.uniforms.loadTexture("u_texture", payload.texture);
+        this.uniforms.load2(
             "u_texture_size",
             Vector2.new(payload.texture.width, payload.texture.height),
         );
@@ -165,7 +165,7 @@ export class BillboardShader extends Program<BillboardPayload | Billboard> {
     }
 
     protected onRender(c: Scene): void {
-        this.uniforms.set3("u_camera_position", c.camera.pos.scaled(-1));
-        this.uniforms.setMatrix4("u_transform", c.camera.totalMatrix);
+        this.uniforms.load3("u_camera_position", c.camera.pos.scaled(-1));
+        this.uniforms.loadMatrix4("u_transform", c.camera.totalMatrix);
     }
 }

@@ -33,7 +33,7 @@ import { DrawElementsType, DrawMethod, DrawMode, INDEX_BUFFER_NAME } from "./Con
  *    - call 'loadAll()' on both attributes & uniforms
  *    - render using either 'DrawArrays()' or 'DrawElements()' (TODO could get some more automation)
  */
-export abstract class Program<T> {
+export abstract class ShaderProgram<T> {
     protected gl: WebGl;
     protected program: WebGLProgram;
 
@@ -66,9 +66,9 @@ export abstract class Program<T> {
         this.setDrawMethod();
     }
 
-    set(r: T, speed: DrawSpeed) {
+    load(r: T, speed: DrawSpeed) {
         this.gl.useProgram(this.program);
-        this.drawCount = this.onSet(r, speed);
+        this.drawCount = this.onLoad(r, speed);
     }
 
     render(c: Scene) {
@@ -77,13 +77,13 @@ export abstract class Program<T> {
         // }
         this.gl.useProgram(this.program);
         this.onRender(c);
-        this.uniforms.loadAll();
-        this.attributes.loadAll();
+        this.uniforms.bindAll();
+        this.attributes.bindAll();
         this.draw();
     }
 
     setAndRender(r: T, context: Scene) {
-        this.set(r, DrawSpeed.DynamicDraw);
+        this.load(r, DrawSpeed.DynamicDraw);
         this.render(context);
     }
 
@@ -99,7 +99,7 @@ export abstract class Program<T> {
 
     protected abstract onInit(settings?: any): DrawMode;
 
-    protected abstract onSet(data: T, speed: DrawSpeed): number;
+    protected abstract onLoad(data: T, speed: DrawSpeed): number;
 
     protected abstract onRender(c: Scene): void;
 

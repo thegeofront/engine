@@ -23,16 +23,16 @@ export class Uniform {
         size: number,
         initState: Iterable<number>,
     ) {
-        let setter = determineSetter(gl, type, size);
+        let setter = getLoader(gl, type, size);
         let loc = gl.getUniformLocation(program, name)!;
         return new Uniform(type, size, loc, setter, initState);
     }
 
-    set(state: Iterable<number>) {
+    load(state: Iterable<number>) {
         this.state = state;
     }
 
-    load(gl: WebGl) {
+    bind(gl: WebGl) {
         this.setter(gl, this.loc, this.state);
     }
 }
@@ -55,7 +55,7 @@ export class UniformTexture {
         return new UniformTexture(gl, id, texture, location)
     }
 
-    set(source: TexImageSource) {
+    load(source: TexImageSource) {
         this.gl.activeTexture(this.gl.TEXTURE0 + this.id);
         this.gl.bindTexture(TEXTURE_2D, this.texture);
         this.gl.texImage2D(TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, source);
@@ -66,14 +66,14 @@ export class UniformTexture {
         this.gl.generateMipmap(TEXTURE_2D);
     }
 
-    load(gl: WebGl) {
+    bind(gl: WebGl) {
         gl.uniform1i(this.loc, this.id);
         gl.activeTexture(gl.TEXTURE0 + this.id);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
     }
 }
 
-function determineSetter(gl: WebGl, type: UniformType, size: number): Function {
+function getLoader(gl: WebGl, type: UniformType, size: number): Function {
     switch (size) {
         case 1:
             if (type == UniformType.Float) {

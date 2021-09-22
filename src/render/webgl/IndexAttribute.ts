@@ -16,13 +16,13 @@ import { WebGl, DrawSpeed } from "./HelpGl";
         return new IndexAttribute(gl, buffer, type);
     }
 
-    set(gl: WebGl, data: BufferSource, speed: DrawSpeed) {
+    load(gl: WebGl, data: BufferSource, speed: DrawSpeed) {
         // experiment with switching these two
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffer);
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, data, speed);
     }
 
-    load(gl: WebGl) {
+    bind(gl: WebGl) {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffer);
     }
 }

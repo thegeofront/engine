@@ -24,7 +24,7 @@ export class Attribute {
     /**
      *  Load some new data into this attribute
      */
-    set(gl: WebGl, data: BufferSource, speed: DrawSpeed) {
+    load(gl: WebGl, data: BufferSource, speed: DrawSpeed) {
         // TODO experiment with switching these two
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
         gl.enableVertexAttribArray(this.position);
@@ -37,7 +37,7 @@ export class Attribute {
      * Enable the attribute / activate it, but do not set any data
      * Must be called before rendering
      */
-    load(gl: WebGl) {
+    bind(gl: WebGl) {
         gl.enableVertexAttribArray(this.position);
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
         gl.vertexAttribPointer(this.position, this.width, this.type, false, 0, 0);

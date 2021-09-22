@@ -4,10 +4,10 @@ import { MultiVector, ToFloatMatrix } from "../../lib";
 import { Scene } from "../Scene";
 import { DrawMode } from "../webgl/Constants";
 import { DrawSpeed } from "../webgl/HelpGl";
-import { Program } from "../webgl/Program";
+import { ShaderProgram } from "../webgl/ShaderProgram";
 import { Uniform } from "../webgl/Uniform";
 
-export class DotShaderWithHeight extends Program<MultiVector> {
+export class DotShaderWithHeight extends ShaderProgram<MultiVector> {
     height: Uniform;
     color: Uniform;
     size: Uniform;
@@ -97,13 +97,13 @@ export class DotShaderWithHeight extends Program<MultiVector> {
         return DrawMode.Points;
     }
 
-    onSet(points: MultiVector, speed: DrawSpeed) {
+    onLoad(points: MultiVector, speed: DrawSpeed) {
         let array = ToFloatMatrix(points);
-        this.attributes.set("a_vertex", array.data, speed);
+        this.attributes.load("a_vertex", array.data, speed);
         return array.count();
     }
 
     onRender(c: Scene) {
-        this.uniforms.setMatrix4("u_transform", c.camera.totalMatrix);
+        this.uniforms.loadMatrix4("u_transform", c.camera.totalMatrix);
     }
 }

@@ -17,8 +17,8 @@ export class Uniforms {
         private textures: Map<string, UniformTexture> = new Map(),
     ) {}
 
-    add(name: string, size: number, state: number[] = [], type = UniformType.Float) {
-        let uniform = Uniform.new(this.gl, this.program, name, type, size, state);
+    add(name: string, size: number, defaultState: Iterable<number> = [], type = UniformType.Float) {
+        let uniform = Uniform.new(this.gl, this.program, name, type, size, defaultState);
         this.uniforms.set(name, uniform);
         return uniform;
     }
@@ -29,51 +29,52 @@ export class Uniforms {
         return texture;
     }
 
-    setTexture(name: string, source: GeonImage) {
-        this.textures.get(name)!.set(source.toImageData());
-    }
-
-    setTextureSource(name: string, source: TexImageSource) {
-        this.textures.get(name)!.set(source);
-    }
-
-    set(name: string, value: number) {
-        this.get(name).set([value]);
-    }
-
-    set2(name: string, value: Vector2) {
-        this.get(name).set([value.x, value.y]);
-    }
-
-    set3(name: string, value: Vector3) {
-        this.get(name).set([value.x, value.y, value.z]);
-    }
-
-    set4(name: string, value: number[]) {
-        this.get(name).set(value);
-    }
-
-    setMatrix3(name: string, value: Matrix3) {
-        this.get(name).set(value.data);
-    }
-
-    setMatrix4(name: string, value: Matrix4) {
-        this.get(name).set(value.data);
-    }
-
     get(name: string) {
         return this.uniforms.get(name)!;
     }
-
+    
+    
     /**
      * Load the state of all uniforms, to prepare for rendering
      */
-    loadAll() {
+     bindAll() {
         for (let v of this.uniforms.values()) {
-            v.load(this.gl);
+            v.bind(this.gl);
         }
         for (let v of this.textures.values()) {
-            v.load(this.gl);
+            v.bind(this.gl);
         }
+    }
+
+    loadTexture(name: string, source: GeonImage) {
+        this.textures.get(name)!.load(source.toImageData());
+    }
+
+    loadTextureSource(name: string, source: TexImageSource) {
+        this.textures.get(name)!.load(source);
+    }
+
+    load(name: string, value: number) {
+        this.get(name).load([value]);
+    }
+
+    load2(name: string, value: Vector2) {
+        this.get(name).load([value.x, value.y]);
+    }
+
+    load3(name: string, value: Vector3) {
+        this.get(name).load([value.x, value.y, value.z]);
+    }
+
+    load4(name: string, value: number[]) {
+        this.get(name).load(value);
+    }
+
+    loadMatrix3(name: string, value: Matrix3) {
+        this.get(name).load(value.data);
+    }
+
+    loadMatrix4(name: string, value: Matrix4) {
+        this.get(name).load(value.data);
     }
 }

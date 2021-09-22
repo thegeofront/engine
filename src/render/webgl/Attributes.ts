@@ -25,16 +25,16 @@ export class Attributes {
         this.attributes.set(INDEX_BUFFER_NAME, IndexAttribute.new(this.gl, type));
     }
 
-    set(name: string, data: BufferSource, speed: DrawSpeed) {
-        this.attributes.get(name)!.set(this.gl, data, speed);
+    load(name: string, data: BufferSource, speed: DrawSpeed) {
+        this.attributes.get(name)!.load(this.gl, data, speed);
     }
 
     /**
      * Load the state of all attributes, to prepare for rendering
      */
-    loadAll() {
+    bindAll() {
         for (let [k, v] of this.attributes) {
-            v.load(this.gl);
+            v.bind(this.gl);
         }
     }
 }
