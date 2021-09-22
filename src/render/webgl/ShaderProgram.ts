@@ -2,8 +2,6 @@
 // author: Jos Feenstra
 // credits to : https://webglfundamentals.org/
 // note: im still figuring out how to organize this
-// TODO: incorrect terminology: this is not a Shader, this is a ShaderSet, ShaderDuo, or something like that
-// still tho, within a larger context, the whole of a fragment & vertex shader can be named Shader for the time being...
 
 import { Attributes } from "./Attributes";
 import { Scene } from "../Scene";
@@ -13,25 +11,22 @@ import { DrawElementsType, DrawMethod, DrawMode, INDEX_BUFFER_NAME } from "./Con
 
 /**
  * An implementation of 'program' needs to define 4 methods:
- * @param T = data to feed the renderer at 'set'
+ * @param T = data to feed the renderer at 'load'
  * 1. `constructor`
  *    - state the vertex & fragment shader
- *    - init all uniforms, state which ones should be exposed publicly
- *    - explain how 'S' set the uniforms, possibly
- *    - DO NOT INIT ATTRIBUTES IN HERE
+ *    - call super
  *
  * 2. `onInit`
  *    - init all attributes
+ *    - init all uniforms, state which ones should be exposed publicly
  *    - return the 'DrawMode' which needs to be used to draw this shader
  *
- * 2. `onSet`
- *    - explain how 'T' set the attributes
+ * 2. `onLoad`
+ *    - explain how 'T' set the main attributes
  *    - return a number representing how many 'drawmode' features need to be drawn
  *
  * 3. `onRender`
  *    - explain how 'Context' needs to be loaded into this shader
- *    - call 'loadAll()' on both attributes & uniforms
- *    - render using either 'DrawArrays()' or 'DrawElements()' (TODO could get some more automation)
  */
 export abstract class ShaderProgram<T> {
     protected gl: WebGl;
@@ -40,12 +35,9 @@ export abstract class ShaderProgram<T> {
     protected uniforms!: Uniforms;
     protected attributes!: Attributes;
 
-    protected active = true;
-
     // auto set
-    private draw = () => {};
+    private drawElementsOrArrays = () => {};
     private method = DrawMethod.Arrays;
-    private elementType?: DrawElementsType;
 
     private mode = DrawMode.Triangles;
     private drawCount = 0; // number of times the shaders need to render
@@ -57,12 +49,12 @@ export abstract class ShaderProgram<T> {
         this.init();
     }
 
-    init(settings?: any) {
+    init() {
         this.gl.useProgram(this.program);
         this.uniforms = new Uniforms(this.gl, this.program);
         this.attributes = new Attributes(this.gl, this.program);
         this.drawCount = 0;
-        this.mode = this.onInit(settings);
+        this.mode = this.onInit();
         this.setDrawMethod();
     }
 
@@ -71,52 +63,47 @@ export abstract class ShaderProgram<T> {
         this.drawCount = this.onLoad(r, speed);
     }
 
-    render(c: Scene) {
-        // if (!this.active) {
-        //     return;
-        // }
+    draw(c: Scene) {
         this.gl.useProgram(this.program);
-        this.onRender(c);
+        this.onDraw(c);
         this.uniforms.bindAll();
         this.attributes.bindAll();
-        this.draw();
+        this.drawElementsOrArrays();
     }
 
-    setAndRender(r: T, context: Scene) {
+    loadAndDraw(r: T, context: Scene) {
         this.load(r, DrawSpeed.DynamicDraw);
-        this.render(context);
+        this.draw(context);
     }
-
-    // pauze() {
-    //     this.active = false;
-    // }
-
-    // resume() {
-    //     this.active = true;
-    // }
 
     // ------------ These three methods need to be overwritten -------------------
 
-    protected abstract onInit(settings?: any): DrawMode;
+    protected abstract onInit(): DrawMode;
 
     protected abstract onLoad(data: T, speed: DrawSpeed): number;
 
-    protected abstract onRender(c: Scene): void;
+    protected abstract onDraw(c: Scene): void;
+
+    // ---------------------------------------------------------------------------
+    
+    protected useProgram() {
+        this.gl.useProgram(this.program);
+    }
 
     // ---------------------------------------------------------------------------
 
     private setDrawMethod() {
         if (this.attributes.has(INDEX_BUFFER_NAME)) {
             this.method = DrawMethod.Elements;
-            this.draw = this.drawElements;
+            this.drawElementsOrArrays = this.drawElements;
         } else {
             this.method = DrawMethod.Arrays;
-            this.draw = this.drawArrays;
+            this.drawElementsOrArrays = this.drawArrays;
         }
     }
 
     private drawElements() {
-        this.gl.drawElements(this.mode, this.drawCount, this.elementType!, this.drawOffset);
+        this.gl.drawElements(this.mode, this.drawCount, this.attributes.indexAttributeElementType!, this.drawOffset);
     }
 
     private drawArrays() {

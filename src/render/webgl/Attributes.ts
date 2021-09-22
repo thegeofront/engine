@@ -10,6 +10,7 @@ export class Attributes {
     constructor(
         private gl: WebGl,
         private program: WebGLProgram,
+        public indexAttributeElementType?: DrawElementsType,
         private attributes: Map<string, Attribute | IndexAttribute> = new Map(),
     ) {}
 
@@ -22,11 +23,20 @@ export class Attributes {
     }
 
     addIndex(type: DrawElementsType) {
-        this.attributes.set(INDEX_BUFFER_NAME, IndexAttribute.new(this.gl, type));
+        this.indexAttributeElementType = type;
+        this.attributes.set(INDEX_BUFFER_NAME, IndexAttribute.new(this.gl));
     }
 
     load(name: string, data: BufferSource, speed: DrawSpeed) {
         this.attributes.get(name)!.load(this.gl, data, speed);
+    }
+
+    loadIndex(data: BufferSource, speed: DrawSpeed) {
+        this.attributes.get(INDEX_BUFFER_NAME)!.load(this.gl, data, speed);
+    }
+
+    getIndex() {
+        return this.attributes.get(INDEX_BUFFER_NAME) as IndexAttribute;
     }
 
     /**

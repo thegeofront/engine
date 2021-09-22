@@ -8,12 +8,11 @@ import { WebGl, DrawSpeed } from "./HelpGl";
     private constructor(
         public gl: WebGl,
         public buffer: WebGLBuffer,
-        public type: DrawElementsType,
     ) {}
 
-    static new(gl: WebGl, type: DrawElementsType) {
+    static new(gl: WebGl) {
         let buffer = gl.createBuffer()!;
-        return new IndexAttribute(gl, buffer, type);
+        return new IndexAttribute(gl, buffer);
     }
 
     load(gl: WebGl, data: BufferSource, speed: DrawSpeed) {

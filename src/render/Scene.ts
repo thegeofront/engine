@@ -24,7 +24,7 @@ export class Scene {
         public lights: Light[]=[], 
         ) {}
 
-    static new(camera, sun = Sun.new(), lights=[]) {
+    static new(camera: Camera, sun = Sun.new(), lights=[]) {
         return new Scene(camera, sun, lights);
     }
 }

@@ -164,7 +164,7 @@ export class BillboardShader extends ShaderProgram<BillboardPayload | Billboard>
         return payload.positions.count;
     }
 
-    protected onRender(c: Scene): void {
+    protected onDraw(c: Scene): void {
         this.uniforms.load3("u_camera_position", c.camera.pos.scaled(-1));
         this.uniforms.loadMatrix4("u_transform", c.camera.totalMatrix);
     }

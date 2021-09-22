@@ -103,7 +103,7 @@ export class DotShaderWithHeight extends ShaderProgram<MultiVector> {
         return array.count();
     }
 
-    onRender(c: Scene) {
+    onDraw(c: Scene) {
         this.uniforms.loadMatrix4("u_transform", c.camera.totalMatrix);
     }
 }

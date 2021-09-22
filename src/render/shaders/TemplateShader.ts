@@ -20,7 +20,7 @@ export class TemplateShader extends ShaderProgram<ShaderMesh> {
      * Init all attributes & uniforms
      * Return the DrawMore required for the vertexshader & fragmentshader
      */
-    protected onInit(settings?: any): DrawMode {
+    protected onInit(): DrawMode {
         throw new Error("Method not implemented.");
     }
 
@@ -35,14 +35,14 @@ export class TemplateShader extends ShaderProgram<ShaderMesh> {
     /**
      * Sub load: fill other attributes or uniforms
      */
-    loadColor() {
+    loadSomeOtherUniform() {
 
     }
 
     /**
      * Specify which data we need from the scene at runtime
      */
-    protected onRender(c: Scene): void {
+    protected onDraw(c: Scene): void {
         
         throw new Error("Method not implemented.");
     }
