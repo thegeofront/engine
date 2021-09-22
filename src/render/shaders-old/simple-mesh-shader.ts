@@ -3,7 +3,7 @@
 // purpose: WebGL based rendering of a mesh.
 
 import { Mesh } from "../../lib";
-import { Scene } from "../Scene";
+import { Scene } from "../../lib";
 import { DrawSpeed } from "../webgl/HelpGl";
 import { OldShader } from "../OldShader";
 

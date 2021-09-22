@@ -1,7 +1,8 @@
 // Name:    scene.ts
 // Author:  Jos Feenstra
 // NOTE:    not used yet
-import { Vector3 } from "../math/Vector3";
+
+import { Vector3 } from "../../lib";
 
 export class Light {
     private constructor(

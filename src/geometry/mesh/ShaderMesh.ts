@@ -16,32 +16,19 @@ import {
     HelpGl,
     Matrix4,
     Mesh,
+    MeshType,
     MultiVector2,
     MultiVector3,
+    NormalKind,
     Plane,
     quadToTri,
     Rectangle3,
     Vector3,
 } from "../../lib";
-import { Renderable } from "../../render/Renderable";
+import { Renderable } from "../../render/basics/Renderable";
 
 type vertexID = number;
 type faceID = number;
-
-export enum MeshType {
-    Invalid = 0,
-    Points = 1,
-    Lines = 2,
-    Triangles = 3,
-    Quads = 4,
-}
-
-export enum NormalKind {
-    None,
-    Vertex,
-    Face,
-    MultiVertex,
-}
 
 export class ShaderMesh implements Renderable {
     // this desperately calls for an overhaul...
@@ -239,7 +226,7 @@ export class ShaderMesh implements Renderable {
     }
 
     getFaceVertices(f: faceID): MultiVector3 {
-        return this.mesh.getLinkVerts(f);
+        return this.mesh.getVerticesOfFace(f);
     }
 
     getType(): MeshType {
@@ -281,13 +268,13 @@ export class ShaderMesh implements Renderable {
             this.norms = MultiVector3.new(0);
             return;
         }
-        let norms = this.mesh.calculateFaceNormals();
+        let norms = this.mesh.OLDcalculateFaceNormals();
         this.norms = MultiVector3.fromList(norms);
         this._normKind = NormalKind.Face;
     }
 
     calculateVertexNormals() {
-        let norms = this.mesh.calculateVertexNormals();
+        let norms = this.mesh.OLDcalculateVertexNormals();
         this.norms = MultiVector3.fromList(norms);
         this._normKind = NormalKind.Vertex;
     }

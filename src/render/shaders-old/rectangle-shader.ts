@@ -1,7 +1,7 @@
 // jos feenstra
 
 import { Rectangle2 } from "../../lib";
-import { Scene } from "../Scene";
+import { Scene } from "../../lib";
 import { OldShader } from "../OldShader";
 
 export class RectangleShader extends OldShader<Rectangle2[]> {

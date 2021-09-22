@@ -2,8 +2,7 @@
 // author:  Jos Feenstra
 // purpose: WebGL based rendering of a mesh.
 
-import { ShaderMesh } from "../../lib";
-import { Scene } from "../Scene";
+import { ShaderMesh, Scene } from "../../lib";
 import { HelpGl, DrawSpeed } from "../webgl/HelpGl";
 import { OldShader } from "../OldShader";
 

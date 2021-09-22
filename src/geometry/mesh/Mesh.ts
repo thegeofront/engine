@@ -1,13 +1,13 @@
 // mesh.ts
 // Author: Jos Feenstra
 // Purpose:
+// NOTE TO SELF: I would rather build a fat Mesh, than to distinquish between pure mesh, a shader mesh, Model, etc. etc.
 
 import {
     BiSurface,
     Cube,
     Graph,
     IntMatrix,
-    MeshType,
     MultiVector3,
     Plane,
     Rectangle3,
@@ -17,16 +17,31 @@ import {
 } from "../../lib";
 import { GeonMath } from "../../math/Math";
 
-// a very pure idea of a mesh : Vertices + links between vertices.
-// Could be anything with these properties: lines, triangle-mesh, quads
-// idea: should normals be part of the Mesh?
+export enum MeshType {
+    Invalid = 0,
+    Points = 1, // NOTE: we never do this, I think it is wise that we just use MultiVector3's when talking about pointclouds
+    Lines = 2, // NOTE: we never do this, I think it is wise that we just use MultiLines's when talking about a bunch of lines
+    Triangles = 3,
+    Quads = 4,
+}
+
+export enum NormalKind {
+    None,
+    Vertex,
+    Face,
+    MultiVertex,
+}
 
 export class Mesh {
-    // CONSTRUCTORS
+
+    private _normalKind = NormalKind.None;
 
     constructor(
         public verts: MultiVector3,
         public links: IntMatrix, // relationships, can be 2 (lines) | 3 (triangles) | 4 (quads)
+        public uvs?: MultiVector3,
+        public facenormals?: MultiVector3, //
+        public vertexnormals?: MultiVector3, 
     ) {}
 
     clone(): Mesh {
@@ -64,7 +79,6 @@ export class Mesh {
         for (let u = 0; u < uPoints; u++) {
             for (let v = 0; v < vPoints; v++) {
                 let i = u * vPoints + v;
-
                 verts.set(i, srf.pointAt(u / uSegments, v / vSegments));
             }
         }
@@ -431,7 +445,7 @@ export class Mesh {
         return Mesh.new(verts, links);
     }
 
-    // CONVERTERS
+    // ------- CONVERTERS
 
     toLines(): Mesh {
         const getLines = (num: number) => {
@@ -471,7 +485,19 @@ export class Mesh {
         return Graph.fromMesh(this);
     }
 
-    // GETTERS
+    // ------ GETTERS
+
+    getVerticesOfFace(f: number) {
+        let verts = MultiVector3.new(this.links._width);
+        this.links.getRow(f).forEach((v, i) => {
+            verts.set(i, this.verts.get(v));
+        });
+        return verts;
+    }
+
+    get type() {
+        return this.getType();
+    }
 
     getType(): MeshType {
         if (this.links._width == MeshType.Points) {
@@ -487,17 +513,67 @@ export class Mesh {
         }
     }
 
-    getLinkVerts(f: number) {
-        let verts = MultiVector3.new(this.links._width);
-        this.links.getRow(f).forEach((v, i) => {
-            verts.set(i, this.verts.get(v));
-        });
-        return verts;
+    get normalKind() {
+        return this._normalKind;
     }
 
-    // MISC
+    CalcAndSetFaceNormals() {
+        this.facenormals = this.calculateFaceNormals();
+    }
 
-    calculateFaceNormals(): Vector3[] {
+    CalcAndSetVertexNormals() {
+        this.vertexnormals = this.calculateVertexNormals();
+    }
+
+    // ----- calculation -----
+
+    private calculateFaceNormals() : MultiVector3 {
+        if (this.getType() != MeshType.Triangles) {
+            console.error("can only calculate normals from triangular meshes");
+            return MultiVector3.new(0);
+        }
+
+        this._normalKind = NormalKind.Face;
+        let faceCount = this.links.count();
+        let norms = MultiVector3.new(faceCount)
+        
+        for (let i = 0; i < faceCount; i++) {
+            let verts = this.getVerticesOfFace(i);
+            let normal = verts.get(1).subbed(verts.get(0)).cross(verts.get(2).subbed(verts.get(0))).normalize();
+            norms.set(i, normal);
+        }
+
+        return norms;
+    }
+
+    private calculateVertexNormals() : MultiVector3  {
+
+        // note: this is not completely accurate
+        // set the vertex normal to the average of all adjacent face normals
+        let faceCount = this.links.count();
+        let faceNormals = this.OLDcalculateFaceNormals();
+
+        // stack all face normals per vertex
+        let normals = MultiVector3.new(this.verts.count);
+        for (let i = 0; i < faceCount; i++) {
+            let normal = faceNormals[i];
+            this.links.getRow(i).forEach((vertexIndex) => {
+                let v = normals.get(vertexIndex);
+                normals.set(vertexIndex, v.add(normal));
+            });
+        }
+
+        // normalize all
+        for (let i = 0; i < normals.count; i++) {
+            normals.set(i, normals.get(i).normalize());
+        }
+        return normals;
+    }
+
+
+    // -------- MISC ----------
+
+    OLDcalculateFaceNormals(): Vector3[] {
         let norms: Vector3[] = [];
         if (this.getType() != MeshType.Triangles) {
             console.error("can only calculate normals from triangular meshes");
@@ -506,16 +582,17 @@ export class Mesh {
 
         let faceCount = this.links.count();
         for (let i = 0; i < faceCount; i++) {
-            let verts = this.getLinkVerts(i).toList();
+            let verts = this.getVerticesOfFace(i).toList();
             let normal = verts[1].subbed(verts[0]).cross(verts[2].subbed(verts[0])).normalize();
             norms.push(normal);
         }
+
         return norms;
     }
 
-    calculateVertexNormals(): Vector3[] {
+    OLDcalculateVertexNormals(): Vector3[] {
         let faceCount = this.links.count();
-        let faceNormals = this.calculateFaceNormals();
+        let faceNormals = this.OLDcalculateFaceNormals();
 
         // stack all face normals per vertex
         let array = MultiVector3.new(this.verts.count);

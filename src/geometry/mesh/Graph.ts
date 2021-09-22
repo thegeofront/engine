@@ -19,8 +19,8 @@ import { Plane } from "../plane";
 import { Const } from "../../math/Const";
 import { Matrix4 } from "../../math/Matrix4";
 import { Vector3 } from "../../math/Vector3";
-import { Mesh } from "./Mesh";
-import { MeshType, ShaderMesh } from "./ShaderMesh";
+import { Mesh, MeshType } from "./Mesh";
+import { ShaderMesh } from "./ShaderMesh";
 
 export type EdgeIndex = number;
 export type VertIndex = number;
@@ -61,7 +61,7 @@ export class Graph {
 
     static fromMesh(mesh: Mesh): Graph {
         let graph = Graph.new();
-        let normals = mesh.calculateVertexNormals();
+        let normals = mesh.OLDcalculateVertexNormals();
 
         mesh.verts.forEach((v, i) => {
             graph.addVert(v, normals[i]);

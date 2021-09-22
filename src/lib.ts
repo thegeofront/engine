@@ -99,9 +99,9 @@ export * from "./render/webgl/Uniforms";
 export * from "./render/webgl/HelpGl";
 
 export * from "./render/OldShader";
-export * from "./render/Camera";
-export * from "./render/Light";
-export * from "./render/Scene";
+export * from "./render/basics/Camera";
+export * from "./render/basics/Light";
+export * from "./render/basics/Scene";
 
 export * from "./render/renderers/DebugRenderer";
 export * from "./render/renderers/ImageRenderer";

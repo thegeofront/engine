@@ -1,4 +1,4 @@
-import { Renderable } from "./Renderable";
+import { Renderable } from "./basics/Renderable";
 
 export abstract class Bufferable {
 

@@ -1,6 +1,6 @@
 import { MultiVector3, Vector3 } from "../../lib";
+import { Renderable } from "../basics/Renderable";
 import { Bufferable } from "../Bufferable"
-import { Renderable } from "../Renderable";
 
 /**
  * A point cloud with direction property

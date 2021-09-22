@@ -2,7 +2,7 @@ import { DrawSpeed } from "../../lib";
 import { Matrix4 } from "../../math/Matrix4";
 import { Mesh } from "../../geometry/mesh/Mesh";
 import { ShaderMesh } from "../../geometry/mesh/ShaderMesh";
-import { Scene } from "../Scene";
+import { Scene } from "../../lib";
 import { Bufferer } from "../Bufferer";
 import { TransformLineShader } from "../shaders-old/transform-line-shader";
 import { TransformMeshShader } from "../shaders-old/transform-mesh-shader";

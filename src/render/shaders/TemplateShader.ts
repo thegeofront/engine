@@ -1,5 +1,5 @@
 import { ShaderMesh } from "../../lib";
-import { Scene } from "../Scene";
+import { Scene } from "../../lib";
 import { DrawMode } from "../webgl/Constants";
 import { DrawSpeed, WebGl } from "../webgl/HelpGl";
 import { ShaderProgram } from "../webgl/ShaderProgram";

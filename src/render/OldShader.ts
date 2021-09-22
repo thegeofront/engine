@@ -7,10 +7,10 @@
 // This is old, not needed anymore
 
 import { Attributes } from "./webgl/Attributes";
-import { Scene } from "./Scene";
 import { Uniforms } from "./webgl/Uniforms";
 import { DrawSpeed, HelpGl, WebGl } from "./webgl/HelpGl";
 import { DrawElementsType, DrawMethod, DrawMode, INDEX_BUFFER_NAME } from "./webgl/Constants";
+import { Scene } from "../lib";
 
 /**
  * An implementation of 'Shader' needs to define 3 methods:

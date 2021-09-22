@@ -11,7 +11,7 @@ import { DotShader } from "../shaders-old/dot-shader";
 import { LineShader } from "../shaders-old/line-shader";
 import { MeshDebugShader } from "../shaders-old/mesh-debug-shader";
 import { ShadedMeshShader } from "../shaders-old/shaded-mesh-shader";
-import { Scene } from "../Scene";
+import { Scene } from "../../lib";
 import { OldShader } from "../OldShader";
 import { DrawSpeed, WebGl } from "../webgl/HelpGl";
 import { Billboard, BillboardPayload, BillboardShader } from "../shaders/BillboardShader";

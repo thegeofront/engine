@@ -1,7 +1,6 @@
 // https://webgl.brown37.net/12_advanced_rendering/07_rendering_points.html
 
-import { MultiVector3, MultiVector2, GeonImage, Vector3, ToFloatMatrix, Vector2 } from "../../lib";
-import { Scene } from "../Scene";
+import { MultiVector3, MultiVector2, GeonImage, Vector3, ToFloatMatrix, Vector2, Scene } from "../../lib";
 import { DrawMode } from "../webgl/Constants";
 import { DrawSpeed } from "../webgl/HelpGl";
 import { ShaderProgram } from "../webgl/ShaderProgram";

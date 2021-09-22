@@ -4,10 +4,10 @@
 // note: im still figuring out how to organize this
 
 import { Attributes } from "./Attributes";
-import { Scene } from "../Scene";
 import { Uniforms } from "./Uniforms";
 import { DrawSpeed, HelpGl, WebGl } from "./HelpGl";
 import { DrawElementsType, DrawMethod, DrawMode, INDEX_BUFFER_NAME } from "./Constants";
+import { Scene } from "../../lib";
 
 /**
  * An implementation of 'program' needs to define 4 methods:

@@ -4,7 +4,7 @@
 
 import { Graph } from "../../geometry/mesh/Graph";
 import { MultiShader } from "../OldMultiShader";
-import { Scene } from "../Scene";
+import { Scene } from "../../lib";
 import { DrawSpeed } from "../webgl/HelpGl";
 import { DotShader } from "./dot-shader";
 import { LineShader } from "./line-shader";

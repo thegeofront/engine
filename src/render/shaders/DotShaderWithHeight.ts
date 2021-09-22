@@ -1,7 +1,6 @@
 // jos feenstra
 
-import { MultiVector, ToFloatMatrix } from "../../lib";
-import { Scene } from "../Scene";
+import { MultiVector, Scene, ToFloatMatrix } from "../../lib";
 import { DrawMode } from "../webgl/Constants";
 import { DrawSpeed } from "../webgl/HelpGl";
 import { ShaderProgram } from "../webgl/ShaderProgram";
