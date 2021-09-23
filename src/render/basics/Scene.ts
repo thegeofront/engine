@@ -11,7 +11,7 @@ import { Light } from "./Light";
 export class Scene {
     constructor(
         public camera: Camera, 
-        public sun: Light = Light.new(Vector3.new(50,50,50), Color.fromHSL(0.1)),
+        public sun: Light = Light.new(Vector3.new(30,40,50), Color.fromHSL(0.1)),
         public lights: Light[]=[], 
         ) {}
 

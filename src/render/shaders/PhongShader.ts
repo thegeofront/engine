@@ -9,7 +9,8 @@ import { ShaderProgram } from "../webgl/ShaderProgram";
 
 export class PhongShader extends ShaderProgram<Model> {
 
-    constructor(gl: WebGl) {
+    constructor(gl: WebGl, indexed=true) {
+    
         const vertexShader = `
         precision mediump int;
         precision mediump float;
@@ -92,6 +93,7 @@ export class PhongShader extends ShaderProgram<Model> {
         }
         `;
         super(gl, vertexShader, fragmentShader);
+        
     }
 
     protected onInit(): DrawMode {
@@ -99,6 +101,7 @@ export class PhongShader extends ShaderProgram<Model> {
         this.attributes.add("position", 3);
         this.attributes.add("uv", 2);
         this.attributes.add("normal", 3);
+        
         this.attributes.addIndex(DrawElementsType.UnsignedShort);
 
         this.uniforms.add("worldMatrix", 16);
@@ -121,7 +124,7 @@ export class PhongShader extends ShaderProgram<Model> {
         this.loadPosition(model.position);
         this.loadMesh(model.mesh, speed);
         this.loadMaterial(model.material);
-        return model.mesh.links.data.length;
+        return model.mesh.maxSize;
     }
 
     public loadPosition(position: Matrix4) {
@@ -133,17 +136,11 @@ export class PhongShader extends ShaderProgram<Model> {
     }
 
     public loadMesh(mesh: Mesh, speed: DrawSpeed) {
-        
-        // make sure the mesh contains the correct type of uv and vertex normals. 
-        mesh.ensureUVs();
-        mesh.ensureVertexNormals();
-
         this.useProgram();
+        this.attributes.loadIndex(mesh.links.data, speed);
         this.attributes.load("position", mesh.verts.matrix.data, speed);
         this.attributes.load("uv", mesh.uvs!.matrix.data, speed);
-        this.attributes.load("normal", mesh.normals!.matrix.data, speed);
-        
-        this.attributes.loadIndex(mesh.links.data, speed);
+        this.attributes.load("normal", mesh.normals!.matrix.data, speed);    
     }
 
     public loadMaterial(material: Material) {

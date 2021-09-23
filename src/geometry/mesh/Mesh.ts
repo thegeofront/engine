@@ -6,8 +6,10 @@
 import {
     BiSurface,
     Cube,
+    getDefaultIndices,
     Graph,
     IntMatrix,
+    Matrix4,
     MultiVector2,
     MultiVector3,
     Plane,
@@ -43,6 +45,14 @@ export class Mesh {
         private _uvs?: MultiVector2,
         private _normals?: MultiVector3, //
     ) {}
+
+    get maxSize() {
+        if (this.links) {
+            return this.links.data.length;
+        } else {
+            return this.verts.count;
+        }
+    }
 
     clone(): Mesh {
         return new Mesh(this.verts.clone(), this.links.clone());
@@ -485,6 +495,34 @@ export class Mesh {
         return Graph.fromMesh(this);
     }
 
+    toLinearMesh() {
+
+        // convert to non-indexed verts & norms
+        this.ensureFaceNormals();
+        let count = this.links.data.length;
+        let faceCount = this.links.count();
+
+        let verts = MultiVector3.new(count);
+        let norms = MultiVector3.new(count);
+
+
+        for (let i = 0; i < faceCount; i++) {
+            let norm = this.normals!.get(i);
+            this.links.getRow(i).forEach((v, j) => {
+                let id = i * 3 + j;
+                verts.set(id, this.verts.get(v));
+                norms.set(id, norm);
+            });
+        }
+
+        let links = IntMatrix.fromList([], 3);
+        links._width = 3;
+        links._height = count / 3;
+        links.data = getDefaultIndices(count);
+        let mesh = new Mesh(verts, links, undefined, norms); 
+        return mesh;
+    }
+
     // ------ GETTERS
 
     getVerticesOfFace(f: number) {
@@ -516,16 +554,7 @@ export class Mesh {
     // ----- Normals -----
 
     get normals() : MultiVector3 | undefined {
-        switch(this.normalKind) {
-            case (NormalKind.None):
-                return undefined
-            case (NormalKind.Vertex):
-                return this._normals;
-            case (NormalKind.MultiVertex):
-                return undefined;
-            case (NormalKind.Face):
-                return this._normals;
-        }
+        return this._normals;
     }
 
     get normalKind() {
@@ -544,7 +573,8 @@ export class Mesh {
 
     
     ensureVertexNormals() {
-        if (this.normalKind == NormalKind.Vertex && this._normals && this._normals.count == this.verts.count) {
+        if (this._normals && this._normals.count == this.verts.count) {
+            this._normalKind = NormalKind.Vertex;
             return;
         } else {
             // console.warn("no or incorrect vertex normals! recalculating...");
@@ -555,10 +585,22 @@ export class Mesh {
 
     ensureFaceNormals() {
         if (this._normals && this._normals.count == this.links.count()) {
+            this._normalKind = NormalKind.Face;
             return true;
         } else {
             // console.warn("no or incorrect face normals! recalculating...");
             this.calcAndSetFaceNormals();
+            return false;
+        }
+    }
+
+    ensureMultiFaceNormals() {
+        if (this._normals && this.normals!.count == this.maxSize) {
+            this._normalKind = NormalKind.MultiVertex;
+            return true;
+        } else {
+            // console.warn("no or incorrect face normals! recalculating...");
+            
             return false;
         }
     }
@@ -654,11 +696,11 @@ export class Mesh {
     }
 
     ensureUVs() {
-        if (this._uvs && this._uvs.count == this.links.data.length) {
+        if (this._uvs && this._uvs.count == this.maxSize) {
             return true;
         } else {
             // console.warn("no uvs yet! filling with dummy data");
-            this._uvs = MultiVector2.new(this.links.data.length);
+            this._uvs = MultiVector2.new(this.maxSize);
             return false;
         }
     }
