@@ -31,6 +31,15 @@ export class Matrix4 extends FloatMatrix {
         return result;
     }
 
+    get position() {
+        let d = this.data;
+        let pos = Vector3.new();
+        pos.x = d[12];
+        pos.y = d[13];
+        pos.z = d[14];
+        return pos;
+    }
+
     clone(): Matrix4 {
         return Matrix4.newCopy(this);
     }
@@ -305,6 +314,31 @@ export class Matrix4 extends FloatMatrix {
         return new Matrix4([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, v.x, v.y, v.z, 1]);
     }
 
+    // static newRotate(euler: Vector3) {
+    //     return Matrix4.newRotation(euler.x, euler.y, euler.z);
+    // }
+
+    // static newRotation(pitch: number, yaw: number, roll: number) {
+        
+        
+    //     let rotation = Matrix4.new();
+    //     let rd = rotation.data;
+
+    //     rd[0] *= pitch;
+    //     rd[1] *= pitch;
+    //     rd[2] *= pitch;
+
+    //     rd[4] *= yaw;
+    //     rd[5] *= yaw;
+    //     rd[6] *= yaw;
+
+    //     rd[8] *= roll;
+    //     rd[9] *= roll;
+    //     rd[10] *= roll;
+
+    //     return rotation;
+    // }
+
     static newXRotation(angleInRadians: number): Matrix4 {
         var c = Math.cos(angleInRadians);
         var s = Math.sin(angleInRadians);
@@ -566,7 +600,7 @@ export class Matrix4 extends FloatMatrix {
         return matrix;
     }
 
-    decompose() {
+    decompose() : [Vector3, Vector3, Vector3] {
         const d = this.data;
 
         // get position
@@ -590,24 +624,8 @@ export class Matrix4 extends FloatMatrix {
         scale.z = sz;
 
         // get rotation
-        let rotation = Matrix4.new();
-        let rd = rotation.data;
+        let rotation = Vector3.new(1 / sx, 1 / sy, 1 / sz);
 
-        const invSX = 1 / sx;
-        const invSY = 1 / sy;
-        const invSZ = 1 / sz;
-
-        rd[0] *= invSX;
-        rd[1] *= invSX;
-        rd[2] *= invSX;
-
-        rd[4] *= invSY;
-        rd[5] *= invSY;
-        rd[6] *= invSY;
-
-        rd[8] *= invSZ;
-        rd[9] *= invSZ;
-        rd[10] *= invSZ;
 
         return [position, rotation, scale];
     }

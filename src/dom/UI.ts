@@ -2,7 +2,8 @@
 // author:  Jos Feenstra
 // purpose: lets create the UI using html & dom api, because why the hell not
 
-import { Domain } from "../math/Domain";
+import { Vector3 } from "../lib";
+import { Domain, Domain3 } from "../math/Domain";
 import { GeonMath } from "../math/Math";
 import { EnumParameter } from "../parametric/EnumParameter";
 import { Parameter } from "../parametric/Parameter";
@@ -120,6 +121,28 @@ export class UI {
         this.addDiv("control", [text1, checkcontainer]);
 
         return checkbox;
+    }
+
+    add3DParameter(name: string, bounds: Domain3, step: number, vec: Vector3, onChange?: Function) {
+        let v = Vector3.zero();
+        this.addParameter(new Parameter(name + "-x", vec.x, bounds.x.t0, bounds.x.t1, step), (x) => {
+            vec.x = x;
+            if (onChange) {
+                onChange();
+            }
+        })
+        this.addParameter(new Parameter(name + "-y", vec.y, bounds.y.t0, bounds.y.t1, step), (y) => {
+            vec.y = y;
+            if (onChange) {
+                onChange();
+            }
+        })
+        this.addParameter(new Parameter(name + "-z", vec.z, bounds.z.t0, bounds.z.t1, step), (z) => {
+            vec.z = z;
+            if (onChange) {
+                onChange();
+            }
+        })
     }
 
     addParameter(param: Parameter | EnumParameter, onInput: (v: number) => void = () => {}) {

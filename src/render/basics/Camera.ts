@@ -26,11 +26,12 @@ export class Camera {
     totalMatrix!: Matrix4;
     worldMatrix!: Matrix4;
     projectMatrix!: Matrix4;
+    inverseWorldMatrix!: Matrix4;
 
     // settings
     canMove: boolean;
     canControl: any;
-
+    
     constructor(canvas: HTMLCanvasElement, z_offset = 1, canMove = false, canControl = true) {
         this.canMove = canMove;
         this.canControl = canControl;
@@ -74,6 +75,11 @@ export class Camera {
 
     // just a quick way of getting & setting
 
+    getActualPosition() {
+        // TODO MUST BE WAY QUICKER!!!
+        return this.inverseWorldMatrix.multiplyVector(Vector3.zero());
+    }
+
     getState(): number[] {
         return [this.pos.x, this.pos.y, this.pos.z, this.z_offset, this.angleAlpha, this.angleBeta];
     }
@@ -97,6 +103,7 @@ export class Camera {
         this.worldMatrix = this.getWorldMatrix();
         this.projectMatrix = this.getProjectionMatrix(canvas);
         this.totalMatrix = this.worldMatrix.multiplied(this.projectMatrix);
+        this.inverseWorldMatrix = this.worldMatrix.inverse();
     }
 
     lookat(position: Vector3, target: Vector3) {
