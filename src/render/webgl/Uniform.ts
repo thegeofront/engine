@@ -12,7 +12,6 @@ export class Uniform {
         public size: number,
         public loc: WebGLUniformLocation,
         public setter: Function,
-        public state: Iterable<number>,
     ) {}
 
     static new(
@@ -21,19 +20,19 @@ export class Uniform {
         name: string,
         type: UniformType,
         size: number,
-        initState: Iterable<number>,
+        initState?: Iterable<number>,
     ) {
         let setter = getLoader(gl, type, size);
         let loc = gl.getUniformLocation(program, name)!;
-        return new Uniform(type, size, loc, setter, initState);
+        let u = new Uniform(type, size, loc, setter);
+        if (initState) {
+            u.loadAndBind(gl, initState);
+        }
+        return u;
     }
 
-    load(state: Iterable<number>) {
-        this.state = state;
-    }
-
-    bind(gl: WebGl) {
-        this.setter(gl, this.loc, this.state);
+    loadAndBind(gl: WebGl, state: Iterable<number>) {
+        this.setter(gl, this.loc, state);
     }
 }
 
@@ -70,6 +69,10 @@ export class UniformTexture {
         gl.uniform1i(this.loc, this.id);
         gl.activeTexture(gl.TEXTURE0 + this.id);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
+    }
+
+    unbind() {
+        throw "TODO";
     }
 }
 

@@ -31,17 +31,19 @@ export class Uniforms {
     }
 
     get(name: string) {
-        return this.uniforms.get(name)!;
+        let u = this.uniforms.get(name);
+        if (u) {
+            return u
+        } else {
+            throw new Error(`uniform called [${name}] is not addded to the uniforms at init...`);
+        }
     }
     
     
     /**
-     * Load the state of all uniforms, to prepare for rendering
+     * Load the state of all textures, to prepare for rendering
      */
      bindAll() {
-        for (let v of this.uniforms.values()) {
-            v.bind(this.gl);
-        }
         for (let v of this.textures.values()) {
             v.bind(this.gl);
         }
@@ -56,30 +58,30 @@ export class Uniforms {
     }
 
     load(name: string, value: number) {
-        this.get(name).load([value]);
+        this.get(name).loadAndBind(this.gl, [value]);
     }
 
     load2(name: string, value: Vector2) {
-        this.get(name).load([value.x, value.y]);
+        this.get(name).loadAndBind(this.gl, [value.x, value.y]);
     }
 
     load3(name: string, value: Vector3) {
-        this.get(name).load([value.x, value.y, value.z]);
+        this.get(name).loadAndBind(this.gl, [value.x, value.y, value.z]);
     }
 
     load4(name: string, value: number[]) {
-        this.get(name).load(value);
+        this.get(name).loadAndBind(this.gl, value);
     }
 
     loadColor(name: string, value: Color) {
-        this.get(name).load(value.data);
+        this.get(name).loadAndBind(this.gl, value.data);
     }
 
     loadMatrix3(name: string, value: Matrix3) {
-        this.get(name).load(value.data);
+        this.get(name).loadAndBind(this.gl, value.data);
     }
 
     loadMatrix4(name: string, value: Matrix4) {
-        this.get(name).load(value.data);
+        this.get(name).loadAndBind(this.gl, value.data);
     }
 }

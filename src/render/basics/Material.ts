@@ -13,7 +13,11 @@ export class Material {
         public bumpmap?: ImageData,
     ) {}
 
-    static newDefault() {
+    static fromObjMtl() {
+        throw "TODO!!!";
+    }
+
+    static default() {
         return new Material(
             Color.fromHex('#444444')!,
             Color.fromHex('#400080')!,

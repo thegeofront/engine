@@ -50,7 +50,7 @@ export abstract class ShaderProgram<T> {
     }
 
     init() {
-        this.gl.useProgram(this.program);
+        this.useProgram();
         this.uniforms = new Uniforms(this.gl, this.program);
         this.attributes = new Attributes(this.gl, this.program);
         this.drawCount = 0;
@@ -59,12 +59,12 @@ export abstract class ShaderProgram<T> {
     }
 
     load(r: T, speed: DrawSpeed) {
-        this.gl.useProgram(this.program);
+        this.useProgram();
         this.drawCount = this.onLoad(r, speed);
     }
 
     draw(c: Scene) {
-        this.gl.useProgram(this.program);
+        this.useProgram();
         this.onDraw(c);
         this.uniforms.bindAll();
         this.attributes.bindAll();

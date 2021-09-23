@@ -16,9 +16,10 @@ export class PhongShader extends ShaderProgram<Model> {
 
         attribute vec4 vertexPosition;
         uniform mat4 worldMatrix;
+        uniform mat4 modelMatrix;
 
         void main() {
-            gl_Position = worldMatrix * vertexPosition;
+            gl_Position = worldMatrix * modelMatrix * vertexPosition;
         }
         `;
 
@@ -44,8 +45,8 @@ export class PhongShader extends ShaderProgram<Model> {
         this.attributes.addIndex(DrawElementsType.UnsignedShort);
 
         this.uniforms.add("worldMatrix", 16);
+        this.uniforms.add("modelMatrix", 16);
         this.uniforms.add("sunPosition", 3);
-        this.uniforms.add("sunColor", 4);
 
         this.uniforms.add("ambient", 4, Color.fromHSL(0, 0).data);
         this.uniforms.add("diffuse", 4, [1.0, 1.0, 1.0, 1.0]);
@@ -56,12 +57,19 @@ export class PhongShader extends ShaderProgram<Model> {
     }
 
     protected onLoad(model: Model, speed: DrawSpeed): number {
+        this.loadPosition(model.position);
         this.loadMesh(model.mesh, speed);
         this.loadMaterial(model.material);
         return model.mesh.links.data.length;
     }
 
+    public loadPosition(position: Matrix4) {
+        this.useProgram();
+        this.uniforms.loadMatrix4("modelMatrix", position);
+    }
+
     public loadMesh(mesh: Mesh, speed: DrawSpeed) {
+        this.useProgram();
         this.attributes.load("vertexPosition", mesh.verts.slice().data, speed);
         this.attributes.loadIndex(mesh.links.data, speed);
     }
@@ -77,6 +85,5 @@ export class PhongShader extends ShaderProgram<Model> {
     protected onDraw(s: Scene) {
         this.uniforms.loadMatrix4("worldMatrix", s.camera.totalMatrix);
         this.uniforms.load3("sunPosition", s.sun.pos);
-        this.uniforms.loadColor("sunColor", s.sun.color);
     }
 }
