@@ -8,6 +8,7 @@ import {
     Cube,
     Graph,
     IntMatrix,
+    MultiVector2,
     MultiVector3,
     Plane,
     Rectangle3,
@@ -39,9 +40,8 @@ export class Mesh {
     constructor(
         public verts: MultiVector3,
         public links: IntMatrix, // relationships, can be 2 (lines) | 3 (triangles) | 4 (quads)
-        public uvs?: MultiVector3,
-        public facenormals?: MultiVector3, //
-        public vertexnormals?: MultiVector3, 
+        private _uvs?: MultiVector2,
+        private _normals?: MultiVector3, //
     ) {}
 
     clone(): Mesh {
@@ -513,19 +513,55 @@ export class Mesh {
         }
     }
 
+    // ----- Normals -----
+
+    get normals() : MultiVector3 | undefined {
+        switch(this.normalKind) {
+            case (NormalKind.None):
+                return undefined
+            case (NormalKind.Vertex):
+                return this._normals;
+            case (NormalKind.MultiVertex):
+                return undefined;
+            case (NormalKind.Face):
+                return this._normals;
+        }
+    }
+
     get normalKind() {
         return this._normalKind;
     }
 
-    CalcAndSetFaceNormals() {
-        this.facenormals = this.calculateFaceNormals();
+    calcAndSetFaceNormals() {
+        this._normalKind = NormalKind.Face;
+        this._normals = this.calculateFaceNormals();
     }
 
-    CalcAndSetVertexNormals() {
-        this.vertexnormals = this.calculateVertexNormals();
+    calcAndSetVertexNormals() {
+        this._normalKind = NormalKind.Vertex;
+        this._normals = this.calculateVertexNormals();
     }
 
-    // ----- calculation -----
+    
+    ensureVertexNormals() {
+        if (this.normalKind == NormalKind.Vertex && this._normals && this._normals.count == this.verts.count) {
+            return;
+        } else {
+            // console.warn("no or incorrect vertex normals! recalculating...");
+            this.calcAndSetVertexNormals();
+            return 
+        }
+    }
+
+    ensureFaceNormals() {
+        if (this._normals && this._normals.count == this.links.count()) {
+            return true;
+        } else {
+            // console.warn("no or incorrect face normals! recalculating...");
+            this.calcAndSetFaceNormals();
+            return false;
+        }
+    }
 
     private calculateFaceNormals() : MultiVector3 {
         if (this.getType() != MeshType.Triangles) {
@@ -533,7 +569,6 @@ export class Mesh {
             return MultiVector3.new(0);
         }
 
-        this._normalKind = NormalKind.Face;
         let faceCount = this.links.count();
         let norms = MultiVector3.new(faceCount)
         
@@ -610,6 +645,22 @@ export class Mesh {
             normals[i].normalize();
         }
         return normals;
+    }
+
+    // ------ UVS
+
+    get uvs() : MultiVector2 | undefined {
+        return this._uvs;
+    }
+
+    ensureUVs() {
+        if (this._uvs && this._uvs.count == this.links.data.length) {
+            return true;
+        } else {
+            // console.warn("no uvs yet! filling with dummy data");
+            this._uvs = MultiVector2.new(this.links.data.length);
+            return false;
+        }
     }
 }
 

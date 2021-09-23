@@ -17,6 +17,9 @@ export class Attribute {
 
     static new(gl: WebGl, program: WebGLProgram, name: string, matrixWidth: number) {
         let position = gl.getAttribLocation(program, name);
+        if (position == -1) {
+            console.error(`couldnt find attribute [${name}] within glsl! Keep in mind: webgl filters unused attributes automatically`);
+        }
         let buffer = gl.createBuffer()!;
         return new Attribute(gl, buffer, position, matrixWidth, gl.FLOAT);
     }

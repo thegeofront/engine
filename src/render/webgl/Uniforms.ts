@@ -18,7 +18,7 @@ export class Uniforms {
         private textures: Map<string, UniformTexture> = new Map(),
     ) {}
 
-    add(name: string, size: number, defaultState: Iterable<number> = [], type = UniformType.Float) {
+    add(name: string, size: number, defaultState?: Iterable<number>, type = UniformType.Float) {
         let uniform = Uniform.new(this.gl, this.program, name, type, size, defaultState);
         this.uniforms.set(name, uniform);
         return uniform;

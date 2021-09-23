@@ -14,12 +14,26 @@ export class PhongShader extends ShaderProgram<Model> {
         precision mediump int;
         precision mediump float;
 
-        attribute vec4 vertexPosition;
+        attribute vec4 position;
+        attribute vec2 uv;
+        attribute vec3 normal;
+        
         uniform mat4 worldMatrix;
         uniform mat4 modelMatrix;
+        
+        uniform vec3 sunPosition;
+
+        varying vec2 varUv;
+        varying vec3 varNormal;
+        varying vec3 varToSun;
 
         void main() {
-            gl_Position = worldMatrix * modelMatrix * vertexPosition;
+            vec4 worldPosition = modelMatrix * position;
+            gl_Position = worldMatrix * worldPosition;
+            
+            varUv = uv;
+            varNormal = normalize((modelMatrix * vec4(normal, 1)).xyz);
+            varToSun = normalize(sunPosition - worldPosition.xyz);
         }
         `;
 
@@ -32,8 +46,16 @@ export class PhongShader extends ShaderProgram<Model> {
         uniform vec4 specular;
         uniform float opacity;
 
+        varying vec2 varUv;
+        varying vec3 varNormal;
+        varying vec3 varToSun;
+
         void main () {
-            gl_FragColor = ambient;
+
+            float brightness = max(0.0, dot(varNormal, varToSun));
+            vec4 diffuseColor = diffuse * brightness; 
+
+            gl_FragColor = max(ambient, diffuseColor);
         }
         `;
         super(gl, vertexShader, fragmentShader);
@@ -41,7 +63,9 @@ export class PhongShader extends ShaderProgram<Model> {
 
     protected onInit(): DrawMode {
 
-        this.attributes.add("vertexPosition", 3);
+        this.attributes.add("position", 3);
+        this.attributes.add("uv", 2);
+        this.attributes.add("normal", 3);
         this.attributes.addIndex(DrawElementsType.UnsignedShort);
 
         this.uniforms.add("worldMatrix", 16);
@@ -69,8 +93,16 @@ export class PhongShader extends ShaderProgram<Model> {
     }
 
     public loadMesh(mesh: Mesh, speed: DrawSpeed) {
+        
+        // make sure the mesh contains the correct type of uv and vertex normals. 
+        mesh.ensureUVs();
+        mesh.ensureVertexNormals();
+
         this.useProgram();
-        this.attributes.load("vertexPosition", mesh.verts.slice().data, speed);
+        this.attributes.load("position", mesh.verts.matrix.data, speed);
+        this.attributes.load("uv", mesh.uvs!.matrix.data, speed);
+        this.attributes.load("normal", mesh.normals!.matrix.data, speed);
+        
         this.attributes.loadIndex(mesh.links.data, speed);
     }
 

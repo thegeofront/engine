@@ -5,7 +5,7 @@ import { FloatMatrix } from "./FloatMatrix";
 import { MultiVector3 } from "./MultiVector3";
 
 export class MultiVector2 extends Geometry {
-    private constructor(private matrix: FloatMatrix) {
+    private constructor(private _matrix: FloatMatrix) {
         super();
     }
 
@@ -17,8 +17,8 @@ export class MultiVector2 extends Geometry {
         let length = vecs.length;
         let multiVector = MultiVector2.new(length);
         for (let i = 0; i < vecs.length; i++) {
-            multiVector.matrix.set(i, 0, vecs[i].x);
-            multiVector.matrix.set(i, 1, vecs[i].y);
+            multiVector._matrix.set(i, 0, vecs[i].x);
+            multiVector._matrix.set(i, 1, vecs[i].y);
         }
         return multiVector;
     }
@@ -32,26 +32,30 @@ export class MultiVector2 extends Geometry {
 
     static fromData(data: number[] | Float32Array): MultiVector2 {
         let multi = MultiVector2.new(data.length / 2);
-        multi.matrix.fillWith(data);
+        multi._matrix.fillWith(data);
         return multi;
     }
 
     // pass through
 
     private get width(): number {
-        return this.matrix.width;
+        return this._matrix.width;
     }
 
     private get height(): number {
-        return this.matrix.height;
+        return this._matrix.height;
     }
 
     public get dimensions(): number {
-        return this.matrix.width;
+        return this._matrix.width;
     }
 
     public get count(): number {
-        return this.matrix.height;
+        return this._matrix.height;
+    }
+
+    get matrix(): FloatMatrix {
+        return this._matrix;
     }
 
     forEach(callbackfn: (value: Vector2, index: number) => void): MultiVector2 {
@@ -79,19 +83,19 @@ export class MultiVector2 extends Geometry {
     }
 
     set(i: number, vec: Vector2) {
-        this.matrix.data[i * this.matrix.width + 0] = vec.x;
-        this.matrix.data[i * this.matrix.width + 1] = vec.y;
+        this._matrix.data[i * this._matrix.width + 0] = vec.x;
+        this._matrix.data[i * this._matrix.width + 1] = vec.y;
     }
 
     setXY(i: number, x: number, y: number) {
-        this.matrix.data[i * this.matrix.width + 0] = x;
-        this.matrix.data[i * this.matrix.width + 1] = y;
+        this._matrix.data[i * this._matrix.width + 0] = x;
+        this._matrix.data[i * this._matrix.width + 1] = y;
     }
 
     get(i: number): Vector2 {
         return new Vector2(
-            this.matrix.data[i * this.width + 0],
-            this.matrix.data[i * this.width + 1],
+            this._matrix.data[i * this.width + 0],
+            this._matrix.data[i * this.width + 1],
         );
     }
 
@@ -99,7 +103,7 @@ export class MultiVector2 extends Geometry {
      *  This is a Slice! Edit the matrix = edit the MultiVector!
      */
     toMatrixSlice() {
-        return this.matrix;
+        return this._matrix;
     }
 
     toList(): Vector2[] {
@@ -113,7 +117,7 @@ export class MultiVector2 extends Geometry {
     to3D(): MultiVector3 {
         let vecs = MultiVector3.new(this.count);
         for (let i = 0; i < this.count; i++) {
-            let row = this.matrix.getRow(i);
+            let row = this._matrix.getRow(i);
             vecs.setXYZ(i, row[0], row[1], 0);
         }
         return vecs;
@@ -121,18 +125,18 @@ export class MultiVector2 extends Geometry {
 
     clone(): MultiVector2 {
         let clone = MultiVector2.new(this.count);
-        clone.matrix = this.matrix.clone();
+        clone._matrix = this._matrix.clone();
         return clone;
     }
 
     transform(m: Matrix4): MultiVector2 {
-        this.matrix.multiply(m);
+        this._matrix.multiply(m);
         return this;
     }
 
     transformed(m: Matrix4): MultiVector2 {
         let clone = MultiVector2.new(this.count);
-        clone.matrix = this.matrix.multiplied(m);
+        clone._matrix = this._matrix.multiplied(m);
         return clone;
     }
 }

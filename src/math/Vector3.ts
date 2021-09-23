@@ -13,6 +13,10 @@ export class Vector3 {
         return new Vector3(x, y, z);
     }
 
+    get data() {
+        return [this.x,this.y,this.z]; 
+    }
+
     static from2d(v: Vector2) {
         return new Vector3(v.x, v.y, 0);
     }

@@ -1,3 +1,6 @@
+/**
+ * A [0 - 1] float based RGBA representation of color
+ */
 export class Color {
 
     private constructor(
@@ -15,7 +18,7 @@ export class Color {
     set a(value: number) { this.data[3] = value }
 
     static new() {
-        return new Color([0.5, 0.5, 0.5, 1]);
+        return new Color([1, 1, 1, 1]);
     }
         
     static fromHex(str: string) {
@@ -77,7 +80,6 @@ export class Color {
         let process = (n: number) => {
             let str = Math.round(n * 255).toString(16);
             str = (str.length==1) ? "0"+str : str;
-            console.log(str);
             return str;
         }
         
@@ -88,7 +90,6 @@ export class Color {
         let process = (n: number) => {
             let str = Math.round(n * 255).toString(16);
             str = (str.length==1) ? "0"+str : str;
-            console.log(str);
             return str;
         }
         

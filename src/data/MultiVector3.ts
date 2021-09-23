@@ -8,7 +8,7 @@ import { MultiVector } from "./MultiVector";
 import { MultiVector2 } from "./MultiVector2";
 
 export class MultiVector3 extends Geometry {
-    constructor(private matrix: FloatMatrix) {
+    constructor(private _matrix: FloatMatrix) {
         super();
     }
 
@@ -30,7 +30,7 @@ export class MultiVector3 extends Geometry {
 
     static fromData(data: number[] | Float32Array): MultiVector3 {
         let multi = MultiVector3.new(data.length / 3);
-        multi.matrix.fillWith(data);
+        multi._matrix.fillWith(data);
         return multi;
     }
 
@@ -44,43 +44,47 @@ export class MultiVector3 extends Geometry {
     // pass through
 
     private get width(): number {
-        return this.matrix.width;
+        return this._matrix.width;
     }
 
     private get height(): number {
-        return this.matrix.height;
+        return this._matrix.height;
     }
 
     public get dimensions(): number {
-        return this.matrix.width;
+        return this._matrix.width;
     }
 
     public get count(): number {
-        return this.matrix.height;
+        return this._matrix.height;
+    }
+
+    get matrix() : FloatMatrix {
+        return this._matrix;
     }
 
     setXYZ(i: number, x: number, y: number, z: number) {
-        this.matrix.data[i * this.width + 0] = x;
-        this.matrix.data[i * this.width + 1] = y;
-        this.matrix.data[i * this.width + 2] = z;
+        this._matrix.data[i * this.width + 0] = x;
+        this._matrix.data[i * this.width + 1] = y;
+        this._matrix.data[i * this.width + 2] = z;
     }
 
     set(i: number, vec: Vector3) {
-        this.matrix.data[i * this.width + 0] = vec.x;
-        this.matrix.data[i * this.width + 1] = vec.y;
-        this.matrix.data[i * this.width + 2] = vec.z;
+        this._matrix.data[i * this.width + 0] = vec.x;
+        this._matrix.data[i * this.width + 1] = vec.y;
+        this._matrix.data[i * this.width + 2] = vec.z;
     }
 
     get(i: number): Vector3 {
         return new Vector3(
-            this.matrix.data[i * this.width + 0],
-            this.matrix.data[i * this.width + 1],
-            this.matrix.data[i * this.width + 2],
+            this._matrix.data[i * this.width + 0],
+            this._matrix.data[i * this.width + 1],
+            this._matrix.data[i * this.width + 2],
         );
     }
 
     slice() {
-        return this.matrix;
+        return this._matrix;
     }
 
     fillFromList(vecs: Vector3[]) {
@@ -137,7 +141,7 @@ export class MultiVector3 extends Geometry {
     }
 
     mapWith(other: MultiVector3, callback: (a: number, b: number) => number) {
-        let result = this.matrix.mapWith(other.matrix, callback);
+        let result = this._matrix.mapWith(other._matrix, callback);
         return new MultiVector3(result);
     }
 
@@ -150,7 +154,7 @@ export class MultiVector3 extends Geometry {
     }
 
     to2D(): MultiVector2 {
-        return MultiVector2.fromMatrix(this.matrix);
+        return MultiVector2.fromMatrix(this._matrix);
     }
 
     mean(): Vector3 {
@@ -159,9 +163,9 @@ export class MultiVector3 extends Geometry {
 
         let count = this.count;
         for (let i = 0; i < count; i++) {
-            sum.x += this.matrix.data[i * 3];
-            sum.y += this.matrix.data[i * 3 + 1];
-            sum.z += this.matrix.data[i * 3 + 2];
+            sum.x += this._matrix.data[i * 3];
+            sum.y += this._matrix.data[i * 3 + 1];
+            sum.z += this._matrix.data[i * 3 + 2];
         }
 
         return sum.scale(1 / count);
@@ -207,7 +211,7 @@ export class MultiVector3 extends Geometry {
     }
 
     clone(): MultiVector3 {
-        return new MultiVector3(this.matrix.clone());
+        return new MultiVector3(this._matrix.clone());
     }
 
     transform(m: Matrix4): MultiVector3 {
@@ -244,7 +248,7 @@ export class MultiVector3 extends Geometry {
     }
 
     transformed(m: Matrix4): MultiVector3 {
-        return new MultiVector3(calc(this.matrix, m));
+        return new MultiVector3(calc(this._matrix, m));
     }
 
     moved(m: Vector3) {
