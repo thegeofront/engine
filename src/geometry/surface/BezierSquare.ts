@@ -193,5 +193,3 @@ function test(times = 1000) {
 
     sw.log(`created ${times} closest points`); // 326 ms
 }
-
-test();

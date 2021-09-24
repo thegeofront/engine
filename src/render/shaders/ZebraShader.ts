@@ -7,7 +7,7 @@ import { DrawElementsType, DrawMode } from "../webgl/Constants";
 import { DrawSpeed, WebGl } from "../webgl/HelpGl";
 import { ShaderProgram } from "../webgl/ShaderProgram";
 
-export class PhongShader extends ShaderProgram<Model> {
+export class ZebraShader extends ShaderProgram<Model> {
     constructor(gl: WebGl, indexed = true) {
         const vertexShader = `
         precision mediump int;
@@ -44,56 +44,42 @@ export class PhongShader extends ShaderProgram<Model> {
         precision mediump int;
         precision mediump float;
 
-        uniform vec4 ambient;
-        uniform vec4 diffuse;
-        uniform vec4 specular;
-        uniform vec4 occluded;
-        uniform float opacity;
-        uniform float specularDampner;
-
         varying vec2 varUv;
         varying vec3 varNormal;
         varying vec3 varToSun;
         varying vec3 varToCamera;
-
-        // float smooth(float t) {
-        //     // Fade function as defined by Ken Perlin.  This eases coordinate values
-        //     // so that they will ease towards integral values.  This ends up smoothing
-        //     // the final output.
-        //     return t * t * t * (t * (t * 6.0 - 15.0) + 10.0); // 6t^5 - 15t^4 + 10t^3
-        // }
     
+        uniform float zebraStripeCount;
+
+        // make from '/' curve a './' curve
+        float flattenPeakClamp(float x, float alpha) {
+            float beta = 0.5 - alpha;
+            float leftover = 1.0 - 2.0 * beta;
+            return clamp((x-beta) * (1.0 / leftover), 0.0, 1.0);
+        }
+
+        // make from '/' curve a '/\' curve
+        float hillClamp(float x) {
+            float clamped = clamp(x, 0.0, 0.5) - clamp(x - 0.5, 0.0, 0.5);
+            return clamped * 2.0;
+        }
+
         void main () {
 
             // normalize 
-            // vec3 toSun = varToSun;
-            // vec3 normal = varNormal;
-            // vec3 toCamera = varToCamera;
-
             vec3 toSun = normalize(varToSun);
             vec3 normal = normalize(varNormal);
             vec3 toCamera = normalize(varToCamera);
 
-            // ambient
-            vec4 ambientColor = ambient;
-
-            // occluded (TODO: expand upon this using ambient occlusion)
-            float diffuseFactor = dot(normal, toSun);
-            float occludedFactor = clamp(diffuseFactor, -1.0, 0.0) * -1.0;
-            vec4 occludedColor = occluded * occludedFactor + ambientColor * (1.0 - occludedFactor);
-
-            // diffuse 
-            diffuseFactor = max(0.0, diffuseFactor);
-            vec4 diffuseColor = diffuse * diffuseFactor; 
-
             // specular
             vec3 reflectedLight = reflect(-toSun, normal);
-            float specfac = max(0.0, dot(reflectedLight, toCamera));
-            specfac = pow(specfac, specularDampner);
-            // specfac = smooth(specfac);
-            vec4 specularColor = vec4(specfac * specular.xyz, 1.0); 
+            float factor = dot(reflectedLight, toCamera);
+            factor = hillClamp(fract(factor * zebraStripeCount));
+            factor = flattenPeakClamp(factor, 0.05);
 
-            gl_FragColor = max(occludedColor, diffuseColor) + specularColor;
+            vec4 specularColor = vec4(vec3(factor), 1.0); 
+
+            gl_FragColor = specularColor;
         }
         `;
         super(gl, vertexShader, fragmentShader);
@@ -113,12 +99,7 @@ export class PhongShader extends ShaderProgram<Model> {
         this.uniforms.add("sunPosition", 3);
         this.uniforms.add("cameraPosition", 3);
 
-        this.uniforms.add("ambient", 4, Color.fromHSL(0, 0).data);
-        this.uniforms.add("diffuse", 4, [1.0, 1.0, 1.0, 1.0]);
-        this.uniforms.add("specular", 4, [1.0, 1.0, 1.0, 1.0]);
-        this.uniforms.add("occluded", 4, [0.2, 0.2, 0.2, 1.0]);
-        this.uniforms.add("opacity", 1, [1.0]);
-        this.uniforms.add("specularDampner", 1, [0.5]);
+        this.uniforms.add("zebraStripeCount", 1, [7.0]);
 
         return DrawMode.Triangles;
     }
@@ -126,7 +107,6 @@ export class PhongShader extends ShaderProgram<Model> {
     protected onLoad(model: Model, speed: DrawSpeed): number {
         this.loadPosition(model.position);
         this.loadMesh(model.mesh, speed);
-        this.loadMaterial(model.material);
         return model.mesh.maxSize;
     }
 
@@ -146,14 +126,8 @@ export class PhongShader extends ShaderProgram<Model> {
         this.attributes.load("normal", mesh.normals!.matrix.data, speed);
     }
 
-    public loadMaterial(material: Material) {
-        this.useProgram();
-        this.uniforms.loadColor("ambient", material.ambient);
-        this.uniforms.loadColor("diffuse", material.diffuse);
-        this.uniforms.loadColor("specular", material.specular);
-        this.uniforms.loadColor("occluded", material.occluded);
-        this.uniforms.load("opacity", material.opacity);
-        this.uniforms.load("specularDampner", material.specularDampner);
+    public loadZebraStripeCount(count: number) {
+        this.uniforms.load("zebraStripeCount", count);
     }
 
     protected onDraw(s: Scene) {

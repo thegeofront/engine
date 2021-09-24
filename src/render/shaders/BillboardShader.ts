@@ -1,6 +1,14 @@
 // https://webgl.brown37.net/12_advanced_rendering/07_rendering_points.html
 
-import { MultiVector3, MultiVector2, GeonImage, Vector3, ToFloatMatrix, Vector2, Scene } from "../../lib";
+import {
+    MultiVector3,
+    MultiVector2,
+    GeonImage,
+    Vector3,
+    ToFloatMatrix,
+    Vector2,
+    Scene,
+} from "../../lib";
 import { DrawMode } from "../webgl/Constants";
 import { DrawSpeed } from "../webgl/HelpGl";
 import { ShaderProgram } from "../webgl/ShaderProgram";
@@ -107,6 +115,7 @@ export class BillboardShader extends ShaderProgram<BillboardPayload | Billboard>
         varying vec2  uv;
         varying vec2  uv_size;
         varying float point_size; // can this be replaced with u_size ??
+
 
         void main() {
             // NOTE this can be done way easier, we dont need uv sized, we just need to go to pixel space

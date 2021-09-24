@@ -1,11 +1,11 @@
 import { Color } from "../../image/Color";
 
 export class Material {
-
     constructor(
         public ambient: Color,
         public diffuse: Color,
         public specular: Color,
+        public occluded: Color,
 
         public specularDampner: number,
         public opacity: number, // 0: transparant, 1: opaque
@@ -19,19 +19,23 @@ export class Material {
 
     static newPurple() {
         return new Material(
-            Color.fromHex('#35006a')!,
-            Color.fromHex('#ff0080')!,
-            Color.fromHex('#513600')!,
+            Color.fromHex("#35006a")!,
+            Color.fromHex("#ff0080")!,
+            Color.fromHex("#513600")!,
+            Color.fromHex("#1b0035")!,
             3.195,
-            1);
+            1,
+        );
     }
 
     static default() {
         return new Material(
-            Color.fromHex('#4f009d')!,
-            Color.fromHex('#06ffff')!,
-            Color.fromHex('#58593e')!,
+            Color.fromHex("#4f009d")!,
+            Color.fromHex("#06ffff")!,
+            Color.fromHex("#58593e")!,
+            Color.fromHex("#1b0035")!,
             3.195,
-            1);
+            1,
+        );
     }
 }
