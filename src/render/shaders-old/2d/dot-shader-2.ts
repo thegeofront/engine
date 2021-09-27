@@ -1,7 +1,6 @@
 // jos feenstra
 
-import { Vector2 } from "../../../lib";
-import { Scene } from "../../Scene";
+import { Scene, Vector2 } from "../../../lib";
 import { OldShader } from "../../OldShader";
 
 export class DotShader2 extends OldShader<Vector2[]> {

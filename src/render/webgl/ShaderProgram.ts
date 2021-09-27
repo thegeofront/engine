@@ -58,7 +58,7 @@ export abstract class ShaderProgram<T> {
         this.setDrawMethod();
     }
 
-    load(r: T, speed: DrawSpeed) {
+    load(r: T, speed = DrawSpeed.StaticDraw) {
         this.useProgram();
         this.drawCount = this.onLoad(r, speed);
     }

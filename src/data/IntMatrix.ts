@@ -12,6 +12,10 @@ export class IntMatrix {
         else this.setData(data);
     }
 
+    static new(height: number, width: number, data: number[] = []) {
+        return new IntMatrix(height, width, data);
+    }
+
     static fromList(list: number[], width: number): IntMatrix {
         let height = list.length / width;
         let array = new IntMatrix(height, width);

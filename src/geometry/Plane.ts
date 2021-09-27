@@ -139,6 +139,10 @@ export class Plane {
         return this._matrix.inverse();
     }
 
+    distanceTo(v: Vector3) : number {
+        return this.khat.dot(v) + this.d;
+    }
+
     setPosition(vec: Vector3) {
         this.center = vec;
     }

@@ -36,7 +36,6 @@ export enum NormalKind {
 }
 
 export class Mesh {
-
     private _normalKind = NormalKind.None;
 
     constructor(
@@ -58,8 +57,13 @@ export class Mesh {
         return new Mesh(this.verts.clone(), this.links.clone());
     }
 
-    static new(verts: MultiVector3, links: IntMatrix): Mesh {
-        return new Mesh(verts, links);
+    static new(
+        verts: MultiVector3,
+        links: IntMatrix,
+        uvs?: MultiVector2,
+        normals?: MultiVector3,
+    ): Mesh {
+        return new Mesh(verts, links, uvs, normals);
     }
 
     static fromLists(verts: Vector3[], faces: number[]): Mesh {
@@ -245,9 +249,10 @@ export class Mesh {
         return this.fromGraph(graph);
     }
 
-    static newSphere(center: Vector3, radius: number, numRings: number, numPerRing: number): Mesh {
+    // TODO remove center. Just move afterwards
+    static newSphere(center: Vector3, radius: number, numRings: number, resolution: number): Mesh {
         // verts
-        let vertCount = numRings * numPerRing + 2;
+        let vertCount = numRings * resolution + 2;
         let verts = MultiVector3.new(vertCount);
         let setVert = function (i: number, vector: Vector3) {
             verts.set(i, vector.scale(radius).add(center));
@@ -255,22 +260,22 @@ export class Mesh {
 
         setVert(0, new Vector3(0, 0, 1));
         for (let ring = 0; ring < numRings; ring++) {
-            for (let perRing = 0; perRing < numPerRing; perRing++) {
+            for (let perRing = 0; perRing < resolution; perRing++) {
                 let alpha = (Math.PI * (ring + 1)) / (numRings + 1);
-                let beta = (2 * Math.PI * perRing) / numPerRing;
+                let beta = (2 * Math.PI * perRing) / resolution;
 
                 let x = Math.sin(alpha) * Math.cos(beta);
                 let y = Math.sin(alpha) * Math.sin(beta);
                 let z = Math.cos(alpha);
 
-                let index = 1 + ring * numPerRing + perRing;
+                let index = 1 + ring * resolution + perRing;
                 setVert(index, new Vector3(x, y, z));
             }
         }
         setVert(vertCount - 1, new Vector3(0, 0, -1));
 
         // faces
-        let faceCount = numPerRing * numRings * 2;
+        let faceCount = resolution * numRings * 2;
         let links = new IntMatrix(faceCount, 3);
         links.fill(-1);
         let setFace = function (i: number, row: number[]) {
@@ -278,8 +283,8 @@ export class Mesh {
         };
 
         // faces top
-        for (let i = 0; i < numPerRing; i++) {
-            setFace(i, [0, i + 1, ((i + 1) % numPerRing) + 1]);
+        for (let i = 0; i < resolution; i++) {
+            setFace(i, [0, i + 1, ((i + 1) % resolution) + 1]);
         }
 
         // faces middle
@@ -287,17 +292,17 @@ export class Mesh {
         // console.log("faces", faceCount);
 
         for (let ring = 0; ring < numRings - 1; ring++) {
-            let vertCursor = numPerRing * ring + 1;
-            let vertCursorBelow = vertCursor + numPerRing;
+            let vertCursor = resolution * ring + 1;
+            let vertCursorBelow = vertCursor + resolution;
 
-            for (let perRing = 0; perRing < numPerRing; perRing++) {
+            for (let perRing = 0; perRing < resolution; perRing++) {
                 let a = vertCursor + perRing;
-                let b = vertCursor + ((perRing + 1) % numPerRing);
+                let b = vertCursor + ((perRing + 1) % resolution);
 
                 let c = vertCursorBelow + perRing;
-                let d = vertCursorBelow + ((perRing + 1) % numPerRing);
+                let d = vertCursorBelow + ((perRing + 1) % resolution);
 
-                let iFace = numPerRing + numPerRing * ring * 2 + perRing * 2;
+                let iFace = resolution + resolution * ring * 2 + perRing * 2;
 
                 // console.log(iFace);
                 setFace(iFace, [a, c, b]);
@@ -306,13 +311,13 @@ export class Mesh {
         }
 
         // faces bottom
-        for (let i = 0; i < numPerRing; i++) {
-            let iNext = (i + 1) % numPerRing;
+        for (let i = 0; i < resolution; i++) {
+            let iNext = (i + 1) % resolution;
             let last = vertCount - 1;
 
-            let iFace = faceCount - numPerRing + i;
+            let iFace = faceCount - resolution + i;
 
-            let zero = vertCount - numPerRing - 1;
+            let zero = vertCount - resolution - 1;
             let vertI = zero + i;
             let vertINext = zero + iNext;
 
@@ -325,10 +330,11 @@ export class Mesh {
         return new Mesh(verts, links);
     }
 
-    static newCylinder(from: Vector3, to: Vector3, radius: number, numPerRing: number): Mesh {
+    // TODO remove from & to, Just move the mesh afterwards
+    static newCylinder(from: Vector3, to: Vector3, radius: number, resolution: number): Mesh {
         let normal = to.subbed(from);
 
-        let numVerts = numPerRing * 2 + 2;
+        let numVerts = resolution * 2 + 2;
         let numFaces = (numVerts - 2) * 2;
         let verts = MultiVector3.new(numVerts);
 
@@ -346,10 +352,10 @@ export class Mesh {
 
         // verts 'from ring
         setVert(0, from);
-        for (let i = 0; i < numPerRing; i++) {
+        for (let i = 0; i < resolution; i++) {
             let v = new Vector3(
-                Math.cos((Math.PI * 2 * i) / numPerRing),
-                Math.sin((Math.PI * 2 * i) / numPerRing),
+                Math.cos((Math.PI * 2 * i) / resolution),
+                Math.sin((Math.PI * 2 * i) / resolution),
                 0,
             ).scale(radius);
 
@@ -359,10 +365,10 @@ export class Mesh {
 
         // verts 'to' ring
         let numVertsHalf = numVerts / 2;
-        for (let i = 0; i < numPerRing; i++) {
+        for (let i = 0; i < resolution; i++) {
             let v = new Vector3(
-                Math.cos((Math.PI * 2 * i) / numPerRing),
-                Math.sin((Math.PI * 2 * i) / numPerRing),
+                Math.cos((Math.PI * 2 * i) / resolution),
+                Math.sin((Math.PI * 2 * i) / resolution),
                 0,
             ).scale(radius);
 
@@ -379,14 +385,14 @@ export class Mesh {
         };
 
         // set faces
-        for (let i = 0; i < numPerRing; i++) {
+        for (let i = 0; i < resolution; i++) {
             let a = 0;
             let b = 1 + i;
-            let c = 1 + ((i + 1) % numPerRing);
+            let c = 1 + ((i + 1) % resolution);
 
             let d = numVerts - 1;
             let e = numVertsHalf + i;
-            let f = numVertsHalf + ((i + 1) % numPerRing);
+            let f = numVertsHalf + ((i + 1) % resolution);
 
             setFace(i * 4, [a, c, b]);
             setFace(i * 4 + 1, [b, c, e]);
@@ -397,9 +403,10 @@ export class Mesh {
         return new Mesh(verts, links);
     }
 
-    static newCone(center: Vector3, radius: number, height: number, numPerRing: number) {
-        let numVerts = numPerRing + 2;
-        let numFaces = numPerRing * 2;
+    // TODO remove center, just move afterwards
+    static newCone(center: Vector3, radius: number, height: number, resolution: number) {
+        let numVerts = resolution + 2;
+        let numFaces = resolution * 2;
         let verts = MultiVector3.new(numVerts);
         let setVert = function (i: number, vector: Vector3) {
             verts.set(i, vector.add(center));
@@ -412,12 +419,12 @@ export class Mesh {
 
         // set verts
         setVert(0, new Vector3(0, 0, 0));
-        for (let i = 0; i < numPerRing; i++) {
+        for (let i = 0; i < resolution; i++) {
             setVert(
                 i + 1,
                 new Vector3(
-                    Math.cos((Math.PI * 2 * i) / numPerRing),
-                    Math.sin((Math.PI * 2 * i) / numPerRing),
+                    Math.cos((Math.PI * 2 * i) / resolution),
+                    Math.sin((Math.PI * 2 * i) / resolution),
                     0,
                 ).scale(radius),
             );
@@ -425,17 +432,68 @@ export class Mesh {
         setVert(numVerts - 1, new Vector3(0, 0, height));
 
         // set faces
-        for (let i = 0; i < numPerRing; i++) {
+        for (let i = 0; i < resolution; i++) {
             let a = 0;
             let b = numVerts - 1;
             let c = 1 + i;
-            let d = 1 + ((i + 1) % numPerRing);
+            let d = 1 + ((i + 1) % resolution);
 
             setFace(i * 2, [a, d, c]);
             setFace(i * 2 + 1, [c, d, b]);
         }
 
         return new Mesh(verts, links);
+    }
+
+    static newTorus(r1: number, r2: number, ringCount: number, vertCount: number) {
+        // verts * normals
+        let count = ringCount * vertCount;
+        let verts = MultiVector3.new(count);
+        let normals = MultiVector3.new(count);
+
+        // create `resolution` number of section rings
+        for (let i = 0; i < ringCount; i++) {
+            let alpha = (Math.PI * 2 * i) / ringCount;
+            let ringCenter = Vector3.new(Math.cos(alpha) * r1, Math.sin(alpha) * r1, 0);
+
+            // per section, create `sectionResolution` number of
+            for (let j = 0; j < vertCount; j++) {
+                let beta = (Math.PI * 2 * j) / vertCount;
+                let normal = Vector3.new(
+                    Math.cos(beta) * Math.cos(alpha),
+                    Math.cos(beta) * Math.sin(alpha),
+                    Math.sin(beta),
+                );
+
+                normals.set(i * vertCount + j, normal);
+                verts.set(i * vertCount + j, normal.add(ringCenter));
+            }
+        }
+
+        // links & uvs
+        let links = IntMatrix.new(count * 2, 3);
+        let uvs = undefined;
+
+        let getIndex = (i: number, j: number) => {
+            return (i % ringCount) * vertCount + (j % vertCount);
+        };
+
+        for (let i = 0; i < ringCount; i++) {
+            for (let j = 0; j < vertCount; j++) {
+                let a = getIndex(i, j);
+                let b = getIndex(i, j + 1);
+                let c = getIndex(i + 1, j);
+                let d = getIndex(i + 1, j + 1);
+
+                let iRow = a * 2;
+
+                links.setRow(iRow, [a, c, b]);
+                links.setRow(iRow + 1, [b, c, d]);
+            }
+        }
+
+        let mesh = Mesh.new(verts, links, uvs, normals);
+        return mesh;
     }
 
     static fromGraph(graph: Graph): Mesh {
@@ -496,7 +554,6 @@ export class Mesh {
     }
 
     toLinearMesh() {
-
         // convert to non-indexed verts & norms
         this.ensureFaceNormals();
         let count = this.links.data.length;
@@ -504,7 +561,6 @@ export class Mesh {
 
         let verts = MultiVector3.new(count);
         let norms = MultiVector3.new(count);
-
 
         for (let i = 0; i < faceCount; i++) {
             let norm = this.normals!.get(i);
@@ -519,7 +575,7 @@ export class Mesh {
         links._width = 3;
         links._height = count / 3;
         links.data = getDefaultIndices(count);
-        let mesh = new Mesh(verts, links, undefined, norms); 
+        let mesh = new Mesh(verts, links, undefined, norms);
         return mesh;
     }
 
@@ -553,7 +609,7 @@ export class Mesh {
 
     // ----- Normals -----
 
-    get normals() : MultiVector3 | undefined {
+    get normals(): MultiVector3 | undefined {
         return this._normals;
     }
 
@@ -571,7 +627,6 @@ export class Mesh {
         this._normals = this.calculateVertexNormals();
     }
 
-    
     ensureVertexNormals() {
         if (this._normals && this._normals.count == this.verts.count) {
             this._normalKind = NormalKind.Vertex;
@@ -579,7 +634,7 @@ export class Mesh {
         } else {
             // console.warn("no or incorrect vertex normals! recalculating...");
             this.calcAndSetVertexNormals();
-            return 
+            return;
         }
     }
 
@@ -600,31 +655,34 @@ export class Mesh {
             return true;
         } else {
             // console.warn("no or incorrect face normals! recalculating...");
-            
+
             return false;
         }
     }
 
-    private calculateFaceNormals() : MultiVector3 {
+    private calculateFaceNormals(): MultiVector3 {
         if (this.getType() != MeshType.Triangles) {
             console.error("can only calculate normals from triangular meshes");
             return MultiVector3.new(0);
         }
 
         let faceCount = this.links.count();
-        let norms = MultiVector3.new(faceCount)
-        
+        let norms = MultiVector3.new(faceCount);
+
         for (let i = 0; i < faceCount; i++) {
             let verts = this.getVerticesOfFace(i);
-            let normal = verts.get(1).subbed(verts.get(0)).cross(verts.get(2).subbed(verts.get(0))).normalize();
+            let normal = verts
+                .get(1)
+                .subbed(verts.get(0))
+                .cross(verts.get(2).subbed(verts.get(0)))
+                .normalize();
             norms.set(i, normal);
         }
 
         return norms;
     }
 
-    private calculateVertexNormals() : MultiVector3  {
-
+    private calculateVertexNormals(): MultiVector3 {
         // note: this is not completely accurate
         // set the vertex normal to the average of all adjacent face normals
         let faceCount = this.links.count();
@@ -646,7 +704,6 @@ export class Mesh {
         }
         return normals;
     }
-
 
     // -------- MISC ----------
 
@@ -691,7 +748,7 @@ export class Mesh {
 
     // ------ UVS
 
-    get uvs() : MultiVector2 | undefined {
+    get uvs(): MultiVector2 | undefined {
         return this._uvs;
     }
 

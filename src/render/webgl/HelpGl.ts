@@ -48,10 +48,11 @@ export class HelpGl {
         return needResize;
     }
 
-    static initWebglContext(canvas: HTMLCanvasElement, blend = false): WebGl {
+    static initWebglContext(canvas: HTMLCanvasElement, blend = false): WebGl | undefined {
         let possiblyGl = canvas.getContext("webgl");
         if (possiblyGl == undefined) {
-            console.log("webgl unavailable...");
+            alert("webgl unavailable...");
+            return undefined;
         }
 
         let gl = possiblyGl!;
@@ -59,8 +60,9 @@ export class HelpGl {
 
         if (blend) {
             gl.enable(gl.BLEND);
-            gl.disable(gl.DEPTH_TEST);
-            gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+            gl.enable(gl.DEPTH_TEST);
+            gl.depthFunc(gl.LEQUAL);
+            // gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         } else {
             gl.disable(gl.BLEND);
             gl.enable(gl.DEPTH_TEST);
@@ -112,7 +114,7 @@ export class HelpGl {
     /**
      * WebGl only allows textures with a width and height of the power of two.
      * This means `32x512` is valid, while `40x40` is not valid
-     * This function takes a size, lets say `40`, and rounds up to the nearest power of two, in this case `64`  
+     * This function takes a size, lets say `40`, and rounds up to the nearest power of two, in this case `64`
      */
     static fixTextureSizing(size: number) {
         let base = Math.log2(size);

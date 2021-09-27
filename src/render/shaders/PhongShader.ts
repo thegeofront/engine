@@ -8,7 +8,7 @@ import { DrawSpeed, WebGl } from "../webgl/HelpGl";
 import { ShaderProgram } from "../webgl/ShaderProgram";
 
 export class PhongShader extends ShaderProgram<Model> {
-    constructor(gl: WebGl, indexed = true) {
+    constructor(gl: WebGl) {
         const vertexShader = `
         precision mediump int;
         precision mediump float;
@@ -16,8 +16,8 @@ export class PhongShader extends ShaderProgram<Model> {
         attribute vec4 position;
         attribute vec2 uv;
         attribute vec3 normal;
+        attribute float occlusion;
         
-        uniform mat3 normalMatrix;
         uniform mat4 worldMatrix;
         uniform mat4 worldInverse;
         uniform mat4 modelMatrix;
@@ -28,15 +28,17 @@ export class PhongShader extends ShaderProgram<Model> {
         varying vec3 varNormal;
         varying vec3 varToSun;
         varying vec3 varToCamera;
+        varying float varVectorOcclusion;
 
         void main() {
             vec4 worldPosition = modelMatrix * position;
             gl_Position = worldMatrix * worldPosition;
             
             varUv = uv;
-            varNormal = normalMatrix * normal;
+            varNormal = mat3(modelMatrix) * normal;
             varToSun = sunPosition - worldPosition.xyz;
             varToCamera = cameraPosition - worldPosition.xyz;
+            varVectorOcclusion = occlusion;
         }
         `;
 
@@ -51,6 +53,7 @@ export class PhongShader extends ShaderProgram<Model> {
         uniform float opacity;
         uniform float specularDampner;
 
+        varying float varVectorOcclusion;
         varying vec2 varUv;
         varying vec3 varNormal;
         varying vec3 varToSun;
@@ -73,43 +76,49 @@ export class PhongShader extends ShaderProgram<Model> {
             vec3 toSun = normalize(varToSun);
             vec3 normal = normalize(varNormal);
             vec3 toCamera = normalize(varToCamera);
-
+            
             // ambient
             vec4 ambientColor = ambient;
 
             // occluded (TODO: expand upon this using ambient occlusion)
-            float diffuseFactor = dot(normal, toSun);
-            float occludedFactor = clamp(diffuseFactor, -1.0, 0.0) * -1.0;
-            vec4 occludedColor = occluded * occludedFactor + ambientColor * (1.0 - occludedFactor);
+            float sunDot = dot(normal, toSun);
+            float occlusion = clamp(sunDot, -1.0, 0.0) * -1.0;
+            occlusion = min(occlusion + varVectorOcclusion, 1.0);
+            vec4 occludedColor = occluded * occlusion + ambientColor * (1.0 - occlusion);
 
             // diffuse 
-            diffuseFactor = max(0.0, diffuseFactor);
-            vec4 diffuseColor = diffuse * diffuseFactor; 
+            float diffusion = max(0.0, sunDot);
+            vec4 diffuseColor = diffuse * diffusion; 
 
             // specular
             vec3 reflectedLight = reflect(-toSun, normal);
-            float specfac = max(0.0, dot(reflectedLight, toCamera));
-            specfac = pow(specfac, specularDampner);
-            // specfac = smooth(specfac);
-            vec4 specularColor = vec4(specfac * specular.xyz, 1.0); 
+            float reflection = max(0.0, dot(reflectedLight, toCamera));
+            reflection = pow(reflection, specularDampner);
+            // reflection = smooth(reflection);
+            vec4 specularColor = vec4(reflection * specular.xyz, 1.0); 
 
             gl_FragColor = max(occludedColor, diffuseColor) + specularColor;
+            // gl_FragColor = vec4(normal, 1.0);
         }
         `;
         super(gl, vertexShader, fragmentShader);
+    }
+
+    static new(gl: WebGl) {
+        return new PhongShader(gl);
     }
 
     protected onInit(): DrawMode {
         this.attributes.add("position", 3);
         this.attributes.add("uv", 2);
         this.attributes.add("normal", 3);
+        this.attributes.add("occlusion", 1);
 
         this.attributes.addIndex(DrawElementsType.UnsignedShort);
 
         this.uniforms.add("worldMatrix", 16);
         this.uniforms.add("worldInverse", 16);
         this.uniforms.add("modelMatrix", 16);
-        this.uniforms.add("normalMatrix", 9);
         this.uniforms.add("sunPosition", 3);
         this.uniforms.add("cameraPosition", 3);
 
@@ -130,12 +139,16 @@ export class PhongShader extends ShaderProgram<Model> {
         return model.mesh.maxSize;
     }
 
+    public loadOcclusion(data: BufferSource, speed: DrawSpeed) {
+        this.useProgram();
+        this.attributes.load("occlusion", data, speed);
+    }
+
     public loadPosition(position: Matrix4) {
         this.useProgram();
-        let euler = position.decompose()[1];
+        // let euler = position.decompose()[1];
         // let rotation = Matrix3.newRotation(euler);
         this.uniforms.loadMatrix4("modelMatrix", position);
-        this.uniforms.loadMatrix3("normalMatrix", Matrix3.newIdentity());
     }
 
     public loadMesh(mesh: Mesh, speed: DrawSpeed) {
@@ -158,6 +171,7 @@ export class PhongShader extends ShaderProgram<Model> {
 
     protected onDraw(s: Scene) {
         this.uniforms.loadMatrix4("worldMatrix", s.camera.totalMatrix);
+        this.uniforms.loadMatrix4("worldInverse", s.camera.inverseTransposeMatrix);
         this.uniforms.load3("sunPosition", s.sun.pos);
         this.uniforms.load3("cameraPosition", s.camera.getActualPosition());
     }

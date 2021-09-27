@@ -31,6 +31,7 @@ export class Camera {
     // settings
     canMove: boolean;
     canControl: any;
+    inverseTransposeMatrix!: Matrix4;
     
     constructor(canvas: HTMLCanvasElement, z_offset = 1, canMove = false, canControl = true) {
         this.canMove = canMove;
@@ -104,6 +105,7 @@ export class Camera {
         this.projectMatrix = this.getProjectionMatrix(canvas);
         this.totalMatrix = this.worldMatrix.multiplied(this.projectMatrix);
         this.inverseWorldMatrix = this.worldMatrix.inverse();
+        this.inverseTransposeMatrix = this.inverseWorldMatrix.transpose(); 
     }
 
     lookat(position: Vector3, target: Vector3) {
