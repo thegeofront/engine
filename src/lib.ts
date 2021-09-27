@@ -59,7 +59,6 @@ export * from "./image/Image";
 
 export * from "./input/InputState";
 
-
 export * from "./math/Domain";
 export * from "./math/Math";
 export * from "./math/Matrix3";
@@ -97,6 +96,8 @@ export * from "./render/webgl/IndexAttribute";
 export * from "./render/webgl/Uniform";
 export * from "./render/webgl/Uniforms";
 export * from "./render/webgl/HelpGl";
+
+export * from "./render/shaders-old/_lib";
 
 export * from "./render/OldShader";
 export * from "./render/basics/Camera";

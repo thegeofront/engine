@@ -20,6 +20,10 @@ export class Vector2 {
         this.y = y;
     }
 
+    get data() {
+        return [this.x, this.y];
+    }
+
     // --- factories & other statics
 
     static new(x = 0, y = 0) {

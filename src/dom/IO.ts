@@ -2,8 +2,95 @@
 // author : Jos Feenstra
 // purpuse : wrap certain DOM functionalities
 
+import { meshFromObj } from "../geometry/mesh/ShaderMesh";
+import { GeonImage } from "../image/Image";
+
 // set any to document to add drop functionality to the entire document, or use any other div.
 type FuncGenericReturn = <T>() => T;
+
+export class IO {
+    // TODO catch
+    static async fetchJson(query: string): Promise<any> {
+        let res = await fetch(query);
+        let data = await res.json();
+        return data;
+    }
+
+    // TODO catch
+    static async fetchText(query: string): Promise<string> {
+        let res = await fetch(query);
+        let data = await res.text();
+        return data;
+    }
+
+    // TODO catch
+    static async fetchBlob(query: string): Promise<Blob> {
+        let res = await fetch(query);
+        let data = await res.blob();
+        return data;
+    }
+
+    static findFile(files: FileList, fileName: string) {
+        for (let i = 0; i < files.length; i++) {
+            let file: File = files.item(i)!;
+            let name = file.name;
+            if (name == fileName) {
+                return file;
+            }
+        }
+        return undefined;
+    }
+
+    static find<T>(
+        arr: Array<T>,
+        predicate: (value: T, index: number, array: T[]) => boolean,
+    ): T | undefined {
+        for (let i = 0; i < arr.length; i++) {
+            if (predicate(arr[i], i, arr)) {
+                return arr[i];
+            }
+        }
+        return undefined;
+    }
+
+    /**
+     * A dumb hack to trigger a file download
+     */
+    static promptDownload(file: string, text: string) {
+        var element = document.createElement("a");
+        element.setAttribute("href", "data:text/plain;charset=utf-8, " + encodeURIComponent(text));
+        element.setAttribute("download", file);
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+    }
+
+    /**
+     * A procedure specific to scans
+     * TODO : fix this
+     */
+    static async meshFromWeb(obj: string, textureBlob: Blob) {
+        console.log("reading json...");
+        let texture = await loadImageFromBlob(textureBlob);
+        let mesh = meshFromObj(obj);
+
+        // flip texture horizontally -> this is needed for some inexplicable reason
+        // and put the flipped version in the mesh
+        let gi = GeonImage.fromImageData(texture);
+        gi = gi.flipVer();
+        mesh.setTexture(gi.toImageData());
+        return mesh;
+    }
+
+    static addDropFileEventListeners(
+        canvas: HTMLCanvasElement,
+        filesCallback: CallbackOneParam<FileList>,
+    ) {
+        return addDropFileEventListeners(canvas, filesCallback);
+    }
+}
+
+//@depricated
 export function addDropFileEventListeners(
     canvas: HTMLCanvasElement,
     filesCallback: CallbackOneParam<FileList>,
@@ -66,10 +153,7 @@ interface CallbackOneParam<T1, T2 = void> {
     (param1: T1): T2;
 }
 
-async function loadImageTest(files: FileList) {
-    let image = await loadImageFromFile(files.item(0)!);
-}
-
+//@depricated
 export function loadTextFromFile(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
         let reader = new FileReader();
@@ -82,6 +166,7 @@ export function loadTextFromFile(file: File): Promise<string> {
     });
 }
 
+//@depricated
 export function loadJSONFromFile(file: File): Promise<JSON> {
     return new Promise((resolve, reject) => {
         let reader = new FileReader();
@@ -94,6 +179,7 @@ export function loadJSONFromFile(file: File): Promise<JSON> {
     });
 }
 
+//@depricated
 export function loadImageFromFile(file: File): Promise<ImageData> {
     return new Promise((resolve, reject) => {
         let reader = new FileReader();
@@ -106,6 +192,7 @@ export function loadImageFromFile(file: File): Promise<ImageData> {
     });
 }
 
+//@depricated
 export function loadImageFromBlob(blob: Blob): Promise<ImageData> {
     return new Promise((resolve, reject) => {
         let reader = new FileReader();
@@ -118,6 +205,7 @@ export function loadImageFromBlob(blob: Blob): Promise<ImageData> {
     });
 }
 
+//@depricated
 export function loadImageFromSrc(src: string): Promise<ImageData> {
     return new Promise(function (resolve, reject) {
         let img = document.createElement("img") as HTMLImageElement;
