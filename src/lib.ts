@@ -85,8 +85,13 @@ export * from "./render/renderers/DebugRenderer";
 export * from "./render/renderers/ImageRenderer";
 export * from "./render/renderers/TextRenderer";
 
+export * from "./render/shaders/AmbientMeshShader";
 export * from "./render/shaders/BillboardShader";
+export * from "./render/shaders/DepthMeshShader";
 export * from "./render/shaders/DotShaderWithHeight";
+export * from "./render/shaders/PhongShader";
+export * from "./render/shaders/TemplateShader";
+export * from "./render/shaders/ZebraShader";
 
 export * from "./render/webgl/Attribute";
 export * from "./render/webgl/Attributes";
@@ -95,13 +100,17 @@ export * from "./render/webgl/HelpGl";
 export * from "./render/webgl/IndexAttribute";
 export * from "./render/webgl/Uniform";
 export * from "./render/webgl/Uniforms";
-export * from "./render/webgl/HelpGl";
 
 export * from "./render/shaders-old/_lib";
 
 export * from "./render/OldShader";
+
 export * from "./render/basics/Camera";
+export * from "./render/basics/Entity";
 export * from "./render/basics/Light";
+export * from "./render/basics/Material";
+export * from "./render/basics/Model";
+export * from "./render/basics/Renderable";
 export * from "./render/basics/Scene";
 
 export * from "./render/renderers/DebugRenderer";

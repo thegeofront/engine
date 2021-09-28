@@ -5,7 +5,7 @@
 		"esModuleInterop": true,
 		"experimentalDecorators": true,
 		"module": "commonjs",
-		"outDir": "build",
+		"outDir": "dist",
 		"removeComments": false,
 		"rootDir": "src",
 		"skipLibCheck": true,
