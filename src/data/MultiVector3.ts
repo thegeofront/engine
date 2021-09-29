@@ -1,5 +1,5 @@
 import { Geometry } from "../geometry/Geometry";
-import { Domain3, Util } from "../lib";
+import { Domain3, Util, Vector2 } from "../lib";
 import { Matrix4 } from "../math/Matrix4";
 import { Random } from "../math/Random";
 import { Vector3 } from "../math/Vector3";
@@ -59,7 +59,7 @@ export class MultiVector3 extends Geometry {
         return this._matrix.height;
     }
 
-    get matrix() : FloatMatrix {
+    get matrix(): FloatMatrix {
         return this._matrix;
     }
 
@@ -154,6 +154,10 @@ export class MultiVector3 extends Geometry {
     }
 
     to2D(): MultiVector2 {
+        let vec2 = MultiVector2.new(this.count);
+        this.forEach((v, i) => {
+            vec2.setXY(i, v.x, v.y);
+        });
         return MultiVector2.fromMatrix(this._matrix);
     }
 

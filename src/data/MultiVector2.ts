@@ -82,6 +82,17 @@ export class MultiVector2 extends Geometry {
         return clone;
     }
 
+    take(indices: number[]): MultiVector2 {
+        // create a new floatarray
+        const count = indices.length;
+        let array = MultiVector2.new(count);
+        for (let i = 0; i < count; i++) {
+            let getIndex = indices[i];
+            array.set(i, this.get(getIndex));
+        }
+        return array;
+    }
+
     set(i: number, vec: Vector2) {
         this._matrix.data[i * this._matrix.width + 0] = vec.x;
         this._matrix.data[i * this._matrix.width + 1] = vec.y;
