@@ -158,7 +158,7 @@ export class MultiVector3 extends Geometry {
         this.forEach((v, i) => {
             vec2.setXY(i, v.x, v.y);
         });
-        return MultiVector2.fromMatrix(this._matrix);
+        return vec2;
     }
 
     mean(): Vector3 {

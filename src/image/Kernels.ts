@@ -1,33 +1,64 @@
 import { FloatMatrix } from "../data/FloatMatrix";
+import { GeonImage } from "./Image";
 
 // kernels
 
 export class Kernels {
-    static readonly SmoothKernel = new FloatMatrix(3, 3, [1, 1, 1, 1, 1, 1, 1, 1, 1]).forEachValue(
+    //prettier-ignore
+    static readonly SmoothKernel = new FloatMatrix(3, 3, 
+        [1, 1, 1, 
+         1, 1, 1, 
+         1, 1, 1]).forEachValue(
         (i) => (i * 1) / 9,
     );
 
-    static readonly SmoothKernel5 = new FloatMatrix(
-        5,
-        5,
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    //prettier-ignore
+    static readonly SmoothKernel5 = new FloatMatrix(5, 5, [
+        1, 1, 1, 1, 1, 
+        1, 1, 1, 1, 1, 
+        1, 1, 1, 1, 1, 
+        1, 1, 1, 1, 1, 
+        1, 1, 1, 1, 1],
     ).forEachValue((v) => (v * 1) / 25);
 
-    static readonly Gauss5 = new FloatMatrix(
-        5,
-        5,
-        [2, 4, 5, 4, 2, 4, 9, 12, 9, 4, 5, 12, 15, 12, 5, 4, 9, 12, 9, 4, 2, 4, 5, 4, 2],
+    //prettier-ignore
+    static readonly Gauss5 = new FloatMatrix(5, 5,
+        [2, 4, 5, 4, 2, 
+         4, 9, 12, 9, 4, 
+        5, 12, 15, 12, 5, 
+         4, 9, 12, 9, 4, 
+         2, 4, 5, 4, 2],
     ).forEachValue((v) => (v * 1) / 159);
 
-    static readonly TestKernel = new FloatMatrix(3, 3, [1, 0, -1, 0, 0, 0, -1, 0, 1]);
+    //prettier-ignore
+    static readonly DiagonalKernel = new FloatMatrix(3, 3, 
+        [1, 0, -1, 
+         0, 0, 0, 
+        -1, 0, 1]);
 
-    static readonly SobelLeft = new FloatMatrix(3, 3, [1, 2, 1, 0, 0, 0, -1, -2, -1]);
+    //prettier-ignore
+    static readonly SobelLeft = new FloatMatrix(3, 3, 
+        [1, 2, 1, 
+        0, 0, 0, 
+        -1, -2, -1]);
 
-    static readonly SobelRight = new FloatMatrix(3, 3, [-1, -2, -1, 0, 0, 0, 1, 2, 1]);
+    //prettier-ignore
+    static readonly SobelRight = new FloatMatrix(3, 3, 
+        [-1, -2, -1, 
+         0, 0, 0, 
+         1, 2, 1]);
 
-    static readonly SobelUp = new FloatMatrix(3, 3, [1, 0, -1, 2, 0, -2, 1, 0, -1]);
+    //prettier-ignore
+    static readonly SobelUp = new FloatMatrix(3, 3, 
+        [1, 0, -1, 
+         2, 0, -2, 
+         1, 0, -1]);
 
-    static readonly SobelDown = new FloatMatrix(3, 3, [-1, 0, 1, -2, 0, 2, -1, 0, 1]);
+    //prettier-ignore
+    static readonly SobelDown = new FloatMatrix(3, 3, 
+        [-1, 0, 1, 
+         -2, 0, 2, 
+         -1, 0, 1]);
 
     // inspired from https://github.com/yuta1984/CannyJS/blob/master/canny.js
     static generateGaussianKernel(sigmma: number, size: number) {
