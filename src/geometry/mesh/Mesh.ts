@@ -463,10 +463,10 @@ export class Mesh {
                     Math.cos(beta) * Math.cos(alpha),
                     Math.cos(beta) * Math.sin(alpha),
                     Math.sin(beta),
-                );
+                ).normalize();
 
                 normals.set(i * vertCount + j, normal);
-                verts.set(i * vertCount + j, normal.add(ringCenter));
+                verts.set(i * vertCount + j, normal.scale(r2).add(ringCenter));
             }
         }
 

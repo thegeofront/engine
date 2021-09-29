@@ -56,14 +56,14 @@ export class DebugRenderer {
     /**
      * Creates a new shader, or updates existing shader
      */
-    set(unit: RenderableUnit, key?: string) {
+    set(unit: RenderableUnit, key?: string, ...options: any[]) {
         if (!key) {
             key = createRandomGUID().slice(0, 8);
         }
 
         let shader = this.shaders.get(key);
         if (!shader) {
-            return this.add(key, unit);
+            return this.add(key, unit, ...options);
         }
 
         // If the type definitions above are set correctly
@@ -84,7 +84,6 @@ export class DebugRenderer {
     }
 
     onChange(key: string, state: boolean) {
-        console.log(state);
         if (state) {
             this.activeShaders.add(key);
         } else {
@@ -98,14 +97,14 @@ export class DebugRenderer {
         }
     }
 
-    private add(key: string, unit: RenderableUnit) {
+    private add(key: string, unit: RenderableUnit, ...options: any[]) {
         let shader;
         let gl = this.gl;
 
         // determine the RenderableUnit type
         // rely as much on the defaults as possilbe
         if (unit instanceof MultiVector3) {
-            shader = new DotShader(gl);
+            shader = new DotShader(gl, ...options);
             shader.set(unit);
         } else if (unit instanceof ShaderMesh) {
             shader = new ShadedMeshShader(gl);
@@ -115,23 +114,23 @@ export class DebugRenderer {
             let smesh = unit.ToShaderMesh();
             shader.set(smesh);
         } else if (unit instanceof BiSurface) {
-            shader = new MeshDebugShader(gl);
+            shader = new MeshDebugShader(gl, ...options);
             let smesh = unit.buffer().ToShaderMesh();
             shader.set(smesh);
         } else if (unit instanceof Curve) {
-            shader = new LineShader(gl);
+            shader = new LineShader(gl, ...options);
             let multiLine = unit.buffer();
             shader.set(multiLine);
         } else if (unit instanceof Polyline) {
-            shader = new LineShader(gl);
+            shader = new LineShader(gl, ...options);
             let multiLine = MultiLine.fromPolyline(unit);
             shader.set(multiLine);
         } else if (unit instanceof Plane) {
-            shader = new LineShader(gl);
+            shader = new LineShader(gl, ...options);
             let multiLine = MultiLine.fromPlane(unit);
             shader.set(multiLine);
         } else if (unit instanceof MultiLine) {
-            shader = new LineShader(gl);
+            shader = new LineShader(gl, ...options);
             shader.set(unit);
         } else if (unit instanceof ImageMesh) {
             shader = new TextureMeshShader(gl);
