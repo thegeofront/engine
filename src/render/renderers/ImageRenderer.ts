@@ -38,8 +38,7 @@ export class ImageRenderer {
         this.images.forEach((image, i) => {
             let mesh = ShaderMesh.fromImage(
                 image,
-                Vector3.new(accumulatedWidth, 0, 0),
-                Vector3.unitZ(),
+                Plane.WorldXY().moveTo(Vector3.new(accumulatedWidth, 0, 0)),
                 false,
                 100,
             );

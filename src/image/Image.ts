@@ -7,22 +7,26 @@
 
 import { Domain2 } from "../math/Domain";
 import { FloatMatrix } from "../data/FloatMatrix";
+import { ImageProcessing } from "./ImageProcessing";
 
 // TODO : x and y are not the same as i and j, and used inconsistently. fix this.
 // TODO : now that GEON is a package, we can use G.Image. the Geon suffix is not needed anymore is not needed anymore!
 const acceptedKernels: number[] = [3, 5, 7, 9];
 export class GeonImage {
-    private data: Uint8ClampedArray;
+    public data: Uint8ClampedArray;
     public readonly width: number;
     public readonly height: number;
     public readonly pixelSize: number;
 
-    constructor(width: number, height: number, pixelSize: number = 4) {
+    constructor(width: number, height: number, pixelSize: number = 4, data?: Uint8ClampedArray) {
         this.width = width;
         this.height = height;
         this.pixelSize = pixelSize;
-        this.data = new Uint8ClampedArray(this.width * this.height * this.pixelSize);
-        this.data.fill(0);
+        if (data) {
+            this.data = data;
+        } else {
+            this.data = new Uint8ClampedArray(this.width * this.height * this.pixelSize);
+        }
     }
 
     static new(width: number, height: number) {
@@ -37,7 +41,12 @@ export class GeonImage {
 
     toImageData(): ImageData {
         // imagedata requires pixelsize of 4.
-        if (this.pixelSize != 4) throw "pixelsize must be 4 for toImageData to work";
+        if (this.pixelSize == 1) {
+            console.log("conferting to rgba...");
+            return ImageProcessing.imagedataFromTrueGreyscale(this);
+        } else if (this.pixelSize != 4) {
+            throw "pixelsize must be 4 for toImageData to work";
+        }
         return new ImageData(this.data, this.width, this.height);
     }
 
@@ -78,6 +87,36 @@ export class GeonImage {
                 this.set(j, i, filler(j, i));
             }
         }
+    }
+
+    /**
+     * Perform an operation to every pixel of an image
+     */
+    forEachPixel(operation: (pixel: number[], i: number, j: number) => number[]) {
+        let result = new GeonImage(this.width, this.height, this.pixelSize);
+        for (let i = 0; i < this.width; i++) {
+            for (let j = 0; j < this.height; j++) {
+                let pixel = this.get(i, j);
+                pixel = operation(pixel, i, j);
+                result.set(i, j, pixel);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Perform an operation to every pixel of a 'greyscale' image
+     */
+    forEachGreyscalePixel(operation: (val: number, i: number, j: number) => number) {
+        let result = new GeonImage(this.width, this.height, this.pixelSize);
+        for (let i = 0; i < this.width; i++) {
+            for (let j = 0; j < this.height; j++) {
+                let val = this.get(i, j)[0];
+                val = operation(val, i, j);
+                result.set(i, j, [val, val, val, 255]);
+            }
+        }
+        return result;
     }
 
     includes(x: number, y: number): boolean {
@@ -186,46 +225,7 @@ export class GeonImage {
         return copy;
     }
 
-    applyNMS(): GeonImage {
-        // determine kernel size
-        let size = 3;
-        let radius = size / 2 - 0.5;
-        let copy = new GeonImage(this.width - radius * 2, this.height - radius * 2, this.pixelSize);
-
-        // old image space
-        for (let i = radius; i < this.width - radius; i++) {
-            for (let j = radius; j < this.height - radius; j++) {
-                // let pixel = this.getWithKernel(i, j, kernel, radius)
-                // copy.set(i-radius, j-radius, pixel);
-            }
-        }
-
-        // img.eachPixel(3, function(x, y, c, n) {
-        //     if (n[1][1] > n[0][1] && n[1][1] > n[2][1]) {
-        //         copy.data[x][y] = n[1][1];
-        //     } else {
-        //         copy.data[x][y] = 0;
-        //     }
-        //     if (n[1][1] > n[0][2] && n[1][1] > n[2][0]) {
-        //         copy.data[x][y] = n[1][1];
-        //     } else {
-        //         copy.data[x][y] = 0;
-        //     }
-        //     if (n[1][1] > n[1][0] && n[1][1] > n[1][2]) {
-        //         copy.data[x][y] = n[1][1];
-        //     } else {
-        //         copy.data[x][y] = 0;
-        //     }
-        //     if (n[1][1] > n[0][0] && n[1][1] > n[2][2]) {
-        //         return copy.data[x][y] = n[1][1];
-        //     } else {
-        //         return copy.data[x][y] = 0;
-        //     }
-        // });
-        return copy;
-    }
-
-    private getWithKernel(i: number, j: number, kernel: FloatMatrix, radius: number): number[] {
+    getWithKernel(i: number, j: number, kernel: FloatMatrix, radius: number): number[] {
         // kernel space
         let sum = [0, 0, 0, 255];
         let [dimx, dimy] = kernel.getDimensions();

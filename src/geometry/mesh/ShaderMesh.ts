@@ -103,14 +103,12 @@ export class ShaderMesh implements Renderable {
 
     static fromImage(
         image: GeonImage,
-        pos = Vector3.zero(),
-        normal = Vector3.unitZ(),
+        plane: Plane,
         centered = true,
         scale = 1,
         fixWebglLimitation = true,
         bothSides = true,
     ): ShaderMesh {
-        let plane = Plane.fromPN(pos, normal);
 
         let domain;
         if (centered) {
@@ -135,8 +133,9 @@ export class ShaderMesh implements Renderable {
 
         // note: webgl can only work with 2^x images
         if (fixWebglLimitation) {
-            let goodWidth = HelpGl.fixTextureSizing(image.width);
-            let goodHeight = HelpGl.fixTextureSizing(image.height);
+
+            let goodWidth = HelpGl.getNearestCorrectTextureSize(image.width);
+            let goodHeight = HelpGl.getNearestCorrectTextureSize(image.height);
             if (goodWidth !== image.width || goodHeight !== image.height) {
                 // we need to perform resizing!
                 console.log("resizing to ", goodWidth, goodHeight);

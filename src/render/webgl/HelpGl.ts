@@ -1,5 +1,7 @@
 // purpose : webgl wrapping & helper functions
 
+import { GeonImage } from "../../image/Image";
+
 var nextTextureId = 0;
 var rendercallsperframe = 0;
 
@@ -13,9 +15,6 @@ export enum DrawSpeed {
 }
 
 export class HelpGl {
-    private constructor() {}
-
-    static new() {}
 
     /**
      * We need to keep track of all textures in the entire webgl application
@@ -116,8 +115,21 @@ export class HelpGl {
      * This means `32x512` is valid, while `40x40` is not valid
      * This function takes a size, lets say `40`, and rounds up to the nearest power of two, in this case `64`
      */
-    static fixTextureSizing(size: number) {
+    static getNearestCorrectTextureSize(size: number) {
         let base = Math.log2(size);
         return Math.pow(2, Math.ceil(base));
+    }
+
+    static fixTextureSizing(image: GeonImage) : GeonImage {
+        let goodWidth = HelpGl.getNearestCorrectTextureSize(image.width);
+        let goodHeight = HelpGl.getNearestCorrectTextureSize(image.height);
+        if (goodWidth !== image.width || goodHeight !== image.height) {
+            // we need to perform resizing!
+            console.log("resizing to ", goodWidth, goodHeight);
+            let u = image.width / goodWidth;
+            let v = image.height / goodHeight;
+            return image.buffer(goodWidth, goodHeight);;
+        }
+        return image;
     }
 }
