@@ -6,7 +6,7 @@ import { Vector3 } from "../math/Vector3";
 import { MultiLine } from "./mesh/MultiLine";
 import { Mesh } from "./mesh/Mesh";
 import { Circle2 } from "./Circle2";
-import { Plane } from "./plane";
+import { Plane } from "./Plane";
 
 export class Circle3 {
     plane: Plane;
