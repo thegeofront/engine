@@ -32,7 +32,7 @@ export * from "./geometry/Circle3";
 export * from "./geometry/Cube";
 export * from "./geometry/Intersect";
 export * from "./geometry/Line";
-export * from "./geometry/plane";
+export * from "./geometry/Plane";
 export * from "./geometry/Rectangle";
 export * from "./geometry/Triangle";
 

@@ -3,7 +3,7 @@
 // notes:   found some nice examples at https://www.cs.princeton.edu/courses/archive/fall00/cs426/lectures/raycast/sld004.htm
 
 import { MultiLine } from "../geometry/mesh/MultiLine";
-import { Plane } from "../geometry/plane";
+import { Plane } from "../geometry/Plane";
 import { Vector3 } from "./Vector3";
 
 export class Ray {

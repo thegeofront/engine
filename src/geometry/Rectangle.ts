@@ -12,7 +12,7 @@ import { Vector2 } from "../math/Vector2";
 
 import { Vector3 } from "../math/Vector3";
 import { Geometry } from "./Geometry";
-import { Plane } from "./plane";
+import { Plane } from "./Plane";
 
 export class Rectangle2 {
     pose: Matrix3;
