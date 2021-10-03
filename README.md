@@ -21,6 +21,7 @@ This will produce ```index.js``` within the build folder. To use it, run a local
 ## TODO
 
 - [✔️] Refactor entire codebase to make it look more like `three.js`
+- [ ] Add image processing basics, like sobel & canny operations 
 - [ ] Build a blender-style glossy mesh shader with filleted edges
 - [ ] Create a maze using marching cubes
 - [ ] 
