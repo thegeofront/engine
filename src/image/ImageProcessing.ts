@@ -3,7 +3,6 @@ import { GeonImage } from "./Image";
 import { Kernels } from "./Kernels";
 
 export namespace ImageProcessing {
-
     export function imagedataFromTrueGreyscale(grey: GeonImage) {
         let rgba = new Uint8ClampedArray(grey.width * grey.height * 4);
 
@@ -62,16 +61,11 @@ export namespace ImageProcessing {
         return grey;
     }
 
-    export function gaussianBlur5(image: GeonImage): GeonImage {
-        image = image.applyKernel(Kernels.Gauss5);
-        return image;
-    }
-
     /**
      * This performs a pythagorean sum of a vertical & horizontal sobel kernel.
      * @returns [gradient: GeonImage, direction: GeonImage]
      */
-    export function sobel(image: GeonImage): [GeonImage, GeonImage] {
+    export function sobelMD(image: GeonImage): [GeonImage, GeonImage] {
         let kernelLeft = Kernels.SobelLeft;
         let kernelUp = Kernels.SobelUp;
 
@@ -80,13 +74,22 @@ export namespace ImageProcessing {
         let newWidth = image.width - radius * 2;
         let newHeight = image.height - radius * 2;
 
-        let gradientImage = new GeonImage(newWidth, newHeight, image.pixelSize);
+        let magnitudeImage = new GeonImage(newWidth, newHeight, image.pixelSize);
         let directionImage = new GeonImage(newWidth, newHeight, image.pixelSize);
 
         for (let i = radius; i < image.width - radius; i++) {
             for (let j = radius; j < image.height - radius; j++) {
-                let deltaX = image.getWithKernel(i, j, kernelLeft, radius)[0];
-                let deltaY = image.getWithKernel(i, j, kernelUp, radius)[0];
+                
+                let pixelX = image.getWithKernel(i, j, kernelLeft, radius);
+                let pixelY = image.getWithKernel(i, j, kernelUp, radius);
+
+                let deltaX = pixelX[0];
+                let deltaY = pixelY[0];
+                
+                // note: this was an idea do use all color differences, instead of just greyscale colors. Results are unpredictable however...
+                // take the maximum color difference;
+                // let deltaX = Math.sqrt(pixelX[0] * pixelX[0] + pixelX[1] * pixelX[1] + pixelX[2] * pixelX[2]) / 2; 
+                // let deltaY = Math.sqrt(pixelY[0] * pixelY[0] + pixelY[1] * pixelY[1] + pixelY[2] * pixelY[2]) / 2; 
 
                 let gradient = Math.pow(deltaX * deltaX + deltaY * deltaY, 0.5);
 
@@ -94,11 +97,11 @@ export namespace ImageProcessing {
                 let desJ = j - radius;
 
                 directionImage.set(desI, desJ, [(deltaX + 255) / 2, (deltaY + 255) / 2, 255, 255]);
-                gradientImage.set(desI, desJ, [gradient, gradient, gradient, 255]);
+                magnitudeImage.set(desI, desJ, [gradient, gradient, gradient, 255]);
             }
         }
 
-        return [gradientImage, directionImage];
+        return [magnitudeImage, directionImage];
     }
 
     /**
@@ -106,10 +109,8 @@ export namespace ImageProcessing {
      *
      */
     export function thetaMap(direction: GeonImage) {
-
         console.time();
         let result = direction.forEachPixel((pixel, i, j) => {
-            
             // get the angle a (x,y) vector makes with a (1,0) vector. result From -PI to PI.
             let theta = Math.atan2(pixel[1] - 128, pixel[0] - 128);
 
@@ -119,7 +120,7 @@ export namespace ImageProcessing {
             // put back into a greyscale image
             theta = theta * 255;
             return [theta, theta, theta, 255];
-        })
+        });
 
         return result;
     }
@@ -127,82 +128,80 @@ export namespace ImageProcessing {
     /**
      * Clamp a theta-map to `x` number of directions
      */
-    export function clampDirections(theta: GeonImage, numberOfDirections: number) {
-        let result = theta.forEachGreyscalePixel((val) => {
-            return Math.round((val / 255) * numberOfDirections) % numberOfDirections;
-        })
+    export function clampGreyscale(image: GeonImage, numberOfValues: number) {
+        let result = image.forEachGreyscalePixel((val) => {
+            return Math.round((val / 255) * numberOfValues) % numberOfValues;
+        });
         return result;
     }
 
     /**
      *
      */
-    export function thinSobelEdges(gradient: GeonImage, eightDirectionalTheta: GeonImage) {
-        
-        let radius = 1;
-        let newWidth = gradient.width - radius * 2;
-        let newHeight = gradient.height - radius * 2;
+    export function cannyNonMaximumSuppression(magnitude: GeonImage, direction: GeonImage) {
 
-        let thinned = new GeonImage(newWidth, newHeight, gradient.pixelSize);
-  
-        for (let i = radius; i < gradient.width - radius; i++) {
-            for (let j = radius; j < gradient.height - radius; j++) {
-                
+        // dir is from 0 to 255
 
-                thinned.set(i-radius, j-radius, [255, 255, 255, 255]);
+        let magGet = (i: number, j: number) => {
+            return magnitude.get(i, j)[0];
+        }
+
+        let range = 1;
+        let result = new GeonImage(magnitude.width-range*2, magnitude.height-range*2, magnitude.pixelSize);
+
+        for (let i = range; i < magnitude.width-range; i++) {
+            for (let j = range; j < magnitude.height-range; j++) {
+                const mag = magGet(i, j);
+                const dir = direction.get(i, j)[0] % 128;
+
+                let val = mag;
+
+                // per direction bucket (dir is angle from 0 to 255)
+                if (dir >= 16 && dir < 48) {
+                    // diagonal-/
+                    if (magGet(i+1, j+1) > mag || magGet(i-1, j-1) > mag) val = 0;
+                } else if (dir >= 48 && dir < 80) {
+                    // vertical
+                    if (magGet(i, j-1) > mag || magGet(i, j+1) > mag) val = 0;
+                } else if (dir >= 80 && dir < 112) {
+                    // diagonal-\
+                    if (magGet(i+1, j-1) > mag || magGet(i-1, j+1) > mag) val = 0;
+                } else {
+                    // horizontal
+                    if (magGet(i-1, j) > mag || magGet(i+1, j) > mag) val = 0;
+                }
+
+                result.set(i, j, [val, val, val, 255]);
             }
         }
-        return thinned;
+    
+        return result;
+    }
+
+
+    export function cannyThreshold(image: GeonImage, lower: number, upper: number, weakValue: number, strongValue: number) {
+        let result = image.forEachGreyscalePixel((val)=> {
+            if (val < lower) {
+                return 0;
+            } else if (val >= lower && val < upper) {
+                return weakValue;
+            } else {
+                return strongValue;
+            }
+        })
+        return result;
+    }
+
+
+    export function cannyHysteresis() {
+        // TODO
     }
 
     export function canny(original: GeonImage) {
         let grey = original.toGreyscale();
-        let blurred = ImageProcessing.gaussianBlur5(grey);
-        let [gradient, direction] = ImageProcessing.sobel(blurred);
+        let blurred = grey.applyKernel(Kernels.Gauss5);
+        let [magnitude, direction] = ImageProcessing.sobelMD(blurred);
         let theta = ImageProcessing.thetaMap(direction);
-        let thetaClamped = ImageProcessing.clampDirections(theta, 8);
-    }
-
-    function applyNMS(image: GeonImage): GeonImage {
-        // determine kernel size
-        let size = 3;
-        let radius = size / 2 - 0.5;
-        let copy = new GeonImage(
-            image.width - radius * 2,
-            image.height - radius * 2,
-            image.pixelSize,
-        );
-
-        // old image space
-        for (let i = radius; i < image.width - radius; i++) {
-            for (let j = radius; j < image.height - radius; j++) {
-                // let pixel = this.getWithKernel(i, j, kernel, radius)
-                // copy.set(i-radius, j-radius, pixel);
-            }
-        }
-
-        // img.eachPixel(3, function(x, y, c, n) {
-        //     if (n[1][1] > n[0][1] && n[1][1] > n[2][1]) {
-        //         copy.data[x][y] = n[1][1];
-        //     } else {
-        //         copy.data[x][y] = 0;
-        //     }
-        //     if (n[1][1] > n[0][2] && n[1][1] > n[2][0]) {
-        //         copy.data[x][y] = n[1][1];
-        //     } else {
-        //         copy.data[x][y] = 0;
-        //     }
-        //     if (n[1][1] > n[1][0] && n[1][1] > n[1][2]) {
-        //         copy.data[x][y] = n[1][1];
-        //     } else {
-        //         copy.data[x][y] = 0;
-        //     }
-        //     if (n[1][1] > n[0][0] && n[1][1] > n[2][2]) {
-        //         return copy.data[x][y] = n[1][1];
-        //     } else {
-        //         return copy.data[x][y] = 0;
-        //     }
-        // });
-        return copy;
+        let thetaClamped = ImageProcessing.clampGreyscale(theta, 8);
     }
 }

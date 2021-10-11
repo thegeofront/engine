@@ -101,4 +101,8 @@ export class Kernels {
         }
         return kernel;
     }
+
+    static buildSobelKernel(x: number, y: number) {
+        // TODO
+    }
 }

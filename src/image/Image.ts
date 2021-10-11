@@ -5,6 +5,10 @@
 //
 // note: named GeonImage to not collide with Image classes.
 
+// PROBLEM: this should be just a normal 2d uint16 matrix or something. 
+// troubles occur with sobel operators, which go negative.
+// its too many layers, this image abstraction should not be needed.  
+
 import { Domain2 } from "../math/Domain";
 import { FloatMatrix } from "../data/FloatMatrix";
 import { ImageProcessing } from "./ImageProcessing";
