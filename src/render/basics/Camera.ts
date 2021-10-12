@@ -18,7 +18,7 @@ export class Camera {
     zNear = 0.01;
 
     // other consts
-    speed = 1;
+    speed = 10;
 
     worldPlane = Plane.WorldXY();
 

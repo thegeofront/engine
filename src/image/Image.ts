@@ -12,6 +12,8 @@
 import { Domain2 } from "../math/Domain";
 import { FloatMatrix } from "../data/FloatMatrix";
 import { ImageProcessing } from "./ImageProcessing";
+import { BiSurface, Vector2 } from "../lib";
+import { Color } from "./Color";
 
 // TODO : x and y are not the same as i and j, and used inconsistently. fix this.
 // TODO : now that GEON is a package, we can use G.Image. the Geon suffix is not needed anymore is not needed anymore!
@@ -141,6 +143,71 @@ export class GeonImage {
             this.data[4 * (j * this.width + i) + 2],
             this.data[4 * (j * this.width + i) + 3],
         ];
+    }
+
+    getWithIndex(index: number) {
+        return [
+            this.data[4 * index],
+            this.data[4 * index + 1],
+            this.data[4 * index + 2],
+            this.data[4 * index + 3],
+        ];
+    }
+
+    setWithIndex(index: number, value: number[]) {
+        this.data[4 * index] = value[0];
+        this.data[4 * index + 1] = value[1];
+        this.data[4 * index + 2] = value[2];
+        this.data[4 * index + 3] = value[3];
+    }
+
+    // NOTE: this should be fixed on the level of an nD array
+
+    vecToIndex(x: number, y: number) {
+        return  y * this.width + x;
+    }
+
+    indexToVec(index: number) {
+        let base = Math.floor(index / this.width);
+        let left = index - base * this.width;
+        return Vector2.new(left, base);
+    }
+
+    getNbIndices(index: number) {
+        let nbs = new Array<number>();
+
+        if (index >= this.width * this.height) return nbs;
+
+        // make sure we dont add out of bound dudes
+        if (index % this.width != 0) nbs.push(index - 1);
+        if ((index+1) % this.width != 0) nbs.push(index + 1);
+        if (index - this.width > 0) nbs.push(index - this.width);
+        if (index + this.width < this.width * this.height) nbs.push(index + this.width);
+
+        return nbs;
+    }
+
+    getNbIndices8(index: number) {
+        let nbs = new Array<number>();
+        let size = this.width * this.height;
+        if (index >= size) return nbs;
+
+        let hasLeft = index % this.width != 0;
+        let hasRight = (index+1) % this.width != 0;
+        let hasTop = index - this.width > 0;
+        let hasBot = index + this.width < size;
+
+        if (hasLeft) nbs.push(index - 1);
+        if (hasRight) nbs.push(index + 1);
+        if (hasTop) nbs.push(index - this.width);
+        if (hasBot) nbs.push(index + this.width);
+
+        if (hasTop && hasLeft)  nbs.push(index - this.width - 1);
+        if (hasTop && hasRight)  nbs.push(index - this.width + 1);
+        if (hasBot && hasLeft) nbs.push(index + this.width - 1);
+        if (hasBot && hasRight) nbs.push(index + this.width + 1);
+
+        return nbs;
     }
 
     flipHor(): GeonImage {
@@ -364,5 +431,70 @@ export class GeonImage {
         //     }
         // }
         // return image;
+    }
+
+    /**
+     * Do a bucketfill (like the ms-paint tool)
+     */
+    bucketFill(start: Vector2, color: Color, diagonals = false) : void {
+
+        let startColor = this.get(start.x, start.y);
+        let fillColor = color.toInt();
+
+        let visitCondition = (val: number) : boolean => {
+            let color = this.getWithIndex(val);
+            return color[0] == startColor[0] && color[1] == startColor[1] && color[2] == startColor[2] && color[3] == startColor[3];
+        }
+
+        let visitAction = (val: number) => {
+            this.setWithIndex(val, fillColor);
+        }
+
+        let getNeighbors: (val: number) => Array<number>;
+
+        if (diagonals) {
+            getNeighbors = this.getNbIndices8.bind(this)
+        } else {
+            getNeighbors = this.getNbIndices.bind(this)
+        }
+
+        this.bucketFillCustom(start, visitCondition, visitAction, getNeighbors);
+    }
+
+
+    /**
+     * Do a custom bucketfill (like the ms-paint tool)
+     * @param image 
+     * @param start 
+     * @param visitCondition if this returns true, we should visit the pixel with this index 
+     * @param visitAction what to do at a visit
+     * @param getNeighbors how to get the neighoring indices
+     */
+    bucketFillCustom(
+        start: Vector2, 
+        visitCondition: (index: number) => boolean, 
+        visitAction: (index: number) => void, 
+        getNeighbors: (val: number) => Array<number>) {
+
+        let checked = new Set<number>();
+        let toVisit = new Array<number>();
+
+        let startIndex = this.vecToIndex(start.x, start.y); 
+
+        toVisit.push(startIndex);
+        checked.add(startIndex);
+
+        while (toVisit.length > 0) {
+            let cursor = toVisit.pop()!;
+            
+            visitAction(cursor);
+
+            for (let nb of getNeighbors(cursor)) {
+                if (checked.has(nb)) continue;
+                checked.add(nb);
+                if (!visitCondition(nb)) continue;
+                toVisit.push(nb);
+            }
+        }
     }
 }

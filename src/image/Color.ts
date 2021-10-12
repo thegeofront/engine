@@ -76,6 +76,17 @@ export class Color {
         return Color.fromRGB(r,g,b,a)
     }
 
+    static fromInt(list: number[]) {
+        return new Color(list.map(v => v / 255));
+    }
+
+    toInt() {
+        let process = (n: number) => {
+            return Math.round(n * 255);
+        }
+        return [process(this.r), process(this.g), process(this.b), process(this.a)]
+    }
+
     toHex8() {
         let process = (n: number) => {
             let str = Math.round(n * 255).toString(16);

@@ -1,4 +1,5 @@
-import { DebugRenderer, ImageMesh, Plane, Vector3 } from "../lib";
+import { DebugRenderer, ImageMesh, Plane, Vector2, Vector3 } from "../lib";
+import { Color } from "./Color";
 import { GeonImage } from "./Image";
 import { Kernels } from "./Kernels";
 
@@ -60,6 +61,8 @@ export namespace ImageProcessing {
 
         return grey;
     }
+
+    // ------ [ CANNY EDGE DETECTION ] --------
 
     /**
      * This performs a pythagorean sum of a vertical & horizontal sobel kernel.
@@ -193,9 +196,32 @@ export namespace ImageProcessing {
     }
 
 
-    export function cannyHysteresis() {
-        // TODO
+    export function cannyHysteresis(image: GeonImage, weakValue: number, strongValue: number) {
+        
+        let result = GeonImage.new(image.width, image.height);
+        
+        let condition = (index: number) => {
+            let val = image.getWithIndex(index)[0];
+            return val == weakValue;
+        };
+
+        let action = (index: number) => {
+            result.setWithIndex(index, [strongValue, strongValue, strongValue, 255]);
+        }
+
+        let count = image.width * image.height;
+        for (let i = 0; i < count; i++) {
+            let pixel = image.getWithIndex(i)[0];
+            if (pixel != strongValue) continue;
+            
+            let vec =  image.indexToVec(i);
+            image.bucketFillCustom(vec, condition, action, image.getNbIndices8.bind(image));
+            // break;
+            // fill all adjacent weakvalues recursively
+        }
+        return result;
     }
+
 
     export function canny(original: GeonImage) {
         let grey = original.toGreyscale();
@@ -203,5 +229,12 @@ export namespace ImageProcessing {
         let [magnitude, direction] = ImageProcessing.sobelMD(blurred);
         let theta = ImageProcessing.thetaMap(direction);
         let thetaClamped = ImageProcessing.clampGreyscale(theta, 8);
+    }
+
+
+    export function bucketFill(image: GeonImage, start: Vector2, color: Color, diagonal=false) : GeonImage {
+        image.clone();
+        image.bucketFill(start, color, diagonal);
+        return image;
     }
 }
