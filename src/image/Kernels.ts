@@ -61,10 +61,10 @@ export class Kernels {
          -1, 0, 1]);
 
     // inspired from https://github.com/yuta1984/CannyJS/blob/master/canny.js
-    static generateGaussianKernel(sigmma: number, size: number) {
+    static generateGaussianKernel(sigma: number, size: number) {
         // messy, probably auto-generated
         var e, gaussian, i, j, kernel, s, sum, x, y, _i, _j, _k, _l, _ref, _ref1, _ref2, _ref3;
-        s = sigmma;
+        s = sigma;
         e = 2.718;
         kernel = new FloatMatrix(size, size);
         sum = 0;

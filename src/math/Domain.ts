@@ -3,6 +3,12 @@
 // author: Jos Feenstra
 // purpose: general representation of a domain / range / bound of numbers
 
+// TODO: give domain a stride / step. 
+//       - redivide 
+//       - fromDivide()
+//       - default: 1 
+//       - 
+
 import { Matrix4, MultiVector2, MultiVector3, Vector3 } from "../lib";
 import { Vector2 } from "./Vector2";
 import { Stopwatch } from "../util/Stopwatch";

@@ -112,7 +112,7 @@ export namespace ImageProcessing {
      *
      */
     export function thetaMap(direction: GeonImage) {
-        console.time();
+
         let result = direction.forEachPixel((pixel, i, j) => {
             // get the angle a (x,y) vector makes with a (1,0) vector. result From -PI to PI.
             let theta = Math.atan2(pixel[1] - 128, pixel[0] - 128);

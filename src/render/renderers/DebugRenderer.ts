@@ -53,6 +53,11 @@ export class DebugRenderer {
         return new DebugRenderer(gl, new Map(), new Set());
     }
 
+    clear() {
+        this.shaders.clear();
+        this.activeShaders.clear();
+    }
+
     /**
      * Creates a new shader, or updates existing shader
      */
@@ -66,10 +71,7 @@ export class DebugRenderer {
             return this.add(key, unit, ...options);
         }
 
-        // If the type definitions above are set correctly
-        // and if the 'add' procedure went correctly, this will work
-        //@ts-ignore
-        shader?.set(unit);
+        this.multiSet(key, unit, ...options);
         return shader;
     }
 
@@ -94,6 +96,51 @@ export class DebugRenderer {
     render(c: Scene) {
         for (let key of this.activeShaders) {
             this.shaders.get(key)!.render(c);
+        }
+    }
+
+    private multiSet(key: string, unit: RenderableUnit, ...options: any[]) {
+
+        // NOTE: If the type definitions above are set correctly
+        // and if the 'add' procedure went correctly, this will work
+        // thats why i'm liberal with the @ts ignores 
+        let gl = this.gl;
+        let shader = this.shaders.get(key);
+        if (unit instanceof MultiVector3) {
+            //@ts-ignore
+            shader.set(unit);
+        } else if (unit instanceof ShaderMesh) {
+            //@ts-ignore
+            shader.set(unit);
+        } else if (unit instanceof Mesh) {
+            let smesh = unit.ToShaderMesh();
+            //@ts-ignore
+            shader.set(smesh);
+        } else if (unit instanceof BiSurface) {
+            let smesh = unit.buffer().ToShaderMesh();
+            //@ts-ignore
+            shader.set(smesh);
+        } else if (unit instanceof Curve) {
+            let multiLine = unit.buffer();
+            //@ts-ignore
+            shader.set(multiLine);
+        } else if (unit instanceof Polyline) {
+            let multiLine = MultiLine.fromPolyline(unit);
+            //@ts-ignore
+            shader.set(multiLine);
+        } else if (unit instanceof Plane) {
+            let multiLine = MultiLine.fromPlane(unit);
+            //@ts-ignore
+            shader.set(multiLine);
+        } else if (unit instanceof MultiLine) {
+            //@ts-ignore
+            shader.set(unit);
+        } else if (unit instanceof ImageMesh) {
+            //@ts-ignore
+            shader.set(unit.buffer(), DrawSpeed.StaticDraw);
+        } else {
+            console.error("MultiRenderer cannot render: ", unit);
+            return undefined;
         }
     }
 

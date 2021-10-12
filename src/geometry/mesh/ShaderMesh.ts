@@ -138,7 +138,7 @@ export class ShaderMesh implements Renderable {
             let goodHeight = HelpGl.getNearestCorrectTextureSize(image.height);
             if (goodWidth !== image.width || goodHeight !== image.height) {
                 // we need to perform resizing!
-                console.log("resizing to ", goodWidth, goodHeight);
+                // console.log("resizing to ", goodWidth, goodHeight);
                 let u = image.width / goodWidth;
                 let v = image.height / goodHeight;
 

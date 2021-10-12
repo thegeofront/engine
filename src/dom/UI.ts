@@ -55,7 +55,8 @@ export class UI {
     }
 
     setContext(appName: string) {
-        this.globalContext.getElementsByClassName(appName);
+        let appDiv = this.globalContext.querySelector("." + appName)! as HTMLDivElement;
+        this.currentContext = appDiv;
     }
 
     removeContext(appName: string) {
