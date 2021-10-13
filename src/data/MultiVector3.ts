@@ -125,17 +125,13 @@ export class MultiVector3 extends Geometry {
         return array;
     }
 
-    map(callbackfn: (value: Vector3, index: number) => any): MultiVector3 {
+    map(callbackfn: (value: Vector3, index: number) => Vector3): MultiVector3 {
         let clone = this.clone();
 
         for (let i = 0; i < this.count; i++) {
             let vec = this.get(i);
-            let result = callbackfn(vec, i)!;
-            if (result instanceof Vector3) {
-                clone.set(i, result);
-            } else {
-                clone.set(i, vec);
-            }
+            let result = callbackfn(vec, i);
+            clone.set(i, result);
         }
         return clone;
     }

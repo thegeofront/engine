@@ -286,7 +286,7 @@ export class ShaderMesh implements Renderable {
         this.calculateFaceNormals();
         let vertNormals = this.mesh.verts.map((v, i) => {
             let adjFaces = this.getAdjacentFaces(i);
-            vertNormals.set(i, this.norms.take(adjFaces).average());
+            return this.norms.take(adjFaces).average();
         });
 
         this.norms = vertNormals;

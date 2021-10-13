@@ -67,19 +67,15 @@ export class MultiVector2 extends Geometry {
         return this;
     }
 
-    map(callbackfn: (value: Vector2, index: number) => any): MultiVector2 {
-        let clone = this.clone();
+    map(callbackfn: (value: Vector2, index: number) => Vector2): MultiVector2 {
+        let result = this.clone();
 
         for (let i = 0; i < this.count; i++) {
             let vec = this.get(i);
-            let result = callbackfn(vec, i)!;
-            if (result instanceof Vector2) {
-                clone.set(i, result);
-            } else {
-                clone.set(i, vec);
-            }
+            result.set(i, callbackfn(vec, i));
+
         }
-        return clone;
+        return result;
     }
 
     take(indices: number[]): MultiVector2 {

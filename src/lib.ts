@@ -54,6 +54,7 @@ export * from "./geometry/mesh/TopoMesh";
 
 // export * from "./geometry/solid";
 
+export * from "./image/Color";
 export * from "./image/Colors";
 export * from "./image/Image";
 export * from "./image/Kernels";
