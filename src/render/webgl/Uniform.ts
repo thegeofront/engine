@@ -1,3 +1,4 @@
+import { GeonImage } from "../../image/Image";
 import { TEXTURE_2D } from "./Constants";
 import { HelpGl, WebGl } from "./HelpGl";
 
@@ -65,6 +66,39 @@ export class UniformTexture {
         this.gl.generateMipmap(TEXTURE_2D);
     }
 
+    loadTexture(geonTexture: GeonImage) {
+
+        console.log(geonTexture);
+
+        let dim = geonTexture.dimentions;
+        let gl = this.gl;
+        let format = textureFormatFromChannels(gl, dim.z);
+        console.log(dim.z);
+        if (!format) {
+            console.warn("a texture with [", dim.z,"] color channels is unsupported");
+            return;
+        }
+
+        gl.activeTexture(gl.TEXTURE0 + this.id);
+        gl.bindTexture(gl.TEXTURE_2D, this.texture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, format, geonTexture.width, geonTexture.height, 0, format, gl.UNSIGNED_BYTE, geonTexture.data);
+
+        // [JF]: from https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL
+        // WebGL1 has different requirements for power of 2 images
+        // vs non power of 2 images so check if the image is a
+        // power of 2 in both dimensions.
+        if (isPowerOf2(geonTexture.width) && isPowerOf2(geonTexture.height)) {
+            // Yes, it's a power of 2. Generate mips.
+            gl.generateMipmap(gl.TEXTURE_2D);
+        } else {
+            // No, it's not a power of 2. Turn off mips and set
+            // wrapping to clamp to edge
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        }
+    }
+
     bind(gl: WebGl) {
         gl.uniform1i(this.loc, this.id);
         gl.activeTexture(gl.TEXTURE0 + this.id);
@@ -74,6 +108,29 @@ export class UniformTexture {
     unbind() {
         throw "TODO";
     }
+}
+
+function textureFormatFromChannels(gl: WebGl, dims: number) : number | undefined {
+    switch(dims) {
+        case 1: 
+            return gl.LUMINANCE
+        case 2:
+            return gl.LUMINANCE_ALPHA
+        case 3:
+            return gl.RGB
+        case 4:
+            return gl.RGBA
+        default:
+            return undefined;
+    }
+}
+
+
+/**
+ * from https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL
+ */
+function isPowerOf2(value: number) {
+    return (value & (value - 1)) == 0;
 }
 
 function getLoader(gl: WebGl, type: UniformType, size: number): Function {
@@ -132,3 +189,5 @@ function getLoader(gl: WebGl, type: UniformType, size: number): Function {
             };
     }
 }
+
+

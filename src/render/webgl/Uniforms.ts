@@ -53,6 +53,10 @@ export class Uniforms {
         this.textures.get(name)!.load(source.toImageData());
     }
 
+    loadTextureDirectly(name: string, source: GeonImage) {
+        this.textures.get(name)!.loadTexture(source);
+    }
+
     loadTextureSource(name: string, source: TexImageSource) {
         this.textures.get(name)!.load(source);
     }

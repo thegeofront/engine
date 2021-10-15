@@ -63,6 +63,10 @@ export abstract class ShaderProgram<T> {
         this.drawCount = this.onLoad(r, speed);
     }
 
+    setDrawCount(count: number) {
+        this.drawCount = count;
+    }
+
     draw(c: Scene) {
         this.useProgram();
         this.onDraw(c);

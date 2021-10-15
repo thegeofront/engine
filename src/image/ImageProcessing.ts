@@ -1,4 +1,4 @@
-import { DebugRenderer, ImageMesh, Plane, Vector2, Vector3 } from "../lib";
+import { DebugRenderer, ImageMesh, IntMatrix, Plane, Vector2, Vector3 } from "../lib";
 import { Color } from "./Color";
 import { GeonImage } from "./Image";
 import { Kernels } from "./Kernels";
@@ -45,19 +45,14 @@ export namespace ImageProcessing {
     }
 
     export function trueGreyscale(rgba: GeonImage) {
+
         let grey = new GeonImage(rgba.width, rgba.height, 1);
 
-        for (let i = 0; i < grey.height; i++) {
-            for (let j = 0; j < grey.width; j++) {
-                grey.data[1 * (i * grey.width + j)] = 0;
-            }
+        for (let i = 0 ; i < grey.data.length; i++) {
+            let pixel = rgba.getWithIndex(i);
+            let round = (pixel[0] + pixel[1] + pixel[2]) / 3;
+            grey.data[i] = pixel[0];
         }
-
-        // grey.forEach((x: number, y: number) => {
-        //     let pixel = rgba.get(y, x);
-        //     pixel = [126, 126, 126, 255];
-        //     return [Math.round(pixel[0] + pixel[1] + pixel[2] / 3)];
-        // });
 
         return grey;
     }
@@ -284,5 +279,10 @@ export namespace ImageProcessing {
         image.clone();
         image.bucketFill(start, color, diagonal);
         return image;
+    }
+
+
+    export function equalizeHistogram(image: GeonImage) {
+        
     }
 }

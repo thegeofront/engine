@@ -19,7 +19,7 @@ import { ImageMesh } from "../bufferables/ImageMesh";
 import { Parameter } from "../../parametric/Parameter";
 import { UI } from "../../dom/UI";
 import { BiSurface, Plane } from "../../lib";
-import { TextureMeshShader } from "../shaders-old/texture-mesh-shader";
+import { TexturedMeshShader } from "../shaders/TexturedMeshShader";
 
 // NOTE: I think this type of polymorphism is better than regular polymorphism
 export type RenderableUnit =
@@ -37,7 +37,7 @@ type AcceptableShader =
     | ShadedMeshShader
     | MeshDebugShader
     | LineShader
-    | TextureMeshShader;
+    | TexturedMeshShader
 
 /**
  * Renderer which can instantly visualize a large number of geometries. Very useful for looking at intermediate data.
@@ -137,7 +137,7 @@ export class DebugRenderer {
             shader.set(unit);
         } else if (unit instanceof ImageMesh) {
             //@ts-ignore
-            shader.set(unit.buffer(), DrawSpeed.StaticDraw);
+            shader.set(unit.bufferNew(), DrawSpeed.StaticDraw);
         } else {
             console.error("MultiRenderer cannot render: ", unit);
             return undefined;
@@ -180,8 +180,8 @@ export class DebugRenderer {
             shader = new LineShader(gl, ...options);
             shader.set(unit);
         } else if (unit instanceof ImageMesh) {
-            shader = new TextureMeshShader(gl);
-            shader.set(unit.buffer(), DrawSpeed.StaticDraw);
+            shader = new TexturedMeshShader(gl);
+            shader.load(unit.bufferNew(), DrawSpeed.StaticDraw);
         } else {
             console.error("MultiRenderer cannot render: ", unit);
             return undefined;

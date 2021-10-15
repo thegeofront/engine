@@ -126,8 +126,15 @@ export class Vector3 {
         return `Vector3(${this.x}, ${this.y}, ${this.z})`;
     }
 
-    toVector2(): Vector2 {
+    get xy() {
         return new Vector2(this.x, this.y);
+    }
+
+    /**
+     * @deprecated
+     */
+    toVector2(): Vector2 {
+        return this.xy;
     }
 
     clone(): Vector3 {

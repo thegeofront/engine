@@ -12,11 +12,12 @@
 import { Domain2 } from "../math/Domain";
 import { FloatMatrix } from "../data/FloatMatrix";
 import { ImageProcessing } from "./ImageProcessing";
-import { BiSurface, Vector2 } from "../lib";
+import { BiSurface, Vector2, Vector3 } from "../lib";
 import { Color } from "./Color";
 
 // TODO : x and y are not the same as i and j, and used inconsistently. fix this.
 // TODO : now that GEON is a package, we can use G.Image. the Geon suffix is not needed anymore is not needed anymore!
+// TODO : rename to Texture, its not taken yet I think!
 const acceptedKernels: number[] = [3, 5, 7, 9];
 export class GeonImage {
     public data: Uint8ClampedArray;
@@ -35,6 +36,10 @@ export class GeonImage {
         }
     }
 
+    get dimentions() {
+        return Vector3.new(this.width, this.height, this.pixelSize);
+    }
+
     static new(width: number, height: number) {
         return new GeonImage(width, height);
     }
@@ -46,6 +51,8 @@ export class GeonImage {
     }
 
     toImageData(): ImageData {
+        console.log("called to image data!");
+
         // imagedata requires pixelsize of 4.
         if (this.pixelSize == 1) {
             console.log("conferting to rgba...");
@@ -67,6 +74,10 @@ export class GeonImage {
         let image = new GeonImage(this.width, this.height, this.pixelSize);
         image.setData(this.data);
         return image;
+    }
+
+    copyFrom(other: GeonImage) {
+        console.warn("TODO");
     }
 
     fill(pixel: number[]): GeonImage {
@@ -129,36 +140,38 @@ export class GeonImage {
         return x < this.width && x >= 0 && y < this.height && y >= 0;
     }
 
-    set(i: number, j: number, pixel: number[]) {
-        this.data[4 * (j * this.width + i)] = pixel[0];
-        this.data[4 * (j * this.width + i) + 1] = pixel[1];
-        this.data[4 * (j * this.width + i) + 2] = pixel[2];
-        this.data[4 * (j * this.width + i) + 3] = pixel[3];
+    // [GETTING & SETTING]
+
+    setVal(i: number, j: number, k: number, val: number) {
+        this.data[this.height * (j * this.width + i) + k] = val;
     }
 
+    getVal(i: number, j: number, k: number) {
+        return this.data[this.height * (j * this.width + i) + k];
+    }
+
+    // TODO rename getPixel
     get(i: number, j: number): number[] {
-        return [
-            this.data[4 * (j * this.width + i)],
-            this.data[4 * (j * this.width + i) + 1],
-            this.data[4 * (j * this.width + i) + 2],
-            this.data[4 * (j * this.width + i) + 3],
-        ];
+        return this.getWithIndex(this.vecToIndex(i, j));
+    }
+
+    // TODO rename setPixel
+    set(i: number, j: number, pixel: number[]) {
+        return this.setWithIndex(this.vecToIndex(i, j), pixel);
     }
 
     getWithIndex(index: number) {
-        return [
-            this.data[4 * index],
-            this.data[4 * index + 1],
-            this.data[4 * index + 2],
-            this.data[4 * index + 3],
-        ];
+        let pixel = new Array<number>(this.height);
+        for (let k = 0 ; k < this.height; k++) {
+            pixel[k] = this.data[(this.height * index) + k];
+        }
+        return pixel;
     }
 
-    setWithIndex(index: number, value: number[]) {
-        this.data[4 * index] = value[0];
-        this.data[4 * index + 1] = value[1];
-        this.data[4 * index + 2] = value[2];
-        this.data[4 * index + 3] = value[3];
+    setWithIndex(index: number, pixel: number[]) {
+        for (let k = 0 ; k < this.height; k++) {
+            this.data[this.height * index + k] = pixel[0];
+        }
     }
 
     // NOTE: this should be fixed on the level of an nD array

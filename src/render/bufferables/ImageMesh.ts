@@ -21,4 +21,11 @@ export class ImageMesh implements Bufferable {
 	buffer() : ShaderMesh {
         return ShaderMesh.fromImage(this.image, this.plane, this.centered, this.scale, this.doubleSided);
 	}
+
+	
+	bufferNew() : {mesh: ShaderMesh, texture: GeonImage} {
+        let mesh = ShaderMesh.fromImageClean(this.image, this.plane, this.centered, this.scale, this.doubleSided);
+		let texture = this.image;
+		return {mesh, texture};
+	}
 }

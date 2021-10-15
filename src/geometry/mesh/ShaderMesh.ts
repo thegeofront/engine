@@ -101,6 +101,37 @@ export class ShaderMesh implements Renderable {
         return rend;
     }
 
+    static fromImageClean(        
+        image: GeonImage,
+        plane: Plane,
+        centered = true,
+        scale = 1,
+        bothSides = true,) {
+
+        let domain;
+        if (centered) {
+            domain = Domain2.fromWH(
+                (-image.width / 2) * scale,
+                (-image.height / 2) * scale,
+                image.width * scale,
+                image.height * scale,
+            );
+        } else {
+            domain = Domain2.fromWH(0, 0, image.width * scale, image.height * scale);
+        }
+
+        let rectangle = new Rectangle3(plane, domain);
+
+        let mesh: ShaderMesh;
+        if (bothSides) {
+            mesh = ShaderMesh.fromRectDoubleSided(rectangle);
+        } else {
+            mesh = ShaderMesh.fromRect(rectangle);
+        }
+
+        return mesh;
+    }
+
     static fromImage(
         image: GeonImage,
         plane: Plane,

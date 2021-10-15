@@ -59,6 +59,16 @@ export class Rectangle3 {
         this.domain = domain;
     }
 
+    static newCentered(plane: Plane, width: number, height: number) {
+        let domain = Domain2.fromWH(
+            (-width / 2),
+            (-height / 2),
+            width,
+            height,
+        );
+        return new Rectangle3(plane, domain);
+    }
+
     static new(plane: Plane, domain: Domain2) {
         return new Rectangle3(plane, domain);
     }
