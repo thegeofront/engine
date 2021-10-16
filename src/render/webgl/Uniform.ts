@@ -68,12 +68,17 @@ export class UniformTexture {
 
     loadTexture(geonTexture: GeonImage) {
 
-        console.log(geonTexture);
+        if (geonTexture.dimentions.z != 4) {
+            console.warn("can only load rrba images...");
+        }
+
+        // console.log(geonTexture);
 
         let dim = geonTexture.dimentions;
         let gl = this.gl;
-        let format = textureFormatFromChannels(gl, dim.z);
-        console.log(dim.z);
+        // let format = textureFormatFromChannels(gl, dim.z);
+        // console.log(dim.z);
+        let format = gl.RGBA;
         if (!format) {
             console.warn("a texture with [", dim.z,"] color channels is unsupported");
             return;
@@ -81,6 +86,7 @@ export class UniformTexture {
 
         gl.activeTexture(gl.TEXTURE0 + this.id);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
+        gl.pixelStorei( gl.UNPACK_ALIGNMENT, 4);
         gl.texImage2D(gl.TEXTURE_2D, 0, format, geonTexture.width, geonTexture.height, 0, format, gl.UNSIGNED_BYTE, geonTexture.data);
 
         // [JF]: from https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL

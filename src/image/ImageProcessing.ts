@@ -51,7 +51,7 @@ export namespace ImageProcessing {
         for (let i = 0 ; i < grey.data.length; i++) {
             let pixel = rgba.getWithIndex(i);
             let round = (pixel[0] + pixel[1] + pixel[2]) / 3;
-            grey.data[i] = pixel[0];
+            grey.data[i] = round;
         }
 
         return grey;
@@ -72,16 +72,13 @@ export namespace ImageProcessing {
         let newWidth = image.width - radius * 2;
         let newHeight = image.height - radius * 2;
 
-        let magnitudeImage = new GeonImage(newWidth, newHeight, image.pixelSize);
-        let directionImage = new GeonImage(newWidth, newHeight, image.pixelSize);
+        let directionImage = new GeonImage(newWidth, newHeight, 4);
+        let magnitudeImage = new GeonImage(newWidth, newHeight, 4);
 
         for (let i = radius; i < image.width - radius; i++) {
             for (let j = radius; j < image.height - radius; j++) {
-                let pixelX = image.getWithKernel(i, j, kernelLeft, radius);
-                let pixelY = image.getWithKernel(i, j, kernelUp, radius);
-
-                let deltaX = pixelX[0];
-                let deltaY = pixelY[0];
+                let deltaX = image.getWithKernelGrey(i, j, kernelLeft, radius);
+                let deltaY = image.getWithKernelGrey(i, j, kernelUp, radius);
 
                 // note: this was an idea do use all color differences, instead of just greyscale colors. Results are unpredictable however...
                 // take the maximum color difference;
@@ -94,7 +91,8 @@ export namespace ImageProcessing {
                 let desJ = j - radius;
 
                 directionImage.set(desI, desJ, [(deltaX + 255) / 2, (deltaY + 255) / 2, 255, 255]);
-                magnitudeImage.set(desI, desJ, [gradient, gradient, gradient, 255]);
+                directionImage.set(desI, desJ, [128, 255, 128, 255]);
+                magnitudeImage.set(desI, desJ, [gradient]);
             }
         }
 
@@ -106,8 +104,11 @@ export namespace ImageProcessing {
      *
      */
     export function thetaMap(direction: GeonImage) {
-        let result = direction.forEachPixel((pixel, i, j) => {
-            // get the angle a (x,y) vector makes with a (1,0) vector. result From -PI to PI.
+
+        let result = GeonImage.new(direction.width, direction.height, 1);
+
+        for (let i = 0; i < direction.depth; i++) {
+            let pixel = direction.getWithIndex(i);
             let theta = Math.atan2(pixel[1] - 128, pixel[0] - 128);
 
             // normalize to [0 - 1] space;
@@ -115,8 +116,8 @@ export namespace ImageProcessing {
 
             // put back into a greyscale image
             theta = theta * 255;
-            return [theta, theta, theta, 255];
-        });
+            result.setWithIndex(i, [theta]);
+        }
 
         return result;
     }
@@ -145,7 +146,7 @@ export namespace ImageProcessing {
         const weak = 128;
         const strong = 255;
 
-        let grey = original.toGreyscale();
+        let grey = ImageProcessing.fakeGreyscale(original);
         let gauss = Kernels.generateGaussianKernel(blurSigma, blurSize);
         let blurred = grey.applyKernel(gauss);
         let [magnitude, direction] = ImageProcessing.sobelMD(blurred);
@@ -183,21 +184,25 @@ export namespace ImageProcessing {
     export function cannyNonMaximumSuppression(magnitude: GeonImage, direction: GeonImage) {
         // dir is from 0 to 255
 
+        // if (magnitude.depth != 1 || direction.depth != 1) {
+        //     throw "needs two greyscale images";
+        // }
+
         let magGet = (i: number, j: number) => {
-            return magnitude.get(i, j)[0];
+            return magnitude.getVal(i, j, 0);
         };
 
         let range = 1;
         let result = new GeonImage(
             magnitude.width - range * 2,
             magnitude.height - range * 2,
-            magnitude.pixelSize,
+            1,
         );
 
         for (let i = range; i < magnitude.width - range; i++) {
             for (let j = range; j < magnitude.height - range; j++) {
                 const mag = magGet(i, j);
-                const dir = direction.get(i, j)[0] % 128;
+                const dir = direction.getVal(i, j, 0) % 128;
 
                 let val = mag;
 
@@ -216,7 +221,7 @@ export namespace ImageProcessing {
                     if (magGet(i - 1, j) > mag || magGet(i + 1, j) > mag) val = 0;
                 }
 
-                result.set(i, j, [val, val, val, 255]);
+                result.setVal(i, j, 0, val);
             }
         }
 
@@ -230,6 +235,7 @@ export namespace ImageProcessing {
         weakValue: number,
         strongValue: number,
     ) {
+
         let result = image.forEachGreyscalePixel((val) => {
             if (val < lower) {
                 return 0;
@@ -254,8 +260,7 @@ export namespace ImageProcessing {
             result.setWithIndex(index, [strongValue, strongValue, strongValue, 255]);
         };
 
-        let count = image.width * image.height;
-        for (let i = 0; i < count; i++) {
+        for (let i = 0; i < image.depth; i++) {
             let pixel = image.getWithIndex(i)[0];
             if (pixel != strongValue) continue;
 

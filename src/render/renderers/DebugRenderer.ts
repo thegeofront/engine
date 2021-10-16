@@ -137,7 +137,7 @@ export class DebugRenderer {
             shader.set(unit);
         } else if (unit instanceof ImageMesh) {
             //@ts-ignore
-            shader.set(unit.bufferNew(), DrawSpeed.StaticDraw);
+            shader.load(unit.bufferNew(), DrawSpeed.StaticDraw);
         } else {
             console.error("MultiRenderer cannot render: ", unit);
             return undefined;

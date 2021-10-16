@@ -19,59 +19,72 @@ import { Color } from "./Color";
 // TODO : now that GEON is a package, we can use G.Image. the Geon suffix is not needed anymore is not needed anymore!
 // TODO : rename to Texture, its not taken yet I think!
 const acceptedKernels: number[] = [3, 5, 7, 9];
+
 export class GeonImage {
+
     public data: Uint8ClampedArray;
+
     public readonly width: number;
     public readonly height: number;
-    public readonly pixelSize: number;
+    public readonly depth: number;
+    
+    public readonly count: number; // pixel count
 
-    constructor(width: number, height: number, pixelSize: number = 4, data?: Uint8ClampedArray) {
+    constructor(width: number, height: number, depth: number = 4, data?: Uint8ClampedArray) {
+        
         this.width = width;
         this.height = height;
-        this.pixelSize = pixelSize;
+        this.depth = depth;
+
+        this.count = width * height;
+
         if (data) {
             this.data = data;
         } else {
-            this.data = new Uint8ClampedArray(this.width * this.height * this.pixelSize);
+            this.data = new Uint8ClampedArray(this.width * this.height * this.depth);
         }
+    }
+
+    get pixelSize() {
+        return this.depth;
     }
 
     get dimentions() {
         return Vector3.new(this.width, this.height, this.pixelSize);
     }
 
-    static new(width: number, height: number) {
-        return new GeonImage(width, height);
+    static new(width: number, height: number, depth=4) {
+        return new GeonImage(width, height, depth);
     }
 
     static fromImageData(id: ImageData): GeonImage {
-        let image = new GeonImage(id.width, id.height);
+        let image = new GeonImage(id.width, id.height, 4);
         image.setData(id.data);
         return image;
     }
 
     toImageData(): ImageData {
-        console.log("called to image data!");
+        console.log("called to image data is not needed anymore!!");
 
         // imagedata requires pixelsize of 4.
-        if (this.pixelSize == 1) {
+        if (this.depth == 1) {
             console.log("conferting to rgba...");
             return ImageProcessing.imagedataFromTrueGreyscale(this);
-        } else if (this.pixelSize != 4) {
-            throw "pixelsize must be 4 for toImageData to work";
+        } else if (this.depth != 4) {
+            throw "depth must be 4 for toImageData to work";
         }
         return new ImageData(this.data, this.width, this.height);
     }
 
     setData(data: Uint8ClampedArray) {
-        if (data.length != this.height * this.width * this.pixelSize)
+        if (data.length != this.height * this.width * this.depth)
             throw "data.length does not match width * height ";
 
         this.data = data;
     }
 
     clone() {
-        let image = new GeonImage(this.width, this.height, this.pixelSize);
+        let image = new GeonImage(this.width, this.height, this.depth);
         image.setData(this.data);
         return image;
     }
@@ -122,16 +135,18 @@ export class GeonImage {
     }
 
     /**
-     * Perform an operation to every pixel of a 'greyscale' image
+     * Perform an operation to every pixel of a greyscale image
+     * I made this, because iteration is much simpler if we are dealing with greyscale images
      */
-    forEachGreyscalePixel(operation: (val: number, i: number, j: number) => number) {
-        let result = new GeonImage(this.width, this.height, this.pixelSize);
-        for (let i = 0; i < this.width; i++) {
-            for (let j = 0; j < this.height; j++) {
-                let val = this.get(i, j)[0];
-                val = operation(val, i, j);
-                result.set(i, j, [val, val, val, 255]);
-            }
+    forEachGreyscalePixel(operation: (val: number) => number) {
+        
+        if (this.depth != 1) {
+            throw new Error("this is not a greyscale image!");
+        }
+        
+        let result = new GeonImage(this.width, this.height, 1);
+        for (let i = 0 ; i < this.data.length; i++) {
+            this.data[i] = operation(this.data[i]);
         }
         return result;
     }
@@ -143,11 +158,11 @@ export class GeonImage {
     // [GETTING & SETTING]
 
     setVal(i: number, j: number, k: number, val: number) {
-        this.data[this.height * (j * this.width + i) + k] = val;
+        this.data[this.depth * (j * this.width + i) + k] = val;
     }
 
     getVal(i: number, j: number, k: number) {
-        return this.data[this.height * (j * this.width + i) + k];
+        return this.data[this.depth * (j * this.width + i) + k];
     }
 
     // TODO rename getPixel
@@ -161,16 +176,16 @@ export class GeonImage {
     }
 
     getWithIndex(index: number) {
-        let pixel = new Array<number>(this.height);
-        for (let k = 0 ; k < this.height; k++) {
-            pixel[k] = this.data[(this.height * index) + k];
+        let pixel = new Array<number>(this.depth);
+        for (let k = 0 ; k < this.depth; k++) {
+            pixel[k] = this.data[(this.depth * index) + k];
         }
         return pixel;
     }
 
     setWithIndex(index: number, pixel: number[]) {
-        for (let k = 0 ; k < this.height; k++) {
-            this.data[this.height * index + k] = pixel[0];
+        for (let k = 0 ; k < this.depth; k++) {
+            this.data[this.depth * index + k] = pixel[0];
         }
     }
 
@@ -249,6 +264,7 @@ export class GeonImage {
         // determine kernel size
         let size = kernel.count();
         let radius = size / 2 - 0.5;
+
         let image = new GeonImage(
             this.width - radius * 2,
             this.height - radius * 2,
@@ -309,12 +325,24 @@ export class GeonImage {
         return copy;
     }
 
+    getWithKernelGrey(i: number, j: number, kernel: FloatMatrix, radius: number): number {
+        // kernel space
+        let sum = 0;
+        for (let ki = 0; ki < kernel.width; ki++) {
+            for (let kj = 0; kj < kernel.height; kj++) {
+                let weight = kernel.get(ki, kj);
+                let pixel = this.getVal(i + ki - radius, j + kj - radius, 0);
+                sum += pixel * weight;     
+            }
+        }
+        return sum;
+    }
+
     getWithKernel(i: number, j: number, kernel: FloatMatrix, radius: number): number[] {
         // kernel space
         let sum = [0, 0, 0, 255];
-        let [dimx, dimy] = kernel.getDimensions();
-        for (let ki = 0; ki < dimx; ki++) {
-            for (let kj = 0; kj < dimy; kj++) {
+        for (let ki = 0; ki < kernel.width; ki++) {
+            for (let kj = 0; kj < kernel.height; kj++) {
                 let weight = kernel.get(ki, kj);
                 let pixel = this.get(i + ki - radius, j + kj - radius);
 
