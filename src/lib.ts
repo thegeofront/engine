@@ -89,6 +89,7 @@ export * from "./render/renderers/ImageRenderer";
 export * from "./render/renderers/TextRenderer";
 
 export * from "./render/shaders/AmbientMeshShader";
+export * from "./render/shaders/TexturedMeshShader";
 export * from "./render/shaders/BillboardShader";
 export * from "./render/shaders/DepthMeshShader";
 export * from "./render/shaders/DotShaderWithHeight";
@@ -96,6 +97,7 @@ export * from "./render/shaders/PhongShader";
 export * from "./render/shaders/TemplateShader";
 export * from "./render/shaders/ZebraShader";
 
+export * from "./render/webgl/DrawTarget";
 export * from "./render/webgl/Attribute";
 export * from "./render/webgl/Attributes";
 export * from "./render/webgl/Constants";

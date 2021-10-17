@@ -49,8 +49,12 @@ export class Uniforms {
         }
     }
 
-    loadTexture(name: string, source: Texture) {
-        this.textures.get(name)!.load(source);
+    loadTexture(name: string, texture: Texture) {
+        this.textures.get(name)!.load(texture);
+    }
+
+    loadTextureSource(name: string, source: WebGLTexture | null) {
+        this.textures.get(name)!.setSource(source);
     }
 
     load(name: string, value: number) {

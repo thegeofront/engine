@@ -16,6 +16,10 @@ export enum DrawSpeed {
 
 export namespace HelpGl {
 
+    export function clear(gl: WebGl) {
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    }
+
     /**
      * We need to keep track of all textures in the entire webgl application
      */
@@ -25,7 +29,7 @@ export namespace HelpGl {
         return id;
     }
 
-    export function resizeCanvas(gl: WebGl) {
+    export function resizeViewportToCanvas(gl: WebGl) {
         // Lookup the size the browser is displaying the canvas in CSS pixels.
         let canvas = gl.canvas as HTMLCanvasElement;
 
@@ -110,10 +114,6 @@ export namespace HelpGl {
         return createProgram(gl, vertexShader, fragmentShader);
     }
 
-
-
-
-
     /**
      * WebGl only allows textures with a width and height of the power of two.
      * This means `32x512` is valid, while `40x40` is not valid
@@ -136,4 +136,18 @@ export namespace HelpGl {
         }
         return image;
     }
+
+    // -- this helps when switching draw targets
+
+    export function resetDrawTarget(gl: WebGl) {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        HelpGl.resizeViewportToCanvas(gl);
+    }
+    
+    export function setDrawTarget(gl: WebGl, fb: WebGLFramebuffer, width: number, height: number) {
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+        gl.viewport(0, 0, width, height);
+        HelpGl.clear(gl);
+    }
+    
 }

@@ -26,6 +26,7 @@ export class Core {
         this.fpsCounter = new FpsCounter();
         this.ui = new UI(uiFrame);
         this.apps = new Map();
+        this.gl.clearColor(0, 0, 0, 0);
     }
 
     // todo: cycle through apps
@@ -78,9 +79,9 @@ export class Core {
                 gl.viewport(0, 0, window.innerWidth, window.innerHeight);
             }
         } else {
+
         }
 
-        this.gl.clearColor(0, 0, 0, 0);
         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
 
         // render all apps

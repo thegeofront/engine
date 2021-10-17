@@ -9,7 +9,7 @@ import { WebGl, HelpGl } from "./HelpGl";
     private constructor(
         private gl: WebGl, 
         public id: number, 
-        private texture: WebGLTexture,
+        private texture: WebGLTexture | null,
         private loc: WebGLUniformLocation) {}
 
     static new(gl: WebGl, program: WebGLProgram, name: string) {
@@ -20,6 +20,19 @@ import { WebGl, HelpGl } from "./HelpGl";
         return new UniformTexture(gl, id, texture, location)
     }
 
+    /**
+     * 'normal' loading
+     */
+    load(texture: Texture) {
+        if (texture.depth != 4) {
+            throw new Error("sorry, but I haven't figured out how to load non-rgba textures...");
+        }
+        this.loadArrayBuffer(texture.width, texture.height, texture.data);
+    }
+
+    /**
+     * loading indirectly with imageData. 
+     */
     loadImageData(imgData: ImageData) {
         this.gl.activeTexture(this.gl.TEXTURE0 + this.id);
         this.gl.bindTexture(TEXTURE_2D, this.texture);
@@ -31,14 +44,10 @@ import { WebGl, HelpGl } from "./HelpGl";
         this.gl.generateMipmap(TEXTURE_2D);
     }
 
-    load(texture: Texture) {
-        if (texture.depth != 4) {
-            throw new Error("sorry, but I haven't figured out how to load non-rgba textures...");
-        }
-        this.loadSource(texture.width, texture.height, texture.data);
-    }
-
-    loadSource(width: number, height: number, source: ArrayBufferView) {
+    /**
+     * loading directly with an array buffer view. 
+     */
+    loadArrayBuffer(width: number, height: number, source: ArrayBufferView) {
 
         let gl = this.gl;
         this.gl.activeTexture(this.gl.TEXTURE0 + this.id);
@@ -63,6 +72,14 @@ import { WebGl, HelpGl } from "./HelpGl";
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
             gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         }
+    }
+
+    /**
+     * 'meta loading'. change the underlying webglTexture to a different adress. 
+     * this way, prerendered textures can be 'loaded' from a drawTarget, for example
+     */
+    setSource(texture: WebGLTexture | null) {
+        this.texture = texture;
     }
 
     bind(gl: WebGl) {

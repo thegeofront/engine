@@ -5,8 +5,13 @@ import { FloatMatrix } from "./FloatMatrix";
 import { MultiVector3 } from "./MultiVector3";
 
 export class MultiVector2 extends Geometry {
+
     private constructor(private _matrix: FloatMatrix) {
         super();
+    }
+
+    get data() {
+        return this._matrix.data;
     }
 
     static new(length: number): MultiVector2 {

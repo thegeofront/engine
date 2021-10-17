@@ -1,4 +1,4 @@
-import { Matrix4, Mesh, ShaderMesh, Vector3 } from "../../lib";
+import { Cube, Matrix4, Mesh, ShaderMesh, Vector3 } from "../../lib";
 import { Material } from "./Material";
 
 /**
@@ -14,8 +14,7 @@ export class Model {
         public mesh: Mesh, 
         public material: Material) {}
 
-
-    static new(mesh = Mesh.newIcosahedron(1), material = Material.default()) {
+    static new(mesh = Mesh.newIcosahedron(), material = Material.default()) {
         return new Model(mesh, material);
     }
 }

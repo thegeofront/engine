@@ -6,6 +6,7 @@
 import {
     BiSurface,
     Cube,
+    Domain3,
     getDefaultIndices,
     Graph,
     IntMatrix,
@@ -16,6 +17,7 @@ import {
     Rectangle3,
     ShaderMesh,
     TriSurface,
+    Vector2,
     Vector3,
 } from "../../lib";
 import { GeonMath } from "../../math/Math";
@@ -210,6 +212,16 @@ export class Mesh {
         return this.fromLists(verts, faces);
     }
 
+    static fromRectDoubleSided(rect: Rectangle3, texture?: ImageData) {
+        let verts = rect.getCorners();
+        let uvs = MultiVector2.fromData(new Float32Array([
+            0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0,
+        ]),);
+        let faces = IntMatrix.fromList([0, 1, 3, 0, 3, 2, 0, 3, 1, 0, 2, 3], 3);
+        let mesh = Mesh.new(MultiVector3.fromList(verts), faces, uvs);
+        return mesh;
+    }
+
     static newQuad(corners: Vector3[]) {
         let faces = [...quadToTri(cubeFaces[0])];
         return this.fromLists(corners, faces);
@@ -224,6 +236,12 @@ export class Mesh {
     }
 
     static fromCube(cube: Cube): Mesh {
+        let verts = cube.getCorners();
+        return Mesh.newOct(verts);
+    }
+
+    static newDefaultCube(): Mesh {
+        let cube = new Cube(Plane.WorldXY(), Domain3.fromRadius(0.5));
         let verts = cube.getCorners();
         return Mesh.newOct(verts);
     }
@@ -636,8 +654,6 @@ export class Mesh {
 
     // ----- Normals -----
 
-
-
     calcAndSetFaceNormals() {
         this._normalKind = NormalKind.Face;
         this._normals = this.calculateFaceNormals();
@@ -797,6 +813,33 @@ const cubeFaces = [
     [2, 3, 7, 6], // bottom
     [5, 4, 6, 7], // back
 ];
+
+const cubeUVS = [
+    [0.0, 0.0],
+    [1.0, 0.0],
+    [0.0, 1.0],
+    [1.0, 1.0],
+    [0.0, 0.0],
+    [1.0, 0.0],
+    [0.0, 1.0],
+    [1.0, 1.0],
+    [0.0, 0.0],
+    [1.0, 0.0],
+    [0.0, 1.0],
+    [1.0, 1.0],
+    [0.0, 0.0],
+    [1.0, 0.0],
+    [0.0, 1.0],
+    [1.0, 1.0],
+    [0.0, 0.0],
+    [1.0, 0.0],
+    [0.0, 1.0],
+    [1.0, 1.0],
+    [0.0, 0.0],
+    [1.0, 0.0],
+    [0.0, 1.0],
+    [1.0, 1.0],
+]
 
 export function quadToTri(abcd: number[]): number[] {
     return [abcd[0], abcd[2], abcd[1], abcd[0], abcd[3], abcd[2]];
