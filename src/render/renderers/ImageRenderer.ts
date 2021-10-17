@@ -2,7 +2,7 @@ import {
     Scene,
     Domain2,
     DrawSpeed,
-    GeonImage,
+    Texture,
     Mesh,
     Plane,
     Rectangle3,
@@ -18,7 +18,7 @@ export class ImageRenderer {
         public stdSize?: Vector3,
         public gap = 10,
         public scale = 2,
-        public images: GeonImage[] = [],
+        public images: Texture[] = [],
         public shaders: TextureMeshShader[] = [],
     ) {}
 
@@ -26,7 +26,7 @@ export class ImageRenderer {
         return new ImageRenderer(gl, stdSize);
     }
 
-    add(image: GeonImage) {
+    add(image: Texture) {
         this.images.push(image);
         this.shaders.push(new TextureMeshShader(this.gl));
     }

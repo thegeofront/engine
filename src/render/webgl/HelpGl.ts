@@ -1,6 +1,6 @@
 // purpose : webgl wrapping & helper functions
 
-import { GeonImage } from "../../image/Image";
+import { Texture } from "../../image/Texture";
 
 var nextTextureId = 0;
 var rendercallsperframe = 0;
@@ -120,7 +120,7 @@ export class HelpGl {
         return Math.pow(2, Math.ceil(base));
     }
 
-    static fixTextureSizing(image: GeonImage) : GeonImage {
+    static fixTextureSizing(image: Texture) : Texture {
         let goodWidth = HelpGl.getNearestCorrectTextureSize(image.width);
         let goodHeight = HelpGl.getNearestCorrectTextureSize(image.height);
         if (goodWidth !== image.width || goodHeight !== image.height) {

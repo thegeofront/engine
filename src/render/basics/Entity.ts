@@ -8,8 +8,11 @@ import { Model } from "./Model";
 export class Entity {
     
     constructor(
-        public model: Model,
         public position: Matrix4,
+        public model: Model,
     ) {}
 
+    static new(position=Matrix4.new(), model=Model.new()) {
+        return new Entity(position, model);
+    }
 }

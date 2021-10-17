@@ -1,7 +1,9 @@
 import { FloatMatrix } from "../data/FloatMatrix";
-import { GeonImage } from "./Image";
+import { Texture } from "./Texture";
 
 // kernels
+
+const acceptedKernels: number[] = [3, 5, 7, 9];
 
 export class Kernels {
     //prettier-ignore

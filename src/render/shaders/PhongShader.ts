@@ -1,5 +1,5 @@
 import { Color } from "../../image/Color";
-import { Matrix3, Matrix4, Mesh, meshFromObj, ShaderMesh, Vector3 } from "../../lib";
+import { Entity, Matrix3, Matrix4, Mesh, meshFromObj, ShaderMesh, Vector3 } from "../../lib";
 import { Material } from "../basics/Material";
 import { Model } from "../basics/Model";
 import { Scene } from "../basics/Scene";
@@ -7,7 +7,7 @@ import { DrawElementsType, DrawMode } from "../webgl/Constants";
 import { DrawSpeed, WebGl } from "../webgl/HelpGl";
 import { ShaderProgram } from "../webgl/ShaderProgram";
 
-export class PhongShader extends ShaderProgram<Model> {
+export class PhongShader extends ShaderProgram<Entity> {
     constructor(gl: WebGl) {
         const vertexShader = `
         precision mediump int;
@@ -132,11 +132,11 @@ export class PhongShader extends ShaderProgram<Model> {
         return DrawMode.Triangles;
     }
 
-    protected onLoad(model: Model, speed: DrawSpeed): number {
-        this.loadPosition(model.position);
-        this.loadMesh(model.mesh, speed);
-        this.loadMaterial(model.material);
-        return model.mesh.maxSize;
+    protected onLoad(e: Entity, speed: DrawSpeed): number {
+        this.loadPosition(e.position);
+        this.loadMesh(e.model.mesh, speed);
+        this.loadMaterial(e.model.material);
+        return e.model.mesh.maxSize;
     }
 
     public loadOcclusion(data: BufferSource, speed: DrawSpeed) {

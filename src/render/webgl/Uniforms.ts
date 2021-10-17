@@ -1,4 +1,4 @@
-import { GeonImage } from "../../image/Image";
+import { Texture } from "../../image/Texture";
 import { Matrix4 } from "../../math/Matrix4";
 import { Vector2 } from "../../math/Vector2";
 import { Uniform, UniformTexture, UniformType } from "./Uniform";
@@ -49,7 +49,7 @@ export class Uniforms {
         }
     }
 
-    loadTexture(name: string, source: GeonImage) {
+    loadTexture(name: string, source: Texture) {
         this.textures.get(name)!.load(source.toImageData());
     }
 

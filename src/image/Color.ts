@@ -1,5 +1,7 @@
 /**
- * A [0 - 1] float based RGBA representation of color
+ * A [0 - 1] float based RGBA representation of color, so it can be loaded directly into webgl
+ * 
+ * Contains a variety of conversion functions
  */
 export class Color {
 

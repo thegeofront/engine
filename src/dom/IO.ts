@@ -3,7 +3,7 @@
 // purpuse : wrap certain DOM functionalities
 
 import { meshFromObj } from "../geometry/mesh/ShaderMesh";
-import { GeonImage } from "../image/Image";
+import { Texture } from "../image/Texture";
 
 // set any to document to add drop functionality to the entire document, or use any other div.
 type FuncGenericReturn = <T>() => T;
@@ -76,7 +76,7 @@ export class IO {
 
         // flip texture horizontally -> this is needed for some inexplicable reason
         // and put the flipped version in the mesh
-        let gi = GeonImage.fromImageData(texture);
+        let gi = Texture.fromImageData(texture);
         gi = gi.flipVer();
         mesh.setTexture(gi.toImageData());
         return mesh;

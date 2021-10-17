@@ -1,3 +1,4 @@
+// author: Jos Feenstra 
 // purpose: polynomial math needed for curves & surfaces
 // note: uses a hardcoded pascal's triangle for performance reasons
 // notes:   based upon the excellent explainations from Prof. C.-K. Shene: https://pages.mtu.edu/~shene/COURSES/cs3621/NOTES/

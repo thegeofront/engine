@@ -3,7 +3,7 @@
 // purpose: wrapper around the ImageData class,
 // - in order to get more functionality out of it
 //
-// note: named GeonImage to not collide with Image classes.
+// note: named Texture to not collide with Image classes.
 
 // PROBLEM: this should be just a normal 2d uint16 matrix or something. 
 // troubles occur with sobel operators, which go negative.
@@ -12,35 +12,52 @@
 import { Domain2 } from "../math/Domain";
 import { FloatMatrix } from "../data/FloatMatrix";
 import { ImageProcessing } from "./ImageProcessing";
-import { BiSurface, Vector2 } from "../lib";
+import { BiSurface, DepthMeshShader, Vector2 } from "../lib";
 import { Color } from "./Color";
 
 // TODO : x and y are not the same as i and j, and used inconsistently. fix this.
 // TODO : now that GEON is a package, we can use G.Image. the Geon suffix is not needed anymore is not needed anymore!
-const acceptedKernels: number[] = [3, 5, 7, 9];
-export class GeonImage {
+
+
+
+
+export class Texture {
     public data: Uint8ClampedArray;
     public readonly width: number;
     public readonly height: number;
-    public readonly pixelSize: number;
+    public readonly depth: number;
 
-    constructor(width: number, height: number, pixelSize: number = 4, data?: Uint8ClampedArray) {
+    public readonly pixelCount: number;
+
+    constructor(width: number, height: number, depth: number = 4, data?: Uint8ClampedArray) {
+        
         this.width = width;
         this.height = height;
-        this.pixelSize = pixelSize;
+        this.depth = depth;
+
+        this.pixelCount = width * height;
+
         if (data) {
             this.data = data;
         } else {
-            this.data = new Uint8ClampedArray(this.width * this.height * this.pixelSize);
+            this.data = new Uint8ClampedArray(this.width * this.height * this.depth);
         }
     }
 
-    static new(width: number, height: number) {
-        return new GeonImage(width, height);
+    get pixelSize() {
+        return this.depth;
     }
 
-    static fromImageData(id: ImageData): GeonImage {
-        let image = new GeonImage(id.width, id.height);
+    get fullSize() {
+        return this.data.length;
+    }
+
+    static new(width: number, height: number, depth=4) {
+        return new Texture(width, height, depth);
+    }
+
+    static fromImageData(id: ImageData): Texture {
+        let image = new Texture(id.width, id.height);
         image.setData(id.data);
         return image;
     }
@@ -64,12 +81,12 @@ export class GeonImage {
     }
 
     clone() {
-        let image = new GeonImage(this.width, this.height, this.pixelSize);
+        let image = new Texture(this.width, this.height, this.pixelSize);
         image.setData(this.data);
         return image;
     }
 
-    fill(pixel: number[]): GeonImage {
+    fill(pixel: number[]): Texture {
         for (let i = 0; i < this.height; i++) {
             for (let j = 0; j < this.width; j++) {
                 this.set(j, i, pixel);
@@ -99,7 +116,7 @@ export class GeonImage {
      * Perform an operation to every pixel of an image
      */
     forEachPixel(operation: (pixel: number[], i: number, j: number) => number[]) {
-        let result = new GeonImage(this.width, this.height, this.pixelSize);
+        let result = new Texture(this.width, this.height, this.pixelSize);
         for (let i = 0; i < this.width; i++) {
             for (let j = 0; j < this.height; j++) {
                 let pixel = this.get(i, j);
@@ -114,7 +131,7 @@ export class GeonImage {
      * Perform an operation to every pixel of a 'greyscale' image
      */
     forEachGreyscalePixel(operation: (val: number, i: number, j: number) => number) {
-        let result = new GeonImage(this.width, this.height, this.pixelSize);
+        let result = new Texture(this.width, this.height, this.pixelSize);
         for (let i = 0; i < this.width; i++) {
             for (let j = 0; j < this.height; j++) {
                 let val = this.get(i, j)[0];
@@ -210,8 +227,8 @@ export class GeonImage {
         return nbs;
     }
 
-    flipHor(): GeonImage {
-        let image = new GeonImage(this.width, this.height, this.pixelSize);
+    flipHor(): Texture {
+        let image = new Texture(this.width, this.height, this.pixelSize);
         for (let i = 0; i < this.height; i++) {
             for (let j = 0; j < this.width; j++) {
                 let jMirror = this.width - 1 - j;
@@ -221,8 +238,8 @@ export class GeonImage {
         return image;
     }
 
-    flipVer(): GeonImage {
-        let image = new GeonImage(this.width, this.height, this.pixelSize);
+    flipVer(): Texture {
+        let image = new Texture(this.width, this.height, this.pixelSize);
         for (let i = 0; i < this.height; i++) {
             let iMirror = this.height - 1 - i;
             for (let j = 0; j < this.width; j++) {
@@ -232,11 +249,11 @@ export class GeonImage {
         return image;
     }
 
-    applyKernel(kernel: FloatMatrix): GeonImage {
+    applyKernel(kernel: FloatMatrix): Texture {
         // determine kernel size
         let size = kernel.count();
         let radius = size / 2 - 0.5;
-        let image = new GeonImage(
+        let image = new Texture(
             this.width - radius * 2,
             this.height - radius * 2,
             this.pixelSize,
@@ -285,8 +302,8 @@ export class GeonImage {
         });
     }
 
-    apply(filler: Function): GeonImage {
-        let copy = new GeonImage(this.width, this.height, this.pixelSize);
+    apply(filler: Function): Texture {
+        let copy = new Texture(this.width, this.height, this.pixelSize);
 
         for (let y = 0; y < this.height; y++) {
             for (let x = 0; x < this.width; x++) {
@@ -323,14 +340,14 @@ export class GeonImage {
         return this;
     }
 
-    scale(scaleX: number, scaleY: number): GeonImage {
+    scale(scaleX: number, scaleY: number): Texture {
         // scale the image to a new width and height, using nearest neighbour
         return this.resize(Math.round(this.width * scaleX), Math.round(this.height * scaleY));
     }
 
-    resize(width: number, height: number): GeonImage {
+    resize(width: number, height: number): Texture {
         // resize the image to a new width and height, using nearest neighbour
-        const image = new GeonImage(width, height, this.pixelSize);
+        const image = new Texture(width, height, this.pixelSize);
         const old = this;
 
         const x_factor = (1 / image.width) * old.width;
@@ -347,8 +364,8 @@ export class GeonImage {
     }
 
     // add borders till this size is achieved
-    buffer(width: number, height: number): GeonImage {
-        const image = new GeonImage(width, height, this.pixelSize);
+    buffer(width: number, height: number): Texture {
+        const image = new Texture(width, height, this.pixelSize);
         const old = this;
 
         for (let y = 0; y < height; y++) {
@@ -386,12 +403,12 @@ export class GeonImage {
         return this.trim(x1, y1, x2, y2);
     }
 
-    trim(x1: number, y1: number, x2: number, y2: number): GeonImage {
+    trim(x1: number, y1: number, x2: number, y2: number): Texture {
         // return a hardcopy of this particular window
         const imageWidth = x2 - x1;
         const imageHeight = y2 - y1;
 
-        const image = new GeonImage(imageWidth, imageHeight, this.pixelSize);
+        const image = new Texture(imageWidth, imageHeight, this.pixelSize);
 
         for (let y = 0; y < imageHeight; y++) {
             for (let x = 0; x < imageWidth; x++) {
@@ -403,10 +420,10 @@ export class GeonImage {
         return image;
     }
 
-    toGreyscale(): GeonImage {
+    toGreyscale(): Texture {
         if (this.pixelSize != 4) throw "please, only use this when pixelsize is 4";
 
-        let image = new GeonImage(this.width, this.height, 4);
+        let image = new Texture(this.width, this.height, 4);
         for (let y = 0; y < this.height; y++) {
             for (let x = 0; x < this.width; x++) {
                 let pixel = this.get(x, y);
@@ -417,12 +434,12 @@ export class GeonImage {
         return image;
     }
 
-    toRGBA(): GeonImage {
+    toRGBA(): Texture {
         // if (this.pixelSize != 1) throw "please, only use this when pixelsize is 1"
 
         return this;
 
-        // let image = new GeonImage(this.width, this.height, 4);
+        // let image = new Texture(this.width, this.height, 4);
         // for (let y = 0; y < this.height; y++) {
         //     for (let x = 0; x < this.width; x++) {
         //         let pixel = this.get(x,y);

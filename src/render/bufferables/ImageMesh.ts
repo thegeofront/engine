@@ -1,4 +1,4 @@
-import { GeonImage, Vector3, ShaderMesh, Plane, Domain2, Rectangle3, Mesh } from "../../lib";
+import { Texture, Vector3, ShaderMesh, Plane, Domain2, Rectangle3, Mesh } from "../../lib";
 import { Bufferable } from "../Bufferable";
 
 /**
@@ -8,13 +8,13 @@ import { Bufferable } from "../Bufferable";
  */
 export class ImageMesh implements Bufferable {
 	constructor(
-		public image: GeonImage, 
+		public image: Texture, 
 		public plane: Plane,
         public scale: number,
         public centered: boolean,
         public doubleSided: boolean) {}
 
-	static new(image: GeonImage, plane=Plane.WorldXY(), scale=1, centered=true, doubleSided=true) {
+	static new(image: Texture, plane=Plane.WorldXY(), scale=1, centered=true, doubleSided=true) {
 		return new ImageMesh(image, plane, scale, centered, doubleSided);
 	}
 

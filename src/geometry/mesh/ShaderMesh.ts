@@ -11,7 +11,7 @@
 
 import {
     Domain2,
-    GeonImage,
+    Texture,
     Graph,
     HelpGl,
     Matrix4,
@@ -102,7 +102,7 @@ export class ShaderMesh implements Renderable {
     }
 
     static fromImage(
-        image: GeonImage,
+        image: Texture,
         plane: Plane,
         centered = true,
         scale = 1,

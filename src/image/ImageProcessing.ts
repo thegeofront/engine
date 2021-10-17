@@ -1,10 +1,10 @@
 import { DebugRenderer, ImageMesh, Plane, Vector2, Vector3 } from "../lib";
 import { Color } from "./Color";
-import { GeonImage } from "./Image";
+import { Texture } from "./Texture";
 import { Kernels } from "./Kernels";
 
 export namespace ImageProcessing {
-    export function imagedataFromTrueGreyscale(grey: GeonImage) {
+    export function imagedataFromTrueGreyscale(grey: Texture) {
         let rgba = new Uint8ClampedArray(grey.width * grey.height * 4);
 
         for (let i = 0; i < grey.width; i++) {
@@ -19,7 +19,7 @@ export namespace ImageProcessing {
                 rgba[4 * (i * grey.width + j) + 3] = 255;
             }
         }
-        // let rgba = new GeonImage(grey.width, grey.height, 4);
+        // let rgba = new Texture(grey.width, grey.height, 4);
         // rgba.fillEvery((x: number, y: number) => {
         //     let pixel = grey.get(x, y);
         //     return [pixel[0], pixel[0], pixel[0], 255];
@@ -30,10 +30,10 @@ export namespace ImageProcessing {
     /**
      * Returns a greyscale image which still contains
      */
-    export function fakeGreyscale(rgba: GeonImage): GeonImage {
+    export function fakeGreyscale(rgba: Texture): Texture {
         if (rgba.pixelSize != 4) throw "please, only use this when pixelsize is 4";
 
-        let image = new GeonImage(rgba.width, rgba.height, 4);
+        let image = new Texture(rgba.width, rgba.height, 4);
         for (let y = 0; y < rgba.height; y++) {
             for (let x = 0; x < rgba.width; x++) {
                 let pixel = rgba.get(x, y);
@@ -44,8 +44,8 @@ export namespace ImageProcessing {
         return image;
     }
 
-    export function trueGreyscale(rgba: GeonImage) {
-        let grey = new GeonImage(rgba.width, rgba.height, 1);
+    export function trueGreyscale(rgba: Texture) {
+        let grey = new Texture(rgba.width, rgba.height, 1);
 
         for (let i = 0; i < grey.height; i++) {
             for (let j = 0; j < grey.width; j++) {
@@ -66,9 +66,9 @@ export namespace ImageProcessing {
 
     /**
      * This performs a pythagorean sum of a vertical & horizontal sobel kernel.
-     * @returns [gradient: GeonImage, direction: GeonImage]
+     * @returns [gradient: Texture, direction: Texture]
      */
-    export function sobelMD(image: GeonImage): [GeonImage, GeonImage] {
+    export function sobelMD(image: Texture): [Texture, Texture] {
         let kernelLeft = Kernels.SobelLeft;
         let kernelUp = Kernels.SobelUp;
 
@@ -77,8 +77,8 @@ export namespace ImageProcessing {
         let newWidth = image.width - radius * 2;
         let newHeight = image.height - radius * 2;
 
-        let magnitudeImage = new GeonImage(newWidth, newHeight, image.pixelSize);
-        let directionImage = new GeonImage(newWidth, newHeight, image.pixelSize);
+        let magnitudeImage = new Texture(newWidth, newHeight, image.pixelSize);
+        let directionImage = new Texture(newWidth, newHeight, image.pixelSize);
 
         for (let i = radius; i < image.width - radius; i++) {
             for (let j = radius; j < image.height - radius; j++) {
@@ -110,7 +110,7 @@ export namespace ImageProcessing {
      * Take a bump map, or a direction image, and convert it to a `theta-angle-greyscale` image.
      *
      */
-    export function thetaMap(direction: GeonImage) {
+    export function thetaMap(direction: Texture) {
         let result = direction.forEachPixel((pixel, i, j) => {
             // get the angle a (x,y) vector makes with a (1,0) vector. result From -PI to PI.
             let theta = Math.atan2(pixel[1] - 128, pixel[0] - 128);
@@ -129,7 +129,7 @@ export namespace ImageProcessing {
     /**
      * Clamp a theta-map to `x` number of directions
      */
-    export function clampGreyscale(image: GeonImage, numberOfValues: number) {
+    export function clampGreyscale(image: Texture, numberOfValues: number) {
         let result = image.forEachGreyscalePixel((val) => {
             return Math.round((val / 255) * numberOfValues) % numberOfValues;
         });
@@ -140,7 +140,7 @@ export namespace ImageProcessing {
      * Take the canny process, but render all in-between steps
      */
     export function canny(
-        original: GeonImage,
+        original: Texture,
         blurSigma = 1.4,
         blurSize = 3,
         lower = 100,
@@ -165,7 +165,7 @@ export namespace ImageProcessing {
         }
 
         let offset = 0;
-        let addToDR = (img: GeonImage, label: string) => {
+        let addToDR = (img: Texture, label: string) => {
             let plane = Plane.WorldYZ().moveTo(Vector3.new(-offset, 0, 0));
             dr?.set(ImageMesh.new(img, plane, 1, false, true), label);
             offset += 10;
@@ -185,7 +185,7 @@ export namespace ImageProcessing {
     /**
      *
      */
-    export function cannyNonMaximumSuppression(magnitude: GeonImage, direction: GeonImage) {
+    export function cannyNonMaximumSuppression(magnitude: Texture, direction: Texture) {
         // dir is from 0 to 255
 
         let magGet = (i: number, j: number) => {
@@ -193,7 +193,7 @@ export namespace ImageProcessing {
         };
 
         let range = 1;
-        let result = new GeonImage(
+        let result = new Texture(
             magnitude.width - range * 2,
             magnitude.height - range * 2,
             magnitude.pixelSize,
@@ -229,7 +229,7 @@ export namespace ImageProcessing {
     }
 
     export function cannyThreshold(
-        image: GeonImage,
+        image: Texture,
         lower: number,
         upper: number,
         weakValue: number,
@@ -247,8 +247,8 @@ export namespace ImageProcessing {
         return result;
     }
 
-    export function cannyHysteresis(image: GeonImage, weakValue: number, strongValue: number) {
-        let result = GeonImage.new(image.width, image.height).fill([0,0,0,255]);
+    export function cannyHysteresis(image: Texture, weakValue: number, strongValue: number) {
+        let result = Texture.new(image.width, image.height).fill([0,0,0,255]);
 
         let condition = (index: number) => {
             let val = image.getWithIndex(index)[0];
@@ -276,11 +276,11 @@ export namespace ImageProcessing {
      * same as image.bucketfill, but functional style
      */
     export function bucketFill(
-        image: GeonImage,
+        image: Texture,
         start: Vector2,
         color: Color,
         diagonal = false,
-    ): GeonImage {
+    ): Texture {
         image.clone();
         image.bucketFill(start, color, diagonal);
         return image;
