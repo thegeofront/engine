@@ -14,18 +14,18 @@ export enum DrawSpeed {
     DynamicDraw = 0x88e8, // if you plan on using the 'set' method every frame
 }
 
-export class HelpGl {
+export namespace HelpGl {
 
     /**
      * We need to keep track of all textures in the entire webgl application
      */
-    static getNextTextureID() {
+    export function getNextTextureID() {
         let id = nextTextureId;
         nextTextureId += 1;
         return id;
     }
 
-    static resizeCanvas(gl: WebGl) {
+    export function resizeCanvas(gl: WebGl) {
         // Lookup the size the browser is displaying the canvas in CSS pixels.
         let canvas = gl.canvas as HTMLCanvasElement;
 
@@ -47,7 +47,7 @@ export class HelpGl {
         return needResize;
     }
 
-    static initWebglContext(canvas: HTMLCanvasElement, blend = false): WebGl | undefined {
+    export function initWebglContext(canvas: HTMLCanvasElement, blend = false): WebGl | undefined {
         let possiblyGl = canvas.getContext("webgl");
         if (possiblyGl == undefined) {
             alert("webgl unavailable...");
@@ -77,7 +77,7 @@ export class HelpGl {
         return gl;
     }
 
-    static compileShader(gl: WebGl, shaderSource: string, shaderType: number): WebGLShader {
+    export function compileShader(gl: WebGl, shaderSource: string, shaderType: number): WebGLShader {
         let shader = gl.createShader(shaderType)!;
         gl.shaderSource(shader, shaderSource);
         gl.compileShader(shader);
@@ -88,7 +88,7 @@ export class HelpGl {
         return shader;
     }
 
-    static createProgram(gl: WebGl, vertexShader: WebGLShader, fragmentShader: WebGLShader) {
+    export function createProgram(gl: WebGl, vertexShader: WebGLShader, fragmentShader: WebGLShader) {
         let program = gl.createProgram()!;
         gl.attachShader(program, vertexShader);
         gl.attachShader(program, fragmentShader);
@@ -100,29 +100,33 @@ export class HelpGl {
         return program;
     }
 
-    static createProgramFromScripts(
+    export function createProgramFromScripts(
         gl: WebGl,
         vertexScript: string,
         fragmentScript: string,
     ): WebGLProgram {
-        let vertexShader = HelpGl.compileShader(gl, vertexScript, gl.VERTEX_SHADER);
-        let fragmentShader = HelpGl.compileShader(gl, fragmentScript, gl.FRAGMENT_SHADER);
-        return HelpGl.createProgram(gl, vertexShader, fragmentShader);
+        let vertexShader = compileShader(gl, vertexScript, gl.VERTEX_SHADER);
+        let fragmentShader = compileShader(gl, fragmentScript, gl.FRAGMENT_SHADER);
+        return createProgram(gl, vertexShader, fragmentShader);
     }
+
+
+
+
 
     /**
      * WebGl only allows textures with a width and height of the power of two.
      * This means `32x512` is valid, while `40x40` is not valid
      * This function takes a size, lets say `40`, and rounds up to the nearest power of two, in this case `64`
      */
-    static getNearestCorrectTextureSize(size: number) {
+    export function getNearestCorrectTextureSize(size: number) {
         let base = Math.log2(size);
         return Math.pow(2, Math.ceil(base));
     }
 
-    static fixTextureSizing(image: Texture) : Texture {
-        let goodWidth = HelpGl.getNearestCorrectTextureSize(image.width);
-        let goodHeight = HelpGl.getNearestCorrectTextureSize(image.height);
+    export function fixTextureSizing(image: Texture) : Texture {
+        let goodWidth = getNearestCorrectTextureSize(image.width);
+        let goodHeight = getNearestCorrectTextureSize(image.height);
         if (goodWidth !== image.width || goodHeight !== image.height) {
             // we need to perform resizing!
             console.log("resizing to ", goodWidth, goodHeight);

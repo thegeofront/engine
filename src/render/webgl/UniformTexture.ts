@@ -13,8 +13,8 @@ import { WebGl, HelpGl } from "./HelpGl";
         private loc: WebGLUniformLocation) {}
 
     static new(gl: WebGl, program: WebGLProgram, name: string) {
-        // let location = gl.getUniformLocation(program, name)!;
-        let location = 0;
+        let location = gl.getUniformLocation(program, name)!;
+        // let location = 0;
         let id = HelpGl.getNextTextureID();
         let texture = gl.createTexture()!;
         return new UniformTexture(gl, id, texture, location)
@@ -66,7 +66,7 @@ import { WebGl, HelpGl } from "./HelpGl";
     }
 
     bind(gl: WebGl) {
-        // gl.uniform1i(this.loc, this.id);
+        gl.uniform1i(this.loc, this.id);
         gl.activeTexture(gl.TEXTURE0 + this.id);
         gl.bindTexture(gl.TEXTURE_2D, this.texture);
     }
@@ -75,15 +75,6 @@ import { WebGl, HelpGl } from "./HelpGl";
         throw "TODO";
     }
 }
-
-
-/**
- * based on : https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Using_textures_in_WebGL
- */
-function loadTexture(gl: WebGl, level: number, texture: Texture) {
-}
-
-
 
 function isPowerOf2(value: number) {
     return (value & (value - 1)) == 0;

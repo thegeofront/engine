@@ -4,6 +4,7 @@ import { Texture } from "./Texture";
 import { Kernels } from "./Kernels";
 
 export namespace ImageProcessing {
+    
     export function imagedataFromTrueGreyscale(grey: Texture) {
         let rgba = new Uint8ClampedArray(grey.width * grey.height * 4);
 
