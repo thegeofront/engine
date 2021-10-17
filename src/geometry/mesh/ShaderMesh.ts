@@ -9,6 +9,8 @@
 //   - triangles (links.width = 3)
 //   - quads (links.width = 4. will need to be converted to triangles for now...)
 
+// NOTE : THIS WHOLE CLASS CAN BE DELETED. ALL FUNCTIONALITY HAS BEEN TRANSFERED TO MESH + MODEL + ENTITY ABSTRACTIONS
+
 import {
     Domain2,
     Texture,
@@ -34,12 +36,8 @@ export class ShaderMesh implements Renderable {
     // this desperately calls for an overhaul...
 
     mesh: Mesh;
-
-    norms: MultiVector3;
-    uvs: MultiVector2;
     ambi: Float32Array;
     texture?: ImageData;
-
     _normKind: NormalKind = NormalKind.None;
 
     position: Matrix4;
@@ -63,6 +61,22 @@ export class ShaderMesh implements Renderable {
         this.ambi = new Float32Array(vertCount);
         this.texture = texture;
         this.position = Matrix4.newIdentity();
+    }
+
+    set norms(v: MultiVector3) {
+        this.mesh.setNormals(v);
+    }
+
+    set uvs(v: MultiVector2) {
+        this.mesh.setUvs(v, this._normKind);
+    }
+
+    get norms() {
+        return this.mesh.normals!;
+    }
+
+    get uvs() {
+        return this.mesh.uvs!;
     }
 
     static new(

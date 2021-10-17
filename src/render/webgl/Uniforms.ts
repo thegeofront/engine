@@ -1,7 +1,8 @@
 import { Texture } from "../../image/Texture";
 import { Matrix4 } from "../../math/Matrix4";
 import { Vector2 } from "../../math/Vector2";
-import { Uniform, UniformTexture, UniformType } from "./Uniform";
+import { Uniform, UniformType } from "./Uniform";
+import { UniformTexture } from "./UniformTexture";
 import { WebGl } from "./HelpGl";
 import { Vector3 } from "../../math/Vector3";
 import { Matrix3 } from "../../math/Matrix3";
@@ -39,21 +40,16 @@ export class Uniforms {
         }
     }
     
-    
     /**
      * Load the state of all textures, to prepare for rendering
      */
-     bindAll() {
+    bindAll() {
         for (let v of this.textures.values()) {
             v.bind(this.gl);
         }
     }
 
     loadTexture(name: string, source: Texture) {
-        this.textures.get(name)!.load(source.toImageData());
-    }
-
-    loadTextureSource(name: string, source: TexImageSource) {
         this.textures.get(name)!.load(source);
     }
 
@@ -62,11 +58,11 @@ export class Uniforms {
     }
 
     load2(name: string, value: Vector2) {
-        this.get(name).loadAndBind(this.gl, [value.x, value.y]);
+        this.get(name).loadAndBind(this.gl, value.data);
     }
 
     load3(name: string, value: Vector3) {
-        this.get(name).loadAndBind(this.gl, [value.x, value.y, value.z]);
+        this.get(name).loadAndBind(this.gl, value.data);
     }
 
     load4(name: string, value: number[]) {

@@ -36,13 +36,13 @@ export enum NormalKind {
 }
 
 export class Mesh {
-    private _normalKind = NormalKind.None;
-
+    
     constructor(
         public verts: MultiVector3,
         public links: IntMatrix, // relationships, can be 2 (lines) | 3 (triangles) | 4 (quads)
         private _uvs?: MultiVector2,
-        private _normals?: MultiVector3, //
+        private _normals?: MultiVector3, 
+        private _normalKind = NormalKind.None
     ) {}
 
     get maxSize() {
@@ -51,6 +51,27 @@ export class Mesh {
         } else {
             return this.verts.count;
         }
+    }
+
+    get uvs(): MultiVector2 | undefined {
+        return this._uvs;
+    }
+
+    get normals(): MultiVector3 | undefined {
+        return this._normals;
+    }
+
+    get normalKind() {
+        return this._normalKind;
+    }
+
+    setUvs(v: MultiVector2, kind: NormalKind) {
+        this._uvs = v;
+        this._normalKind = kind;
+    }
+
+    setNormals(v: MultiVector3) {
+        this._normals = v;
     }
 
     clone(): Mesh {
@@ -66,8 +87,14 @@ export class Mesh {
         return new Mesh(verts, links, uvs, normals);
     }
 
-    static fromLists(verts: Vector3[], faces: number[]): Mesh {
-        return new Mesh(MultiVector3.fromList(verts), IntMatrix.fromList(faces, 3));
+    static fromLists(verts: Vector3[], faces: number[], uvs=[], normals=[], normalKind = NormalKind.None): Mesh {
+        return new Mesh(MultiVector3.fromList(verts), IntMatrix.fromList(faces, 3), MultiVector2.fromList(uvs), MultiVector3.fromList(normals), normalKind);
+    }
+
+    static fromRawLists(verts: number[], faces: number[], uvs: number[], normals: number[], normalKind=NormalKind.None): Mesh {
+        
+        return new Mesh(MultiVector3.fromData(verts), IntMatrix.fromList(faces, 3), MultiVector2.fromData(uvs), MultiVector3.fromData(normals), normalKind);
+
     }
 
     static newEmpty(vertCount: number, linkCount: number, perLinkCount: number): Mesh {
@@ -609,13 +636,7 @@ export class Mesh {
 
     // ----- Normals -----
 
-    get normals(): MultiVector3 | undefined {
-        return this._normals;
-    }
 
-    get normalKind() {
-        return this._normalKind;
-    }
 
     calcAndSetFaceNormals() {
         this._normalKind = NormalKind.Face;
@@ -747,10 +768,6 @@ export class Mesh {
     }
 
     // ------ UVS
-
-    get uvs(): MultiVector2 | undefined {
-        return this._uvs;
-    }
 
     ensureUVs() {
         if (this._uvs && this._uvs.count == this.maxSize) {
