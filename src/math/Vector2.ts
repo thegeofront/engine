@@ -82,7 +82,7 @@ export class Vector2 {
         // sort of cross product
         let d = 2 * (a.x * (b.y - c.y) + b.x * (c.y - a.y) + c.x * (a.y - b.y));
 
-        // if this triangle has no circumcenter?
+        // if this triangle has no circumcenter
         if (d < 0.000001) return Vector2.NaN();
 
         let x = (asum * (b.y - c.y) + bsum * (c.y - a.y) + csum * (a.y - b.y)) / d;

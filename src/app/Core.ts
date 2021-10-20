@@ -6,6 +6,7 @@ import { InputState } from "../input/InputState";
 import { App } from "./App";
 import { FpsCounter } from "../util/FpsCounter";
 import { UI } from "../dom/UI";
+import { HelpGl } from "../lib";
 
 export class Core {
     canvas: HTMLCanvasElement;
@@ -82,7 +83,7 @@ export class Core {
 
         }
 
-        this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT);
+        HelpGl.clear()
 
         // render all apps
         // TODO : reverse order
