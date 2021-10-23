@@ -27,9 +27,7 @@ export class Camera {
     worldMatrix!: Matrix4;
     projectMatrix!: Matrix4;
     inverseWorldMatrix!: Matrix4;
-
-    // lazies
-    inverseRotateMatrix!: Matrix4;
+    inverseTotalViewMatrix!: Matrix4;
 
     // settings
     canMove: boolean;
@@ -110,6 +108,15 @@ export class Camera {
         this.totalMatrix = this.worldMatrix.multiplied(this.projectMatrix);
         this.inverseWorldMatrix = this.worldMatrix.inverse();
         this.inverseTransposeMatrix = this.inverseWorldMatrix.transpose(); 
+
+        // translation = 0
+        var viewDirectionMatrix = Matrix4.newCopy(this.worldMatrix);
+        viewDirectionMatrix.data[12] = 0;
+        viewDirectionMatrix.data[13] = 0;
+        viewDirectionMatrix.data[14] = 0;
+
+        let totalViewMatrix = viewDirectionMatrix.multiplied(this.projectMatrix);
+        this.inverseTotalViewMatrix = totalViewMatrix.inverse();
     }
 
     lookat(position: Vector3, target: Vector3) {
@@ -238,8 +245,7 @@ export class Camera {
         let x_rotation = Matrix4.newXRotation(angleA);
         let z_rotation = Matrix4.newZRotation(angleB);
         let rotation = z_rotation.multiply(x_rotation);
-        this.inverseRotateMatrix = rotation.inverse();
-
+ 
         // let transform = mOffset.multiply(rotation).multiply(position);
 
         let transform = position.multiply(rotation).multiply(mOffset);

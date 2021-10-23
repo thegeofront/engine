@@ -17,9 +17,11 @@ export class SkyBoxShader extends ShaderProgram<Texture> {
 
         attribute vec4 a_position;
         varying vec4 v_position;
+        uniform mat4 u_viewDirectionProjectionInverse;
 
         void main() {
-            v_position = vec4(a_position.x, a_position.y, a_position.z * -1.0, a_position.w);
+
+            v_position = a_position;
             gl_Position = a_position;
             gl_Position.z = 1.0;
         }
@@ -46,7 +48,7 @@ export class SkyBoxShader extends ShaderProgram<Texture> {
         vec2 to_polar(vec3 normal) {
             vec2 dir = normalize(normal.xy) * 0.5;
             float delta = acos(normal.z) / PI;
-            return vec2(0.5, 0.5) + dir * 0.5; 
+            return vec2(0.5, 0.5) + dir * delta; 
         }
 
         vec3 to_sphere(vec3 P) {
@@ -64,20 +66,19 @@ export class SkyBoxShader extends ShaderProgram<Texture> {
         }
 
         void main() {
-            // vec4 t = u_viewDirectionProjectionInverse * v_position;
-            // vec3 normal = normalize(t.xyz / t.w);
+            vec4 t = u_viewDirectionProjectionInverse * v_position;
+            vec3 normal = normalize(t.xyz / t.w);
 
-            // gl_FragColor = vec4(t.xyz, 1.0);
-            // gl_FragColor = vec4(1.0, 0.0,0.0,1.0);
+            // debug
+            // gl_FragColor = vec4((normal + 1.0) * 0.5, 1.0);
+
+            // using cubemap
             // gl_FragColor = texture2D(u_skybox, (v_position.xy + 1.0) / 2.0);
             // gl_FragColor = textureCube(u_skybox, normal);
 
-            // use polar projection 
-            // float lat = atan2(-this.y, -this.x);
-
-            // vec2 pole = to_polar(normal);
-            // gl_FragColor = texture2D(u_skybox, pole);
-            // gl_FragColor = vec4((t.xyz + 1.0) * 0.5, 1.0);
+            // using single texture with polar projection
+            vec2 polar = to_polar(normal);
+            gl_FragColor = texture2D(u_skybox, polar);
         }
         `;
         super(gl, vertexShader, fragmentShader);
@@ -85,7 +86,6 @@ export class SkyBoxShader extends ShaderProgram<Texture> {
 
     protected onInit(): DrawMode {
         this.attributes.add("a_position", 2);
-        this.attributes.addIndex(DrawElementsType.UnsignedByte);
         this.uniforms.add("u_viewDirectionProjectionInverse", 16, Matrix4.newIdentity().data);
         this.uniforms.addTexture("u_skybox");
         return DrawMode.Triangles;
@@ -93,28 +93,17 @@ export class SkyBoxShader extends ShaderProgram<Texture> {
 
     protected onLoad(texture: Texture, speed: DrawSpeed): number {
 
-        let cube = new Float32Array([
-            -1.0,  1.0,  1.0,
-            -1.0, -1.0,  1.0,
-             1.0, -1.0,  1.0,
-             1.0,  1.0,  1.0,
-            -1.0,  1.0, -1.0,
-            -1.0, -1.0, -1.0,
-             1.0, -1.0, -1.0,
-             1.0,  1.0, -1.0,
-        ]);
+        var quad = new Float32Array(
+            [
+              -1, -1, 
+               1, -1, 
+              -1,  1, 
+              -1,  1,
+               1, -1,
+               1,  1,
+            ]);
 
-        let cubeIndices = new Float32Array([
-            0, 1, 2, 3,
-            3, 2, 6, 7,
-            7, 6, 5, 4,
-            4, 5, 1, 0,
-            0, 3, 7, 4,
-            1, 2, 6, 5,
-        ]);
-
-        this.attributes.load("a_position", cube, speed);
-        this.attributes.loadIndex(cubeIndices, speed);
+        this.attributes.load("a_position", quad, speed);
 
         this.uniforms.loadTexture("u_skybox", texture);
 
@@ -124,6 +113,6 @@ export class SkyBoxShader extends ShaderProgram<Texture> {
     protected onDraw(c: Scene) {
         // let our quad pass the depth test at 1.0
         // this.gl.depthFunc(this.gl.LEQUAL);
-        this.uniforms.loadMatrix4("u_viewDirectionProjectionInverse", c.camera.inverseRotateMatrix);
+        this.uniforms.loadMatrix4("u_viewDirectionProjectionInverse", c.camera.inverseTotalViewMatrix);
     }
 }
