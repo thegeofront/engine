@@ -11,6 +11,16 @@ export class Matrix3 extends FloatMatrix {
         super(3, 3, data);
     }
 
+    static fromMat4(mat4: Matrix4) {
+        let d = mat4.data;
+        return new Matrix3([
+            d[0], d[1], d[2],
+            d[4], d[5], d[6],
+            d[8], d[9], d[10]
+        ]);
+    }
+    
+
     static new(data = [1, 0, 0, 0, 1, 0, 0, 0, 1]) {
         return new Matrix3(data);
     }
@@ -58,6 +68,28 @@ export class Matrix3 extends FloatMatrix {
             d[7],
             0,
             d[8],
+        ]);
+    }
+
+    toMat4Rot(): Matrix4 {
+        let d = this.data;
+        return new Matrix4([
+            d[0],
+            d[1],
+            d[2],
+            0,
+            d[3],
+            d[4],
+            d[5],
+            0,
+            d[6],
+            d[7],
+            d[8],
+            0,
+            0,
+            0,
+            0,
+            1,
         ]);
     }
 

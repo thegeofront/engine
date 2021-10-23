@@ -96,6 +96,7 @@ export * from "./render/shaders/DotShaderWithHeight";
 export * from "./render/shaders/PhongShader";
 export * from "./render/shaders/TemplateShader";
 export * from "./render/shaders/ZebraShader";
+export * from "./render/shaders/SkyBoxShader";
 
 export * from "./render/webgl/DrawTarget";
 export * from "./render/webgl/Attribute";

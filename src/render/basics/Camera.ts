@@ -1,7 +1,7 @@
 // author : Jos Feenstra
 // purpose : contain all logic regarding
 
-import { Vector3, Vector2, Plane, Matrix4, InputState, GeonMath, Ray } from "../../lib";
+import { Vector3, Vector2, Plane, Matrix4, InputState, GeonMath, Ray, Matrix3 } from "../../lib";
 
 
 export class Camera {
@@ -28,6 +28,9 @@ export class Camera {
     projectMatrix!: Matrix4;
     inverseWorldMatrix!: Matrix4;
 
+    // lazies
+    inverseRotateMatrix!: Matrix4;
+
     // settings
     canMove: boolean;
     canControl: any;
@@ -42,6 +45,7 @@ export class Camera {
         this.offset = new Vector3(0, 0, -z_offset);
         this.updateMatrices(canvas);
     }
+
 
     new(canvas: HTMLCanvasElement, zOffset = 1, canMove = false) {
         return new Camera(canvas, zOffset, canMove);
@@ -224,7 +228,7 @@ export class Camera {
         let angleB = this.angleBeta;
 
         // translate so z means 'up'
-        let yzFlip = new Matrix4([1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1]);
+        // let yzFlip = new Matrix4([1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1]);
 
         // translated to fit screen
         let position = Matrix4.newTranslation(this.pos.x, this.pos.y, this.pos.z);
@@ -234,6 +238,7 @@ export class Camera {
         let x_rotation = Matrix4.newXRotation(angleA);
         let z_rotation = Matrix4.newZRotation(angleB);
         let rotation = z_rotation.multiply(x_rotation);
+        this.inverseRotateMatrix = rotation.inverse();
 
         // let transform = mOffset.multiply(rotation).multiply(position);
 

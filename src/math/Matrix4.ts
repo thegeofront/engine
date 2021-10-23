@@ -4,6 +4,7 @@
 // NOTE:
 
 import { FloatMatrix } from "../data/FloatMatrix";
+import { Matrix3 } from "./Matrix3";
 import { Quaternion } from "./Quaternion";
 import { Vector2 } from "./Vector2";
 import { Vector3 } from "./Vector3";

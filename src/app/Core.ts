@@ -61,11 +61,6 @@ export class Core {
         const canvas = this.canvas;
         const gl = this.gl;
 
-        // put fps in the title
-        if (this.fpsInTitle) {
-            document.title = "fps: " + this.fpsCounter.getFps();
-        }
-
         if (this.fullscreen) {
             // pre-gl business
             if (window.innerHeight != canvas.height || window.innerWidth != canvas.width) {
@@ -83,7 +78,7 @@ export class Core {
 
         }
 
-        HelpGl.clear()
+        HelpGl.clear(gl);
 
         // render all apps
         // TODO : reverse order
