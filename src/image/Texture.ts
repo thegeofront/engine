@@ -21,7 +21,7 @@ import { Color } from "./Color";
 
 
 
-export class Texture {
+export class BitMap {
     public data: Uint8ClampedArray;
     public readonly width: number;
     public readonly height: number;
@@ -45,6 +45,7 @@ export class Texture {
     }
 
     get pixelSize() {
+
         return this.depth;
     }
 
@@ -53,11 +54,11 @@ export class Texture {
     }
 
     static new(width: number, height: number, depth=4) {
-        return new Texture(width, height, depth);
+        return new BitMap(width, height, depth);
     }
 
-    static fromImageData(id: ImageData): Texture {
-        let image = new Texture(id.width, id.height);
+    static fromImageData(id: ImageData): BitMap {
+        let image = new BitMap(id.width, id.height);
         image.setData(id.data);
         return image;
     }
@@ -81,12 +82,12 @@ export class Texture {
     }
 
     clone() {
-        let image = new Texture(this.width, this.height, this.pixelSize);
+        let image = new BitMap(this.width, this.height, this.pixelSize);
         image.setData(this.data);
         return image;
     }
 
-    fill(pixel: number[]): Texture {
+    fill(pixel: number[]): BitMap {
         for (let i = 0; i < this.height; i++) {
             for (let j = 0; j < this.width; j++) {
                 this.set(j, i, pixel);
@@ -116,7 +117,7 @@ export class Texture {
      * Perform an operation to every pixel of an image
      */
     forEachPixel(operation: (pixel: number[], i: number, j: number) => number[]) {
-        let result = new Texture(this.width, this.height, this.pixelSize);
+        let result = new BitMap(this.width, this.height, this.pixelSize);
         for (let i = 0; i < this.width; i++) {
             for (let j = 0; j < this.height; j++) {
                 let pixel = this.get(i, j);
@@ -131,7 +132,7 @@ export class Texture {
      * Perform an operation to every pixel of a 'greyscale' image
      */
     forEachGreyscalePixel(operation: (val: number, i: number, j: number) => number) {
-        let result = new Texture(this.width, this.height, this.pixelSize);
+        let result = new BitMap(this.width, this.height, this.pixelSize);
         for (let i = 0; i < this.width; i++) {
             for (let j = 0; j < this.height; j++) {
                 let val = this.get(i, j)[0];
@@ -227,8 +228,8 @@ export class Texture {
         return nbs;
     }
 
-    flipHor(): Texture {
-        let image = new Texture(this.width, this.height, this.pixelSize);
+    flipHor(): BitMap {
+        let image = new BitMap(this.width, this.height, this.pixelSize);
         for (let i = 0; i < this.height; i++) {
             for (let j = 0; j < this.width; j++) {
                 let jMirror = this.width - 1 - j;
@@ -238,8 +239,8 @@ export class Texture {
         return image;
     }
 
-    flipVer(): Texture {
-        let image = new Texture(this.width, this.height, this.pixelSize);
+    flipVer(): BitMap {
+        let image = new BitMap(this.width, this.height, this.pixelSize);
         for (let i = 0; i < this.height; i++) {
             let iMirror = this.height - 1 - i;
             for (let j = 0; j < this.width; j++) {
@@ -249,11 +250,11 @@ export class Texture {
         return image;
     }
 
-    applyKernel(kernel: FloatMatrix): Texture {
+    applyKernel(kernel: FloatMatrix): BitMap {
         // determine kernel size
         let size = kernel.count();
         let radius = size / 2 - 0.5;
-        let image = new Texture(
+        let image = new BitMap(
             this.width - radius * 2,
             this.height - radius * 2,
             this.pixelSize,
@@ -302,8 +303,8 @@ export class Texture {
         });
     }
 
-    apply(filler: Function): Texture {
-        let copy = new Texture(this.width, this.height, this.pixelSize);
+    apply(filler: Function): BitMap {
+        let copy = new BitMap(this.width, this.height, this.pixelSize);
 
         for (let y = 0; y < this.height; y++) {
             for (let x = 0; x < this.width; x++) {
@@ -340,14 +341,14 @@ export class Texture {
         return this;
     }
 
-    scale(scaleX: number, scaleY: number): Texture {
+    scale(scaleX: number, scaleY: number): BitMap {
         // scale the image to a new width and height, using nearest neighbour
         return this.resize(Math.round(this.width * scaleX), Math.round(this.height * scaleY));
     }
 
-    resize(width: number, height: number): Texture {
+    resize(width: number, height: number): BitMap {
         // resize the image to a new width and height, using nearest neighbour
-        const image = new Texture(width, height, this.pixelSize);
+        const image = new BitMap(width, height, this.pixelSize);
         const old = this;
 
         const x_factor = (1 / image.width) * old.width;
@@ -364,8 +365,8 @@ export class Texture {
     }
 
     // add borders till this size is achieved
-    buffer(width: number, height: number): Texture {
-        const image = new Texture(width, height, this.pixelSize);
+    buffer(width: number, height: number): BitMap {
+        const image = new BitMap(width, height, this.pixelSize);
         const old = this;
 
         for (let y = 0; y < height; y++) {
@@ -403,12 +404,12 @@ export class Texture {
         return this.trim(x1, y1, x2, y2);
     }
 
-    trim(x1: number, y1: number, x2: number, y2: number): Texture {
+    trim(x1: number, y1: number, x2: number, y2: number): BitMap {
         // return a hardcopy of this particular window
         const imageWidth = x2 - x1;
         const imageHeight = y2 - y1;
 
-        const image = new Texture(imageWidth, imageHeight, this.pixelSize);
+        const image = new BitMap(imageWidth, imageHeight, this.pixelSize);
 
         for (let y = 0; y < imageHeight; y++) {
             for (let x = 0; x < imageWidth; x++) {
@@ -420,10 +421,10 @@ export class Texture {
         return image;
     }
 
-    toGreyscale(): Texture {
+    toGreyscale(): BitMap {
         if (this.pixelSize != 4) throw "please, only use this when pixelsize is 4";
 
-        let image = new Texture(this.width, this.height, 4);
+        let image = new BitMap(this.width, this.height, 4);
         for (let y = 0; y < this.height; y++) {
             for (let x = 0; x < this.width; x++) {
                 let pixel = this.get(x, y);
@@ -434,7 +435,7 @@ export class Texture {
         return image;
     }
 
-    toRGBA(): Texture {
+    toRGBA(): BitMap {
         // if (this.pixelSize != 1) throw "please, only use this when pixelsize is 1"
 
         return this;

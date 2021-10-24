@@ -1,4 +1,4 @@
-import { Texture } from "../../image/Texture";
+import { BitMap } from "../../image/Texture";
 import { Matrix4 } from "../../math/Matrix4";
 import { Vector2 } from "../../math/Vector2";
 import { Uniform, UniformType } from "./Uniform";
@@ -49,7 +49,7 @@ export class Uniforms {
         }
     }
 
-    loadTexture(name: string, texture: Texture) {
+    loadTexture(name: string, texture: BitMap) {
         this.textures.get(name)!.load(texture);
     }
 

@@ -1,5 +1,5 @@
 import { Color } from "../../image/Color";
-import { Matrix3, Matrix4, Mesh, meshFromObj, ShaderMesh, Texture, Vector2 } from "../../lib";
+import { Matrix3, Matrix4, Mesh, meshFromObj, ShaderMesh, BitMap, Vector2 } from "../../lib";
 import { Scene } from "../basics/Scene";
 import { DrawElementsType, DrawMode } from "../webgl/Constants";
 import { DrawSpeed, WebGl } from "../webgl/HelpGl";
@@ -9,7 +9,7 @@ import { UniformType } from "../webgl/Uniform";
 /**
  * quite literarly taken from https://webglfundamentals.org/webgl/lessons/webgl-skybox.html, saw no reason to change it
  */
-export class SkyBoxShader extends ShaderProgram<Texture> {
+export class SkyBoxShader extends ShaderProgram<BitMap> {
 
     constructor(gl: WebGl) {
         const vertexShader = `
@@ -46,8 +46,8 @@ export class SkyBoxShader extends ShaderProgram<Texture> {
         }
 
         vec2 to_polar(vec3 normal) {
-            vec2 dir = normalize(normal.xy) * 0.5;
-            float delta = acos(normal.z) / PI;
+            vec2 dir = normalize(normal.xy);
+            float delta = acos(abs(normal.z)) / PI;
             return vec2(0.5, 0.5) + dir * delta; 
         }
 
@@ -91,7 +91,7 @@ export class SkyBoxShader extends ShaderProgram<Texture> {
         return DrawMode.Triangles;
     }
 
-    protected onLoad(texture: Texture, speed: DrawSpeed): number {
+    protected onLoad(texture: BitMap, speed: DrawSpeed): number {
 
         var quad = new Float32Array(
             [

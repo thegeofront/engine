@@ -1,6 +1,6 @@
 // purpose : webgl wrapping & helper functions
 
-import { Texture } from "../../image/Texture";
+import { BitMap } from "../../image/Texture";
 
 var nextTextureId = 0;
 var rendercallsperframe = 0;
@@ -124,7 +124,7 @@ export namespace HelpGl {
         return Math.pow(2, Math.ceil(base));
     }
 
-    export function fixTextureSizing(image: Texture) : Texture {
+    export function fixTextureSizing(image: BitMap) : BitMap {
         let goodWidth = getNearestCorrectTextureSize(image.width);
         let goodHeight = getNearestCorrectTextureSize(image.height);
         if (goodWidth !== image.width || goodHeight !== image.height) {

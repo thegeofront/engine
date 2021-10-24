@@ -1,4 +1,4 @@
-import { Texture } from "../../lib";
+import { BitMap } from "../../lib";
 import { TEXTURE_2D } from "./Constants";
 import { WebGl, HelpGl } from "./HelpGl";
 
@@ -23,7 +23,7 @@ import { WebGl, HelpGl } from "./HelpGl";
     /**
      * 'normal' loading
      */
-    load(texture: Texture) {
+    load(texture: BitMap) {
         if (texture.depth != 4) {
             throw new Error("sorry, but I haven't figured out how to load non-rgba textures...");
         }
