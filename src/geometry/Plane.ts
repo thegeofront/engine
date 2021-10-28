@@ -2,6 +2,8 @@
 // author:  Jos Feenstra
 // purpose: definition of a 3d plane.
 // todo:    turn Center, Ihat, Jhat, Khat construction to an actual matrix
+// todo:    differentiate between a Space (a matrix in essense, ihat, jhat, khat, center, etc...) and a Plane (a, b, c, d);
+//          Space = a matrix which is parallel-preserving, i.e. any combination of rotation, scaling and translation, but not a perspective distortion. 
 
 import { Matrix4, Vector3, Const, MultiVector3, Stat } from "../lib";
 
@@ -31,7 +33,7 @@ export class Plane {
         let khat = v1.clone().cross(v2).normalize(); //.scale(-1);
 
         let center = a.clone();
-        let ihat = v1.normalize();
+        let ihat = v1.normalized();
         let jhat = v1.clone().cross(khat);
 
         let mat = Plane.planeMatrixFromVecs(center, ihat, jhat, khat);

@@ -3,7 +3,7 @@
 import {
     MultiVector3,
     MultiVector2,
-    BitMap,
+    Bitmap,
     Vector3,
     ToFloatMatrix,
     Vector2,
@@ -36,16 +36,16 @@ export type BillboardPayload = {
     // positionUvs: MultiVector2; // the coordinate of the 'center point', from the perspective of a billboard
     uvs: MultiVector2; //
     uvSizes: MultiVector2;
-    texture: BitMap;
+    texture: Bitmap;
 };
 
 /**
  * A single billboard
  */
 export class Billboard {
-    constructor(public position: Vector3, public image: BitMap) {}
+    constructor(public position: Vector3, public image: Bitmap) {}
 
-    static new(position: Vector3, image: BitMap) {
+    static new(position: Vector3, image: Bitmap) {
         return new Billboard(position, image);
     }
 

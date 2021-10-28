@@ -1,11 +1,11 @@
 import { DebugRenderer, ImageMesh, Plane, Vector2, Vector3 } from "../lib";
 import { Color } from "./Color";
-import { BitMap } from "./Texture";
+import { Bitmap } from "./Texture";
 import { Kernels } from "./Kernels";
 
 export namespace ImageProcessing {
     
-    export function imagedataFromTrueGreyscale(grey: BitMap) {
+    export function imagedataFromTrueGreyscale(grey: Bitmap) {
         let rgba = new Uint8ClampedArray(grey.width * grey.height * 4);
 
         for (let i = 0; i < grey.width; i++) {
@@ -31,10 +31,10 @@ export namespace ImageProcessing {
     /**
      * Returns a greyscale image which still contains
      */
-    export function fakeGreyscale(rgba: BitMap): BitMap {
+    export function fakeGreyscale(rgba: Bitmap): Bitmap {
         if (rgba.pixelSize != 4) throw "please, only use this when pixelsize is 4";
 
-        let image = new BitMap(rgba.width, rgba.height, 4);
+        let image = new Bitmap(rgba.width, rgba.height, 4);
         for (let y = 0; y < rgba.height; y++) {
             for (let x = 0; x < rgba.width; x++) {
                 let pixel = rgba.get(x, y);
@@ -45,8 +45,8 @@ export namespace ImageProcessing {
         return image;
     }
 
-    export function trueGreyscale(rgba: BitMap) {
-        let grey = new BitMap(rgba.width, rgba.height, 1);
+    export function trueGreyscale(rgba: Bitmap) {
+        let grey = new Bitmap(rgba.width, rgba.height, 1);
 
         for (let i = 0; i < grey.height; i++) {
             for (let j = 0; j < grey.width; j++) {
@@ -69,7 +69,7 @@ export namespace ImageProcessing {
      * This performs a pythagorean sum of a vertical & horizontal sobel kernel.
      * @returns [gradient: Texture, direction: Texture]
      */
-    export function sobelMD(image: BitMap): [BitMap, BitMap] {
+    export function sobelMD(image: Bitmap): [Bitmap, Bitmap] {
         let kernelLeft = Kernels.SobelLeft;
         let kernelUp = Kernels.SobelUp;
 
@@ -78,8 +78,8 @@ export namespace ImageProcessing {
         let newWidth = image.width - radius * 2;
         let newHeight = image.height - radius * 2;
 
-        let magnitudeImage = new BitMap(newWidth, newHeight, image.pixelSize);
-        let directionImage = new BitMap(newWidth, newHeight, image.pixelSize);
+        let magnitudeImage = new Bitmap(newWidth, newHeight, image.pixelSize);
+        let directionImage = new Bitmap(newWidth, newHeight, image.pixelSize);
 
         for (let i = radius; i < image.width - radius; i++) {
             for (let j = radius; j < image.height - radius; j++) {
@@ -111,7 +111,7 @@ export namespace ImageProcessing {
      * Take a bump map, or a direction image, and convert it to a `theta-angle-greyscale` image.
      *
      */
-    export function thetaMap(direction: BitMap) {
+    export function thetaMap(direction: Bitmap) {
         let result = direction.forEachPixel((pixel, i, j) => {
             // get the angle a (x,y) vector makes with a (1,0) vector. result From -PI to PI.
             let theta = Math.atan2(pixel[1] - 128, pixel[0] - 128);
@@ -130,7 +130,7 @@ export namespace ImageProcessing {
     /**
      * Clamp a theta-map to `x` number of directions
      */
-    export function clampGreyscale(image: BitMap, numberOfValues: number) {
+    export function clampGreyscale(image: Bitmap, numberOfValues: number) {
         let result = image.forEachGreyscalePixel((val) => {
             return Math.round((val / 255) * numberOfValues) % numberOfValues;
         });
@@ -141,7 +141,7 @@ export namespace ImageProcessing {
      * Take the canny process, but render all in-between steps
      */
     export function canny(
-        original: BitMap,
+        original: Bitmap,
         blurSigma = 1.4,
         blurSize = 3,
         lower = 100,
@@ -166,7 +166,7 @@ export namespace ImageProcessing {
         }
 
         let offset = 0;
-        let addToDR = (img: BitMap, label: string) => {
+        let addToDR = (img: Bitmap, label: string) => {
             let plane = Plane.WorldYZ().moveTo(Vector3.new(-offset, 0, 0));
             dr?.set(ImageMesh.new(img, plane, 1, false, true), label);
             offset += 10;
@@ -186,7 +186,7 @@ export namespace ImageProcessing {
     /**
      *
      */
-    export function cannyNonMaximumSuppression(magnitude: BitMap, direction: BitMap) {
+    export function cannyNonMaximumSuppression(magnitude: Bitmap, direction: Bitmap) {
         // dir is from 0 to 255
 
         let magGet = (i: number, j: number) => {
@@ -194,7 +194,7 @@ export namespace ImageProcessing {
         };
 
         let range = 1;
-        let result = new BitMap(
+        let result = new Bitmap(
             magnitude.width - range * 2,
             magnitude.height - range * 2,
             magnitude.pixelSize,
@@ -230,7 +230,7 @@ export namespace ImageProcessing {
     }
 
     export function cannyThreshold(
-        image: BitMap,
+        image: Bitmap,
         lower: number,
         upper: number,
         weakValue: number,
@@ -248,8 +248,8 @@ export namespace ImageProcessing {
         return result;
     }
 
-    export function cannyHysteresis(image: BitMap, weakValue: number, strongValue: number) {
-        let result = BitMap.new(image.width, image.height).fill([0,0,0,255]);
+    export function cannyHysteresis(image: Bitmap, weakValue: number, strongValue: number) {
+        let result = Bitmap.new(image.width, image.height).fill([0,0,0,255]);
 
         let condition = (index: number) => {
             let val = image.getWithIndex(index)[0];
@@ -277,11 +277,11 @@ export namespace ImageProcessing {
      * same as image.bucketfill, but functional style
      */
     export function bucketFill(
-        image: BitMap,
+        image: Bitmap,
         start: Vector2,
         color: Color,
         diagonal = false,
-    ): BitMap {
+    ): Bitmap {
         image.clone();
         image.bucketFill(start, color, diagonal);
         return image;

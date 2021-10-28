@@ -21,7 +21,7 @@ import { Color } from "./Color";
 
 
 
-export class BitMap {
+export class Bitmap {
     public data: Uint8ClampedArray;
     public readonly width: number;
     public readonly height: number;
@@ -54,11 +54,11 @@ export class BitMap {
     }
 
     static new(width: number, height: number, depth=4) {
-        return new BitMap(width, height, depth);
+        return new Bitmap(width, height, depth);
     }
 
-    static fromImageData(id: ImageData): BitMap {
-        let image = new BitMap(id.width, id.height);
+    static fromImageData(id: ImageData): Bitmap {
+        let image = new Bitmap(id.width, id.height);
         image.setData(id.data);
         return image;
     }
@@ -82,12 +82,12 @@ export class BitMap {
     }
 
     clone() {
-        let image = new BitMap(this.width, this.height, this.pixelSize);
+        let image = new Bitmap(this.width, this.height, this.pixelSize);
         image.setData(this.data);
         return image;
     }
 
-    fill(pixel: number[]): BitMap {
+    fill(pixel: number[]): Bitmap {
         for (let i = 0; i < this.height; i++) {
             for (let j = 0; j < this.width; j++) {
                 this.set(j, i, pixel);
@@ -117,7 +117,7 @@ export class BitMap {
      * Perform an operation to every pixel of an image
      */
     forEachPixel(operation: (pixel: number[], i: number, j: number) => number[]) {
-        let result = new BitMap(this.width, this.height, this.pixelSize);
+        let result = new Bitmap(this.width, this.height, this.pixelSize);
         for (let i = 0; i < this.width; i++) {
             for (let j = 0; j < this.height; j++) {
                 let pixel = this.get(i, j);
@@ -132,7 +132,7 @@ export class BitMap {
      * Perform an operation to every pixel of a 'greyscale' image
      */
     forEachGreyscalePixel(operation: (val: number, i: number, j: number) => number) {
-        let result = new BitMap(this.width, this.height, this.pixelSize);
+        let result = new Bitmap(this.width, this.height, this.pixelSize);
         for (let i = 0; i < this.width; i++) {
             for (let j = 0; j < this.height; j++) {
                 let val = this.get(i, j)[0];
@@ -228,8 +228,8 @@ export class BitMap {
         return nbs;
     }
 
-    flipHor(): BitMap {
-        let image = new BitMap(this.width, this.height, this.pixelSize);
+    flipHor(): Bitmap {
+        let image = new Bitmap(this.width, this.height, this.pixelSize);
         for (let i = 0; i < this.height; i++) {
             for (let j = 0; j < this.width; j++) {
                 let jMirror = this.width - 1 - j;
@@ -239,8 +239,8 @@ export class BitMap {
         return image;
     }
 
-    flipVer(): BitMap {
-        let image = new BitMap(this.width, this.height, this.pixelSize);
+    flipVer(): Bitmap {
+        let image = new Bitmap(this.width, this.height, this.pixelSize);
         for (let i = 0; i < this.height; i++) {
             let iMirror = this.height - 1 - i;
             for (let j = 0; j < this.width; j++) {
@@ -250,11 +250,11 @@ export class BitMap {
         return image;
     }
 
-    applyKernel(kernel: FloatMatrix): BitMap {
+    applyKernel(kernel: FloatMatrix): Bitmap {
         // determine kernel size
         let size = kernel.count();
         let radius = size / 2 - 0.5;
-        let image = new BitMap(
+        let image = new Bitmap(
             this.width - radius * 2,
             this.height - radius * 2,
             this.pixelSize,
@@ -303,8 +303,8 @@ export class BitMap {
         });
     }
 
-    apply(filler: Function): BitMap {
-        let copy = new BitMap(this.width, this.height, this.pixelSize);
+    apply(filler: Function): Bitmap {
+        let copy = new Bitmap(this.width, this.height, this.pixelSize);
 
         for (let y = 0; y < this.height; y++) {
             for (let x = 0; x < this.width; x++) {
@@ -341,14 +341,14 @@ export class BitMap {
         return this;
     }
 
-    scale(scaleX: number, scaleY: number): BitMap {
+    scale(scaleX: number, scaleY: number): Bitmap {
         // scale the image to a new width and height, using nearest neighbour
         return this.resize(Math.round(this.width * scaleX), Math.round(this.height * scaleY));
     }
 
-    resize(width: number, height: number): BitMap {
+    resize(width: number, height: number): Bitmap {
         // resize the image to a new width and height, using nearest neighbour
-        const image = new BitMap(width, height, this.pixelSize);
+        const image = new Bitmap(width, height, this.pixelSize);
         const old = this;
 
         const x_factor = (1 / image.width) * old.width;
@@ -365,8 +365,8 @@ export class BitMap {
     }
 
     // add borders till this size is achieved
-    buffer(width: number, height: number): BitMap {
-        const image = new BitMap(width, height, this.pixelSize);
+    buffer(width: number, height: number): Bitmap {
+        const image = new Bitmap(width, height, this.pixelSize);
         const old = this;
 
         for (let y = 0; y < height; y++) {
@@ -404,12 +404,12 @@ export class BitMap {
         return this.trim(x1, y1, x2, y2);
     }
 
-    trim(x1: number, y1: number, x2: number, y2: number): BitMap {
+    trim(x1: number, y1: number, x2: number, y2: number): Bitmap {
         // return a hardcopy of this particular window
         const imageWidth = x2 - x1;
         const imageHeight = y2 - y1;
 
-        const image = new BitMap(imageWidth, imageHeight, this.pixelSize);
+        const image = new Bitmap(imageWidth, imageHeight, this.pixelSize);
 
         for (let y = 0; y < imageHeight; y++) {
             for (let x = 0; x < imageWidth; x++) {
@@ -421,10 +421,10 @@ export class BitMap {
         return image;
     }
 
-    toGreyscale(): BitMap {
+    toGreyscale(): Bitmap {
         if (this.pixelSize != 4) throw "please, only use this when pixelsize is 4";
 
-        let image = new BitMap(this.width, this.height, 4);
+        let image = new Bitmap(this.width, this.height, 4);
         for (let y = 0; y < this.height; y++) {
             for (let x = 0; x < this.width; x++) {
                 let pixel = this.get(x, y);
@@ -435,7 +435,7 @@ export class BitMap {
         return image;
     }
 
-    toRGBA(): BitMap {
+    toRGBA(): Bitmap {
         // if (this.pixelSize != 1) throw "please, only use this when pixelsize is 1"
 
         return this;

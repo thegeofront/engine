@@ -1,4 +1,5 @@
 import { Geometry } from "../geometry/Geometry";
+import { Stat } from "../lib";
 import { Matrix4 } from "../math/Matrix4";
 
 // generic all-pupose matrix of floats
@@ -7,9 +8,11 @@ export class FloatMatrix {
     readonly width: number;
     readonly height: number;
 
-    constructor(height: number, width: number, data: number[] = []) {
-        this.height = height;
+    constructor(width: number, height: number, data: number[] = []) {
+        
         this.width = width;
+        this.height = height;
+        
         this.data = new Float32Array(this.width * this.height);
         if (data == [] || data.length == 0) {
             // this.fill(0); // not needed, and not efficient ;)
@@ -17,6 +20,50 @@ export class FloatMatrix {
             this.setData(data);
         }
     }
+
+    static zeros(width=1, height=1) {
+        return new FloatMatrix(width, height);
+    }
+
+    /**
+     * stack a bunch of equal-length arrays horizontally
+     */
+    static vstack(...arrays: number[][]) {
+        if (arrays.length == 0) throw new Error("need minimum of one array...");
+
+        let height = arrays.length;
+        let width = arrays[0].length;
+        let matrix = FloatMatrix.zeros(width, height);
+        for (let i = 0; i < height; i++) {
+            if (arrays[i].length != width) throw new Error("all arrays need to be the same length");
+            for (let j = 0; j < width; j++) {
+                matrix.set(i, j, arrays[i][j]);
+            }
+        }
+    }
+
+    static fromNative(native: number[][]): FloatMatrix {
+        // assume all subarrays have the same shape!!
+        let height = native.length;
+        let width = native[0].length;
+        let matrix = new FloatMatrix(width, height);
+        for (var i = 0; i < native.length; i++) {
+            for (var j = 0; j < native[0].length; j++) {
+                matrix.set(i, j, native[i][j]);
+            }
+        }
+        return matrix;
+    }
+
+    clone(): FloatMatrix {
+        let clone = new FloatMatrix(this.width, this.height);
+        for (let i = 0; i < this.data.length; i++) {
+            clone.data[i] = this.data[i];
+        }
+        return clone;
+    }
+
+    // [GETTING & SETTING]
 
     print() {
         let strings: string[] = [];
@@ -47,6 +94,10 @@ export class FloatMatrix {
         // number of entries / rows.
         // when derrived classes ask for 'how many of x?' they usually mean this.
         return this.height;
+    }
+
+    get size() {
+        return this.width * this.height;
     }
 
     getDimensions(): [number, number] {
@@ -153,8 +204,20 @@ export class FloatMatrix {
         return result;
     }
 
-    // generalized multiplication
+    toNative(): number[][] {
+        let native: number[][] = [];
+        for (var i = 0; i < this.height; i++) {
+            native[i] = [];
+            for (var j = 0; j < this.width; j++) {
+                native[i][j] = this.get(i, j);
+            }
+        }
+        return native;
+    }
 
+    // [CALCULATIONS]
+
+    // generalized multiplication
     multiplied(b: FloatMatrix): FloatMatrix {
         let a = this;
         if (b.height !== a.width) {
@@ -176,44 +239,34 @@ export class FloatMatrix {
         return product;
     }
 
-    multiply(b: FloatMatrix): FloatMatrix {
-        let result = this.multiplied(b);
-        this.data = result.data;
+    transposed() {
+        let tp = FloatMatrix.zeros(this.height, this.width);
+        for (let i = 0 ; i < this.height; i++) {
+            for (let j = 0 ; j < this.width; j++) {
+                tp.set(j, i, this.get(i, j));
+            }
+        }
+
+        return tp;
+    }
+
+    inversed() {
+        return Stat.pinv(this);
+    }
+
+    mul(b: FloatMatrix): FloatMatrix {
+        this.data = this.multiplied(b).data;
         return this;
     }
 
-    static fromNative(native: number[][]): FloatMatrix {
-        // assume all subarrays have the same shape!!
-        let height = native.length;
-        let width = native[0].length;
-        let matrix = new FloatMatrix(height, width);
-        for (var i = 0; i < native.length; i++) {
-            for (var j = 0; j < native[0].length; j++) {
-                matrix.set(i, j, native[i][j]);
-            }
-        }
-        return matrix;
+    tp() : FloatMatrix {
+        // NOTE: this is dumb
+        return this.transposed();
     }
 
-    toNative(): number[][] {
-        let native: number[][] = [];
-        for (var i = 0; i < this.height; i++) {
-            native[i] = [];
-            for (var j = 0; j < this.width; j++) {
-                native[i][j] = this.get(i, j);
-            }
-        }
-        return native;
-    }
-
-    // geo trait
-
-    clone(): FloatMatrix {
-        let clone = new FloatMatrix(this.height, this.width);
-        for (let i = 0; i < this.data.length; i++) {
-            clone.data[i] = this.data[i];
-        }
-        return clone;
+    inv() {
+        this.data = this.inversed().data;
+        return this;
     }
 }
 

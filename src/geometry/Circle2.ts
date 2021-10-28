@@ -1,13 +1,20 @@
+import { MultiVector2 } from "../lib";
 import { Const } from "../math/Const";
 import { Vector2 } from "../math/Vector2";
 
 export class Circle2 {
-    center: Vector2;
-    radius: number;
 
-    constructor(center: Vector2, radius: number) {
-        this.center = center;
-        this.radius = radius;
+    constructor(
+        public center: Vector2, 
+        public radius: number) {}
+
+    static new(center=Vector2.new(), radius=1) {
+        return new Circle2(center, radius);
+    }
+
+    static fromLSA(points: MultiVector2) : Circle2 {
+        
+        return Circle2.new();
     }
 
     // thank you mr Mitteldorf for making me remember how basic math works

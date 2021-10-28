@@ -1,4 +1,4 @@
-import { BitMap, Vector3, ShaderMesh, Plane, Domain2, Rectangle3, Mesh } from "../../lib";
+import { Bitmap, Vector3, ShaderMesh, Plane, Domain2, Rectangle3, Mesh } from "../../lib";
 import { Bufferable } from "../Bufferable";
 
 /**
@@ -8,13 +8,13 @@ import { Bufferable } from "../Bufferable";
  */
 export class ImageMesh implements Bufferable {
 	constructor(
-		public image: BitMap, 
+		public image: Bitmap, 
 		public plane: Plane,
         public scale: number,
         public centered: boolean,
         public doubleSided: boolean) {}
 
-	static new(image: BitMap, plane=Plane.WorldXY(), scale=1, centered=true, doubleSided=true) {
+	static new(image: Bitmap, plane=Plane.WorldXY(), scale=1, centered=true, doubleSided=true) {
 		return new ImageMesh(image, plane, scale, centered, doubleSided);
 	}
 

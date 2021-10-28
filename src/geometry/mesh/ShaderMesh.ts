@@ -13,7 +13,7 @@
 
 import {
     Domain2,
-    BitMap,
+    Bitmap,
     Graph,
     HelpGl,
     Matrix4,
@@ -116,7 +116,7 @@ export class ShaderMesh implements Renderable {
     }
 
     static fromImage(
-        image: BitMap,
+        image: Bitmap,
         plane: Plane,
         centered = true,
         scale = 1,

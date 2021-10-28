@@ -13,7 +13,7 @@ export class MultiVector3 extends Geometry {
     }
 
     static new(count: number) {
-        return new MultiVector3(new FloatMatrix(count, 3));
+        return new MultiVector3(new FloatMatrix(3, count));
     }
 
     static fromList(vecs: Vector3[]): MultiVector3 {
@@ -265,7 +265,7 @@ export class MultiVector3 extends Geometry {
 function calc(a: FloatMatrix, b: Matrix4) {
     // we need to do something ugly here, because of the 4th column...
     // and while im at it, I specified the rest of the values as well, for speed's sake
-    let product = new FloatMatrix(a.height, b.width);
+    let product = new FloatMatrix(b.width, a.height);
 
     for (var i = 0; i < a.height; i++) {
         for (var j = 0; j < 4; j++) {

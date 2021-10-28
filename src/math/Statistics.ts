@@ -12,10 +12,11 @@
 //          "Because eigenvectors trace the principal lines of force, and the axes of greatest variance and covariance illustrate where the data is most susceptible to change."
 
 import { FloatMatrix } from "../data/FloatMatrix";
+import { Matrix4, MultiVector2, MultiVector3 } from "../lib";
 
-export class Stat {
+export namespace Stat {
     // calculate sum
-    static sum(x: number[] | Float32Array) {
+    export function sum(x: number[] | Float32Array) {
         let sum = 0;
         for (let i = 0; i < x.length; i++) {
             sum += x[i];
@@ -24,12 +25,12 @@ export class Stat {
     }
 
     // calculate average
-    static mean(x: number[] | Float32Array) {
-        return this.sum(x) / x.length;
+    export function mean(x: number[] | Float32Array) {
+        return sum(x) / x.length;
     }
 
     // calculate weighted mean
-    static meanWeighted(values: number[] | Float32Array, weights: number[] | Float32Array) {
+    export function meanWeighted(values: number[] | Float32Array, weights: number[] | Float32Array) {
         if (values.length != weights.length) {
             throw new Error("values & weights need same length");
         }
@@ -46,10 +47,10 @@ export class Stat {
     }
 
     // calculate variance
-    static variance(x: number[] | Float32Array) {
+    export function variance(x: number[] | Float32Array) {
         //σ^2x = (1/n−1) * n∑i=1 (x[i] – xAvr)^2
         let n = x.length;
-        let avr = this.mean(x);
+        let avr = mean(x);
 
         let sum = 0;
         for (let i = 0; i < n; i++) {
@@ -59,16 +60,16 @@ export class Stat {
     }
 
     // calculate the standard deviation
-    static deviation(x: number[] | Float32Array) {
-        return this.variance(x) ** 0.5;
+    export function deviation(x: number[] | Float32Array) {
+        return variance(x) ** 0.5;
     }
 
     // calculate covariance
-    static covariance(x: number[] | Float32Array, y: number[] | Float32Array) {
+    export function covariance(x: number[] | Float32Array, y: number[] | Float32Array) {
         if (x.length != y.length) throw "this is not how covariance works...";
         let n = x.length;
-        let xAvr = this.mean(x);
-        let yAvr = this.mean(y);
+        let xAvr = mean(x);
+        let yAvr = mean(y);
 
         let sum = 0;
         for (let i = 0; i < n; i++) {
@@ -78,7 +79,7 @@ export class Stat {
     }
 
     // calculate variance / covariance matrix
-    static cov(matrix: FloatMatrix) {
+    export function cov(matrix: FloatMatrix) {
         let size = matrix.width;
         let cov = new FloatMatrix(size, size);
 
@@ -90,7 +91,7 @@ export class Stat {
         // matrix is symmertical, so only run through one half
         for (let i = 0; i < size; i++) {
             for (let j = i; j < size; j++) {
-                let value = this.covariance(columns[i], columns[j]);
+                let value = covariance(columns[i], columns[j]);
                 cov.set(i, j, value);
                 cov.set(j, i, value);
             }
@@ -98,8 +99,8 @@ export class Stat {
         return cov;
     }
 
-    static eig(A: FloatMatrix): [Float32Array, FloatMatrix] {
-        let results = this.svd(A);
+    export function eig(A: FloatMatrix): [Float32Array, FloatMatrix] {
+        let results = svd(A);
         return [results[1], results[2]];
     }
 
@@ -112,10 +113,10 @@ export class Stat {
      * @param  {FloatMatrix} A matrix to decompose, such as a covariance matrix
      * @returns [U, ∑, V]
      * U -> during EVD, these are the eigen vectors of A transposed, if im not mistaken
-     * ∑ -> during EVD, this are the eigen values
+     * ∑ -> during EVD, these are the eigen values
      * V -> during EVD, the columns are eigen vectors
      */
-    static svd(A: FloatMatrix): [FloatMatrix, Float32Array, FloatMatrix] {
+    export function svd(A: FloatMatrix): [FloatMatrix, Float32Array, FloatMatrix] {
         var prec = Math.pow(2, -52); // assumes double prec
         var tolerance = 1e-64 / prec;
         var itmax = 50;
@@ -377,5 +378,34 @@ export class Stat {
         }
 
         return [FloatMatrix.fromNative(u), new Float32Array(q), FloatMatrix.fromNative(v)];
+    }
+
+    /**
+     * Calculate the pseudo inverse of a matrix:
+     * `M = UΣV†` -> `M† = V Σ† U`
+     * https://en.wikipedia.org/wiki/Singular_value_decomposition
+     * @param A 
+     */
+    export function pinv(A: FloatMatrix) {
+        
+        let [U, s, V] = svd(A);
+        
+        /**
+         * take S, and turn it into a transposed matrix
+         */
+        let transposeS = (s: Float32Array, A: FloatMatrix) => {
+            let St = FloatMatrix.zeros(A.width, A.height);
+            let size = Math.min(A.width, A.height);
+            for (let i = 0; i < size; i++) {
+                St.set(i, i, 1 / s[i]);        
+            }
+            return St;
+        }
+
+        let S = transposeS(s, A);
+
+        let Mt = U.tp().mul(S.mul(V.tp()));
+
+        return Mt;
     }
 }

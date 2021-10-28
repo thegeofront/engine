@@ -1,5 +1,5 @@
 import { Color } from "../../image/Color";
-import { BitMap } from "../../lib";
+import { Bitmap } from "../../lib";
 
 export class Material {
     
@@ -11,15 +11,15 @@ export class Material {
 
         public specularDampner: number,
         public opacity: number, // 0: transparant, 1: opaque
-        public texture?: BitMap,
-        public bumpmap?: BitMap,
+        public texture?: Bitmap,
+        public bumpmap?: Bitmap,
     ) {}
 
     static fromObjMtl() {
         throw new Error("TODO!!!");
     }
 
-    static fromTexture(texture: BitMap) {
+    static fromTexture(texture: Bitmap) {
         let mat = Material.neutral();
         mat.texture = texture;
         return mat;

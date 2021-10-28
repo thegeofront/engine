@@ -15,7 +15,7 @@ export class MultiVector2 extends Geometry {
     }
 
     static new(length: number): MultiVector2 {
-        return new MultiVector2(new FloatMatrix(length, 2));
+        return new MultiVector2(new FloatMatrix(2, length));
     }
 
     static fromList(vecs: Vector2[]): MultiVector2 {
@@ -142,7 +142,7 @@ export class MultiVector2 extends Geometry {
     }
 
     transform(m: Matrix4): MultiVector2 {
-        this._matrix.multiply(m);
+        this._matrix.mul(m);
         return this;
     }
 

@@ -2,7 +2,7 @@ import {
     Scene,
     Domain2,
     DrawSpeed,
-    BitMap,
+    Bitmap,
     Mesh,
     Plane,
     Rectangle3,
@@ -18,7 +18,7 @@ export class ImageRenderer {
         public stdSize?: Vector3,
         public gap = 10,
         public scale = 2,
-        public images: BitMap[] = [],
+        public images: Bitmap[] = [],
         public shaders: TextureMeshShader[] = [],
     ) {}
 
@@ -26,7 +26,7 @@ export class ImageRenderer {
         return new ImageRenderer(gl, stdSize);
     }
 
-    add(image: BitMap) {
+    add(image: Bitmap) {
         this.images.push(image);
         this.shaders.push(new TextureMeshShader(this.gl));
     }
