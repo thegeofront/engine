@@ -1,5 +1,6 @@
-import { MultiVector2 } from "../lib";
+import { MultiVector2, MultiVector3 } from "../lib";
 import { Const } from "../math/Const";
+import { LSA } from "../math/LSA";
 import { Vector2 } from "../math/Vector2";
 
 export class Circle2 {
@@ -13,8 +14,8 @@ export class Circle2 {
     }
 
     static fromLSA(points: MultiVector2) : Circle2 {
-        
-        return Circle2.new();
+        let [x, y, r] = LSA.lsaCircle2(points);
+        return Circle2.new(Vector2.new(x, y), r);
     }
 
     // thank you mr Mitteldorf for making me remember how basic math works

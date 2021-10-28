@@ -148,7 +148,7 @@ export class MultiVector2 extends Geometry {
 
     transformed(m: Matrix4): MultiVector2 {
         let clone = MultiVector2.new(this.count);
-        clone._matrix = this._matrix.multiplied(m);
+        clone._matrix = this._matrix.mul(m);
         return clone;
     }
 }

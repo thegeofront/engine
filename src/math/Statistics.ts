@@ -99,13 +99,13 @@ export namespace Stat {
         return cov;
     }
 
-    export function eig(A: FloatMatrix): [Float32Array, FloatMatrix] {
+    export function eig(A: FloatMatrix) : [Float32Array, FloatMatrix] {
         let results = svd(A);
         return [results[1], results[2]];
     }
 
     /**
-     * Single Value Decomposition.
+     * Thin Single Value Decomposition.
      * Can be used for Eigen Value Decomposition
      * from G. H. Golub and C. Reinsch, Numer. Math. 14, 403-420 (1970).
      * Taken from numeric.js. not yet cleaned & optimized.
@@ -114,7 +114,7 @@ export namespace Stat {
      * @returns [U, ∑, V]
      * U -> during EVD, these are the eigen vectors of A transposed, if im not mistaken
      * ∑ -> during EVD, these are the eigen values
-     * V -> during EVD, the columns are eigen vectors
+     * V -> during EVD, the columns are eigen vectors. NOT TRANSPOSED !!!!!
      */
     export function svd(A: FloatMatrix): [FloatMatrix, Float32Array, FloatMatrix] {
         var prec = Math.pow(2, -52); // assumes double prec
@@ -377,7 +377,37 @@ export namespace Stat {
             }
         }
 
-        return [FloatMatrix.fromNative(u), new Float32Array(q), FloatMatrix.fromNative(v)];
+        // let transposeS = (s: Float32Array, A: FloatMatrix) => {
+        //     let size = Math.min(A.width, A.height);
+        //     let St = FloatMatrix.zeros(size, size);
+        //     for (let i = 0; i < size; i++) {
+        //         St.set(i, i, 1 / s[i]);        
+        //     }
+        //     return St;
+        // }
+        // let S = transposeS(sum, A);
+
+        let sum = new Float32Array(q);
+        
+        return [FloatMatrix.fromNative(u), sum, FloatMatrix.fromNative(v)];
+    }
+
+    export function diagonalize(sum: Float32Array, size: number) {
+
+        let St = FloatMatrix.zeros(size, size);
+        for (let i = 0; i < size; i++) {
+            St.set(i, i, sum[i]);        
+        }
+        return St;
+    }
+
+    export function diagonalizeInverse(sum: Float32Array, size: number) {
+
+        let St = FloatMatrix.zeros(size, size);
+        for (let i = 0; i < size; i++) {
+            St.set(i, i, 1 / sum[i]);        
+        }
+        return St;
     }
 
     /**
@@ -389,23 +419,55 @@ export namespace Stat {
     export function pinv(A: FloatMatrix) {
         
         let [U, s, V] = svd(A);
-        
-        /**
-         * take S, and turn it into a transposed matrix
-         */
-        let transposeS = (s: Float32Array, A: FloatMatrix) => {
-            let St = FloatMatrix.zeros(A.width, A.height);
-            let size = Math.min(A.width, A.height);
-            for (let i = 0; i < size; i++) {
-                St.set(i, i, 1 / s[i]);        
-            }
-            return St;
-        }
+        let St = diagonalizeInverse(s, Math.min(A.width, A.height));
 
-        let S = transposeS(s, A);
-
-        let Mt = U.tp().mul(S.mul(V.tp()));
-
+        let mul = FloatMatrix.mulBtoA;
+        let Mt = mul(U.tp(), mul(St, V));       
         return Mt;
     }
+
+    export function pinv2(A: FloatMatrix) {
+        
+        console.log("PSEUDO INVERSE 2")
+
+        A.print();
+
+        let [U, s, Vt] = svd(A);
+        let S = diagonalizeInverse(s, Math.min(A.width, A.height));
+
+        console.log("[ PRINTING SVD: ]");
+        let mul = FloatMatrix.mulAtoB;
+
+        U.print();
+        S.print();
+        Vt.print();
+
+        let something = mul(U, mul(S, Vt));
+        something.print()
+
+        // console.log(V.width, V.height);
+        // Ut.print();
+
+        // let Mt = S.mul(Ut).mul(V);
+
+        return something;
+    }
+}
+
+function test() {
+
+    
+
+    // console.log("[ CHECK SUM INVERSE ]")
+    // let result = Stat.svd(A);
+    // let [U, s, V] = result;
+    // let S = Stat.diagonalize(s, Math.min(A.width, A.height));
+
+    // U.print();
+    // S.print();
+    // V.print();
+
+    // A.print();
+    // U.mul(S.mul(V.tp())).print();
+
 }

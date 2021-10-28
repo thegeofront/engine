@@ -21,6 +21,24 @@ export class FloatMatrix {
         }
     }
 
+    static mulBtoA(A: FloatMatrix, B: FloatMatrix) {
+        // / matrix multiplications are weird. Sometimes, A*B is noted in some book, when they mean B*A in actuality
+        
+        // console.log(`attempting to multiply A [${A.width}x${A.height}] to B [${B.width}x${B.height}]`)
+        
+        return B.mul(A);
+    }
+
+    static mulAtoB(A: FloatMatrix, B: FloatMatrix) {
+        // / matrix multiplications are weird. Sometimes, A*B is noted in some book, when they mean B*A in actuality
+        console.log(`attempting to multiply A [${A.width}x${A.height}] to B [${B.width}x${B.height}]`)
+        return A.mul(B);
+    }
+
+    static multiply(a: FloatMatrix, b: FloatMatrix) {
+        return b.mul(a);
+    }
+
     static zeros(width=1, height=1) {
         return new FloatMatrix(width, height);
     }
@@ -66,12 +84,13 @@ export class FloatMatrix {
     // [GETTING & SETTING]
 
     print() {
+
         let strings: string[] = [];
         const WIDTH = 8;
-        for (var i = 0; i < this.width; i++) {
+        for (var i = 0; i < this.height; i++) {
             strings.push("|");
-            for (var j = 0; j < this.height; j++) {
-                let str = this.get(j, i).toFixed(2); // TODO THIS IS INCORRECT
+            for (var j = 0; j < this.width; j++) {
+                let str = this.get(i, j).toFixed(2); // TODO THIS IS INCORRECT
                 str = str.padStart(WIDTH, " ");
                 strings.push(str);
 
@@ -218,55 +237,48 @@ export class FloatMatrix {
     // [CALCULATIONS]
 
     // generalized multiplication
-    multiplied(b: FloatMatrix): FloatMatrix {
+    mul(b: FloatMatrix): FloatMatrix {
+        
         let a = this;
         if (b.height !== a.width) {
             throw new Error(
                 `Columns in A should be the same as the number of rows in B
-                b.width ${b.height},
-                a.height ${a.width}`,
+                a.width ${a.width},
+                b.height ${b.height}`,
             );
         }
-        var product = new FloatMatrix(a.height, b.width);
+        let size = a.width;
+        var product = new FloatMatrix(b.width, a.height);
 
         for (var i = 0; i < product.height; i++) {
-            for (var j = 0; j < b.width; j++) {
-                for (var k = 0; k < a.width; k++) {
-                    product.set(i, j, product.get(i, j) + a.get(i, k) * b.get(k, j));
+            for (var j = 0; j < product.width; j++) {
+                let sum = 0;
+                for (var k = 0; k < size; k++) {
+                    sum += a.get(i, k) * b.get(k, j);
                 }
+                product.set(i, j, sum);
             }
         }
+
         return product;
     }
 
-    transposed() {
+    tp() {
         let tp = FloatMatrix.zeros(this.height, this.width);
         for (let i = 0 ; i < this.height; i++) {
             for (let j = 0 ; j < this.width; j++) {
                 tp.set(j, i, this.get(i, j));
             }
         }
-
         return tp;
     }
 
-    inversed() {
+    inv() {
         return Stat.pinv(this);
     }
 
-    mul(b: FloatMatrix): FloatMatrix {
-        this.data = this.multiplied(b).data;
-        return this;
-    }
-
-    tp() : FloatMatrix {
-        // NOTE: this is dumb
-        return this.transposed();
-    }
-
-    inv() {
-        this.data = this.inversed().data;
-        return this;
+    inv2() {
+        return Stat.pinv2(this);
     }
 }
 

@@ -1,4 +1,4 @@
-import { Circle2, FloatMatrix, Matrix4, MultiVector2, MultiVector3, Stat } from "../lib";
+import { FloatMatrix, Matrix4, MultiVector2, MultiVector3, Stat } from "../lib";
 
 /**
  * Use this namespace for fitting 
@@ -9,16 +9,38 @@ export namespace LSA {
     /**
      * Find optimal `W` for `AW = b`. 
      */ 
-    export function lsa(A: FloatMatrix, b: FloatMatrix) : FloatMatrix {
+    export function lsa(A: FloatMatrix, b: FloatMatrix) : Float32Array {
 
-
-        let W = FloatMatrix.zeros(A.width);
-
-        return W;
+        let At = A.tp();
+        let mul = FloatMatrix.mulBtoA;
+        let inv_ATA = mul(A, At).inv();
+        inv_ATA.print();
+        let Atb = mul(b, At);
+        Atb.print();
+        let W = mul(Atb, inv_ATA);
+        return W.getColumn(0);
     }
 
-    export function lsaCircle2(data: MultiVector2) : Circle2 {
-        return Circle2.new();
+    // https://mec560sbu.github.io/2016/08/29/Least_SQ_Fitting/
+    export function lsaCircle2(points: MultiVector2) {
+
+        // create and fill A & b
+        let count = points.count;
+        let A = FloatMatrix.zeros(3, count)
+        let b = FloatMatrix.zeros(1, count)
+        for (let i = 0 ; i < count; i++) {
+            let [x,y] = points.matrix.getRow(i);
+            
+            A.setRow(i, [-2*x, -2*y, 1]);
+            b.setRow(i, [-(x*x + y*y)]);
+        }
+
+        let w = lsa(A, b);
+        console.log(w);
+        let xc = w[0];
+        let yc = w[1]*-1; // note: WHY THE FUCK DO I NEED THIS -1???
+        let r = Math.sqrt(xc * xc + yc * yc - w[2]);
+        return [xc, yc, r];
     }
 
     
