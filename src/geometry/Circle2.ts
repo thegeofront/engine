@@ -14,7 +14,7 @@ export class Circle2 {
     }
 
     static fromLSA(points: MultiVector2) : Circle2 {
-        let [x, y, r] = LSA.lsaCircle2(points);
+        let [x, y, r] = LSA.circle2(points);
         return Circle2.new(Vector2.new(x, y), r);
     }
 
@@ -51,5 +51,15 @@ export class Circle2 {
                 middle.clone().add(normY.clone().scale(-disToCenter)),
             ];
         }
+    }
+
+    /**
+     * Caclulate how far this point is removed from the circle 
+     */
+    distance(point: Vector2) {
+
+        let distance = this.center.disTo(point);
+
+        return distance - this.radius;
     }
 }

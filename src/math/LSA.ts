@@ -1,4 +1,4 @@
-import { FloatMatrix, Matrix4, MultiVector2, MultiVector3, Stat } from "../lib";
+import { Circle2, FloatMatrix, Matrix4, MultiVector2, MultiVector3, Stat, Vector2 } from "../lib";
 
 /**
  * Use this namespace for fitting 
@@ -7,22 +7,24 @@ export namespace LSA {
 
 
     /**
-     * Find optimal `W` for `AW = b`. 
+     * Find optimal `W` for `AW = b(*error^2)`. 
      */ 
     export function lsa(A: FloatMatrix, b: FloatMatrix) : Float32Array {
-
-        let At = A.tp();
         let mul = FloatMatrix.mulBtoA;
+        let At = A.tp();
         let inv_ATA = mul(A, At).inv();
-        inv_ATA.print();
         let Atb = mul(b, At);
-        Atb.print();
         let W = mul(Atb, inv_ATA);
         return W.getColumn(0);
     }
 
     // https://mec560sbu.github.io/2016/08/29/Least_SQ_Fitting/
-    export function lsaCircle2(points: MultiVector2) {
+    /**
+     * returns center X, center Y, radius
+     * @param points 
+     * @returns 
+     */
+    export function circle2(points: MultiVector2) {
 
         // create and fill A & b
         let count = points.count;
@@ -36,18 +38,77 @@ export namespace LSA {
         }
 
         let w = lsa(A, b);
-        console.log(w);
+        // console.log(w);
         let xc = w[0];
         let yc = w[1]*-1; // note: WHY THE FUCK DO I NEED THIS -1???
         let r = Math.sqrt(xc * xc + yc * yc - w[2]);
         return [xc, yc, r];
     }
 
+    /**
+     * Progressive Least Squares Fitting of a circle. 
+     * This method's result is comparable to normal Least Squares, but it can detect and remove outliers. 
+     * This is at the cost of latency, since this will calculate an LSA circle every iterations
+     * 
+     * Returns a complete circle
+     */
+    export function circle2Progressive(included: MultiVector2, maxDeviation: number, maxIterations=1000) : {circle: Circle2, included: MultiVector2, excluded: MultiVector2} | undefined {
+        
+        let getIdWithLargestError = (circle: Circle2, points2d: MultiVector2) => {
+            
+            let highscore = 0;
+            let highscoreId = -1;
+            for (let i = 0 ; i < points2d.count; i++) {
+                let p = points2d.get(i);
+                let score = Math.abs(circle.distance(p));
+                if (score > highscore) {
+                    highscore = score;
+                    highscoreId = i;
+                }
+            }
+            return [highscore, highscoreId];
+        }
+
+        let excluded: Vector2[] = [];
+        let points2d = included.clone();
+
+        for (let i = 0; i < maxIterations; i++) {
+            console.log(i);
+            if (points2d.count < 2) {
+                console.error("PROGRESSIVE-LSA FAILED DUE TO LESS THAN TWO POINTS (REMAIN WITHIN ERROR RANGE).");
+                return undefined;
+            }
+        
+            // get a circle using all `points`
+            let circle = Circle2.fromLSA(points2d);
+
+            // remove the point with an error larger than max-deviation
+            let [largestError, largestID] = getIdWithLargestError(circle, points2d);
+            console.log(largestError, circle.distance(points2d.get(largestID)), maxDeviation);
+            if (largestError > maxDeviation) {
+                
+                // NOTE: SOMETHING'S STILL WRONG HERE...
+                excluded.push(points2d.get(largestID));
+                points2d = points2d.remove([largestID]);
+                continue;
+            }
+
+            // if we arrive here, all errors are smaller than the max-deviation. We are done!
+            return {
+                circle, 
+                included: points2d, 
+                excluded: MultiVector2.fromList(excluded)
+            };
+        }
+        console.error("PROGRESSIVE-LSA FAILED DUE TO TOO MANY ITERATIONS");
+        return undefined;
+    }
+
     
     /**
      *  solve x for Ax = b, where in this case, A = left, b = right.
      */ 
-    export function lsaMatrix(left: MultiVector3, right: MultiVector3): Matrix4 {
+    export function matrix(left: MultiVector3, right: MultiVector3): Matrix4 {
         if (left.count != right.count) {
             throw "matrices need to be of equal width & height";
         }
