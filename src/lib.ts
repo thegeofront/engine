@@ -62,6 +62,9 @@ export * from "./image/ImageProcessing";
 
 export * from "./input/InputState";
 
+export * from "./input-2.0/InputHandler";
+export * from "./input-2.0/Keys";
+
 export * from "./math/Domain";
 export * from "./math/Math";
 export * from "./math/Matrix3";

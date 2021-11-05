@@ -40,7 +40,7 @@ export namespace LSA {
         let w = lsa(A, b);
         // console.log(w);
         let xc = w[0];
-        let yc = w[1]*-1; // note: WHY THE FUCK DO I NEED THIS -1???
+        let yc = w[1]; 
         let r = Math.sqrt(xc * xc + yc * yc - w[2]);
         return [xc, yc, r];
     }

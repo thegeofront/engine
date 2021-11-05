@@ -339,8 +339,7 @@ const triTable = [
     [-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1],
 ];
 
-function polygonise(corners: Vector3[], values: number[], level: number): Mesh {
-    let triangles = null;
+export function marchingCubes(corners: Vector3[], values: number[], level: number): Vector3[] {
 
     // get the marching cube index based on corners
     let cubeindex = 0;
@@ -353,9 +352,10 @@ function polygonise(corners: Vector3[], values: number[], level: number): Mesh {
     if (values[6] < level) cubeindex |= 64;
     if (values[7] < level) cubeindex |= 128;
 
-    /* Cube is entirely in/out of the surface */
+    // early out
+    if (edgeTable[cubeindex] == 0) return [];
+
     let vertlist: Vector3[] = []; // 12
-    if (edgeTable[cubeindex] == 0) return Mesh.zero();
 
     /* Find the vertices where the surface intersects the cube */
     if (edgeTable[cubeindex] & 1)
@@ -384,16 +384,15 @@ function polygonise(corners: Vector3[], values: number[], level: number): Mesh {
         vertlist[11] = lerp(level, corners[3], corners[7], values[3], values[7]);
 
     // create triangles
-    // ntriang = 0;
-    // for (let i = 0; triTable[cubeindex][i]!=-1; i+=3) {
-    //     triangles[ntriang].p[0] = vertlist[triTable[cubeindex][i  ]];
-    //     triangles[ntriang].p[1] = vertlist[triTable[cubeindex][i+1]];
-    //     triangles[ntriang].p[2] = vertlist[triTable[cubeindex][i+2]];
-    //     ntriang++;
-    // }
+    let triangles: Vector3[] = [];
+    let triangleIds = triTable[cubeindex];
+
+    for (let i = 0; triangleIds[i] != -1; i++) {
+        triangles.push(vertlist[triangleIds[i]]);
+    }
 
     // return(ntriang);
-    return Mesh.zero();
+    return triangles;
 }
 
 /*
