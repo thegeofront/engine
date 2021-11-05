@@ -179,8 +179,7 @@ export class InputState {
         // update mouse buttons
         this.mouseLeftPressed = this.mouseLeftPrev != this.mouseLeftDown && this.mouseLeftDown;
         this.mouseRightPressed = this.mouseRightPrev != this.mouseRightDown && this.mouseRightDown;
-        this.mouseMiddlePressed =
-            this.mouseMiddlePrev != this.mouseMiddleDown && this.mouseMiddleDown;
+        this.mouseMiddlePressed = this.mouseMiddlePrev != this.mouseMiddleDown && this.mouseMiddleDown;
 
         // update scrolling
 
