@@ -1,6 +1,24 @@
 // https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants
 // I will add everything eventually
 
+export enum CubeMapTarget {
+    PosX = 0x8515,
+    NegX = 0x8516,
+    PosY = 0x8517,
+    NegY = 0x8518,
+    PosZ = 0x8519,
+    NegZ = 0x851A
+}
+
+export const CubeMapTargets = [
+    CubeMapTarget.PosX, 
+    CubeMapTarget.NegX, 
+    CubeMapTarget.PosY, 
+    CubeMapTarget.NegY, 
+    CubeMapTarget.PosZ, 
+    CubeMapTarget.NegZ
+];
+
 export enum ClearBufferBit {
     Depth = 0x00000100,
     Stencil = 0x00000400,

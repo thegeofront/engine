@@ -7,6 +7,7 @@ import { WebGl } from "./HelpGl";
 import { Vector3 } from "../../math/Vector3";
 import { Matrix3 } from "../../math/Matrix3";
 import { Color } from "../../image/Color";
+import { CubeMap } from "./CubeMap";
 
 /**
  * all uniforms corresponding to one GL program.
@@ -16,7 +17,7 @@ export class Uniforms {
         private gl: WebGl,
         private program: WebGLProgram,
         private uniforms: Map<string, Uniform> = new Map(),
-        private textures: Map<string, UniformTexture> = new Map(),
+        private textures: Map<string, UniformTexture | CubeMap> = new Map(),
     ) {}
 
     add(name: string, size: number, defaultState?: Iterable<number>, type = UniformType.Float) {
@@ -29,6 +30,12 @@ export class Uniforms {
         let texture = UniformTexture.new(this.gl, this.program, name);
         this.textures.set(name, texture);
         return texture;
+    }
+
+    addCubeMap(name: string) {
+        let cubemap = CubeMap.new(this.gl, this.program, name);
+        this.textures.set(name, cubemap);
+        return cubemap;
     }
 
     get(name: string) {
@@ -49,12 +56,16 @@ export class Uniforms {
         }
     }
 
+    loadCubeMapUrls(name: string, urls: string[]) {
+        (this.textures.get(name) as CubeMap)!.loadUrls(urls);
+    }
+
     loadTexture(name: string, texture: Bitmap) {
-        this.textures.get(name)!.load(texture);
+        (this.textures.get(name) as UniformTexture)!.load(texture);
     }
 
     loadTextureSource(name: string, source: WebGLTexture | null) {
-        this.textures.get(name)!.setSource(source);
+        (this.textures.get(name) as UniformTexture)!.setSource(source);
     }
 
     load(name: string, value: number) {

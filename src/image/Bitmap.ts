@@ -20,7 +20,9 @@ import { Color } from "./Color";
 
 
 
-
+/**
+ * A class representing an image, meant to actually edit the image.
+ */
 export class Bitmap {
     public data: Uint8ClampedArray;
     public readonly width: number;

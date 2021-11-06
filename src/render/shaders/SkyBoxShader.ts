@@ -9,7 +9,7 @@ import { UniformType } from "../webgl/Uniform";
 /**
  * quite literarly taken from https://webglfundamentals.org/webgl/lessons/webgl-skybox.html, saw no reason to change it
  */
-export class SkyBoxShader extends ShaderProgram<Bitmap> {
+export class SkyBoxShader extends ShaderProgram<string[]> {
 
     constructor(gl: WebGl) {
         const vertexShader = `
@@ -34,36 +34,36 @@ export class SkyBoxShader extends ShaderProgram<Bitmap> {
 
         precision mediump float;
      
-        uniform sampler2D u_skybox;
+        uniform samplerCube u_skybox;
         uniform mat4 u_viewDirectionProjectionInverse;
          
         varying vec4 v_position;
 
-        vec2 to_lat_long_normalized(vec3 normal) {
-            float longitude = atan(normal.y, normal.x) / TWO_PI;
-            float latitude = 0.0;
-            return vec2(longitude, latitude);
-        }
+        // vec2 to_lat_long_normalized(vec3 normal) {
+        //     float longitude = atan(normal.y, normal.x) / TWO_PI;
+        //     float latitude = 0.0;
+        //     return vec2(longitude, latitude);
+        // }
 
-        vec2 to_polar(vec3 normal) {
-            vec2 dir = normalize(normal.xy);
-            float delta = acos(abs(normal.z)) / PI;
-            return vec2(0.5, 0.5) + dir * delta; 
-        }
+        // vec2 to_polar(vec3 normal) {
+        //     vec2 dir = normalize(normal.xy);
+        //     float delta = acos(abs(normal.z)) / PI;
+        //     return vec2(0.5, 0.5) + dir * delta; 
+        // }
 
-        vec3 to_sphere(vec3 P) {
-            float r = sqrt(P.x*P.x + P.y*P.y + P.z*P.z);
-            float theta = atan(P.y, P.x);
-            float phi = acos(P.z/r);
-            return vec3(r, theta, phi);
-        }
+        // vec3 to_sphere(vec3 P) {
+        //     float r = sqrt(P.x*P.x + P.y*P.y + P.z*P.z);
+        //     float theta = atan(P.y, P.x);
+        //     float phi = acos(P.z/r);
+        //     return vec3(r, theta, phi);
+        // }
         
-        vec3 to_cart(vec3 P) {
-            float r = P.x;
-            float theta = P.y;
-            float phi = P.z;
-            return r * vec3(cos(phi)*sin(theta),sin(phi)*sin(theta),cos(theta));
-        }
+        // vec3 to_cart(vec3 P) {
+        //     float r = P.x;
+        //     float theta = P.y;
+        //     float phi = P.z;
+        //     return r * vec3(cos(phi)*sin(theta),sin(phi)*sin(theta),cos(theta));
+        // }
 
         void main() {
             vec4 t = u_viewDirectionProjectionInverse * v_position;
@@ -74,11 +74,12 @@ export class SkyBoxShader extends ShaderProgram<Bitmap> {
 
             // using cubemap
             // gl_FragColor = texture2D(u_skybox, (v_position.xy + 1.0) / 2.0);
-            // gl_FragColor = textureCube(u_skybox, normal);
+            gl_FragColor = textureCube(u_skybox, normal);
 
             // using single texture with polar projection
-            vec2 polar = to_polar(normal);
-            gl_FragColor = texture2D(u_skybox, polar);
+            // vec2 polar = to_polar(normal);
+            // gl_FragColor = texture2D(u_skybox, polar);
+            // gl_FragColor = vec4(1,0.8,0,1);
         }
         `;
         super(gl, vertexShader, fragmentShader);
@@ -87,11 +88,11 @@ export class SkyBoxShader extends ShaderProgram<Bitmap> {
     protected onInit(): DrawMode {
         this.attributes.add("a_position", 2);
         this.uniforms.add("u_viewDirectionProjectionInverse", 16, Matrix4.newIdentity().data);
-        this.uniforms.addTexture("u_skybox");
+        this.uniforms.addCubeMap("u_skybox");
         return DrawMode.Triangles;
     }
 
-    protected onLoad(texture: Bitmap, speed: DrawSpeed): number {
+    protected onLoad(urls: string[], speed: DrawSpeed): number {
 
         var quad = new Float32Array(
             [
@@ -104,8 +105,7 @@ export class SkyBoxShader extends ShaderProgram<Bitmap> {
             ]);
 
         this.attributes.load("a_position", quad, speed);
-
-        this.uniforms.loadTexture("u_skybox", texture);
+        this.uniforms.loadCubeMapUrls("u_skybox", urls);
 
         return 6;
     }
