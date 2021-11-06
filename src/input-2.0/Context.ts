@@ -1,1 +1,2 @@
-export type Context = Window | HTMLElement
+export type Context = Window | HTMLElement;
+

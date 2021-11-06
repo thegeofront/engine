@@ -1,3 +1,4 @@
+import { TimeHandler } from "../input-2.0/TimeHandler";
 import { InputState } from "../input/InputState";
 
 export class FpsCounter {
@@ -22,7 +23,7 @@ export class FpsCounter {
         }
     }
 
-    update(state: InputState) {
+    update(state: InputState | TimeHandler) {
         this._update(state.tick);
     }
 

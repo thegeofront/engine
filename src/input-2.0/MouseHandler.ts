@@ -1,7 +1,7 @@
 import { Vector2 } from "../lib";
 import { Context } from "./Context";
 
-export type MouseAction = () => void;
+export type MouseAction = (e: MouseEvent) => void;
 
 export class MouseHandler {
 
@@ -41,7 +41,7 @@ export class MouseHandler {
         return new MouseHandler(context, width, height);
     }
 
-    start() {
+    private start() {
         let c = this.context;
 
         document.addEventListener("mousedown", (e) => this.onDomEventMouseDown(e));
@@ -66,14 +66,19 @@ export class MouseHandler {
      */
     update() {
         // // update mouse pos
-        // if (!this.mousePosBuffered.equals(this.mousePos)) {
-        //     // mouse has moved during previous frame
-        //     this.mousePos = this.mousePosBuffered.clone();
-        //     this.mouseDelta = this.mousePos.subbed(this.mousePosPrev);
-        //     this.mousePosPrev = this.mousePos.clone();
-        // } else {
-        //     this.mouseDelta = Vector2.zero();
-        // }
+        if (!this.posBefore.equals(this.pos)) {
+            // mouse has moved during previous frame | try to not create new vectors every frame
+
+            this.delta.set(this.pos.x - this.posBefore.x, this.pos.y - this.posBefore.y);
+            this.posBefore.copy(this.pos);
+
+            // this.mousePos = this.mousePosBuffered.clone();
+            // this.mouseDelta = this.mousePos.subbed(this.mousePosPrev);
+            // this.mousePosPrev = this.mousePos.clone();
+        } else {
+            this.delta.x = 0;
+            this.delta.y = 0;
+        }
 
         // // normalize all scrolling behaviour
         // if (this.mouseScrollBuffered != 0) {
@@ -103,21 +108,22 @@ export class MouseHandler {
     private onDomEventMouseDown(e: MouseEvent) {
         e.preventDefault();
         e.stopPropagation();
+
         this.context.focus();
         let code = e.buttons;
         if (code >= 4) {
             code -= 4;
-            if (!this.middleDown && this.onMiddlePressed) this.onMiddlePressed();
+            if (!this.middleDown && this.onMiddlePressed) this.onMiddlePressed(e);
             this.middleDown = true;
         }
         if (code >= 2) {
             code -= 2;
-            if (!this.rightDown && this.onRightPressed) this.onRightPressed();
+            if (!this.rightDown && this.onRightPressed) this.onRightPressed(e);
             this.rightDown = true;
         }
         if (code >= 1) {
             code -= 1;
-            if (!this.leftDown && this.onLeftPressed) this.onLeftPressed();
+            if (!this.leftDown && this.onLeftPressed) this.onLeftPressed(e);
             this.leftDown = true;
         }
         return false;
@@ -127,20 +133,22 @@ export class MouseHandler {
         let code = e.buttons;
         if (code < 4) {
             this.middleDown = false;
-            if (this.onMiddleUp) this.onMiddleUp();
+            if (this.onMiddleUp) this.onMiddleUp(e);
         }
         if (code < 2) {
             this.rightDown = false;
-            if (this.onRightUp) this.onRightUp();
+            if (this.onRightUp) this.onRightUp(e);
         }
         if (code < 1) {
             this.leftDown = false;
-            if (this.onLeftUp) this.onLeftUp();
+            if (this.onLeftUp) this.onLeftUp(e);
         }
     }
 
     private onDomEventMouseMove(e: MouseEvent) {
         // 
+        this.pos.x = e.clientX;
+        this.pos.y = e.clientY;
     }
 
     private onDomEventWheel(e: Event) {

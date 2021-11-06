@@ -16,11 +16,12 @@ export class KeyboardHandler {
         private keyUpActions: Map<Key, KeyAction> = new Map(),
         
     ) {
-        this.setup();
+        this.start();
     }
 
     static new(context: Context) {
-        return new KeyboardHandler(context);
+        // NOTE: it seems that svg's do not handle button press events. For now, use global window.
+        return new KeyboardHandler(window);
     }
 
     update() {
@@ -62,9 +63,9 @@ export class KeyboardHandler {
 
     ///////////////////////////////////////////////////////////////////////////
 
-    private setup() {
+    private start() {
         let c = this.context;
-
+        
         c.addEventListener("keydown", (res) => this.onDomEventKeyDown(res));
         c.addEventListener("keyup", (res) => this.onDomEventKeyUp(res));
         c.addEventListener("blur", (res) => this.onDomEventBlur());
@@ -74,7 +75,6 @@ export class KeyboardHandler {
 
     private onDomEventKeyDown(res: any) {
         let code = res.keyCode;
-        // console.log(code, "down");
         if (this.keysDownWithAction.has(code)) return; 
         
         // the key is freshly pressed
@@ -105,11 +105,13 @@ export class KeyboardHandler {
     }
 
     private onDomEventBlur() {
+        // console.log("on blur");
+        
         this.keysDownWithAction.clear();
         this.keysDown.clear();
     }
 
     private onDomEventFocus() {
-
+        // console.log("on focus");
     }
 }
