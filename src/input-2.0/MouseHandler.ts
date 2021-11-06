@@ -33,7 +33,9 @@ export class MouseHandler {
         public context: Context,
         public width: number,
         public height: number,
-    ) {}
+    ) {
+        this.start()
+    }
 
     static new(context: Context, width: number, height: number) {
         return new MouseHandler(context, width, height);
@@ -62,8 +64,29 @@ export class MouseHandler {
     /**
      * Call this before general game update calls
      */
-    preUpdate() {
+    update() {
+        // // update mouse pos
+        // if (!this.mousePosBuffered.equals(this.mousePos)) {
+        //     // mouse has moved during previous frame
+        //     this.mousePos = this.mousePosBuffered.clone();
+        //     this.mouseDelta = this.mousePos.subbed(this.mousePosPrev);
+        //     this.mousePosPrev = this.mousePos.clone();
+        // } else {
+        //     this.mouseDelta = Vector2.zero();
+        // }
 
+        // // normalize all scrolling behaviour
+        // if (this.mouseScrollBuffered != 0) {
+        //     // we are scrolling
+        //     let value = 0.1;
+        //     if (this.mouseScrollBuffered < 0) value = -0.1;
+        //     this.scrollValue = Math.max(0, this.scrollValue + value);
+        //     this.mouseScrollDelta = value;
+        //     this.mouseScrollBuffered = 0;
+        // } else {
+        //     // this.mouseScrollBuffered = 0;
+        //     this.mouseScrollDelta = 0;
+        // }
     }
 
     /**

@@ -1,10 +1,10 @@
 export class TimeHandler {
     
-    newTime: number;
-    oldTime: number;
-    startTime: number;
+    newTime!: number;
+    oldTime!: number;
+    startTime!: number;
     
-    tick: number;
+    tick!: number;
 
     constructor() {
         this.start();
