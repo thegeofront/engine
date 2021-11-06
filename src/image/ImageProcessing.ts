@@ -1,6 +1,6 @@
 import { DebugRenderer, ImageMesh, Plane, Vector2, Vector3 } from "../lib";
 import { Color } from "./Color";
-import { Bitmap } from "./Texture";
+import { Bitmap } from "./Bitmap";
 import { Kernels } from "./Kernels";
 
 export namespace ImageProcessing {

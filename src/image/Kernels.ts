@@ -1,5 +1,5 @@
 import { FloatMatrix } from "../data/FloatMatrix";
-import { Bitmap } from "./Texture";
+import { Bitmap } from "./Bitmap";
 
 // kernels
 

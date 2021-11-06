@@ -1,6 +1,6 @@
 // purpose : webgl wrapping & helper functions
 
-import { Bitmap } from "../../image/Texture";
+import { Bitmap } from "../../image/Bitmap";
 
 var nextTextureId = 0;
 var rendercallsperframe = 0;

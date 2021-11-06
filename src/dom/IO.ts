@@ -3,7 +3,7 @@
 // purpuse : wrap certain DOM functionalities
 
 import { meshFromObj } from "../geometry/mesh/ShaderMesh";
-import { Bitmap } from "../image/Texture";
+import { Bitmap } from "../image/Bitmap";
 
 // set any to document to add drop functionality to the entire document, or use any other div.
 type FuncGenericReturn = <T>() => T;

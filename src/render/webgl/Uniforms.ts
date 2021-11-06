@@ -1,4 +1,4 @@
-import { Bitmap } from "../../image/Texture";
+import { Bitmap } from "../../image/Bitmap";
 import { Matrix4 } from "../../math/Matrix4";
 import { Vector2 } from "../../math/Vector2";
 import { Uniform, UniformType } from "./Uniform";
