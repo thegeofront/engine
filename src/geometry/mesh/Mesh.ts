@@ -8,6 +8,7 @@ import {
     Cube,
     Domain3,
     getDefaultIndices,
+    getLongDefaultIndices,
     Graph,
     IntMatrix,
     Matrix4,
@@ -21,7 +22,6 @@ import {
     Vector3,
 } from "../../lib";
 import { GeonMath } from "../../math/Math";
-import { getLongDefaultIndices } from "./MultiLine";
 
 export enum MeshType {
     Invalid = 0,
@@ -42,7 +42,7 @@ export class Mesh {
     
     constructor(
         public verts: MultiVector3,
-        public _links?: IntMatrix, // relationships, can be 2 (lines) | 3 (triangles) | 4 (quads)
+        public links: IntMatrix, // relationships, can be 2 (lines) | 3 (triangles) | 4 (quads)
         private _uvs?: MultiVector2,
         private _normals?: MultiVector3, 
         private _normalKind = NormalKind.None
@@ -54,10 +54,6 @@ export class Mesh {
         } else {
             return this.verts.count;
         }
-    }
-
-    get links() {
-        return this._links!;
     }
 
     get uvs(): MultiVector2 | undefined {
@@ -87,7 +83,7 @@ export class Mesh {
 
     static new(
         verts: MultiVector3,
-        links?: IntMatrix,
+        links: IntMatrix,
         uvs?: MultiVector2,
         normals?: MultiVector3,
     ): Mesh {
@@ -170,7 +166,7 @@ export class Mesh {
     }
 
     static zero(): Mesh {
-        return new Mesh(MultiVector3.new(0), undefined);
+        return new Mesh(MultiVector3.new(0), new IntMatrix(0, 0));
     }
 
     static fromJoin(meshes: Mesh[]): Mesh {
@@ -609,8 +605,6 @@ export class Mesh {
         let count = this.links.data.length;
         let faceCount = this.links.count();
 
-        
-
         let verts = MultiVector3.new(count);
         let norms = MultiVector3.new(count);
 
@@ -623,11 +617,11 @@ export class Mesh {
             });
         }
 
-        // let links = IntMatrix.fromList([], 3);
-        // links._width = 3;
-        // links._height = count / 3;
-        // links.data = getLongDefaultIndices(count);
-        let mesh = new Mesh(verts, undefined, undefined, norms);
+        let links = IntMatrix.fromList([], 3);
+        links._width = 3;
+        links._height = count / 3;
+        links.data = getDefaultIndices(count);
+        let mesh = new Mesh(verts, links, undefined, norms);
         return mesh;
     }
 

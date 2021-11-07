@@ -114,7 +114,7 @@ export class PhongShader extends ShaderProgram<Entity> {
         this.attributes.add("normal", 3);
         this.attributes.add("occlusion", 1);
 
-        this.attributes.addIndex(DrawElementsType.UnsignedInt);
+        this.attributes.addIndex(DrawElementsType.UnsignedShort);
 
         this.uniforms.add("worldMatrix", 16);
         this.uniforms.add("worldInverse", 16);

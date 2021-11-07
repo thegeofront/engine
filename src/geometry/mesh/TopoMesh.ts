@@ -36,7 +36,7 @@ export class TopoMesh extends ShaderMesh {
         topoMesh.mesh.verts = rend.mesh.verts.clone();
         topoMesh.norms = rend.norms.clone();
         topoMesh.uvs = rend.uvs.clone();
-        topoMesh.mesh._links = rend.mesh.links.clone();
+        topoMesh.mesh.links = rend.mesh.links.clone();
         topoMesh.setNeighborMap();
         return topoMesh;
     }

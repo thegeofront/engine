@@ -1,14 +1,14 @@
 // generic all-pupose matrix of ints
 
 export class IntMatrix {
-    data: Uint32Array; //  change
+    data: Uint16Array; //  change
     _width: number;
     _height: number;
 
     constructor(height: number, width: number, data?: ArrayLike<number>) {
         this._height = height;
         this._width = width;
-        this.data = new Uint32Array(this._width * this._height);
+        this.data = new Uint16Array(this._width * this._height);
         if (data) this.setData(data);
     }
 
@@ -143,7 +143,7 @@ export class IntMatrix {
         return array;
     }
 
-    getData(): Uint32Array {
+    getData(): Uint16Array {
         return this.data;
     }
 
