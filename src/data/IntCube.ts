@@ -8,19 +8,20 @@ export class IntCube {
     _depth: number;
 
     constructor(height: number, width: number, depth: number, data: number[] = []) {
-        this._height = height;
         this._width = width;
+        this._height = height;
         this._depth = depth;
         let size = this._width * this._height * this._depth;
         this.data = new Int32Array(size);
-        if (data == [] || data.length == 0) this.fill(0);
-        else {
+        if (data == [] || data.length == 0) {
+
+        } else {
             this.setData(data);
         }
     }
 
-    static new(height: number, width: number, depth: number, data: number[] = []) {
-        return new IntCube(height, width, depth, data);
+    static new(width: number, height: number, depth: number, data: number[] = []) {
+        return new IntCube(width, height, depth, data);
     }
 
     size(): number {
@@ -62,7 +63,7 @@ export class IntCube {
         return i * (this._height * this._depth) + j * this._depth + k;
     }
 
-    getCoords(index: number): Vector3 {
+    getCoord(index: number): Vector3 {
         // javascript, dont you dare turn  'int / int' into a float...
         let i = Math.floor(index / (this._height * this._depth)) % this._width;
         let j = Math.floor(index / this._depth) % this._height;

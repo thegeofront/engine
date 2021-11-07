@@ -44,7 +44,10 @@ export class MultiLine implements Renderable {
     // get all lines from a mesh
     static fromMesh(rend: ShaderMesh, uv = false): MultiLine {
         // 3 edges per face, 2 indices per edge
+        
         let mesh = rend.mesh;
+        let links = mesh._links? mesh.links : getDefaultIndices(mesh.maxSize);
+
         let count = mesh.links.count() * 6;
         let data = new Uint16Array(count);
         for (let i = 0; i < mesh.links.count(); i++) {

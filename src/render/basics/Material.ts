@@ -36,6 +36,18 @@ export class Material {
         );
     }
 
+    static grey() {
+        return new Material(
+            Color.fromHex("#1d1d1d")!,
+            Color.fromHex("#4c4c4c")!,
+            Color.fromHex("#f0f0f0")!,
+            Color.fromHex("#1d1d1d")!,
+            3.195,
+            1,
+        );
+    }
+
+
     static neutral() {
         return new Material(
             Color.fromHex("#111111")!,

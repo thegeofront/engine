@@ -87,7 +87,7 @@ export class Mesh {
 
     static new(
         verts: MultiVector3,
-        links: IntMatrix,
+        links?: IntMatrix,
         uvs?: MultiVector2,
         normals?: MultiVector3,
     ): Mesh {
@@ -170,7 +170,7 @@ export class Mesh {
     }
 
     static zero(): Mesh {
-        return new Mesh(MultiVector3.new(0), new IntMatrix(0, 0));
+        return new Mesh(MultiVector3.new(0), undefined);
     }
 
     static fromJoin(meshes: Mesh[]): Mesh {
@@ -607,8 +607,9 @@ export class Mesh {
         // convert to non-indexed verts & norms
         this.ensureFaceNormals();
         let count = this.links.data.length;
-        console.log(count);
         let faceCount = this.links.count();
+
+        
 
         let verts = MultiVector3.new(count);
         let norms = MultiVector3.new(count);

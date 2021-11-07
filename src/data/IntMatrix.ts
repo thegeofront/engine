@@ -5,15 +5,14 @@ export class IntMatrix {
     _width: number;
     _height: number;
 
-    constructor(height: number, width: number, data: number[] = []) {
+    constructor(height: number, width: number, data?: ArrayLike<number>) {
         this._height = height;
         this._width = width;
         this.data = new Uint32Array(this._width * this._height);
-        if (data == [] || data.length == 0) this.fill(0);
-        else this.setData(data);
+        if (data) this.setData(data);
     }
 
-    static new(height: number, width: number, data: number[] = []) {
+    static new(height: number, width: number, data?: ArrayLike<number>) {
         return new IntMatrix(height, width, data);
     }
 
@@ -51,9 +50,9 @@ export class IntMatrix {
         return clone;
     }
 
-    setData(data: number[]) {
-        if (data.length != this._height * this._width)
-            throw "data.length does not match width * height " + data.length.toString();
+    setData(data: ArrayLike<number>) {
+        // if (data.length != this._height * this._width)
+        //     throw "data.length does not match width * height " + data.length.toString();
         this.data.set(data);
     }
 

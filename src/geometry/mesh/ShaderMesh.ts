@@ -183,7 +183,7 @@ export class ShaderMesh implements Renderable {
     }
 
     static fromMesh(mesh: Mesh): ShaderMesh {
-        let r = new ShaderMesh(mesh.verts.count, 0, 0, mesh.links.count());
+        let r = new ShaderMesh(mesh.verts.count, 0, 0, mesh.maxSize);
         r.mesh = mesh;
         return r;
     }
