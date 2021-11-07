@@ -152,6 +152,20 @@ export class Vector3 {
         return Math.max(this.x, this.y, this.z);
     }
 
+    addN(n: number) {
+        this.x += n;
+        this.y += n;
+        this.z += n;
+        return this;
+    }
+
+    addNs(x: number, y: number, z: number) {
+        this.x += x;
+        this.y += y;
+        this.z += z;
+        return this;
+    }
+
     added(v: Vector3): Vector3 {
         return new Vector3(this.x + v.x, this.y + v.y, this.z + v.z);
     }

@@ -16,9 +16,12 @@ import { Random } from "./Random";
 
 export class Domain {
     // note: including t0, including t1
-    constructor(public t0 = 0.0, public t1 = 1.0) {
+    size: number;
+
+    constructor(public t0 = 0.0, public  t1 = 1.0) {
         // if (t0 > t1) console.error("created a domain with negative size.");
         // if (t0 == t1) console.warn("created a domain with size is 0.0. could cause problems");
+        this.size = this.t1 - this.t0;
     }
 
     static new(t0 = 0, t1 = 1) {
@@ -44,6 +47,7 @@ export class Domain {
     offset(t0Offset: number, t1Offset: number) {
         this.t0 += t0Offset;
         this.t1 += t1Offset;
+        this.size = this.t1 - this.t0;
         return this;
     }
 
@@ -57,14 +61,9 @@ export class Domain {
         return value >= this.t0 && value < this.t1;
     }
 
-    size(): number {
-        // the size or length of this domain
-        return this.t1 - this.t0;
-    }
-
     normalize(value: number): number {
         // normalize a parameter
-        return (value - this.t0) / this.size();
+        return (value - this.t0) / this.size;
     }
 
     /**
@@ -74,7 +73,7 @@ export class Domain {
      */
     elevate(t: number): number {
         // elevate a normalized parameter to the parameter space of this domain
-        return t * this.size() + this.t0;
+        return t * this.size + this.t0;
     }
 
     /**
@@ -98,7 +97,7 @@ export class Domain {
         // return new Float32Array(this.iter(count));
 
         let result = new Float32Array(count);
-        let step = this.size() / (count - 1);
+        let step = this.size / (count - 1);
         for (let i = 0; i < count; i++) {
             result[i] = this.t0 + i * step;
         }
@@ -107,7 +106,7 @@ export class Domain {
 
     *iter(count: number): Generator<number> {
         // iterate over this Domain 'count' number of times
-        let step = this.size() / (count - 1);
+        let step = this.size / (count - 1);
         for (let i = 0; i < count; i++) {
             let val = this.t0 + i * step;
             yield val;
@@ -190,7 +189,7 @@ export class Domain2 {
 
     size(): Vector2 {
         // the size or length of this domain
-        return new Vector2(this.x.size(), this.y.size());
+        return new Vector2(this.x.size, this.y.size);
     }
 
     normalize(value: Vector2): Vector2 {
@@ -263,6 +262,10 @@ export class Domain3 {
         this.z = z;
     }
 
+    static fromVectors(lower=Vector3.zero(), upper=Vector3.new(1,1,1)) {
+        return new Domain3(new Domain(lower.x, upper.x), new Domain(lower.y, upper.y), new Domain(lower.z, upper.z))
+    }
+
     static fromBounds(
         x0: number,
         x1: number,
@@ -308,7 +311,7 @@ export class Domain3 {
 
     size(): Vector3 {
         // the size or length of this domain
-        return new Vector3(this.x.size(), this.y.size(), this.z.size());
+        return new Vector3(this.x.size, this.y.size, this.z.size);
     }
 
     normalize(value: Vector3): Vector3 {

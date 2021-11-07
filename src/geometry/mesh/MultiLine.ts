@@ -225,6 +225,15 @@ export function getDefaultIndices(count: number): Uint16Array {
     return data;
 }
 
+// just get an int sequence from 0 to length.
+export function getLongDefaultIndices(count: number): Uint32Array {
+    let data = new Uint32Array(count);
+    for (let i = 0; i < count; i++) {
+        data[i] = i;
+    }
+    return data;
+}
+
 function getPairIndices(count: number, cyclic: boolean): Uint16Array {
     // given count of 3 => return 0,1 | 1,2 | 2,0
     let length = count * 2;

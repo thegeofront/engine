@@ -51,7 +51,7 @@ export class Camera {
 
     update(state: InputState) {
         this.updateControls(state);
-        this.updateMatrices(state.canvas);
+        this.updateMatrices(state.canvas); // TODO only move if we have changed
         this.updateClick(state);
 
         if (state.IsKeyPressed("p")) {
@@ -103,19 +103,45 @@ export class Camera {
     }
 
     private updateMatrices(canvas: HTMLCanvasElement) {
-        this.worldMatrix = this.getWorldMatrix();
-        this.projectMatrix = this.getProjectionMatrix(canvas);
-        this.totalMatrix = this.worldMatrix.multiplied(this.projectMatrix);
-        this.inverseWorldMatrix = this.worldMatrix.inverse();
-        this.inverseTransposeMatrix = this.inverseWorldMatrix.transpose(); 
+
+        // 1 : calculate world matrix
+        let offset = this.offset;
+        let angleA = this.angleAlpha;
+        let angleB = this.angleBeta;
+
+        // translate so z means 'up'
+        // let yzFlip = new Matrix4([1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1]);
+
+        // translated to fit screen
+        let position = Matrix4.newTranslation(this.pos.x, this.pos.y, this.pos.z);
+        let mOffset = Matrix4.newTranslation(offset.x, offset.y, offset.z);
+
+        // rotated by user
+        let x_rotation = Matrix4.newXRotation(angleA);
+        let z_rotation = Matrix4.newZRotation(angleB);
+        let rotation = z_rotation.multiply(x_rotation);
+ 
+        // let transform = mOffset.multiply(rotation).multiply(position);
+        let worldMatrix = position.multiply(rotation).multiply(mOffset);
+
+        // 2 : project & total
+        let projectMatrix = this.getProjectionMatrix(canvas); // THIS IS MORE OR LESS STATIC, CACHE IT!
+        let totalMatrix = worldMatrix.multiplied(projectMatrix);
 
         // translation = 0
-        var viewDirectionMatrix = Matrix4.newCopy(this.worldMatrix);
+        var viewDirectionMatrix = Matrix4.newCopy(worldMatrix);
         viewDirectionMatrix.data[12] = 0;
         viewDirectionMatrix.data[13] = 0;
         viewDirectionMatrix.data[14] = 0;
 
-        let totalViewMatrix = viewDirectionMatrix.multiplied(this.projectMatrix);
+        let totalViewMatrix = rotation.multiplied(projectMatrix);
+
+        this.worldMatrix = worldMatrix;
+        this.projectMatrix = projectMatrix;
+        this.totalMatrix = totalMatrix; 
+
+        this.inverseWorldMatrix = this.worldMatrix.inverse();
+        this.inverseTransposeMatrix = this.inverseWorldMatrix.transpose(); 
         this.inverseTotalViewMatrix = totalViewMatrix.inverse();
     }
 
@@ -182,7 +208,7 @@ export class Camera {
     }
 
     getCameraPoint(): Vector3 {
-        return this.worldMatrix.inverse().multiplyVector(new Vector3(0, 0, 0));
+        return this.inverseWorldMatrix.multiplyVector(new Vector3(0, 0, 0));
     }
 
     getMouseWorldRay(canvasWidth: number, canvasHeight: number, useMouse = true): Ray {
@@ -206,7 +232,7 @@ export class Camera {
 
         let f = size / Math.tan(this.fov / 2); // focal length
 
-        let invWorld = this.worldMatrix.inverse();
+        let invWorld = this.inverseWorldMatrix;
         let origin = invWorld.multiplyVector(new Vector3(0, 0, 0));
 
         // TODO instead of doing this, just extract the x, y, and z columns of invWorld
@@ -227,29 +253,6 @@ export class Camera {
             : origin.added(khat.scaled(f));
 
         return Ray.fromPoints(origin, screenPoint);
-    }
-
-    getWorldMatrix(): Matrix4 {
-        let offset = this.offset;
-        let angleA = this.angleAlpha;
-        let angleB = this.angleBeta;
-
-        // translate so z means 'up'
-        // let yzFlip = new Matrix4([1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1]);
-
-        // translated to fit screen
-        let position = Matrix4.newTranslation(this.pos.x, this.pos.y, this.pos.z);
-        let mOffset = Matrix4.newTranslation(offset.x, offset.y, offset.z);
-
-        // rotated by user
-        let x_rotation = Matrix4.newXRotation(angleA);
-        let z_rotation = Matrix4.newZRotation(angleB);
-        let rotation = z_rotation.multiply(x_rotation);
- 
-        // let transform = mOffset.multiply(rotation).multiply(position);
-
-        let transform = position.multiply(rotation).multiply(mOffset);
-        return transform;
     }
 
     getProjectionMatrix(canvas: HTMLCanvasElement): Matrix4 {

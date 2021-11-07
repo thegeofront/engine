@@ -21,6 +21,7 @@ import {
     Vector3,
 } from "../../lib";
 import { GeonMath } from "../../math/Math";
+import { getLongDefaultIndices } from "./MultiLine";
 
 export enum MeshType {
     Invalid = 0,
@@ -41,7 +42,7 @@ export class Mesh {
     
     constructor(
         public verts: MultiVector3,
-        public links: IntMatrix, // relationships, can be 2 (lines) | 3 (triangles) | 4 (quads)
+        public _links?: IntMatrix, // relationships, can be 2 (lines) | 3 (triangles) | 4 (quads)
         private _uvs?: MultiVector2,
         private _normals?: MultiVector3, 
         private _normalKind = NormalKind.None
@@ -53,6 +54,10 @@ export class Mesh {
         } else {
             return this.verts.count;
         }
+    }
+
+    get links() {
+        return this._links!;
     }
 
     get uvs(): MultiVector2 | undefined {
@@ -602,6 +607,7 @@ export class Mesh {
         // convert to non-indexed verts & norms
         this.ensureFaceNormals();
         let count = this.links.data.length;
+        console.log(count);
         let faceCount = this.links.count();
 
         let verts = MultiVector3.new(count);
@@ -616,11 +622,11 @@ export class Mesh {
             });
         }
 
-        let links = IntMatrix.fromList([], 3);
-        links._width = 3;
-        links._height = count / 3;
-        links.data = getDefaultIndices(count);
-        let mesh = new Mesh(verts, links, undefined, norms);
+        // let links = IntMatrix.fromList([], 3);
+        // links._width = 3;
+        // links._height = count / 3;
+        // links.data = getLongDefaultIndices(count);
+        let mesh = new Mesh(verts, undefined, undefined, norms);
         return mesh;
     }
 

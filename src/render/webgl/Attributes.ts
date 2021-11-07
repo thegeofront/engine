@@ -31,8 +31,16 @@ export class Attributes {
         this.attributes.get(name)!.load(this.gl, data, speed);
     }
 
+    unload(name: string) {
+        this.attributes.delete(name);
+    }
+
     loadIndex(data: BufferSource, speed: DrawSpeed) {
         this.attributes.get(INDEX_BUFFER_NAME)!.load(this.gl, data, speed);
+    }
+
+    unloadIndex() {
+        this.attributes.delete(INDEX_BUFFER_NAME);
     }
 
     getIndex() {

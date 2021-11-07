@@ -37,7 +37,7 @@ export abstract class ShaderProgram<T> {
 
     // auto set
     private drawElementsOrArrays = () => {};
-    private method = DrawMethod.Arrays;
+    protected drawMethod = DrawMethod.Arrays;
 
     private mode = DrawMode.Triangles;
     private drawCount = 0; // number of times the shaders need to render
@@ -49,13 +49,13 @@ export abstract class ShaderProgram<T> {
         this.init();
     }
 
-    init() {
+    private init() {
         this.useProgram();
         this.uniforms = new Uniforms(this.gl, this.program);
         this.attributes = new Attributes(this.gl, this.program);
         this.drawCount = 0;
         this.mode = this.onInit();
-        this.setDrawMethod();
+        this.updateDrawMethod();
     }
 
     load(r: T, speed = DrawSpeed.StaticDraw) {
@@ -76,6 +76,8 @@ export abstract class ShaderProgram<T> {
         this.draw(context);
     }
 
+
+
     // ------------ These three methods need to be overwritten -------------------
 
     protected abstract onInit(): DrawMode;
@@ -90,14 +92,18 @@ export abstract class ShaderProgram<T> {
         this.gl.useProgram(this.program);
     }
 
+    protected setDrawCount(count: number) {
+        this.drawCount = count;
+    }
+
     // ---------------------------------------------------------------------------
 
-    private setDrawMethod() {
+    updateDrawMethod() {
         if (this.attributes.has(INDEX_BUFFER_NAME)) {
-            this.method = DrawMethod.Elements;
+            this.drawMethod = DrawMethod.Elements;
             this.drawElementsOrArrays = this.drawElements;
         } else {
-            this.method = DrawMethod.Arrays;
+            this.drawMethod = DrawMethod.Arrays;
             this.drawElementsOrArrays = this.drawArrays;
         }
     }

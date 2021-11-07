@@ -19,6 +19,10 @@ export class IntCube {
         }
     }
 
+    static new(height: number, width: number, depth: number, data: number[] = []) {
+        return new IntCube(height, width, depth, data);
+    }
+
     size(): number {
         return this._width * this._height * this._depth;
     }

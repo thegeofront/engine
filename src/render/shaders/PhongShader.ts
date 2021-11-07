@@ -114,7 +114,7 @@ export class PhongShader extends ShaderProgram<Entity> {
         this.attributes.add("normal", 3);
         this.attributes.add("occlusion", 1);
 
-        this.attributes.addIndex(DrawElementsType.UnsignedShort);
+        this.attributes.addIndex(DrawElementsType.UnsignedInt);
 
         this.uniforms.add("worldMatrix", 16);
         this.uniforms.add("worldInverse", 16);
@@ -153,10 +153,20 @@ export class PhongShader extends ShaderProgram<Entity> {
 
     public loadMesh(mesh: Mesh, speed: DrawSpeed) {
         this.useProgram();
-        this.attributes.loadIndex(mesh.links.data, speed);
+
+        // handle index-less meshes 
+        if (mesh.links) {
+            this.attributes.loadIndex(mesh.links.data, speed);
+        } else {
+            this.setDrawCount(mesh.maxSize);
+            this.attributes.unloadIndex();
+            this.updateDrawMethod();
+        }
+
         this.attributes.load("position", mesh.verts.matrix.data, speed);
-        if (mesh.uvs) this.attributes.load("uv", mesh.uvs!.matrix.data, speed);
-        if (mesh.normals )this.attributes.load("normal", mesh.normals!.matrix.data, speed);
+        if (mesh.uvs) this.attributes.load("uv", mesh.uvs!.matrix.data, speed); else this.attributes.unload("uv");
+        if (mesh.normals )this.attributes.load("normal", mesh.normals!.matrix.data, speed); else this.attributes.unload("normal");
+        this.attributes.unload("occlusion");
     }
 
     public loadMaterial(material: Material) {
