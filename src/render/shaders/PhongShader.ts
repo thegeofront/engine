@@ -164,8 +164,8 @@ export class PhongShader extends ShaderProgram<Entity> {
         }
 
         this.attributes.load("position", mesh.verts.matrix.data, speed);
-        if (mesh.uvs) this.attributes.load("uv", mesh.uvs!.matrix.data, speed); else this.attributes.unload("uv");
-        if (mesh.normals )this.attributes.load("normal", mesh.normals!.matrix.data, speed); else this.attributes.unload("normal");
+        if (mesh.uvs) this.attributes.load("uv", mesh.uvs!.matrix.data, speed); // this.attributes.unload("uv");
+        if (mesh.normals )this.attributes.load("normal", mesh.normals!.matrix.data, speed); //this.attributes.unload("normal");
         this.attributes.unload("occlusion");
     }
 

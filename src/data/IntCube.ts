@@ -59,6 +59,17 @@ export class IntCube {
         );
     }
 
+    isOnEdge(i: number, j: number, k: number, buffer=1): boolean {
+        return (
+            i < buffer ||
+            j < buffer ||
+            k < buffer ||
+            i > this._width - 1 - buffer ||
+            j > this._height - 1 - buffer ||
+            k > this._depth - 1 - buffer
+        );
+    }
+
     getIndex(i: number, j: number, k: number): number {
         return i * (this._height * this._depth) + j * this._depth + k;
     }
@@ -76,11 +87,11 @@ export class IntCube {
         return this.data[this.getIndex(i, j, k)];
     }
 
-    tryGet(i: number, j: number, k: number): number | undefined {
+    tryGet(i: number, j: number, k: number, outOfRange: number): number {
         if (this.inRange(i, j, k)) {
             return this.data[this.getIndex(i, j, k)];
         } else {
-            return;
+            return outOfRange;
         }
     }
 
