@@ -21,6 +21,14 @@ export class EnumParameter {
         return this.p.get();
     }
 
+    get state() {
+        return this.p.state;
+    }
+
+    get name() {
+        return this.p.name;
+    }
+
     set(state: number) {
         return this.p.set(state);
     }

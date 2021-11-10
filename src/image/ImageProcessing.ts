@@ -5,6 +5,8 @@ import { Kernels } from "./Kernels";
 
 export namespace ImageProcessing {
     
+    const GREY_LVLS = 256;
+
     export function imagedataFromTrueGreyscale(grey: Bitmap) {
         let rgba = new Uint8ClampedArray(grey.width * grey.height * 4);
 
@@ -139,6 +141,8 @@ export namespace ImageProcessing {
 
     /**
      * Take the canny process, but render all in-between steps
+     * When using Dynamic Threshold, the lower and upper values refer to 'edge intensity percentile' values.
+     * 
      */
     export function canny(
         original: Bitmap,
@@ -146,17 +150,29 @@ export namespace ImageProcessing {
         blurSize = 3,
         lower = 100,
         upper = 200,
+        equalizeHistogram = true,
+        dynamicThreshold = false,
         dr?: DebugRenderer,
     ) {
         const weak = 128;
         const strong = 255;
 
         let grey = original.toGreyscale();
+        
+        if (equalizeHistogram) {
+            grey = ImageProcessing.equalizeHistogram(grey);
+        }
         let gauss = Kernels.generateGaussianKernel(blurSigma, blurSize);
         let blurred = grey.applyKernel(gauss);
         let [magnitude, direction] = ImageProcessing.sobelMD(blurred);
         let thetaDirections = ImageProcessing.thetaMap(direction);
+
         let supressed = ImageProcessing.cannyNonMaximumSuppression(magnitude, thetaDirections);
+
+        if (dynamicThreshold) {
+            [lower, upper] = ImageProcessing.cannyDynamicthreshold(supressed, lower / 255, upper / 255);
+        }
+
         let thressed = ImageProcessing.cannyThreshold(supressed, lower, upper, weak, strong);
         let result = ImageProcessing.cannyHysteresis(thressed, weak, strong);
 
@@ -172,6 +188,10 @@ export namespace ImageProcessing {
             offset += 10;
         };
 
+        if (dynamicThreshold) {
+            console.log("dynamic threshold used: ", {lower, upper});
+        }
+
         addToDR(original, "original");
         addToDR(grey, "grey");
         addToDR(blurred, "blurred");
@@ -180,7 +200,37 @@ export namespace ImageProcessing {
         addToDR(supressed, "supressed");
         addToDR(thressed, "threshold");
         addToDR(result, "hysteresis");
+
         return result;
+    }
+
+    export function cannyDynamicthreshold(supressed: Bitmap, lowerPercentile: number, upperPercentile: number) {
+        let histogram = ImageProcessing.getHistogram(supressed);
+
+        // remove lowest channel
+        let count = supressed.width * supressed.height - histogram[0];
+        histogram.splice(0, 1);
+        let cfg = ImageProcessing.getCFG(histogram, count);
+
+        // console.log(histogram);
+        // console.log(cfg);
+
+        // returns the pixel intensity at which `percentile` percent of pixels left in the image are more intense
+        // if (p=0.95) return 128, that means that pixels more intense than 128 make up 0.05 of the image.  
+        let getValueAtPercentile = (cfg: number[], percentile: number) => {
+            for (let i = 0; i < GREY_LVLS; i++) {
+                
+                // NOTE: because i am stupid, there needs to be a plus or minus one somewhere in here
+                if (cfg[i] > percentile) {
+                    return i;
+                }
+            }
+            return undefined;
+        }
+    
+        let lower = getValueAtPercentile(cfg, lowerPercentile)!;
+        let upper = getValueAtPercentile(cfg, upperPercentile)!;
+        return [lower, upper];
     }
 
     /**
@@ -285,5 +335,58 @@ export namespace ImageProcessing {
         image.clone();
         image.bucketFill(start, color, diagonal);
         return image;
+    }
+
+
+    /**
+     * Put all pixels in a 
+     */
+    export function equalizeHistogram(image: Bitmap, channel=0) {
+
+        let histogram = getHistogram(image);
+        let count = image.width * image.height;
+        let cfg = getCFG(histogram, count);
+
+        let equalized = new Bitmap(image.width, image.height);
+        for (let i = 0; i < count; i++) {
+            let value = image.getWithIndex(i)[channel];
+            let newValue = cfg[value] * 255;
+            equalized.setWithIndex(i, [newValue, newValue, newValue, 255]);
+        }
+
+        return equalized;
+    }
+
+    export function getHistogram(image: Bitmap, channel=0) {
+        let histogram: Array<number> = new Array(GREY_LVLS);
+
+        for (let i = 0 ; i < GREY_LVLS; i++) {
+            histogram[i] = 0;
+        } 
+
+        // just take the first (red) channel, and pretend it is a greyscale image
+        let count = image.width * image.height;
+        for (let i = 0; i < count; i++) {
+            let value = image.getWithIndex(i)[channel];
+            histogram[value] = histogram[value] + 1; 
+        }
+        return histogram;
+    }
+
+    /**
+     * Calculate the cumulative distributive function of a histogram
+     * @param histogram an array, each item is how many times i occures. ASSUMES `GREY_LVLS` amount of buckets
+     * @param totalCount the sum of the histogram
+     * @returns 
+     */
+    export function getCFG(histogram: Array<number>, totalCount: number) {
+        let cfg = new Array<number>(histogram.length);
+        let sum = 0;
+        for (let i = 0 ; i < histogram.length; i++) {
+            let count = histogram[i];
+            sum += count;
+            cfg[i] = sum / totalCount;
+        } 
+        return cfg;
     }
 }

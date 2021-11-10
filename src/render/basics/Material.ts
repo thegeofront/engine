@@ -50,14 +50,26 @@ export class Material {
 
     static neutral() {
         return new Material(
-            Color.fromHex("#111111")!,
-            Color.fromHex("#000000")!,
-            Color.fromHex("#000000")!,
-            Color.fromHex("#000000")!,
+            Color.fromHex("#ffffff")!,
+            Color.fromHex("#ffffff")!,
+            Color.fromHex("#ffffff")!,
+            Color.fromHex("#ffffff")!,
             3.195,
             1,
         );
     }
+
+    static yellow() {
+        return new Material(
+            Color.fromHex("#fff25f")!,
+            Color.fromHex("#fff25f")!,
+            Color.fromHex("#fff25f")!,
+            Color.fromHex("#fff25f")!,
+            3.195,
+            1,
+        );
+    }
+
 
     static default() {
         return new Material(
