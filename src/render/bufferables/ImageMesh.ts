@@ -1,12 +1,12 @@
 import { Bitmap, Vector3, ShaderMesh, Plane, Domain2, Rectangle3, Mesh } from "../../lib";
-import { Bufferable } from "../Bufferable";
+import { Bufferable } from "../basics/Bufferable";
 
 /**
  * This describes an image in 3D space.
  * Can be regarded as a 3D sprite, build would be very inefficient to be used like that 
  * Mostly used for debugging textures
  */
-export class ImageMesh implements Bufferable {
+export class ImageMesh implements Bufferable<ShaderMesh> {
 	constructor(
 		public image: Bitmap, 
 		public plane: Plane,

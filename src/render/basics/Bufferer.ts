@@ -16,8 +16,8 @@
 // TODO: maybe find a better name, but 'combo' is quite distinct in a way
 // todo: force buffering a bit more. make a way that requiers this.buffered to be filled
 
-import { Scene, OldShader } from "../lib";
-import { MultiShader } from "./OldMultiShader";
+import { Scene, OldShader } from "../../lib";
+import { MultiShader } from "./../OldMultiShader";
 
 // staticcombo
 

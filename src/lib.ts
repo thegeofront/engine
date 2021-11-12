@@ -84,8 +84,6 @@ export * from "./parametric/Parameter";
 export * from "./parametric/ParametricModel";
 
 export * from "./render/bufferables/ImageMesh";
-export * from "./render/bufferables/VectorCloud";
-
 export * from "./render/bufferers/MeshBufferer";
 
 export * from "./render/renderers/DebugRenderer";

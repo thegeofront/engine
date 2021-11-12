@@ -32,7 +32,7 @@ import { Renderable } from "../../render/basics/Renderable";
 type vertexID = number;
 type faceID = number;
 
-export class ShaderMesh implements Renderable {
+export class ShaderMesh {
     // this desperately calls for an overhaul...
 
     mesh: Mesh;

@@ -11,7 +11,7 @@ import { DotShader } from "../shaders-old/dot-shader";
 import { LineShader } from "../shaders-old/line-shader";
 import { MeshDebugShader } from "../shaders-old/mesh-debug-shader";
 import { ShadedMeshShader } from "../shaders-old/shaded-mesh-shader";
-import { Scene } from "../../lib";
+import { Circle3, Scene } from "../../lib";
 import { OldShader } from "../OldShader";
 import { DrawSpeed, WebGl } from "../webgl/HelpGl";
 import { Billboard, BillboardPayload, BillboardShader } from "../shaders/BillboardShader";
@@ -31,7 +31,8 @@ export type RenderableUnit =
     | Polyline
     | Plane
     | MultiLine
-    | ImageMesh;
+    | ImageMesh
+    | Circle3;
 type AcceptableShader =
     | DotShader
     | ShadedMeshShader
@@ -132,6 +133,9 @@ export class DebugRenderer {
             let multiLine = MultiLine.fromPlane(unit);
             //@ts-ignore
             shader.set(multiLine);
+        } else if (unit instanceof Circle3) {
+            //@ts-ignore
+            shader.set(MultiLine.fromCircle(unit));
         } else if (unit instanceof MultiLine) {
             //@ts-ignore
             shader.set(unit);
@@ -175,6 +179,10 @@ export class DebugRenderer {
         } else if (unit instanceof Plane) {
             shader = new LineShader(gl, ...options);
             let multiLine = MultiLine.fromPlane(unit);
+            shader.set(multiLine);
+        } else if (unit instanceof Circle3) {
+            shader = new LineShader(gl, ...options);
+            let multiLine = MultiLine.fromCircle(unit);
             shader.set(multiLine);
         } else if (unit instanceof MultiLine) {
             shader = new LineShader(gl, ...options);

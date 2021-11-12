@@ -18,11 +18,13 @@ import {
     Bezier,
     Cube,
     ShaderMesh,
+    Domain2,
+    Domain,
 } from "../../lib";
 import { Renderable } from "../../render/basics/Renderable";
 
 // represents a collection of multiple lines. These could form 1 polyline, but this is not a requirement
-export class MultiLine implements Renderable {
+export class MultiLine {
     verts: FloatMatrix;
     links: Uint16Array;
 
@@ -151,14 +153,16 @@ export class MultiLine implements Renderable {
         return new MultiLine(lines.slice());
     }
 
-    static fromCircle(c: Circle3, numSegments = Const.CIRCLE_SEGMENTS): MultiLine {
+    static fromCircle(c: Circle3, numSegments = Const.CIRCLE_SEGMENTS, domain?: Domain): MultiLine {
         let count = numSegments;
-        let verts = MultiVector3.new(count);
         let PI2 = Math.PI * 2;
+        if (!domain) domain = Domain.new(0, PI2);
+        
+        let verts = MultiVector3.new(count);
         // x lines
         for (let i = 0; i < count; i++) {
             // radial fraction of a circle
-            let t = (i / count) * PI2;
+            let t = domain.elevate(i / count);
             verts.set(i, c.at(t));
         }
         return new MultiLine(verts.slice(), getPairIndices(count, true));
