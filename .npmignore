@@ -1,3 +1,15 @@
+# make sure we just publish a `package.json` and a `dist/` folder 
+
 .vscode
 /doc
 /src
+
+MANUAL.md
+
+node_modules
+package-lock.json
+
+tsconfig.json
+tsconfig.tsbuildinfo
+webpack.config.js
+.*

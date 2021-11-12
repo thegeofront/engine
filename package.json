@@ -1,9 +1,9 @@
 {
   "name": "geon-engine",
-  "version": "0.4.1",
+  "version": "0.4.6",
   "author": "Jos Feenstra",
   "license": "MIT",
-  "description": "Lightweight 3d geometry library + 3d renderer",
+  "description": "3d geometry library + 3d renderer",
   "main": "dist/lib.js",
   "types": "dist/lib.d.ts",
   "scripts": {

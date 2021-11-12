@@ -1,0 +1,6 @@
+
+## BUG
+- super weird bug: when publishing to npm, the project needs to be build using the 'classic' method: building it into a js / ts library.
+  - BUT the `npx tsc --build` or `npm run build -> tsc--build` commands only SOMETIMES create a new build...
+  - WORKAROUND is deleting the dist folder manually, change the tsconfig a bit, and try again...
+  - this is related, but not the same thing: https://github.com/Microsoft/TypeScript/issues/8186

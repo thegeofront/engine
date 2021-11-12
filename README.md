@@ -4,19 +4,11 @@ Think barebones three.js, but with a focus on parametric design / procedural gen
 
 
 ## Demo
-[repo](https://github.com/josfeenstra/geon-demo/)
-
 [online](http://josfeenstra.nl/project/geon/)
 
+[repo](https://github.com/josfeenstra/geon-demo/)
 
-## Install 
-```
-git clone https://github.com/josfeenstra/geon-engine
-cd geon-engine 
-npm install 
-npm run build
-```
-This will produce ```index.js``` within the build folder. To use it, run a local web server like [live server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer) or [web server for chrome](https://chrome.google.com/webstore/detail/web-server-for-chrome/ofhbbkphhbklhfoeikjpcbhemlocgigb).
+
 
 ## TODO
 
@@ -37,6 +29,20 @@ This will produce ```index.js``` within the build folder. To use it, run a local
   - can be done by decoupled loaders, like: `shader.loadCamera` / `shader.loadModel` / `shader.loadMaterial`. 
 - TODO: create an InstanceRenderer(), which accepts 1 model and a whole bunch of position matrices.
   - Try to render a whole forest with them
+
+## Install 
+```
+git clone https://github.com/josfeenstra/geon-engine
+git clone https://github.com/josfeenstra/geon-demo
+cd geon_engine
+npm install
+cd ..
+cd geon-demo
+npm install
+```
+The geon-engine is just a bunch of dependency-less typescript files. they can be build into javascript using the regular `tsc --build` command. 
+However, this makes it hard to make changes on the fly. This is why this uncommon way of using direct `ts` dependencies is used.
+
 _____________________________________________________________
 ⚙️ = Busy | ✔️= DONE 
 
