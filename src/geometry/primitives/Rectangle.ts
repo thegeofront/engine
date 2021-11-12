@@ -11,6 +11,8 @@ import { Vector2 } from "../../math/Vector2";
 // purpose: Represents a cube in 3d space, in a certain pose.
 
 import { Vector3 } from "../../math/Vector3";
+import { Bufferable } from "../../render/basics/Bufferable";
+import { MultiLine } from "../mesh/MultiLine";
 import { Geometry } from "./../Geometry";
 import { Plane } from "./Plane";
 
@@ -50,7 +52,8 @@ export class Rectangle2 {
     }
 }
 
-export class Rectangle3 {
+export class Rectangle3 implements Bufferable<MultiLine> {
+
     plane: Plane;
     domain: Domain2;
 
@@ -67,5 +70,9 @@ export class Rectangle3 {
         let corners = this.domain.corners();
         let corners3 = corners.map((c) => this.plane.pushToWorld(Vector3.from2d(c)));
         return corners3;
+    }
+
+    buffer(): MultiLine {
+        return MultiLine.fromRect(this);
     }
 }

@@ -1,6 +1,6 @@
-import { Renderable } from "./Renderable";
+import { Shadable } from "./Shadable";
 
-export abstract class Bufferable<T extends Renderable> {
+export abstract class Bufferable<T extends Shadable> {
 
     abstract buffer() : T
 }

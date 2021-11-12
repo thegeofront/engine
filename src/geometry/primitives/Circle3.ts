@@ -42,6 +42,13 @@ export class Circle3 extends Geometry {
         return this.plane.pushToWorld(new Vector3(Math.cos(t) * this.radius, Math.sin(t) * this.radius, 0))
     }
 
+    frameAt(t: number) : Plane {
+        let p = this.at(t);
+        let ihat = this.plane.center.subbed(p).normalize();
+        let jhat = this.plane.khat.normalize();
+        return Plane.fromPVV(p, ihat, jhat);
+    }
+
     ///////////////////////////////////////////////////////////////////////////
 
     buffer(): MultiLine {

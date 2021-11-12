@@ -27,7 +27,7 @@ import {
     Rectangle3,
     Vector3,
 } from "../../lib";
-import { Renderable } from "../../render/basics/Renderable";
+import { Shadable } from "../../render/basics/Shadable";
 
 type vertexID = number;
 type faceID = number;

@@ -21,7 +21,8 @@ import {
     Domain2,
     Domain,
 } from "../../lib";
-import { Renderable } from "../../render/basics/Renderable";
+import { Shadable } from "../../render/basics/Shadable";
+import { Rectangle3 } from "../primitives/Rectangle";
 
 // represents a collection of multiple lines. These could form 1 polyline, but this is not a requirement
 export class MultiLine {
@@ -188,6 +189,18 @@ export class MultiLine {
 
         return new MultiLine(verts);
     }
+
+    static fromRect(rect: Rectangle3): MultiLine {
+        let verts = MultiVector3.fromList(rect.getCorners());
+        
+        // swap 2 and 3
+        let tempVert = verts.get(3);
+        verts.set(3, verts.get(2));
+        verts.set(2, tempVert);
+        
+        return new MultiLine(verts, getPairIndices(verts.count, true));
+    }
+
 
     static fromJoin(lines: MultiLine[]): MultiLine {
         // join meshes, dont try to look for duplicate vertices

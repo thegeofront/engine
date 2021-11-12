@@ -105,7 +105,7 @@ export class Camera {
         this.angleBeta = beta;
     }
 
-    private updateMatrices(canvas: HTMLCanvasElement) {
+    updateMatrices(canvas: HTMLCanvasElement) {
 
         // 1 : calculate world matrix
         let offset = this.offset;

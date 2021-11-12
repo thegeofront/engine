@@ -17,6 +17,7 @@ import { MultiLine } from "../mesh/MultiLine";
 import { Stopwatch } from "../../util/Stopwatch";
 import { Curve } from "./Curve";
 import { Polyline } from "./Polyline";
+import { Plane } from "../primitives/Plane";
 
 export class Bezier extends Curve {
     private _approx?: Polyline;
@@ -171,6 +172,12 @@ export class Bezier extends Curve {
         return this.tangentAt(t).cross(up);
     }
 
+    frameAt(t: number, up = Vector3.unitZ()) {
+        let p = this.pointAt(t);
+        let tan = this.tangentAt(t);
+        return Plane.fromPVV(p, tan.cross(up), up);
+    }
+
     /**
      * Approximate the closest point with a wacky method
      * partially taken from: https://stackoverflow.com/questions/2742610/closest-point-on-a-cubic-bezier-curve
@@ -260,7 +267,7 @@ export class Bezier extends Curve {
         this._approx = this.toPolyline(100);
     }
 
-    // geo trait
+    ///////////////////////////////////////////////////////////////////////////
 
     clone(): Bezier {
         return Bezier.new(this.verts.clone());

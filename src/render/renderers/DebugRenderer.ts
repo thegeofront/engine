@@ -20,6 +20,8 @@ import { Parameter } from "../../parametric/Parameter";
 import { UI } from "../../dom/UI";
 import { BiSurface, Plane } from "../../lib";
 import { TextureMeshShader } from "../shaders-old/texture-mesh-shader";
+import { Bufferable } from "../basics/Bufferable";
+import { AnyShader, createNewShaderForShadable, Shadable } from "../basics/Shadable";
 
 // NOTE: I think this type of polymorphism is better than regular polymorphism
 export type RenderableUnit =
@@ -34,6 +36,7 @@ export type RenderableUnit =
     | ImageMesh
     | Circle3;
 type AcceptableShader =
+    | AnyShader
     | DotShader
     | ShadedMeshShader
     | MeshDebugShader
@@ -73,6 +76,31 @@ export class DebugRenderer {
         }
 
         this.multiSet(key, unit, ...options);
+        return shader;
+    }
+
+    setBufferable<T extends Shadable>(unit: Bufferable<T>, key?: string, ...options: any[]) {
+        this.setShadable(unit.buffer(), key, options);
+    }
+
+
+    setShadable(shadable: Shadable, key?: string, ...options: any[]) {
+        if (!key) {
+            key = createRandomGUID().slice(0, 8);
+        }
+
+        let shader = this.shaders.get(key);
+        if (!shader) {
+            shader = createNewShaderForShadable(shadable, this.gl)!;
+            this.shaders.set(key, shader);
+            this.activeShaders.add(key);
+            // ADD THE OPTIONS SOMEHOW
+            // shader.setOptions(options); 
+        }
+
+        //@ts-ignore
+        shader.set(shadable, DrawSpeed.StaticDraw);
+
         return shader;
     }
 

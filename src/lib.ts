@@ -118,7 +118,7 @@ export * from "./render/basics/Entity";
 export * from "./render/basics/Light";
 export * from "./render/basics/Material";
 export * from "./render/basics/Model";
-export * from "./render/basics/Renderable";
+export * from "./render/basics/Shadable";
 export * from "./render/basics/Scene";
 
 export * from "./render/renderers/DebugRenderer";
