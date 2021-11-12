@@ -1,7 +1,7 @@
-import { MultiVector2, MultiVector3 } from "../lib";
-import { Const } from "../math/Const";
-import { LSA } from "../math/LSA";
-import { Vector2 } from "../math/Vector2";
+import { MultiVector2, MultiVector3 } from "../../lib";
+import { Const } from "../../math/Const";
+import { LSA } from "../../math/LSA";
+import { Vector2 } from "../../math/Vector2";
 
 export class Circle2 {
 

@@ -27,14 +27,15 @@ export * from "./dom/IO";
 export * from "./dom/UI";
 
 export * from "./geometry/Geometry";
-export * from "./geometry/Circle2";
-export * from "./geometry/Circle3";
-export * from "./geometry/Cube";
 export * from "./geometry/Intersect";
-export * from "./geometry/Line";
-export * from "./geometry/Plane";
-export * from "./geometry/Rectangle";
-export * from "./geometry/Triangle";
+
+export * from "./geometry/primitives/Circle2";
+export * from "./geometry/primitives/Circle3";
+export * from "./geometry/primitives/Cube";
+export * from "./geometry/primitives/Line";
+export * from "./geometry/primitives/Plane";
+export * from "./geometry/primitives/Rectangle";
+export * from "./geometry/primitives/Triangle";
 
 export * from "./geometry/curve/Curve";
 export * from "./geometry/curve/Bezier";

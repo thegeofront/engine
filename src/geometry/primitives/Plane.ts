@@ -5,7 +5,7 @@
 // todo:    differentiate between a Space (a matrix in essense, ihat, jhat, khat, center, etc...) and a Plane (a, b, c, d);
 //          Space = a matrix which is parallel-preserving, i.e. any combination of rotation, scaling and translation, but not a perspective distortion. 
 
-import { Matrix4, Vector3, Const, MultiVector3, Stat } from "../lib";
+import { Matrix4, Vector3, Const, MultiVector3, Stat } from "../../lib";
 
 export class Plane {
     _matrix!: Matrix4;

@@ -1,7 +1,7 @@
-import { Domain2 } from "../math/Domain";
-import { Matrix3 } from "../math/Matrix3";
-import { Matrix4 } from "../math/Matrix4";
-import { Vector2 } from "../math/Vector2";
+import { Domain2 } from "../../math/Domain";
+import { Matrix3 } from "../../math/Matrix3";
+import { Matrix4 } from "../../math/Matrix4";
+import { Vector2 } from "../../math/Vector2";
 
 // basic 2d rectangle
 // a Matrix3 and Domain2 is used.
@@ -10,8 +10,8 @@ import { Vector2 } from "../math/Vector2";
 // author:  Jos Feenstra
 // purpose: Represents a cube in 3d space, in a certain pose.
 
-import { Vector3 } from "../math/Vector3";
-import { Geometry } from "./Geometry";
+import { Vector3 } from "../../math/Vector3";
+import { Geometry } from "./../Geometry";
 import { Plane } from "./Plane";
 
 export class Rectangle2 {

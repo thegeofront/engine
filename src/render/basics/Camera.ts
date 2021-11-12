@@ -49,9 +49,11 @@ export class Camera {
         return new Camera(canvas, zOffset, canMove);
     }
 
-    update(state: InputState) {
-        this.updateControls(state);
-        this.updateMatrices(state.canvas); // TODO only move if we have changed
+    update(state: InputState) : boolean {
+        let hasChanged = this.updateControls(state);
+        if (hasChanged) {
+            this.updateMatrices(state.canvas); // TODO only move if we have changed
+        }
         this.updateClick(state);
 
         if (state.IsKeyPressed("p")) {
@@ -74,6 +76,7 @@ export class Camera {
 
             console.log("speed is now: " + this.speed);
         }
+        return hasChanged;
     }
 
     // just a quick way of getting & setting
@@ -154,9 +157,11 @@ export class Camera {
         // todo
     }
 
-    private updateControls(state: InputState) {
+    private updateControls(state: InputState) : boolean {
+
+        let hasChanged = false;
         if (!this.canControl) {
-            return;
+            return hasChanged;
         }
 
         let deltaScroll = state.scrollValue * 1.2;
@@ -174,9 +179,10 @@ export class Camera {
         this.mousePos = state.mousePos.clone();
         let delta = prevPos.clone().sub(this.mousePos);
 
-        this.getMouseWorldRay(state.canvas.width, state.canvas.height);
+        // this.getMouseWorldRay(state.canvas.width, state.canvas.height);
 
         if (state.mouseRightDown) {
+            hasChanged = delta.y != 0 || delta.x != 0;
             this.angleAlpha = GeonMath.clamp(this.angleAlpha + delta.y * 0.01, 0, Math.PI);
             this.angleBeta += delta.x * -0.01;
         }
@@ -192,19 +198,35 @@ export class Camera {
         }
 
         if (!this.canMove) {
-            return;
+            return hasChanged;
         }
 
-        if (state.IsKeyDown("s"))
+        if (state.IsKeyDown("s")) {
+            hasChanged = true;
             this.pos.add(relativeUnitY(-this.angleBeta).scale(0.01 * this.speed));
-        if (state.IsKeyDown("w"))
+        }
+        if (state.IsKeyDown("w")) {
+            hasChanged = true;
             this.pos.add(relativeUnitY(-this.angleBeta).scale(-0.01 * this.speed));
-        if (state.IsKeyDown("a"))
+        }
+        if (state.IsKeyDown("a")) {
+            hasChanged = true;
             this.pos.add(relativeUnitX(-this.angleBeta).scale(0.01 * this.speed));
-        if (state.IsKeyDown("d"))
+        }
+        if (state.IsKeyDown("d")) {
+            hasChanged = true;
             this.pos.add(relativeUnitX(-this.angleBeta).scale(-0.01 * this.speed));
-        if (state.IsKeyDown("q")) this.pos.z += 0.01 * this.speed;
-        if (state.IsKeyDown("e")) this.pos.z -= 0.01 * this.speed;
+        }
+        if (state.IsKeyDown("q")) {
+            hasChanged = true;
+            this.pos.z += 0.01 * this.speed;
+        }
+        if (state.IsKeyDown("e")) {
+            hasChanged = true;
+            this.pos.z -= 0.01 * this.speed;
+        }
+
+        return hasChanged;
     }
 
     getCameraPoint(): Vector3 {

@@ -2,7 +2,7 @@
 // author:  Jos Feenstra
 // purpose: Represents a cube in 3d space, in a certain pose.
 
-import { Domain3, Plane, Vector3 } from "../lib";
+import { Domain3, Plane, Vector3 } from "../../lib";
 
 export class Cube {
     constructor(public plane: Plane, public domain: Domain3) {}

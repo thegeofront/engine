@@ -1,4 +1,4 @@
-import { Vector2, MultiVector2, Vector3, Plane, LineCurve2 } from "../lib";
+import { Vector2, MultiVector2, Vector3, Plane, LineCurve2 } from "../../lib";
 
 export class Triangle2 {
     a: Vector2;

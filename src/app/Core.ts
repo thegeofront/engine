@@ -57,7 +57,7 @@ export class Core {
         this.state.postUpdate();
     }
 
-    draw() {
+    draw(clear=true) {
         const canvas = this.canvas;
         const gl = this.gl;
 
@@ -74,11 +74,11 @@ export class Core {
 
                 gl.viewport(0, 0, window.innerWidth, window.innerHeight);
             }
-        } else {
+        } 
 
+        if (clear) {
+            HelpGl.clear(gl);
         }
-
-        HelpGl.clear(gl);
 
         // render all apps
         // TODO : reverse order

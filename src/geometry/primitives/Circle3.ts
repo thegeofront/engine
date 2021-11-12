@@ -1,18 +1,21 @@
 // purpose: represents a 3d circle
 
-import { Const } from "../math/Const";
-import { Matrix4 } from "../math/Matrix4";
-import { Vector3 } from "../math/Vector3";
-import { MultiLine } from "./mesh/MultiLine";
-import { Mesh } from "./mesh/Mesh";
+import { Const } from "../../math/Const";
+import { Matrix4 } from "../../math/Matrix4";
+import { Vector3 } from "../../math/Vector3";
+import { MultiLine } from "./../mesh/MultiLine";
+import { Mesh } from "./../mesh/Mesh";
 import { Circle2 } from "./Circle2";
 import { Plane } from "./Plane";
+import { Geometry } from "../Geometry";
 
-export class Circle3 {
+export class Circle3 extends Geometry {
+
     plane: Plane;
     radius: number;
 
     private constructor(plane: Plane, radius: number) {
+        super();
         this.plane = plane;
         this.radius = radius;
     }
@@ -33,7 +36,14 @@ export class Circle3 {
         return new Circle3(plane, circle2.radius);
     }
 
-    // convert
+    ///////////////////////////////////////////////////////////////////////////
+
+    at(t: number) {
+        return this.plane.pushToWorld(new Vector3(Math.cos(t) * this.radius, Math.sin(t) * this.radius, 0))
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+
     buffer(): MultiLine {
         return MultiLine.fromCircle(this);
     }
@@ -53,5 +63,19 @@ export class Circle3 {
         // length of total error vector needs to be smaller than the given
         // tolerance
         return yError ** 2 + xError ** 2 < Const.TOL_SQUARED;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+
+    clone(): Geometry {
+        throw new Error("Method not implemented.");
+    }
+
+    transform(m: Matrix4): Geometry {
+        throw new Error("Method not implemented.");
+    }
+
+    transformed(m: Matrix4): Geometry {
+        throw new Error("Method not implemented.");
     }
 }

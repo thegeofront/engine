@@ -154,21 +154,18 @@ export class MultiLine implements Renderable {
     static fromCircle(c: Circle3, numSegments = Const.CIRCLE_SEGMENTS): MultiLine {
         let count = numSegments;
         let verts = MultiVector3.new(count);
-
+        let PI2 = Math.PI * 2;
         // x lines
         for (let i = 0; i < count; i++) {
             // radial fraction of a circle
-            let t = (i / count) * (Math.PI * 2);
-            verts.set(
-                i,
-                c.plane.pushToWorld(new Vector3(Math.cos(t) * c.radius, Math.sin(t) * c.radius, 0)),
-            );
+            let t = (i / count) * PI2;
+            verts.set(i, c.at(t));
         }
         return new MultiLine(verts.slice(), getPairIndices(count, true));
     }
 
-    static fromPolyline(p: Polyline) {
-        return new MultiLine(p.verts, getPairIndices(p.verts.count, false));
+    static fromPolyline(p: Polyline, closed=false) {
+        return new MultiLine(p.verts, getPairIndices(p.verts.count, closed));
     }
 
     static fromBezier(b: Bezier, numSegments = Const.BEZIER_SEGMENTS) {
