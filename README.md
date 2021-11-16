@@ -19,7 +19,7 @@ cd geon-demo
 npm install
 ```
 The geon-engine can be compiled to `js` using the regular `tsc --build` command. 
-However, this makes it hard to make changes on the fly. This is why this uncommon way of using direct `ts` dependencies is used. This essentially makes the geon-engine a [header-only](https://en.wikipedia.org/wiki/Header-only) library.
+However, this makes it hard to make changes on the fly. This is why this uncommon way of using direct `ts` dependencies is used. This essentially makes the engine a [header-only](https://en.wikipedia.org/wiki/Header-only) library.
 
 --------------------------------------------------------------------
 
