@@ -8,7 +8,20 @@ Think barebones three.js, but with a focus on parametric design / procedural gen
 
 [repo](https://github.com/josfeenstra/geon-demo/)
 
+## Install 
+```
+git clone https://github.com/josfeenstra/geon-engine
+git clone https://github.com/josfeenstra/geon-demo
+cd geon_engine
+npm install
+cd ..
+cd geon-demo
+npm install
+```
+The geon-engine can be compiled to `js` using the regular `tsc --build` command. 
+However, this makes it hard to make changes on the fly. This is why this uncommon way of using direct `ts` dependencies is used. This essentially makes the geon-engine a [header-only](https://en.wikipedia.org/wiki/Header-only) library.
 
+--------------------------------------------------------------------
 
 ## TODO
 
@@ -27,23 +40,8 @@ Think barebones three.js, but with a focus on parametric design / procedural gen
 - Entity needs a Model and Shader. 
 - We need a `Shader` interface which enables us to only update that which needs updating.
   - can be done by decoupled loaders, like: `shader.loadCamera` / `shader.loadModel` / `shader.loadMaterial`. 
-- TODO: create an InstanceRenderer(), which accepts 1 model and a whole bunch of position matrices.
+- TODO: create an `InstanceRenderer()`, which accepts 1 model and a whole bunch of position matrices.
   - Try to render a whole forest with them
-
-## Install 
-```
-git clone https://github.com/josfeenstra/geon-engine
-git clone https://github.com/josfeenstra/geon-demo
-cd geon_engine
-npm install
-cd ..
-cd geon-demo
-npm install
-```
-The geon-engine can be compiled to javascript using the regular `tsc --build` command. 
-However, this makes it hard to make changes on the fly. 
-
-This is why this uncommon way of using direct `ts` dependencies is used. This essentially makes the geon-engine a [header-only](https://en.wikipedia.org/wiki/Header-only) library
 
 _____________________________________________________________
 ⚙️ = Busy | ✔️= DONE 
