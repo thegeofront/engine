@@ -55,6 +55,15 @@ export class Random {
         this.c = (this.c + t) | 0;
         return (t >>> 0) / 4294967296;
     }
+
+    getInt(max: number) {
+        return Math.floor(this.get() * max);
+    }
+
+    choose<T>(array: ArrayLike<T>) {
+        let choice = this.getInt(array.length);
+        return array[choice];
+    }
 }
 
 // not using this right now, but could be fun
@@ -82,9 +91,10 @@ function xmur3(str: string) {
  * @returns guid
  */
 export function createGUID(rng: Random) {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-       var r = rng.get() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-       return v.toString(16);
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+        var r = (rng.get() * 16) | 0,
+            v = c == "x" ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
     });
 }
 
