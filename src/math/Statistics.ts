@@ -16,7 +16,7 @@ import { Matrix4, MultiVector2, MultiVector3 } from "../lib";
 
 export namespace Stat {
     // calculate sum
-    export function sum(x: number[] | Float32Array) {
+    export function sum(x: ArrayLike<number>) {
         let sum = 0;
         for (let i = 0; i < x.length; i++) {
             sum += x[i];
@@ -25,7 +25,7 @@ export namespace Stat {
     }
 
     // calculate average
-    export function mean(x: number[] | Float32Array) {
+    export function mean(x: ArrayLike<number>) {
         return sum(x) / x.length;
     }
 

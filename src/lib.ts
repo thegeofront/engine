@@ -125,3 +125,4 @@ export * from "./render/renderers/DebugRenderer";
 export * from "./render/renderers/ImageRenderer";
 
 export * from "./util/FpsCounter";
+export * from "./util/Microphone";

@@ -49,9 +49,9 @@ export class Camera {
         return new Camera(canvas, zOffset, canMove);
     }
 
-    update(state: InputState) : boolean {
+    update(state: InputState, forceUpdate = true) : boolean {
         let hasChanged = this.updateControls(state);
-        if (hasChanged) {
+        if (hasChanged || forceUpdate) {
             this.updateMatrices(state.canvas); // TODO only move if we have changed
         }
         this.updateClick(state);
