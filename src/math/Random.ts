@@ -56,12 +56,12 @@ export class Random {
         return (t >>> 0) / 4294967296;
     }
 
-    getInt(max: number) {
+    int(max: number) {
         return Math.floor(this.get() * max);
     }
 
     choose<T>(array: ArrayLike<T>) {
-        let choice = this.getInt(array.length);
+        let choice = this.int(array.length);
         return array[choice];
     }
 }

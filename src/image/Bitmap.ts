@@ -89,6 +89,12 @@ export class Bitmap {
         return image;
     }
 
+    fillWithColors(colors: number[][]) {
+        for (let i = 0; i < this.pixelCount; i++) {
+            this.setWithIndex(i, colors[i]);
+        }
+    }
+
     fill(pixel: number[]): Bitmap {
         for (let i = 0; i < this.height; i++) {
             for (let j = 0; j < this.width; j++) {

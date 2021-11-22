@@ -1,8 +1,10 @@
+import { D8 } from "../math/Directions";
+
 /**
  * Generic matrix
  */
 export class GenMatrix<T> {
-    private constructor(private width: number, private height: number, public data: T[]) {}
+    private constructor(public readonly width: number, public readonly height: number, public data: T[]) {}
 
     static new<T>(width: number, height: number) {
         let data = new Array<T>(width * height);
@@ -87,27 +89,16 @@ export class GenMatrix<T> {
      * NOTE this is not allowed on images smaller than 3x3,
      * and this does not work for non-neighbors. so DONT use this to blindly check if two cells are neighbors...
      */
-    getDirectionFromDifference(delta: number): Dir8 | undefined {
-        if (delta === 1) return Dir8.Left;
-        if (delta === -this.width + 1) return Dir8.TopLeft;
-        if (delta === -this.width) return Dir8.Top;
-        if (delta === -this.width - 1) return Dir8.TopRight;
-        if (delta === -1) return Dir8.Right;
-        if (delta === this.width - 1) return Dir8.BotRight;
-        if (delta === this.width) return Dir8.Bot;
-        if (delta === this.width + 1) return Dir8.BotLeft;
+    getDirectionFromDifference(delta: number): D8 | undefined {
+        if (delta === 1) return D8.Right;
+        if (delta === -this.width + 1) return D8.UpRight;
+        if (delta === -this.width) return D8.Up;
+        if (delta === -this.width - 1) return D8.UpLeft;
+        if (delta === -1) return D8.Left;
+        if (delta === this.width - 1) return D8.DownLeft;
+        if (delta === this.width) return D8.Down;
+        if (delta === this.width + 1) return D8.DownRight;
 
         return undefined;
     }
-}
-
-export enum Dir8 {
-    Left,
-    TopLeft,
-    Top,
-    TopRight,
-    Right,
-    BotRight,
-    Bot,
-    BotLeft,
 }
