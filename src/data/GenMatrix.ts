@@ -45,25 +45,34 @@ export class GenMatrix<T> {
         return !(x < 0 || x >= this.width || y < 0 || y >= this.height);
     }
 
+    getNbCellsDelta(cell: number) {
+
+        let deltas = new Array<number>();
+        let size = this.width * this.height;
+        if (cell >= size) return deltas;
+
+        let hasLeft = cell % this.width != 0;
+        let hasRight = (cell + 1) % this.width != 0;
+        let hasTop = cell - this.width > 0;
+        let hasBot = cell + this.width < size;
+
+        if (hasRight) deltas.push(1);
+        if (hasTop) deltas.push(-this.width);
+        if (hasLeft) deltas.push(-1);
+        if (hasBot) deltas.push(this.width);
+
+        return deltas;
+    }
+
     getNbCells(cell: number) {
-        let nbs = new Array<number>();
+        return this.getNbCellsDelta(cell).map((i) => cell + i);
+    } 
 
-        if (cell >= this.width * this.height) return nbs;
-
-        // make sure we dont add out of bound indices
-        if (cell % this.width != 0) nbs.push(cell - 1);
-        if ((cell + 1) % this.width != 0) nbs.push(cell + 1);
-        if (cell - this.width > 0) nbs.push(cell - this.width);
-        if (cell + this.width < this.width * this.height) nbs.push(cell + this.width);
-
-        return nbs;
+    getNbCells8(cell: number) {
+        return this.getNbCells8Delta(cell).map((i) => cell + i);
     }
 
-    getNbIndices8(cell: number) {
-        return this.getNbIndices8Delta(cell).map((i) => cell + i);
-    }
-
-    getNbIndices8Delta(cell: number) {
+    getNbCells8Delta(cell: number) {
         let deltas = new Array<number>();
         let size = this.width * this.height;
         if (cell >= size) return deltas;

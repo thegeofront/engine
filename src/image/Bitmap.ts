@@ -429,6 +429,23 @@ export class Bitmap {
         return image;
     }
 
+    periodicTrim(x1: number, y1: number, x2: number, y2: number): Bitmap {
+        // return a hardcopy of this particular window
+        const imageWidth = x2 - x1;
+        const imageHeight = y2 - y1;
+
+        const image = new Bitmap(imageWidth, imageHeight, this.pixelSize);
+
+        for (let y = 0; y < imageHeight; y++) {
+            for (let x = 0; x < imageWidth; x++) {
+                let pixel = this.get((x + x1) % this.width, (y + y1) % this.height);
+                image.set(x, y, pixel);
+            }
+        }
+
+        return image;
+    }
+
     toGreyscale(): Bitmap {
         if (this.pixelSize != 4) throw "please, only use this when pixelsize is 4";
 

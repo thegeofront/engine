@@ -1,9 +1,11 @@
 import { GenMatrix } from "../data/GenMatrix";
-import { Bitmap, Color, Random, Util, Vector2 } from "../lib";
+import { Queue } from "../data/Queue";
+import { Bitmap, Color, Core, Random, Util, Vector2 } from "../lib";
 import { D8, Direction } from "../math/Directions";
+import { TileAtlas } from "./TileAtlas";
 
 /**
- * Implementation of the famous and fascinating WaveFunctionCollapse algorithm for 2d Textures:
+ * Implementation of the famous and fascinating WaveFunctionCollapse algorithm
  * https://github.com/mxgmn/WaveFunctionCollapse
  *
  * Some video's
@@ -17,68 +19,58 @@ import { D8, Direction } from "../math/Directions";
  *
  *
  */
-class Option {
-    
-    constructor(public index: number, public tile: number) {
-
-    }
-}
-
-export class WFC {
+export class WaveField {
 
     private constructor(
         private cells: GenMatrix<Uint8Array>, // sometimes called 'wave'
-        private options: Option[], // sometimes called 'Prototypes'
-        public readonly tiles: Bitmap[], //
+        public atlas: TileAtlas,
         private random: Random,
     ) {}
 
-    static new(input: Bitmap, kernelSize: number, cellsX: number, cellsY: number) : WFC {
-        
-        // cut the input into tiles
-        console.log("cutting...")
-        let tiles: Bitmap[] = [];
-        for (let y = 0; y < input.height-2; y++) {
-            for (let x = 0; x < input.width-2; x++) {
-                tiles.push(input.trim(x, y, x + kernelSize, y + kernelSize))
-            }
-        }
-
-        // turn tiles into options
-        let options: Option[] = [];
-        for (let i = 0; i < tiles.length; i++) {
-            options[i] = new Option(i, i);
-        }
+    static new(atlas: TileAtlas, width: number, height: number) {
 
         // init all cells containing all options
-        let cells = GenMatrix.new<Uint8Array>(cellsX, cellsY);
+        let maxOptions = atlas.prototypes.length;
+        let cells = GenMatrix.new<Uint8Array>(width, height);
         for (let i = 0; i < cells.data.length; i++) {
 
             // add the indices of all options
-            cells.data[i] = new Uint8Array(options.length);
+            cells.data[i] = new Uint8Array(maxOptions);
             cells.data[i].fill(1);
             // cells.data[i] = Util.range(options.length);
         }
 
-        return new WFC(cells, options, tiles, Random.fromRandom()) 
+        return new WaveField(cells, atlas, Random.fromRandom()) 
     }
 
     ///////////////////////////////////////////////////////////////////////////
 
-    solve(maxIterations=1000000) {
+    collapse() {
         // after doing this, all cell lists should contain just a single pointer
+        let maxIterations = this.cells.data.length + 10 // we will never have to iterate more times than cells in the target image
         for (let i = 0; i < maxIterations; i++) {
             if (this.isCollapsed()) {
-                return this.renderResult();
+                return true;
             }
-            let leastOptionCells = this.getCellsWithLeastOptions();
-            let leastOptionCell = this.random.choose(leastOptionCells);
-            this.pickRandomOption(leastOptionCell);
-            this.removeInvalidOptions(leastOptionCell);
+            let success = this.collapseStep();
+            if (!success) {
+                return false;
+            }
         }
         
         console.error("max iteration reached in solve!");
-        return undefined;
+        return false;
+    }
+
+    collapseStep() {
+        let leastOptionCells = this.getCellsWithLeastOptions();
+        console.log("leastOptionCells", leastOptionCells)
+        let leastOptionCell = this.random.choose(leastOptionCells);
+        if (leastOptionCell == 0) {
+            console.log("BUG INCOMING BUG INCOMING!!!!!!");
+        }
+        this.pickRandomOption(leastOptionCell);
+        return this.removeInvalidOptions(leastOptionCell);
     }
 
     pickRandomOption(cell: number) {
@@ -93,7 +85,6 @@ export class WFC {
         }
 
         let choice = this.random.choose(options);
-
         this.setOption(cell, choice);
 
         // for (let i = 0; i < data.length; i++) {
@@ -106,72 +97,114 @@ export class WFC {
     /**
      * The core
      */
-    removeInvalidOptions(startCell: number, maxIterations = 1000000) {
-        let stack: number[] = [];
+    removeInvalidOptions(startCell: number, maxIterations = 10000000, debug=false) {
+        let stack = new Array<number>();
+        let visited = new Set<number>();
+        
         stack.push(startCell);
-
+        
         // protected while loop
         for (let i = 0; i < maxIterations; i++) {
             if (stack.length < 1) {
                 return true;
             }
 
-            // per neighbor
+            // visit this cell
             let cell = stack.pop()!;
-            for (let neighbor of this.cells.getNbIndices8(cell)) {
-                let unchanged = this.removeInvalidOptionsOfNeighbor(cell, neighbor);
-                if (!unchanged) {
-                    stack.push(neighbor);
+            visited.add(cell);
+
+            // debug 
+            if (debug) {
+                console.log("-----------------")
+                console.log("SOURCE:", cell, "|", this.getOptions(cell).length);
+                this.atlas.printConcatConnections(this.getOptions(cell));
+            }
+
+            // per unvisited neighbor
+            for (let neighbor of this.cells.getNbCells(cell)) {
+                if (visited.has(neighbor)) continue;
+                
+                let ops = this.getOptions(neighbor);
+                let changed = this.removeInvalidOptionsOfNeighbor(cell, neighbor, debug);
+
+                // saveguard
+                if (this.getOptions(neighbor).length == 0) {
+                    console.error("All options were removed from node", neighbor, "!!");
+                    console.log("SOURCE:", cell, "|", this.getOptions(cell).length);
+                    console.log("TARGET TO THE", D8[this.cells.getDirectionFromDifference(neighbor - cell)!])
+                    this.atlas.printConcatConnections(this.getOptions(cell));
+                    console.log("ORIGINAL OPTIONS", ops);
+                    return false;
                 }
 
-                // debug
-                // break;
+                if (changed) {
+                    stack.push(neighbor);
+                }   
             }
+
+            // debug | return after one cycle
+            // return false;
         }
 
         console.error("max iteration reached!");
         return false;
     }
 
-    private removeInvalidOptionsOfNeighbor(cell: number, neighbor: number) {
+    private removeInvalidOptionsOfNeighbor(cell: number, neighbor: number, debug=false) {
 
-        let unchanged = true;
+        let isTargetAllowed = (sourceOptions: number[], target: number, direction: D8) => {
+            for (let source of sourceOptions) {
+                if (this.atlas.canBeConnected(source, target, direction)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        let changed = false;
 
         // first, we require the direction
         let direction = this.cells.getDirectionFromDifference(neighbor - cell)!;
-        console.log("direction:", D8[direction]);
-        
+
+        // console.log("direction:", D8[direction], " means offset", offset);
+
         let sourceOptions = this.getOptions(cell);
         let targetOptions = this.getOptions(neighbor);
+        let ogCount = targetOptions.length;
 
-        let newTargetOptions: number[] = [];
-        console.log(targetOptions.length);
+        // console.log("I have ", sourceOptions, "options");
+        // console.log("target has", targetOptions, "options");
 
         // go over target options
         for (let target of targetOptions) {
-            for (let source of sourceOptions) {
-                let offset = Direction.D8ToVector(direction);
-
-                // console.log(this.tiles[source.tile]);
-                let thisTileIsIncorrect = doImagesOverlap(this.tiles[source.tile], this.tiles[target.tile], offset);
-                
-                if (thisTileIsIncorrect) {
-                    console.log("incorrect!");
-                    this.removeOption(neighbor, target);
-                    unchanged = true;
-                    // unchanged = false;
-                    
-                } 
-            }
+            // if target matches NONE of the source options, it should be removed
+            if (!isTargetAllowed(sourceOptions, target, direction)) {
+                // console.log("incorrect!");
+                this.removeOption(neighbor, target);
+                changed = true;
+            } 
         }
-        return unchanged;
+
+        // debug
+        if (debug) {           
+            let newCount = this.getOptions(neighbor).length;
+    
+            // debug
+            console.log("NB", D8[direction], ":", neighbor, "|", ogCount, "->", newCount);
+        }
+
+        return changed;
     }
 
 
 
-    isCollapsed(): boolean {
-        for (let options of this.cells.data) {
-            if (options.length != 1) {
+    isCollapsed(debug=false): boolean {
+        for (let i = 0; i < this.cells.data.length; i++) {
+            let options = this.getOptions(i);
+            if (debug) {
+                console.log(options);
+            }
+            if (options.length !== 1) {
                 return false;
             }
         }
@@ -179,11 +212,11 @@ export class WFC {
     }
 
     getOptions(cell: number) {
-        let ops: Option[] = [];
+        let ops: number[] = [];
         let flags = this.cells.data[cell];
         for (let i = 0 ; i < flags.length; i++) {
             if (flags[i] == 1) {
-                ops.push(this.options[i]);
+                ops.push(i);
             }
         }
         return ops;
@@ -195,25 +228,27 @@ export class WFC {
         data[choice] = 1;
     }
 
-    removeOption(cell: number, option: Option) {
-        this.cells.data[cell][option.index] = 0;
+    removeOption(cell: number, option: number) {
+        this.cells.data[cell][option] = 0;
     }
 
     getTileOptions(cell: number) {
-        return this.getOptions(cell).map(i => this.tiles[i.tile]);
+        return this.getOptions(cell).map(i => this.atlas.tiles[this.atlas.prototypes[i].tile]);
     }
 
     /**
      * or 'minimum entrophy', if you wanna be all fancy
      */
     private getCellsWithLeastOptions() {
-        let least: number[] = [-1];
+        let least: number[] = [];
         let leastOptions = Infinity;
         for (let i = 0; i < this.cells.data.length; i++) {
-            let options = this.cells.data[i];
+            let options = this.getOptions(i);
+            // console.log(options);
             if (options.length == 1) {
                 continue;
             }
+
             if (options.length == leastOptions) {
                 least.push(i);
             } else if (options.length < leastOptions) {
@@ -222,6 +257,8 @@ export class WFC {
                 leastOptions = options.length;
             }
         }
+        console.log("least options", leastOptions)
+        console.log("least", least)
         return least;
     }
 
@@ -232,7 +269,12 @@ export class WFC {
         for (let i = 0; i < image.pixelCount; i++) {
             // get average pixel
             let options = this.getTileOptions(i);
-            image.setWithIndex(i, getAverageCenterPixel(options));
+            if (options.length == 0) {
+                console.warn("optionless cell encountered!");
+                image.setWithIndex(i, [255,0,0,255]);
+            } else {
+                image.setWithIndex(i, getAverageCenterPixel(options));
+            }
         }
         return image;
     }
@@ -254,23 +296,3 @@ function getAverageCenterPixel(imageSeries: Bitmap[]) {
 }
 
 
-export function doImagesOverlap(a: Bitmap, b: Bitmap, offset: Vector2) : boolean {
-
-    let aoff = Vector2.zero();
-    if (offset.x > 0) aoff.x += offset.x;
-    if (offset.y > 0) aoff.y += offset.y;
-
-    let boff = Vector2.zero();
-    if (offset.x < 0) boff.x += offset.x * -1;
-    if (offset.y < 0) boff.y += offset.y * -1;
-
-    for (let y = 0; y < a.height - Math.abs(offset.y); y++) {
-        for (let x = 0; x < a.width - Math.abs(offset.x); x++) {
-            if (!Color.isTheSame(a.get(x + aoff.x, y + aoff.y), b.get(x + boff.x, y + boff.y))) {
-                return false
-            }
-        }
-    }
-
-    return true;
-}
