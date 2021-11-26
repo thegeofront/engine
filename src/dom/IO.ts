@@ -4,30 +4,36 @@
 
 import { meshFromObj } from "../geometry/mesh/ShaderMesh";
 import { Bitmap } from "../image/Bitmap";
+import { WebIO } from "./WebIO";
 
 // set any to document to add drop functionality to the entire document, or use any other div.
 type FuncGenericReturn = <T>() => T;
 
 export class IO {
-    // TODO catch
+
+    /**
+     * TODO catch
+     * @deprecated
+     */
     static async fetchJson(query: string): Promise<any> {
-        let res = await fetch(query);
-        let data = await res.json();
-        return data;
+        return WebIO.getJson(query);
+
     }
 
-    // TODO catch
+    /**
+     * TODO catch
+     * @deprecated
+     */
     static async fetchText(query: string): Promise<string> {
-        let res = await fetch(query);
-        let data = await res.text();
-        return data;
+        return WebIO.getText(query);
     }
 
-    // TODO catch
+    /**
+     * TODO catch
+     * @deprecated
+     */
     static async fetchBlob(query: string): Promise<Blob> {
-        let res = await fetch(query);
-        let data = await res.blob();
-        return data;
+        return WebIO.getBlob(query);
     }
 
     static findFile(files: FileList, fileName: string) {
@@ -68,6 +74,7 @@ export class IO {
     /**
      * A procedure specific to scans
      * TODO : fix this
+     * @deprecated
      */
     static async meshFromWeb(obj: string, textureBlob: Blob) {
         console.log("reading json...");
@@ -220,6 +227,7 @@ export function loadImageFromBlob(blob: Blob): Promise<ImageData> {
 export function loadImageFromSrc(src: string): Promise<ImageData> {
     return new Promise(function (resolve, reject) {
         let img = document.createElement("img") as HTMLImageElement;
+        img.crossOrigin = "Anonymous";
         img.src = src;
 
         img.onload = () => resolve(loadImageHelper2(img));
@@ -231,6 +239,7 @@ function loadImageHelper1(fileReader: FileReader): Promise<ImageData> {
     return new Promise(function (resolve, reject) {
         let img = document.createElement("img") as HTMLImageElement;
         img.src = fileReader.result as string;
+        img.crossOrigin = "Anonymous";
 
         img.onload = () => resolve(loadImageHelper2(img));
         img.onerror = () => reject(new Error(`Script load error for ${img}`));

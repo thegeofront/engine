@@ -1,5 +1,5 @@
 import { Color } from "../../image/Color";
-import { Entity, Matrix3, Matrix4, Mesh, meshFromObj, ShaderMesh, Vector3 } from "../../lib";
+import { Bitmap, Entity, Matrix3, Matrix4, Mesh, meshFromObj, ShaderMesh, Vector3 } from "../../lib";
 import { Material } from "../basics/Material";
 import { Model } from "../basics/Model";
 import { Scene } from "../basics/Scene";
@@ -7,6 +7,9 @@ import { DrawElementsType, DrawMode } from "../webgl/Constants";
 import { DrawSpeed, WebGl } from "../webgl/HelpGl";
 import { ShaderProgram } from "../webgl/ShaderProgram";
 
+
+// TODO: do we want to add textures? they complicate a lot....
+// PhongEntityShader | TextureEntityShader
 export class PhongShader extends ShaderProgram<Entity> {
     constructor(gl: WebGl) {
         const vertexShader = `
@@ -53,6 +56,9 @@ export class PhongShader extends ShaderProgram<Entity> {
         uniform float opacity;
         uniform float specularDampner;
 
+        uniform float textureBlend;
+        uniform sampler2D u_texture;
+
         varying float varVectorOcclusion;
         varying vec2 varUv;
         varying vec3 varNormal;
@@ -78,7 +84,8 @@ export class PhongShader extends ShaderProgram<Entity> {
             vec3 toCamera = normalize(varToCamera);
             
             // ambient
-            vec4 ambientColor = ambient;
+            // vec4 ambientColor = ambient * (1.0 - textureBlend) + textureBlend * texture2D(u_texture, varUv);
+            vec4 ambientColor = ambient
 
             // occluded (TODO: expand upon this using ambient occlusion)
             float sunDot = dot(normal, toSun);
@@ -129,6 +136,8 @@ export class PhongShader extends ShaderProgram<Entity> {
         this.uniforms.add("opacity", 1, [1.0]);
         this.uniforms.add("specularDampner", 1, [0.5]);
 
+        this.uniforms.add("textureBlend", 1, [0.0]);
+
         return DrawMode.Triangles;
     }
 
@@ -177,6 +186,16 @@ export class PhongShader extends ShaderProgram<Entity> {
         this.uniforms.loadColor("occluded", material.occluded);
         this.uniforms.load("opacity", material.opacity);
         this.uniforms.load("specularDampner", material.specularDampner);
+        if (material.texture) {
+            this.loadTexture(material.texture);
+        }
+    }
+
+    public loadTexture(texture: Bitmap) {
+        this.useProgram();
+        this.uniforms.addTexture("u_texture");
+        this.uniforms.loadTexture("u_texture", texture);
+        this.uniforms.add("textureBlend", 1, [1.0]);
     }
 
     protected onDraw(s: Scene) {

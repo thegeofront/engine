@@ -1,4 +1,5 @@
 import { Cube, Matrix4, Mesh, ShaderMesh, Vector3 } from "../../lib";
+import { Entity } from "./Entity";
 import { Material } from "./Material";
 
 /**
@@ -16,5 +17,12 @@ export class Model {
 
     static new(mesh = Mesh.newIcosahedron(), material = Material.default()) {
         return new Model(mesh, material);
+    }
+
+    /**
+     * Spawns an entity equiped with this model
+     */
+    spawn() {
+        return Entity.new(Matrix4.newIdentity(), this);
     }
 }

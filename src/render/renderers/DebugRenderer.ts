@@ -22,6 +22,8 @@ import { BiSurface, Plane } from "../../lib";
 import { TextureMeshShader } from "../shaders-old/texture-mesh-shader";
 import { Bufferable } from "../basics/Bufferable";
 import { AnyShader, createNewShaderForShadable, Shadable } from "../basics/Shadable";
+import { Entity } from "../basics/Entity";
+import { PhongShader } from "../shaders/PhongShader";
 
 // NOTE: I think this type of polymorphism is better than regular polymorphism
 export type RenderableUnit =
@@ -34,14 +36,16 @@ export type RenderableUnit =
     | Plane
     | MultiLine
     | ImageMesh
-    | Circle3;
+    | Circle3
+    | Entity;
 type AcceptableShader =
     | AnyShader
     | DotShader
     | ShadedMeshShader
     | MeshDebugShader
     | LineShader
-    | TextureMeshShader;
+    | TextureMeshShader
+    | PhongShader;
 
 /**
  * Renderer which can instantly visualize a large number of geometries. Very useful for looking at intermediate data.
@@ -170,6 +174,9 @@ export class DebugRenderer {
         } else if (unit instanceof ImageMesh) {
             //@ts-ignore
             shader.set(unit.buffer(), DrawSpeed.StaticDraw);
+        } else if (unit instanceof Entity) {
+            //@ts-ignore
+            shader.load(unit, DrawSpeed.StaticDraw);
         } else {
             console.error("MultiRenderer cannot render: ", unit);
             return undefined;
@@ -218,6 +225,18 @@ export class DebugRenderer {
         } else if (unit instanceof ImageMesh) {
             shader = new TextureMeshShader(gl);
             shader.set(unit.buffer(), DrawSpeed.StaticDraw);
+        } else if (unit instanceof Entity) {
+
+            if (unit.model.material.texture) {
+                // TODO WE NEED A NEW TEXTUREDMESHSHADER!!!!!
+                shader = new TextureMeshShader(gl);
+                shader.setWithMesh(unit.model.mesh, unit.model.material.texture, DrawSpeed.StaticDraw);
+            } else {
+                shader = new PhongShader(gl);
+                unit.model.mesh.calcAndSetVertexNormals();
+                shader.load(unit, DrawSpeed.StaticDraw);
+            }
+
         } else {
             console.error("MultiRenderer cannot render: ", unit);
             return undefined;

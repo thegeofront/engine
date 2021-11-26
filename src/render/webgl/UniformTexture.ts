@@ -93,6 +93,6 @@ import { WebGl, HelpGl } from "./HelpGl";
     }
 }
 
-function isPowerOf2(value: number) {
+export function isPowerOf2(value: number) {
     return (value & (value - 1)) == 0;
 }

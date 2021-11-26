@@ -22,6 +22,8 @@ import {
     Vector3,
 } from "../../lib";
 import { GeonMath } from "../../math/Math";
+import { Geometry } from "../Geometry";
+import { ObjProcessing } from "./ObjProcessing";
 
 export enum MeshType {
     Invalid = 0,
@@ -38,7 +40,7 @@ export enum NormalKind {
     MultiVertex,
 }
 
-export class Mesh {
+export class Mesh extends Geometry {
     
     constructor(
         public verts: MultiVector3,
@@ -46,7 +48,9 @@ export class Mesh {
         private _uvs?: MultiVector2,
         private _normals?: MultiVector3, 
         private _normalKind = NormalKind.None
-    ) {}
+    ) {
+        super();
+    }
 
     get maxSize() {
         if (this.links) {
@@ -77,8 +81,19 @@ export class Mesh {
         this._normals = v;
     }
 
+    /////////////////////////////////////////////////////////////////////////// Geometry Trait
+
     clone(): Mesh {
-        return new Mesh(this.verts.clone(), this.links.clone());
+        return new Mesh(this.verts.clone(), this.links.clone(), this._uvs?.clone(), this._normals?.clone(), this._normalKind);
+    }
+
+    transform(m: Matrix4): Mesh {
+        this.verts.transform(m);
+        return this;
+    }
+
+    transformed(m: Matrix4): Mesh {
+        return this.clone().transform(m);
     }
 
     static new(

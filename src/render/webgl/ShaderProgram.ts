@@ -63,9 +63,9 @@ export abstract class ShaderProgram<T> {
         this.drawCount = this.onLoad(r, speed);
     }
 
-    draw(c: Scene) {
+    draw(s: Scene) {
         this.useProgram();
-        this.onDraw(c);
+        this.onDraw(s);
         this.uniforms.bindAll();
         this.attributes.bindAll();
         this.drawElementsOrArrays();
@@ -76,7 +76,12 @@ export abstract class ShaderProgram<T> {
         this.draw(context);
     }
 
-
+    /**
+     *@deprecated 
+     */
+    render(s: Scene) {
+        return this.draw(s);
+    }
 
     // ------------ These three methods need to be overwritten -------------------
 
