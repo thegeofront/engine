@@ -81,12 +81,8 @@ export namespace ObjProcessing {
         // console.log("number of faces: " + faces.length / 3);
         // console.log("number of uvs: " + uvs.length / 2);
         // console.log("number of norms: " + norms.length / 3);
-    
-        console.log("lalalalaal");
-        
-        let mesh = Mesh.fromRawLists(verts, faces, uvs, norms);
-        console.log(mesh);
-    
+   
+        let mesh = Mesh.fromRawLists(verts, faces, uvs, norms);    
         return mesh;
     }
     

@@ -1,8 +1,9 @@
 import { GenMatrix } from "../data/GenMatrix";
 import { Queue } from "../data/Queue";
-import { Bitmap, Color, Core, Random, Util, Vector2 } from "../lib";
+import { Bitmap, Color, Core, Debug, Random, Util, Vector2 } from "../lib";
 import { D8, Direction } from "../math/Directions";
 import { TileAtlas } from "./TileAtlas";
+
 
 /**
  * Implementation of the famous and fascinating WaveFunctionCollapse algorithm
@@ -19,10 +20,10 @@ import { TileAtlas } from "./TileAtlas";
  *
  *
  */
-export class WaveField {
+export class TileSolver {
 
     private constructor(
-        private cells: GenMatrix<Uint8Array>, // sometimes called 'wave'
+        private cells: GenMatrix<Uint8Array>, // sometimes called 'wave'. every uint8 represents a 'present' flag for one of 'atlas''s prototypes
         public atlas: TileAtlas,
         private random: Random,
     ) {}
@@ -40,58 +41,65 @@ export class WaveField {
             // cells.data[i] = Util.range(options.length);
         }
 
-        return new WaveField(cells, atlas, Random.fromRandom()) 
+        return new TileSolver(cells, atlas, Random.fromRandom()) 
     }
 
     ///////////////////////////////////////////////////////////////////////////
 
-    collapse() {
+    solve() {
         // after doing this, all cell lists should contain just a single pointer
-        let maxIterations = this.cells.data.length + 10 // we will never have to iterate more times than cells in the target image
+        let maxIterations = 10000000 // we will never have to iterate more times than cells in the target image
         for (let i = 0; i < maxIterations; i++) {
             if (this.isCollapsed()) {
                 return true;
             }
-            let success = this.collapseStep();
-            if (!success) {
-                return false;
-            }
+            this.solveStep();
         }
         
         console.error("max iteration reached in solve!");
         return false;
     }
 
-    collapseStep() {
-        let leastOptionCells = this.getCellsWithLeastOptions();
-        console.log("leastOptionCells", leastOptionCells)
-        let leastOptionCell = this.random.choose(leastOptionCells);
-        if (leastOptionCell == 0) {
-            console.log("BUG INCOMING BUG INCOMING!!!!!!");
+    solveStep() {
+        
+        // pick a cell, and a choice for that cell 
+        // let cells = this.getCellsWithLeastOptions();
+        let cells = this.getCellsWithLeastEntrophy();
+        // Debug.logOnce(cells, entr);
+
+        let cell = this.random.choose(cells);
+        let cellChoicesBackup = new Uint8Array(this.cells.data[cell]);
+        let choice = this.pickRandomOption(cell);
+        
+        // try to propagate this constraint
+        // if this did not work: backtracking. 
+        // revert the changes, and remove this choice from the possible choices
+        let success = this.removeInvalidOptions(cell);
+        if (!success) {
+            console.count("backing up...");
+            this.cells.data[cell] = cellChoicesBackup;
+            this.removeOption(cell, choice);
         }
-        this.pickRandomOption(leastOptionCell);
-        return this.removeInvalidOptions(leastOptionCell);
+        return success;
     }
 
     pickRandomOption(cell: number) {
       
-        // get choices
+        // get choices + weights
         let data = this.cells.data[cell];
         let options: number[] = [];
+        let weights: number[] = [];
         for (let i = 0; i < data.length; i++) {
             if (data[i] == 1) {
                 options.push(i); 
+                weights.push(this.atlas.prototypes[i].probability);
             } 
         }
 
-        let choice = this.random.choose(options);
+        // now pick one
+        let choice = this.random.chooseWeighted(options, weights);
         this.setOption(cell, choice);
-
-        // for (let i = 0; i < data.length; i++) {
-        //     if (data[i]) count += 1; 
-        //     if (i == choice) data[i] = 1;
-        //     else data[i] = 0;
-        // }
+        return choice;
     }
 
     /**
@@ -100,7 +108,15 @@ export class WaveField {
     removeInvalidOptions(startCell: number, maxIterations = 10000000, debug=false) {
         let stack = new Array<number>();
         let visited = new Set<number>();
-        
+        let backup = new Array<[number, number]>();
+
+        // use the backup to restore the original state if this state does not resolve
+        let restoreState = () => {
+            for (let entry of backup) {
+                this.addOption(entry[0], entry[1]);
+            }
+        }
+
         stack.push(startCell);
         
         // protected while loop
@@ -125,16 +141,19 @@ export class WaveField {
                 if (visited.has(neighbor)) continue;
                 
                 let ops = this.getOptions(neighbor);
-                let changed = this.removeInvalidOptionsOfNeighbor(cell, neighbor, debug);
+                let changed = this.removeInvalidOptionsOfNeighbor(cell, neighbor, backup, debug);
 
                 // saveguard
                 if (this.getOptions(neighbor).length == 0) {
-                    console.error("All options were removed from node", neighbor, "!!");
-                    console.log("SOURCE:", cell, "|", this.getOptions(cell).length);
-                    console.log("TARGET TO THE", D8[this.cells.getDirectionFromDifference(neighbor - cell)!])
-                    this.atlas.printConcatConnections(this.getOptions(cell));
-                    console.log("ORIGINAL OPTIONS", ops);
+
+                    // console.info("All options were removed from node", neighbor, "!!");
+                    restoreState();
                     return false;
+
+                    // console.log("SOURCE:", cell, "|", this.getOptions(cell).length);
+                    // console.log("TARGET TO THE", D8[this.cells.getDirectionFromDifference(neighbor - cell)!])
+                    // this.atlas.printConcatConnections(this.getOptions(cell));
+                    // console.log("ORIGINAL OPTIONS", ops);
                 }
 
                 if (changed) {
@@ -147,10 +166,11 @@ export class WaveField {
         }
 
         console.error("max iteration reached!");
+        restoreState();
         return false;
     }
 
-    private removeInvalidOptionsOfNeighbor(cell: number, neighbor: number, debug=false) {
+    private removeInvalidOptionsOfNeighbor(cell: number, neighbor: number, backup: Array<[number, number]>, debug=false) {
 
         let isTargetAllowed = (sourceOptions: number[], target: number, direction: D8) => {
             for (let source of sourceOptions) {
@@ -181,6 +201,7 @@ export class WaveField {
             if (!isTargetAllowed(sourceOptions, target, direction)) {
                 // console.log("incorrect!");
                 this.removeOption(neighbor, target);
+                backup.push([neighbor, target]);
                 changed = true;
             } 
         }
@@ -214,12 +235,25 @@ export class WaveField {
     getOptions(cell: number) {
         let ops: number[] = [];
         let flags = this.cells.data[cell];
-        for (let i = 0 ; i < flags.length; i++) {
+        for (let i = 0; i < flags.length; i++) {
             if (flags[i] == 1) {
                 ops.push(i);
             }
         }
         return ops;
+    }
+
+    getEntrophy(cell: number) {
+        let entrophy = 0;
+
+        let flags = this.cells.data[cell];
+        for (let i = 0; i < flags.length; i++) {
+            if (flags[i] == 1) {
+                let p = this.atlas.prototypes[i].probability;
+                entrophy += p * Math.log(p);
+            }
+        }
+        return -entrophy;
     }
 
     setOption(cell: number, choice: number) {
@@ -230,6 +264,10 @@ export class WaveField {
 
     removeOption(cell: number, option: number) {
         this.cells.data[cell][option] = 0;
+    }
+
+    addOption(cell: number, option: number) {
+        this.cells.data[cell][option] = 1;
     }
 
     getTileOptions(cell: number) {
@@ -243,8 +281,8 @@ export class WaveField {
         let least: number[] = [];
         let leastOptions = Infinity;
         for (let i = 0; i < this.cells.data.length; i++) {
+
             let options = this.getOptions(i);
-            // console.log(options);
             if (options.length == 1) {
                 continue;
             }
@@ -257,7 +295,33 @@ export class WaveField {
                 leastOptions = options.length;
             }
         }
-        console.log("least options", leastOptions)
+        // console.log("least options", leastOptions)
+        // console.log("least", least)
+        return least;
+    }
+
+    private getCellsWithLeastEntrophy() {
+        let least: number[] = [];
+        let leastEntrophy = Infinity;
+        for (let i = 0; i < this.cells.data.length; i++) {
+
+            let options = this.getOptions(i);
+            let entrophy = this.getEntrophy(i);
+
+            // console.log(options);
+            if (options.length == 1) {
+                continue;
+            }
+
+            if (entrophy == leastEntrophy) {
+                least.push(i);
+            } else if (entrophy < leastEntrophy) {
+                least = [];
+                least.push(i);
+                leastEntrophy = entrophy;
+            }
+        }
+        // console.log("least options", leastOptions)
         console.log("least", least)
         return least;
     }
@@ -285,7 +349,7 @@ function getAverageCenterPixel(imageSeries: Bitmap[]) {
     let count = imageSeries.length;
     let oneOverCount = 1 / count;
     let k = Math.floor(imageSeries[0].width / 2);
-    
+
     for (let image of imageSeries) {
         let newPixel = image.get(k, k);
         for (let i = 0; i < 4; i++) {

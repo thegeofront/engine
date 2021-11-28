@@ -12,7 +12,14 @@ type Prototype = {
     tile: number,
     rotation: number,
     mirrored: boolean,
+    probability: number,
 };
+
+export enum ConnectionType {
+    Edge,
+    Point,
+    PointAndEdge
+}
 
 /**
  * Contains all tiles, and connectivity data between different tiles
@@ -24,52 +31,32 @@ export class TileAtlas {
     private constructor(
         public readonly tiles: Bitmap[],
         public readonly prototypes: Prototype[],
+        public readonly connectionType: ConnectionType,
         public readonly connections: Connection[],
         public readonly connectionHash: Set<string>, 
         ) {}
 
-    static fromSourceImage(input: Bitmap, kernelSize: number) {
-        // generate tiles period
-        let tiles: Bitmap[] = [];
-        for (let y = 0; y < input.height-kernelSize+1; y++) {
-            for (let x = 0; x < input.width-kernelSize+1; x++) {
-                let newTile = input.trim(x, y, x + kernelSize, y + kernelSize);
-                
-                let include = true;
-                for (let tile of tiles) {
-                    if (doImagesOverlap(tile, newTile, Vector2.zero())) {
-                        // console.log("overlapping source!");
-                        include = false;
-                        break;
-                    }
-                }
-
-                if (include) {
-                    tiles.push(newTile);
-                }
-            }
-        }
-    }
-
     static fromPeriodicSourceImage(input: Bitmap, kernelSize: number) {
 
-        // generate tiles period
+        // generate tiles themselves from the source image 
         let tiles: Bitmap[] = [];
+        let probabilities: number[] = [];
+
+        
+
         for (let y = 0; y < input.height; y++) {
             for (let x = 0; x < input.width; x++) {
+
+                // trim periodically, so that the tile pattern will be repeated
                 let newTile = input.periodicTrim(x, y, x + kernelSize, y + kernelSize);
                 
-                let include = true;
-                for (let tile of tiles) {
-                    if (doImagesOverlap(tile, newTile, Vector2.zero())) {
-                        // console.log("overlapping source!");
-                        include = false;
-                        break;
-                    }
-                }
-
-                if (include) {
+                let overlapTileId = tiles.findIndex(((tile, i) => doImagesOverlap(tile, newTile)));
+                
+                if (overlapTileId == -1) {
+                    probabilities.push(1);
                     tiles.push(newTile);
+                } else {
+                    probabilities[overlapTileId] += 1;
                 }
             }
         }
@@ -77,7 +64,7 @@ export class TileAtlas {
         // generate prototypes
         let prototypes: Prototype[] = [];
         for (let i = 0; i < tiles.length; i++) {
-            prototypes.push({tile: i, rotation: 0, mirrored: false})
+            prototypes.push({tile: i, rotation: 0, mirrored: false, probability: probabilities[i] / tiles.length})
         }
 
         // calculate connections based on correct image overlap
@@ -105,7 +92,7 @@ export class TileAtlas {
             connectionHash.add(JSON.stringify(con));
         }
 
-        return new TileAtlas(tiles, prototypes, connections, connectionHash);        
+        return new TileAtlas(tiles, prototypes, ConnectionType.Edge, connections, connectionHash);        
     }
 
     getConcatConnections(ptts: number[]) {
@@ -160,7 +147,7 @@ export class TileAtlas {
     }
 }
 
-export function doImagesOverlap(a: Bitmap, b: Bitmap, offset: Vector2, debug=false) : boolean {
+export function doImagesOverlap(a: Bitmap, b: Bitmap, offset=Vector2.zero(), debug=false) : boolean {
 
     let aoff = Vector2.zero();
     if (offset.x > 0) aoff.x += offset.x;

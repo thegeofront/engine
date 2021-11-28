@@ -12,6 +12,16 @@
 export namespace Debug {
 
 	export let active = true;
+	export let once = true;
+
+	/////////////////////////////////////////////////////////////////////////// Additions
+
+	export function logOnce(message?: any, ...optionalParams: any[]): void {
+		if (!active) return;
+		if (!once) return;
+		console.log(message, ...optionalParams);
+		once = false;
+	}
 
 	/////////////////////////////////////////////////////////////////////////// Pass throughs
 

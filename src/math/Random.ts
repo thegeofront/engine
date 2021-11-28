@@ -40,6 +40,9 @@ export class Random {
         return this.new(seeder(), seeder(), seeder(), seeder());
     }
 
+    /**
+     * number in between 0 and 1
+     */
     get(): number {
         // sfc32
         this.a >>>= 0;
@@ -56,13 +59,48 @@ export class Random {
         return (t >>> 0) / 4294967296;
     }
 
+    /**
+     * get random integer
+     */
     int(max: number) {
         return Math.floor(this.get() * max);
     }
 
+    /**
+     * get random item from array
+     */
     choose<T>(array: ArrayLike<T>) {
         let choice = this.int(array.length);
         return array[choice];
+    }
+
+    chooseWeighted<T>(array: ArrayLike<T>, weights: ArrayLike<number>) {
+        let choice = this.weightedIndex(weights);
+        return array[choice];
+    }
+
+    /**
+     * 2n implementation of ChooseWeighted
+     */
+    weightedIndex(weights: ArrayLike<number>) {
+        
+        let sumOfWeights = 0;
+        for (let i = 0; i < weights.length; i++) {
+            sumOfWeights += weights[i];
+        }
+
+        let value = this.get() * sumOfWeights;
+        for (let i = 0; i < weights.length; i++) {
+            value -= weights[i];
+            if (value < 0) {
+                return i;
+            }
+        }
+
+        // will never get here, since this.get() includes 0, and excludes 1. 
+        // it will always be smaller than the sum of weights
+        console.error("RANDOM: should never happen...")
+        return 0;
     }
 }
 
@@ -105,4 +143,17 @@ export function createGUID(rng: Random) {
 export function createRandomGUID() {
     let rng = Random.fromRandom();
     return createGUID(rng);
+}
+
+
+function test() {
+    let r = Random.fromRandom();
+    let counts = [0,0,0];
+    let arr = [4,2,10];
+    console.time("1000 weighted index");
+    for (let i = 0 ; i < 1000; i++) {
+        counts[r.weightedIndex(arr)] += 1;
+    }
+    console.timeEnd("1000 weighted index");
+    console.log(counts);
 }
