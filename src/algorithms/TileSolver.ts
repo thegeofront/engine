@@ -97,7 +97,9 @@ export class TileSolver {
         }
 
         // now pick one
-        let choice = this.random.chooseWeighted(options, weights);
+        let choice = this.random.choose(options);
+        let choicew = this.random.chooseWeighted(options, weights);
+        Debug.logTimes(10, {choice, choicew, options, weights})
         this.setOption(cell, choice);
         return choice;
     }
@@ -322,7 +324,7 @@ export class TileSolver {
             }
         }
         // console.log("least options", leastOptions)
-        console.log("least", least)
+        // console.log("least", least)
         return least;
     }
 
@@ -349,7 +351,7 @@ function getAverageCenterPixel(imageSeries: Bitmap[]) {
     let count = imageSeries.length;
     let oneOverCount = 1 / count;
     let k = Math.floor(imageSeries[0].width / 2);
-
+    // k = 1;
     for (let image of imageSeries) {
         let newPixel = image.get(k, k);
         for (let i = 0; i < 4; i++) {

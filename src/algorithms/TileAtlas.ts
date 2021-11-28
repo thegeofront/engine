@@ -42,15 +42,13 @@ export class TileAtlas {
         let tiles: Bitmap[] = [];
         let probabilities: number[] = [];
 
-        
-
         for (let y = 0; y < input.height; y++) {
             for (let x = 0; x < input.width; x++) {
 
                 // trim periodically, so that the tile pattern will be repeated
                 let newTile = input.periodicTrim(x, y, x + kernelSize, y + kernelSize);
                 
-                let overlapTileId = tiles.findIndex(((tile, i) => doImagesOverlap(tile, newTile)));
+                let overlapTileId = tiles.findIndex(((tile) => doImagesOverlap(tile, newTile)));
                 
                 if (overlapTileId == -1) {
                     probabilities.push(1);
@@ -71,10 +69,12 @@ export class TileAtlas {
         let connections: Connection[] = [];
         for (let i = 0; i < prototypes.length; i++) {
             let tileA = tiles[prototypes[i].tile];
+
             for (let j = 0; j < prototypes.length; j++) {
-                if (i == j) continue;
+                // if (i == j) continue;
                 if (i > j) continue; // dont do double checks, we dont need to
                 let tileB = tiles[prototypes[j].tile];
+
                 for (let dir of Direction.Four) {
                     let offset = Direction.D8ToVector(dir);
                 
@@ -86,13 +86,59 @@ export class TileAtlas {
             }   
         }
 
-        // because js is stupid and has no tuple set mechanics, we need to to the hashing by calling json.stringify...
+        // because js is stupid and has no tuple set, we need to to the hashing by calling json.stringify...
         let connectionHash = new Set<string>();
         for (let con of connections) {
             connectionHash.add(JSON.stringify(con));
         }
 
         return new TileAtlas(tiles, prototypes, ConnectionType.Edge, connections, connectionHash);        
+    }
+
+    static fromSourceImageBetter(input: Bitmap, kernelSize: number) {
+
+        // generate tiles themselves from the source image 
+        let idMapper = new Map<number, number>();
+        let frequency = new Array<number>();
+        
+        let tiles: Bitmap[] = [];
+        let frequencies: number[] = [];
+
+        let i = 0;
+        for (let y = 0; y < input.height; y++) {
+            for (let x = 0; x < input.width; x++) {
+                // trim periodically, so that the tile pattern will be repeated
+                let newTile = input.periodicTrim(x, y, x + kernelSize, y + kernelSize);
+                
+                // deal with indices
+                let overlapTileId = tiles.findIndex(((tile) => doImagesOverlap(tile, newTile)));
+                let index;
+                if (overlapTileId == -1) {
+                    // new tile
+                    tiles.push(newTile);
+                    frequencies.push(1);
+                    idMapper.set(i, i);
+                    index = i;
+                } else {
+                    // existing tile 
+                    // increase frequency, and add an index to point back to this other tile
+                    frequencies[overlapTileId] += 1;
+                    idMapper.set(i, overlapTileId);
+                    index = overlapTileId
+                }
+                i++
+
+                // deal with connections
+                for (let dir of Direction.Four) {
+                    // let offset = Direction.D8ToVector(dir);
+                
+                    // if (doImagesOverlap(tileA, tileB, offset)) {
+                    //     connections.push({from: i, to: j, dir});
+                    //     connections.push({from: j, to: i, dir: Direction.opposite(dir)});
+                    // }
+                }
+            }
+        }
     }
 
     getConcatConnections(ptts: number[]) {

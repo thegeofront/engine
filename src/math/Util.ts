@@ -4,6 +4,7 @@ import { GeonMath } from "./Math";
 import { Vector2 } from "./Vector2";
 
 export class Util {
+    
     static range(n: number): number[] {
         let array: number[] = [];
         for (let i = 0; i < n; i++) {
