@@ -258,6 +258,42 @@ export class Bitmap {
         return image;
     }
 
+    rot90(): Bitmap {
+        let image = new Bitmap(this.height, this.width, this.pixelSize);
+        for (let oldy = 0; oldy < this.height; oldy++) {
+            for (let oldx = 0; oldx < this.width; oldx++) {
+                let x = this.width - 1 - oldy;
+                let y = oldx;
+                image.set(x, y, this.get(oldx, oldy));
+            }
+        }
+        return image;
+    }
+
+    rot180(): Bitmap {
+        let image = new Bitmap(this.width, this.height, this.pixelSize);
+        for (let oldy = 0; oldy < this.height; oldy++) {
+            for (let oldx = 0; oldx < this.width; oldx++) {
+                let x = this.width - 1 - oldx;
+                let y = this.height - 1 - oldy;
+                image.set(x, y, this.get(oldx, oldy));
+            }
+        }
+        return image;
+    }
+
+    rot270(): Bitmap {
+        let image = new Bitmap(this.height, this.width, this.pixelSize);
+        for (let oldy = 0; oldy < this.height; oldy++) {
+            for (let oldx = 0; oldx < this.width; oldx++) {
+                let x = oldy;
+                let y = this.width - 1 - oldx;
+                image.set(x, y, this.get(oldx, oldy));
+            }
+        }
+        return image;
+    }
+
     applyKernel(kernel: FloatMatrix): Bitmap {
         // determine kernel size
         let size = kernel.count();

@@ -67,7 +67,7 @@ export class TileSolver {
         let cells = this.getCellsWithLeastEntrophy();
         // Debug.logOnce(cells, entr);
 
-        let cell = this.random.choose(cells);
+        let cell = cells[0];
         let cellChoicesBackup = new Uint8Array(this.cells.data[cell]);
         let choice = this.pickRandomOption(cell);
         
@@ -100,7 +100,7 @@ export class TileSolver {
         let choice = this.random.choose(options);
         let choicew = this.random.chooseWeighted(options, weights);
         Debug.logTimes(10, {choice, choicew, options, weights})
-        this.setOption(cell, choice);
+        this.setOption(cell, choicew);
         return choice;
     }
 
@@ -139,14 +139,14 @@ export class TileSolver {
             }
 
             // per unvisited neighbor
-            for (let neighbor of this.cells.getNbCells(cell)) {
+            for (let neighbor of this.cells.getNbCells8(cell)) {
                 if (visited.has(neighbor)) continue;
                 
                 let ops = this.getOptions(neighbor);
                 let changed = this.removeInvalidOptionsOfNeighbor(cell, neighbor, backup, debug);
 
                 // saveguard
-                if (this.getOptions(neighbor).length == 0) {
+                if (ops.length == 0) {
 
                     // console.info("All options were removed from node", neighbor, "!!");
                     restoreState();

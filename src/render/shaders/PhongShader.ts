@@ -85,7 +85,7 @@ export class PhongShader extends ShaderProgram<Entity> {
             
             // ambient
             // vec4 ambientColor = ambient * (1.0 - textureBlend) + textureBlend * texture2D(u_texture, varUv);
-            vec4 ambientColor = ambient
+            vec4 ambientColor = ambient;
 
             // occluded (TODO: expand upon this using ambient occlusion)
             float sunDot = dot(normal, toSun);

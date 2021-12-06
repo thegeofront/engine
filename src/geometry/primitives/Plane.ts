@@ -6,13 +6,16 @@
 //          Space = a matrix which is parallel-preserving, i.e. any combination of rotation, scaling and translation, but not a perspective distortion. 
 
 import { Matrix4, Vector3, Const, MultiVector3, Stat } from "../../lib";
+import { Geometry } from "../Geometry";
 
-export class Plane {
+export class Plane extends Geometry {
+
     _matrix!: Matrix4;
     // _inverse!: Matrix4; // NOTE: currently im not caching this. Might be needed.
 
     // NOTE : d is not really needed anymore...
     constructor(m: Matrix4) {
+        super();
         this._matrix = m;
     }
 
@@ -153,13 +156,17 @@ export class Plane {
         this.khat = vec;
     }
 
-    clone() {
+    clone(): Plane {
         return new Plane(this._matrix.clone());
     }
 
     transform(m: Matrix4): Plane {
         this._matrix = this._matrix.multiply(m);
         return this;
+    }
+
+    transformed(m: Matrix4): Geometry {
+        return this.clone().transform(m);
     }
 
     moveTo(origin: Vector3) {

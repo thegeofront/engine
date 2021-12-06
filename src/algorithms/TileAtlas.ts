@@ -15,12 +15,6 @@ type Prototype = {
     probability: number,
 };
 
-export enum ConnectionType {
-    Edge,
-    Point,
-    PointAndEdge
-}
-
 /**
  * Contains all tiles, and connectivity data between different tiles
  * 
@@ -31,7 +25,6 @@ export class TileAtlas {
     private constructor(
         public readonly tiles: Bitmap[],
         public readonly prototypes: Prototype[],
-        public readonly connectionType: ConnectionType,
         public readonly connections: Connection[],
         public readonly connectionHash: Set<string>, 
         ) {}
@@ -40,29 +33,32 @@ export class TileAtlas {
 
         // generate tiles themselves from the source image 
         let tiles: Bitmap[] = [];
-        let probabilities: number[] = [];
-
+        let weights: number[] = [];
+        let total = 0;
         for (let y = 0; y < input.height; y++) {
             for (let x = 0; x < input.width; x++) {
-
+                
                 // trim periodically, so that the tile pattern will be repeated
-                let newTile = input.periodicTrim(x, y, x + kernelSize, y + kernelSize);
-                
-                let overlapTileId = tiles.findIndex(((tile) => doImagesOverlap(tile, newTile)));
-                
+                let tile = input.periodicTrim(x, y, x + kernelSize, y + kernelSize);
+                // for (let tile of [cutout, cutout.rot90(), cutout.rot180(), cutout.rot270()]) {
+                    
+                let overlapTileId = tiles.findIndex(((t) => doImagesOverlap(t, tile)));
+            
                 if (overlapTileId == -1) {
-                    probabilities.push(1);
-                    tiles.push(newTile);
+                    weights.push(1);
+                    tiles.push(tile);
                 } else {
-                    probabilities[overlapTileId] += 1;
+                    weights[overlapTileId] += 1;
                 }
+                total += 1;
+                // }
             }
         }
 
         // generate prototypes
         let prototypes: Prototype[] = [];
         for (let i = 0; i < tiles.length; i++) {
-            prototypes.push({tile: i, rotation: 0, mirrored: false, probability: probabilities[i] / tiles.length})
+            prototypes.push({tile: i, rotation: 0, mirrored: false, probability: weights[i] / total})
         }
 
         // calculate connections based on correct image overlap
@@ -75,7 +71,7 @@ export class TileAtlas {
                 if (i > j) continue; // dont do double checks, we dont need to
                 let tileB = tiles[prototypes[j].tile];
 
-                for (let dir of Direction.Four) {
+                for (let dir of Direction.Eight) {
                     let offset = Direction.D8ToVector(dir);
                 
                     if (doImagesOverlap(tileA, tileB, offset)) {
@@ -92,54 +88,66 @@ export class TileAtlas {
             connectionHash.add(JSON.stringify(con));
         }
 
-        return new TileAtlas(tiles, prototypes, ConnectionType.Edge, connections, connectionHash);        
+        return new TileAtlas(tiles, prototypes, connections, connectionHash);        
     }
 
-    static fromSourceImageBetter(input: Bitmap, kernelSize: number) {
+    // static fromSourceImageBetter(input: Bitmap, kernelSize: number) {
 
-        // generate tiles themselves from the source image 
-        let idMapper = new Map<number, number>();
-        let frequency = new Array<number>();
-        
-        let tiles: Bitmap[] = [];
-        let frequencies: number[] = [];
+    //     // generate tiles themselves from the source image 
+    //     let tiles: Bitmap[] = [];
+    //     let tileOGID = new Array<number>();
+    //     let idMapper = new Map<number, number>();
+    //     let frequency = new Array<number>();
+    //     let frequencies: number[] = [];
 
-        let i = 0;
-        for (let y = 0; y < input.height; y++) {
-            for (let x = 0; x < input.width; x++) {
-                // trim periodically, so that the tile pattern will be repeated
-                let newTile = input.periodicTrim(x, y, x + kernelSize, y + kernelSize);
+    //     let i = 0;
+    //     for (let y = 0; y < input.height; y++) {
+    //         for (let x = 0; x < input.width; x++) {
+    //             // trim periodically, so that the tile pattern will be repeated
+    //             let tile = input.periodicTrim(x, y, x + kernelSize, y + kernelSize);
+
                 
-                // deal with indices
-                let overlapTileId = tiles.findIndex(((tile) => doImagesOverlap(tile, newTile)));
-                let index;
-                if (overlapTileId == -1) {
-                    // new tile
-                    tiles.push(newTile);
-                    frequencies.push(1);
-                    idMapper.set(i, i);
-                    index = i;
-                } else {
-                    // existing tile 
-                    // increase frequency, and add an index to point back to this other tile
-                    frequencies[overlapTileId] += 1;
-                    idMapper.set(i, overlapTileId);
-                    index = overlapTileId
-                }
-                i++
 
-                // deal with connections
-                for (let dir of Direction.Four) {
-                    // let offset = Direction.D8ToVector(dir);
-                
-                    // if (doImagesOverlap(tileA, tileB, offset)) {
-                    //     connections.push({from: i, to: j, dir});
-                    //     connections.push({from: j, to: i, dir: Direction.opposite(dir)});
-                    // }
-                }
-            }
-        }
-    }
+    //             // // deal with indices
+    //             // let overlapTileId = tiles.findIndex(((tile) => doImagesOverlap(tile, tile)));
+    //             // let index;
+    //             // if (overlapTileId == -1) {
+    //             //     // new tile
+    //             //     index = tiles.length;
+    //             //     tiles.push(tile);
+    //             //     frequencies.push(1);
+    //             //     idMapper.set(i, i);
+    //             // } else {
+    //             //     // existing tile 
+    //             //     // increase frequency, and add an index to point back to this other tile
+    //             //     index = overlapTileId
+    //             //     frequencies[overlapTileId] += 1;
+    //             // }
+    //             // idMapper.set(i, index);
+    //             // i++
+
+    //             // deal with connections
+    //             for (let dir of Direction.Four) {
+    //                 let offset = Direction.D8ToVector(dir);
+    //                 // nbIndex = 
+
+    //                 // if (doImagesOverlap(tileA, tileB, offset)) {
+    //                 //     connections.push({from: i, to: j, dir});
+    //                 //     connections.push({from: j, to: i, dir: Direction.opposite(dir)});
+    //                 // }
+    //             }
+    //         }
+    //     }
+    //     console.log(idMapper);
+
+    //     let prototypes = new Array<Prototype>();
+    //     let connections = new Array<Connection>();
+    //     let connectionHash = new Set<string>();
+    //     for (let con of connections) {
+    //         connectionHash.add(JSON.stringify(con));
+    //     }
+    //     return new TileAtlas(tiles, prototypes, connections, connectionHash)
+    // }
 
     getConcatConnections(ptts: number[]) {
         let data: any = {};
