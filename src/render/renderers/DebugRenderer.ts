@@ -196,7 +196,7 @@ export class DebugRenderer {
             shader = new ShadedMeshShader(gl);
             shader.set(unit);
         } else if (unit instanceof Mesh) {
-            shader = new MeshDebugShader(gl);
+            shader = new MeshDebugShader(gl, [0.5,0,0,1], [0.8,0,0,1]);
             let smesh = unit.ToShaderMesh();
             shader.set(smesh);
         } else if (unit instanceof BiSurface) {

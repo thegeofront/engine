@@ -26,6 +26,8 @@ export class Vector2 {
 
     // --- factories & other statics
 
+    static _zero: Vector2 = Vector2.zero();
+
     static new(x = 0, y = 0) {
         return new Vector2(x, y);
     }

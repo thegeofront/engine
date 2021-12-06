@@ -3,6 +3,11 @@
 import { Const } from "./Const";
 
 export class GeonMath {
+
+    static isRougly(value: number, check: number, tolerance: number) {
+        return Math.abs(value - check) < tolerance;
+    }
+
     // make sure 'value' is more than 'lower', and less than 'upper'
     static clamp(value: number, lower: number, upper: number) {
         return Math.min(Math.max(value, lower), upper);

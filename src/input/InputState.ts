@@ -225,6 +225,10 @@ export class InputState {
         return false;
     }
 
+    public setCursorStyle(str: string) {
+        this.canvas.style.cursor = "str";     
+    }
+
     public onKeyDown(e: KeyboardEvent) {
         let key = e.key.toLowerCase();
         if (this.keysDown[key] == true) return;
