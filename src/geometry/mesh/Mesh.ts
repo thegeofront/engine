@@ -846,11 +846,14 @@ export class Mesh extends Geometry {
             return MultiLine.fromLines([]);
         }
 
-        Debug.time("cuts");
         let width = 3
         let height = this.links.count();
+
+        // we can never have more than 2 vertices per face. We will make this array shorter at the end 
+        let linePoints = MultiVector3.new(height * 2); 
+        
         let points: Vector3[] = [];
-        let count = 0;
+        let nCuts = 0;
 
         // sorry for this mess, but I want this as fast as possible
         let a = Vector3.zero();
@@ -860,18 +863,20 @@ export class Mesh extends Geometry {
         // in between products 
         let ba = Vector3.zero();
         let ac = Vector3.zero();
-
+        let intersectionsPerTriangle;
         let pNormal = plane.khat;
         let pCenter = plane.center;
+        let stored: Vector3 | undefined;
+        let twice = false; 
 
         // per triangle
         for (let i = 0; i < height; i++) {
             // I do a little trick to 'store' the previous intersection of a triangle, in order to create lines
-            c.x = NaN;
-            c.y = NaN;
-
+            stored = undefined;
+            twice = false;
             // per edge of the triangle
             for (let j = 0; j < width; j++) {
+                if (twice) continue;
                 let jnext = (j + 1) % width;
                 
                 let ia = this.links.get(i, j);
@@ -896,19 +901,19 @@ export class Mesh extends Geometry {
                 }
 
                 // if we arrive here: valid intersection!               
-                if (c.x != NaN && c.y != NaN) {
-                    points.push(c.clone());
-                    points.push(c.copy(a).lerp(b, t).clone());
-                    // if edge 0 and 1 have intersection, ignore the check of edge 2
-                } 
-                c.copy(a).lerp(b, t);
-                count++;
+                if (stored) {
+                    linePoints.set(nCuts, stored);
+                    linePoints.set(nCuts+1, c.copy(a).lerp(b, t));
+                    nCuts += 2;
+                    twice = true;
+                } else {
+                    c.copy(a).lerp(b, t);
+                    stored = c;
+                }
             }
         }
-
-        Debug.timeEnd("cuts");
-        console.log(count);
-        return MultiLine.fromLines(points);
+        linePoints = MultiVector3.fromData(linePoints.matrix.data.slice(0, nCuts * 3));
+        return MultiLine.fromLines(linePoints);
     }
 }
 

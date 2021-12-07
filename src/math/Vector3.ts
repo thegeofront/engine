@@ -379,7 +379,6 @@ export class Vector3 {
         this.x += (other.x - this.x) * alpha;
         this.y += (other.y - this.y) * alpha;
         this.z += (other.z - this.z) * alpha;
-        
         return this;
     }
 
