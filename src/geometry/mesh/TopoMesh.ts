@@ -4,10 +4,10 @@ import {
     Vector2,
     Vector3,
     MultiVector3,
-    Triangle2,
     Triangle3,
     ShaderMesh,
 } from "../../lib";
+import { Triangle2 } from "../primitives/Triangle2";
 
 // a mesh with topological information
 export class TopoMesh extends ShaderMesh {

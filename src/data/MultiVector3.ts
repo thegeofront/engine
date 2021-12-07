@@ -83,6 +83,15 @@ export class MultiVector3 extends Geometry {
         );
     }
 
+    /**
+     * this copies the data to an existing vector
+     */
+    getCopy(vec: Vector3, i: number) {
+        vec.x = this._matrix.data[i * this.width + 0];
+        vec.y = this._matrix.data[i * this.width + 1];
+        vec.z = this._matrix.data[i * this.width + 2];
+    }
+
     slice() {
         return this._matrix;
     }

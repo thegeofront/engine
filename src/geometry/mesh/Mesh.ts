@@ -6,6 +6,7 @@
 import {
     BiSurface,
     Cube,
+    Debug,
     Domain3,
     getDefaultIndices,
     getLongDefaultIndices,
@@ -23,7 +24,10 @@ import {
 } from "../../lib";
 import { GeonMath } from "../../math/Math";
 import { Geometry } from "../Geometry";
+import { Line3 } from "../primitives/Line3";
+import { MultiLine } from "./MultiLine";
 import { ObjProcessing } from "./ObjProcessing";
+import { meshFromObj } from "./ShaderMesh";
 
 export enum MeshType {
     Invalid = 0,
@@ -44,7 +48,7 @@ export class Mesh extends Geometry {
     
     constructor(
         public verts: MultiVector3,
-        public links: IntMatrix, // relationships, can be 2 (lines) | 3 (triangles) | 4 (quads)
+        public links: IntMatrix, // relationships, can be 3 (triangles) | 4 (quads)
         private _uvs?: MultiVector2,
         private _normals?: MultiVector3, 
         private _normalKind = NormalKind.None
@@ -576,9 +580,25 @@ export class Mesh extends Geometry {
 
     // ------- CONVERTERS
 
+    getLineIds() {
+        let width = this.links._width;
+        let count = this.links.data.length;
+        let lines = new IntMatrix(count, 2);
+        for (let i = 0; i < this.links.count(); i++) {
+            for (let j = 0; j < width; j++) {
+                let jnext = (j + 1) % width;
+                let iLines = i * width + j;
+                lines.set(iLines, 0, this.links.get(i, j));
+                lines.set(iLines, 1, this.links.get(i, jnext));
+            }
+        }
+        return lines;
+    }
+
     toLines(): Mesh {
-        const getLines = (num: number) => {
-            let count = this.links.count() * num;
+        // i think we can replace this with this.getLineIds(), I just cant be bothered to test side effects for now...
+        const getLines = (num: number) => { 
+            let count = this.links.count() * num; 
             let lines = new IntMatrix(count, 2);
             for (let i = 0; i < this.links.count(); i++) {
                 for (let j = 0; j < num; j++) {
@@ -809,6 +829,86 @@ export class Mesh extends Geometry {
             this._uvs = MultiVector2.new(this.maxSize);
             return false;
         }
+    }
+
+    /////////////////////////////////////////////////////////////////////////// True Operators
+
+    /**
+     * 1. For every edge, intersect with plane. if hit: store
+     * 2. Use triangle IDS to stitch the points together to form lines. 
+     * (2. for now, just figure out continuous line segments some other way) 
+     * @returns 
+     */
+    xPlane(plane: Plane) : MultiLine {
+
+        if (this.links._width != 3) {
+            Debug.error("intersection on quad based mesh not implemented...");
+            return MultiLine.fromLines([]);
+        }
+
+        Debug.time("cuts");
+        let width = 3
+        let height = this.links.count();
+        let points: Vector3[] = [];
+        let count = 0;
+
+        // sorry for this mess, but I want this as fast as possible
+        let a = Vector3.zero();
+        let b = Vector3.zero();
+        let c = Vector3.zero();
+        
+        // in between products 
+        let ba = Vector3.zero();
+        let ac = Vector3.zero();
+
+        let pNormal = plane.khat;
+        let pCenter = plane.center;
+
+        // per triangle
+        for (let i = 0; i < height; i++) {
+            // I do a little trick to 'store' the previous intersection of a triangle, in order to create lines
+            c.x = NaN;
+            c.y = NaN;
+
+            // per edge of the triangle
+            for (let j = 0; j < width; j++) {
+                let jnext = (j + 1) % width;
+                
+                let ia = this.links.get(i, j);
+                let ib = this.links.get(i, jnext)
+
+                // get the verts of the edge
+                this.verts.getCopy(a, ia);
+                this.verts.getCopy(b, ib);
+
+                // intersection
+                ba.copy(a).sub(b);
+                ac.copy(a).sub(pCenter);
+
+                let bot = ba.dot(pNormal);
+                if (bot == 0) {
+                    continue;
+                }
+                let top = pNormal.dot(ac);
+                let t = top / bot;
+                if (t < 0 || t > 1) {
+                    continue;
+                }
+
+                // if we arrive here: valid intersection!               
+                if (c.x != NaN && c.y != NaN) {
+                    points.push(c.clone());
+                    points.push(c.copy(a).lerp(b, t).clone());
+                    // if edge 0 and 1 have intersection, ignore the check of edge 2
+                } 
+                c.copy(a).lerp(b, t);
+                count++;
+            }
+        }
+
+        Debug.timeEnd("cuts");
+        console.log(count);
+        return MultiLine.fromLines(points);
     }
 }
 

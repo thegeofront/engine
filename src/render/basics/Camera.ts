@@ -203,7 +203,7 @@ export class Camera {
         
         // apply scroll 
         if (state.mouseScrollDelta != 0) {
-            this.zoomDelta += state.mouseScrollDelta * 0.05;
+            this.zoomDelta += state.mouseScrollDelta * 0.08;
             
         }
         // [ cntrl + rmb ] zoom the camera 

@@ -28,13 +28,17 @@ export class Ray {
         return this.origin.added(this.normal.scaled(t));
     }
 
+    /**
+     *  ray : pt = rOrigin + t * rNormal
+     *  plane : a, b, c, d -> pNormal(a, b, c) , d
+     *  plane : P . N + d = 0;
+     *  substitute for p:
+     *  t = -(rOrigin . N + d) / (V . N)
+     * 
+     * @param plane 
+     * @returns t
+     */
     xPlane(plane: Plane): number {
-        // ray : pt = rOrigin + t * rNormal
-        // plane : a, b, c, d -> pNormal(a, b, c) , d
-        // plane : P . N + d = 0;
-        // substitute for p:
-        // t = -(rOrigin . N + d) / (V . N)
-
         let ray = this; // to be clear
         return -(ray.origin.dot(plane.normal) + plane.d) / ray.normal.dot(plane.normal);
     }

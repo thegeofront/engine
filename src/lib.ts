@@ -32,10 +32,11 @@ export * from "./geometry/Intersect";
 export * from "./geometry/primitives/Circle2";
 export * from "./geometry/primitives/Circle3";
 export * from "./geometry/primitives/Cube";
-export * from "./geometry/primitives/Line";
+export * from "./geometry/primitives/Line2";
 export * from "./geometry/primitives/Plane";
 export * from "./geometry/primitives/Rectangle";
-export * from "./geometry/primitives/Triangle";
+export * from "./geometry/primitives/Triangle2";
+export * from "./geometry/primitives/Triangle3";
 
 export * from "./geometry/curve/Curve";
 export * from "./geometry/curve/Bezier";

@@ -5,7 +5,10 @@ import { Random } from "./Random";
 import { Util } from "./Util";
 import { Vector2 } from "./Vector2";
 
+
+
 export class Vector3 {
+      
     // #region constructors
     constructor(public x: number, public y: number, public z: number) {}
 
@@ -372,7 +375,12 @@ export class Vector3 {
     }
 
     lerp(other: Vector3, alpha: number): Vector3 {
-        return Vector3.fromLerp(this, other, alpha);
+        
+        this.x += (other.x - this.x) * alpha;
+        this.y += (other.y - this.y) * alpha;
+        this.z += (other.z - this.z) * alpha;
+        
+        return this;
     }
 
     // #endregion

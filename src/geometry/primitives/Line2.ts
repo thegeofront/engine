@@ -2,7 +2,7 @@ import { Domain, Domain2 } from "../../math/Domain";
 import { Vector2 } from "../../math/Vector2";
 
 // heavy weight Line class
-export class LineCurve2 {
+export class Line2 {
     readonly from: Vector2;
     readonly to: Vector2;
     readonly vector: Vector2;

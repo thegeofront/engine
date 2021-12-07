@@ -69,7 +69,3 @@ function signed_volume(a: Vector3, b: Vector3, c: Vector3, d: Vector3) {
             .dot(c.sub(d).cross(b.sub(d)))
     );
 }
-
-function IsRoughly(test1: number, arg1: number) {
-    throw new Error("Function not implemented.");
-}
