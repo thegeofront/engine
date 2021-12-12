@@ -140,9 +140,6 @@ export class InputState {
         document.addEventListener("mousemove", this.onMouseMove.bind(this));
         canvas.addEventListener("wheel", this.setMouseScroll.bind(this));
 
-        document.addEventListener("touchmove", this.setTouch.bind(this));
-        canvas.addEventListener("touchstart", this.setTouch.bind(this));
-        canvas.addEventListener("touchend", this.setTouchUp.bind(this));
         // for (let i = 0; i < 223; i++) this.keysDown[i] = false;
 
         // keyboard
@@ -169,11 +166,11 @@ export class InputState {
         // update mouse pos
         if (!this.mousePosBuffered.equals(this.mousePos)) {
             // mouse has moved during previous frame
-            this.mousePos = this.mousePosBuffered.clone();
-            this.mouseDelta = this.mousePos.subbed(this.mousePosPrev);
-            this.mousePosPrev = this.mousePos.clone();
+            this.mousePos.copy(this.mousePosBuffered);
+            this.mouseDelta.copy(this.mousePos).sub(this.mousePosPrev);
+            this.mousePosPrev.copy(this.mousePos);
         } else {
-            this.mouseDelta = Vector2.zero();
+            this.mouseDelta.set(0,0);
         }
 
         // update mouse buttons
@@ -244,18 +241,6 @@ export class InputState {
 
     public onKeyPressed(e: KeyboardEvent) {
         // NOTE: i made a different system to handle this, see onKeyDown
-    }
-
-    private setTouch(e: TouchEvent) {
-        e.preventDefault();
-
-        this.mousePos = new Vector2(e.touches[0].clientX, e.touches[0].clientY);
-        this.mouseLeftDown = true;
-    }
-
-    private setTouchUp(e: TouchEvent) {
-        e.preventDefault();
-        this.mouseLeftDown = false;
     }
 
     private setMouseScroll(e: WheelEvent) {

@@ -27,5 +27,4 @@ export class TimeHandler {
         this.tick = this.newTime - this.oldTime;
         this.oldTime = this.newTime;
     }
-
 }

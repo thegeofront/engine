@@ -9,4 +9,11 @@ export namespace Util {
         }
         return numbers;
     }
+
+    /**
+     * True if the current browser this code exists within is a mobile device's.
+     */
+    export function isUserMobile() {
+        return (/Mobi|Android/i.test(navigator.userAgent));
+    }
 }

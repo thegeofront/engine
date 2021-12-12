@@ -6,6 +6,7 @@ export class FpsCounter {
     updateEveryXTicks = 100;
     elapsed = 0;
     frames = 0;
+    frameTime = 0;
 
     constructor() {}
 

@@ -45,6 +45,13 @@ export class Matrix4 extends FloatMatrix {
         return Matrix4.newCopy(this);
     }
 
+    copy(other: Matrix4) {
+        for (let i = 0 ; i < 16; i++) {
+            this.data[i] = other.data[i];
+        }
+        return this;
+    }
+
     multiplied(other: Matrix4) {
         // NOTE: i swapped a and b, this makes more sense to me, but i could be wrong about it...
         const a = other.data;
@@ -307,12 +314,22 @@ export class Matrix4 extends FloatMatrix {
         return matrix;
     }
 
-    static newTranslation(tx: number, ty: number, tz: number): Matrix4 {
-        return new Matrix4([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, tx, ty, tz, 1]);
+    static newTranslation(tx: number, ty: number, tz: number, matrix = Matrix4.new()): Matrix4 {
+        let data = matrix.data;
+        data[12] = tx;
+        data[13] = ty;
+        data[14] = tz;
+        
+        return matrix;
     }
 
-    static newTranslate(v: Vector3): Matrix4 {
-        return new Matrix4([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, v.x, v.y, v.z, 1]);
+    static newTranslate(v: Vector3, matrix = Matrix4.new()): Matrix4 {
+        let data = matrix.data;
+        data[12] = v.x;
+        data[13] = v.y;
+        data[14] = v.z;
+        
+        return matrix;
     }
 
     // static newRotate(euler: Vector3) {
@@ -340,43 +357,46 @@ export class Matrix4 extends FloatMatrix {
     //     return rotation;
     // }
 
-    static newXRotation(angleInRadians: number): Matrix4 {
+    static newXRotation(angleInRadians: number, matrix=Matrix4.newIdentity()) {
+        let data = matrix.data;
         var c = Math.cos(angleInRadians);
         var s = Math.sin(angleInRadians);
 
-        return new Matrix4([1, 0, 0, 0, 0, c, -s, 0, 0, s, c, 0, 0, 0, 0, 1]);
+        // return new Matrix4(
+        //     [1, 0, 0, 0, 
+        //     0, c, -s, 0, 
+        //     0, s, c, 0,
+        //      0, 0, 0, 1]);
+        data[5] = c;
+        data[6] = -s;
+        data[9] = s;
+        data[10] = c;
+        return matrix;
     }
 
-    static newYRotation(angleInRadians: number): Matrix4 {
+    static newYRotation(angleInRadians: number, matrix=Matrix4.newIdentity()) {
+        let data = matrix.data;
         var c = Math.cos(angleInRadians);
         var s = Math.sin(angleInRadians);
 
-        return new Matrix4([c, 0, s, 0, 0, 1, 0, 0, -s, 0, c, 0, 0, 0, 0, 1]);
+        // return new Matrix4([c, 0, s, 0, 0, 1, 0, 0, -s, 0, c, 0, 0, 0, 0, 1]);
+        data[0] = c;
+        data[2] = s;
+        data[8] = -s;
+        data[10] = c;
+        return matrix;
     }
 
-    static newZRotation(angleInRadians: number) {
-        let matrix = new Matrix4();
-        let dst = matrix.data;
+    static newZRotation(angleInRadians: number, matrix=Matrix4.newIdentity()) {
+        let data = matrix.data;
 
         var c = Math.cos(angleInRadians);
         var s = Math.sin(angleInRadians);
 
-        dst[0] = c;
-        dst[1] = s;
-        dst[2] = 0;
-        dst[3] = 0;
-        dst[4] = -s;
-        dst[5] = c;
-        dst[6] = 0;
-        dst[7] = 0;
-        dst[8] = 0;
-        dst[9] = 0;
-        dst[10] = 1;
-        dst[11] = 0;
-        dst[12] = 0;
-        dst[13] = 0;
-        dst[14] = 0;
-        dst[15] = 1;
+        data[0] = c;
+        data[1] = s;
+        data[4] = -s;
+        data[5] = c;
 
         return matrix;
     }
@@ -549,8 +569,8 @@ export class Matrix4 extends FloatMatrix {
     /**
      * creates a matrix from translation, quaternion, scale
      */
-    newCompose(translation: Vector3, quaternion: Quaternion, scale: Vector3): Matrix4 {
-        let matrix = new Matrix4();
+    newCompose(translation: Vector3, quaternion: Quaternion, scale: Vector3, matrix = new Matrix4()): Matrix4 {
+        
         let d = matrix.data;
 
         const x = quaternion.x;
@@ -675,8 +695,8 @@ export class Matrix4 extends FloatMatrix {
         return 1.0 / (m00 * t0 + m10 * t1 + m20 * t2 + m30 * t3);
     }
 
-    inverse(): Matrix4 {
-        let matrix = new Matrix4();
+    inverse(matrix = new Matrix4()): Matrix4 {
+
         let dst = matrix.data;
         let m = this.data;
 

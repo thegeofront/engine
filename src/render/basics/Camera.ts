@@ -1,7 +1,15 @@
 // author : Jos Feenstra
 // purpose : contain all logic regarding
 
-import { Vector3, Vector2, Plane, Matrix4, InputState, GeonMath, Ray, Matrix3 } from "../../lib";
+import { TouchHandler } from "../../input-2.0/TouchHandler";
+import { Vector3, Vector2, Plane, Matrix4, InputState, GeonMath, Ray, Matrix3, InputHandler, Debug, Key, Pointertype } from "../../lib";
+
+enum MoveMode {
+    None,
+    Rotate,
+    Pan,
+    Zoom,        
+}
 
 
 export class Camera {
@@ -21,17 +29,32 @@ export class Camera {
 
     worldPlane = Plane.WorldXY();
 
-    // ! means: dont worry, these will be set in the constructor
+    positionM = Matrix4.new();
+
+
+    rotateXRev = Matrix4.new();
+    rotateZRev = Matrix4.new();
+    rotateX = Matrix4.new();
+    rotateZ = Matrix4.new();
+    rotate = Matrix4.new();
+
     totalMatrix!: Matrix4;
     worldMatrix!: Matrix4;
     projectMatrix!: Matrix4;
     inverseWorldMatrix!: Matrix4;
     inverseTotalViewMatrix!: Matrix4;
 
+    calculateInverseMatrices = true;
+
     // settings
     canMove: boolean;
     canControl: any;
     inverseTransposeMatrix!: Matrix4;
+
+    // stuff for smooth camera
+    rotateDropoffDelta = Vector2.zero();
+    zoomDelta = 0;
+    // scrollPrev = 0;
     
     constructor(canvas: HTMLCanvasElement, z_offset = 1, canMove = false, canControl = true) {
         this.canMove = canMove;
@@ -39,7 +62,7 @@ export class Camera {
 
         this.pos = new Vector3(0, 0, 0);
         this.offset = new Vector3(0, 0, -z_offset);
-        this.updateMatrices(canvas);
+        this.updateMatrices(canvas.width, canvas.height);
     }
 
     get zoom() {
@@ -54,34 +77,50 @@ export class Camera {
         return new Camera(canvas, zOffset, canMove);
     }
 
-    update(state: InputState, forceUpdate = true) : boolean {
-        let hasChanged = this.updateControls(state);
+    /**
+     * New way of updating. Has touch support
+     */
+    updateNew(state: InputHandler, forceUpdate = true) : boolean {
+        let hasChanged = this.updateControlsNew(state);
         if (hasChanged || forceUpdate) {
-            this.updateMatrices(state.canvas); // TODO only move if we have changed
+            this.updateMatrices(state.width, state.height); // TODO only move if we have changed
         }
-        this.updateClick(state);
-
-        if (state.IsKeyPressed("p")) {
-            console.log(
-                `camera state: [${this.pos.x.toPrecision(5)}, ${this.pos.y.toPrecision(
-                    5,
-                )}, ${this.pos.z.toPrecision(5)}, ${this.zoom}, ${this.angleAlpha},${
-                    this.angleBeta
-                }]`,
-            );
-
-            // console.log(
-            //     `printing camera status.
-            //     pos: ${this.pos},
-            //     offset: ${this.offset},
-            //     speed: ${this.speed},
-            //     alpha ${this.angleAlpha},
-            //     beta: ${this.angleBeta}`,
-            // );
-
-            console.log("speed is now: " + this.speed);
-        }
+        state.keys?.onPressed(Key.P, this.printState.bind(this));
+        // this.updateOtherControls(state);
         return hasChanged;
+    }
+
+    update(state: InputState, forceUpdate = true) : boolean {
+        let hasChanged = this.updateControlsOld(state);
+        if (hasChanged || forceUpdate) {
+            this.updateMatrices(state.canvas.width, state.canvas.height); // TODO only move if we have changed
+        }
+        
+        if (state.IsKeyPressed('p')) this.printState();
+        
+        return hasChanged;
+    }
+
+    printState() {
+        // make camera debuggable, and create a way to get camera positions
+        Debug.log(
+            `camera state: [${this.pos.x.toPrecision(5)}, ${this.pos.y.toPrecision(
+                5,
+            )}, ${this.pos.z.toPrecision(5)}, ${this.zoom}, ${this.angleAlpha},${
+                this.angleBeta
+            }]`,
+        );
+
+        // console.log(
+        //     `printing camera status.
+        //     pos: ${this.pos},
+        //     offset: ${this.offset},
+        //     speed: ${this.speed},
+        //     alpha ${this.angleAlpha},
+        //     beta: ${this.angleBeta}`,
+        // );
+
+        Debug.log("speed is now: " + this.speed);
     }
 
     // just a quick way of getting & setting
@@ -110,12 +149,10 @@ export class Camera {
         this.angleBeta = beta;
     }
 
-    updateMatrices(canvas: HTMLCanvasElement) {
+    updateMatrices(width: number, height: number) {
 
         // 1 : calculate world matrix
         let offset = this.offset;
-        let angleA = this.angleAlpha;
-        let angleB = this.angleBeta;
 
         // translate so z means 'up'
         // let yzFlip = new Matrix4([1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1]);
@@ -125,15 +162,17 @@ export class Camera {
         let mOffset = Matrix4.newTranslation(offset.x, offset.y, offset.z);
 
         // rotated by user
-        let x_rotation = Matrix4.newXRotation(angleA);
-        let z_rotation = Matrix4.newZRotation(angleB);
-        let rotation = z_rotation.multiply(x_rotation);
+        this.rotateX = Matrix4.newXRotation(this.angleAlpha, this.rotateX);
+        this.rotateXRev = Matrix4.newXRotation(-this.angleAlpha, this.rotateXRev);
+        this.rotateZ = Matrix4.newZRotation(this.angleBeta, this.rotateZ);
+        this.rotateZRev = Matrix4.newZRotation(-this.angleBeta, this.rotateZRev);
+        this.rotate.copy(this.rotateZ).multiply(this.rotateX);
  
         // let transform = mOffset.multiply(rotation).multiply(position);
-        let worldMatrix = position.multiply(rotation).multiply(mOffset);
+        let worldMatrix = position.multiply(this.rotate).multiply(mOffset);
 
         // 2 : project & total
-        let projectMatrix = this.getProjectionMatrix(canvas); // THIS IS MORE OR LESS STATIC, CACHE IT!
+        let projectMatrix = this.getProjectionMatrix(width, height); // THIS IS MORE OR LESS STATIC, CACHE IT!
         let totalMatrix = worldMatrix.multiplied(projectMatrix);
 
         // translation = 0
@@ -142,15 +181,18 @@ export class Camera {
         viewDirectionMatrix.data[13] = 0;
         viewDirectionMatrix.data[14] = 0;
 
-        let totalViewMatrix = rotation.multiplied(projectMatrix);
+        let totalViewMatrix = this.rotate.multiplied(projectMatrix);
 
         this.worldMatrix = worldMatrix;
         this.projectMatrix = projectMatrix;
         this.totalMatrix = totalMatrix; 
 
-        this.inverseWorldMatrix = this.worldMatrix.inverse();
-        this.inverseTransposeMatrix = this.inverseWorldMatrix.transpose(); 
-        this.inverseTotalViewMatrix = totalViewMatrix.inverse();
+        // early out: matrix inverses every frame? dont do it if it is not needed!
+        if (this.calculateInverseMatrices) {
+            this.inverseWorldMatrix = this.worldMatrix.inverse();
+            this.inverseTransposeMatrix = this.inverseWorldMatrix.transpose(); 
+            this.inverseTotalViewMatrix = totalViewMatrix.inverse();
+        }
     }
 
     lookat(position: Vector3, target: Vector3) {
@@ -158,42 +200,124 @@ export class Camera {
         let matrix = Matrix4.newLookAt(position, target, this.worldPlane.khat);
     }
 
-    private updateClick(state: InputState) {
-        // todo
+    ///////////////////////////////////////////////////////////////////////////
+
+    private updateControlsOld(state: InputState) {
+
+        // dont update controls if we are not allowed to
+        if (!this.canControl) {
+            return false;
+        }
+        
+        // determine control values using 'state';
+        let mode = this.getMoveModeFromKeyboard(state);
+        let prevPos = this.mousePos.clone();
+        let pos = state.mousePos.clone();
+        this.mousePos = pos;
+        let delta = prevPos.clone().sub(this.mousePos);
+        let scrollDelta = state.mouseScrollDelta;
+
+        // update things
+        let hasChanged1 = this.updatePointerControls(mode, delta, scrollDelta);
+        let hasChanged2 = this.updateKeyboardControlsOld(state);
+        this.updatePointerStyle();
+
+        return hasChanged1 || hasChanged2;
     }
 
-    rotateDropoffDelta = Vector2.zero();
-    zoomDelta = 0;
-    scrollPrev = 0;
-    private updateControls(state: InputState) : boolean {
+    private updateControlsNew(input: InputHandler) {
+        
+        if (!this.canControl) {
+            return false;
+        }
+
+        let mode = MoveMode.None;
+        let delta = Vector2.zero();
+        let scrollDelta = 0;
+        let hasChanged1 = false;
+        let hasChanged2 = false;
+
+        if (input.touch) {
+            mode = this.getMoveModeFromTouch(input.touch);
+            if (input.touch.down > 0) {
+                delta = input.touch.fingers[0].delta;
+            } else {
+                delta = Vector2.zero();
+            }
+
+            if (mode == MoveMode.Zoom) {
+                delta.x = 0;
+                delta.y = input.touch.zoomDelta;
+
+            }
+        } 
+
+        if (input.mouse) {
+            
+        } 
+
+        if (input.keys) {
+            
+        }
+
+        // [ rmb ] rotate the camera. we use a dropoff to make it smooth
+        // let isControlDown = state.IsKeyDown('control');
+        // let isShiftDown = state.IsKeyDown('shift');
+        // if (state.mouseRightDown && !isControlDown && !isShiftDown) {
+        //     hasChanged = delta.y != 0 || delta.x != 0;
+        //     this.rotateDropoffDelta.copy(delta);
+        // }
+
+        hasChanged1 = this.updatePointerControls(mode, delta, scrollDelta);
+        this.updatePointerStyle();
+
+        return hasChanged1 || hasChanged2;
+    }
+
+    private getMoveModeFromTouch(touch: TouchHandler) {
+
+        if (touch.down > 3) {
+            return MoveMode.Pan;
+        } else if (touch.down == 2) {
+            return MoveMode.Zoom;
+        } else if (touch.down == 1) {
+            return MoveMode.Rotate;
+        } else {
+            return MoveMode.None;
+        }
+    }
+
+    private getMoveModeFromKeyboard(state: InputState) : MoveMode {
+        
+        let isMouseRightDown = state.mouseRightDown; 
+        let isControlDown = state.IsKeyDown('control');
+        let isShiftDown = state.IsKeyDown('shift');
+        
+        if (isMouseRightDown && !isControlDown && !isShiftDown) {
+            return MoveMode.Rotate;
+        } else if (isMouseRightDown && isControlDown && !isShiftDown) {
+            return MoveMode.Zoom;
+        } else if (state.mouseRightDown && !isControlDown && isShiftDown) {
+            return MoveMode.Pan;
+        } else {
+            return MoveMode.None;
+        }
+    }
+
+    private updatePointerControls(mode: MoveMode, delta: Vector2, scrollDelta: number) : boolean {
 
         let hasChanged = false;
         if (!this.canControl) {
             return hasChanged;
         }
         
-        if (state.IsKeyPressed("r")) {
-            this.speed *= 2;
-        }
-        if (state.IsKeyPressed("f")) {
-            this.speed = Math.max(this.speed * 0.5, 0.1);
-        }
-
-        // deal with mouse
-        let prevPos = this.mousePos.clone();
-        this.mousePos = state.mousePos.clone();
-        let delta = prevPos.clone().sub(this.mousePos);
-
-        // this.getMouseWorldRay(state.canvas.width, state.canvas.height);
-
-        // [ rmb ] rotate the camera. we use a dropoff to make it smooth
-        let isControlDown = state.IsKeyDown('control');
-        let isShiftDown = state.IsKeyDown('shift');
-        if (state.mouseRightDown && !isControlDown && !isShiftDown) {
+        // rotate the camera : apply
+        if (mode == MoveMode.Rotate) {
             hasChanged = delta.y != 0 || delta.x != 0;
             this.rotateDropoffDelta.copy(delta);
         }
 
+        // rotate the camera : we use a dropoff to make it smooth
         if (!this.rotateDropoffDelta.roughlyEquals(Vector2._zero, 0.1)) {
             hasChanged = true;
             this.angleAlpha = GeonMath.clamp(this.angleAlpha + this.rotateDropoffDelta.y * 0.003, 0, Math.PI);
@@ -201,67 +325,77 @@ export class Camera {
             this.rotateDropoffDelta.scale(0.9)
         }
         
-        // apply scroll 
-        if (state.mouseScrollDelta != 0) {
-            this.zoomDelta += state.mouseScrollDelta * 0.08;
+        // zoom the camera : apply scroll
+        if (scrollDelta != 0) {
+            this.zoomDelta += scrollDelta * 0.08;
             
         }
-        // [ cntrl + rmb ] zoom the camera 
-        if (state.mouseRightDown && isControlDown && !isShiftDown) {
+        // zoom the camera : apply mouse move
+        if (mode == MoveMode.Zoom) {
             this.zoomDelta -= delta.y * 0.0005;
         }
 
+        // zoom the camera : apply dropoff effect
         if (!GeonMath.isRougly(this.zoomDelta, 0, 0.001)) {
             hasChanged = true;
             this.zoom = Math.min(-0.001, this.zoom * (1 + this.zoomDelta));
             this.zoomDelta *= 0.9;
         }
-        this.scrollPrev = state.scrollValue; 
 
-        ////////////////////////////////
-
-        let relativeUnitZ = () => {
-            let m = Matrix4.newXRotation(-this.angleAlpha);
-            let m2 = Matrix4.newZRotation(-this.angleBeta);
-            return m2.multiplyVector(m.multiplyVector(Vector3.unitZ()));
+        // pan the camera : no dropoff
+        if (mode == MoveMode.Pan) {
+            hasChanged = true;
+            this.pos.add(this.getRelativeUnitX().scale(0.0005 * this.zoom * delta.x));
+            this.pos.add(this.getRelativeTrueUnitY().scale(0.0005 * this.zoom * -delta.y));
         }
 
-        let relativeTrueUnitY = () => {
-            let m = Matrix4.newXRotation(-this.angleAlpha);
-            let m2 = Matrix4.newZRotation(-this.angleBeta);
-            return m2.multiplyVector(m.multiplyVector(Vector3.unitY()));
-        }
+        return hasChanged;
+    }
 
-        let relativeUnitY = () => {
-            // let m = Matrix4.newXRotation(-this.angleAlpha);
-            let m = Matrix4.newZRotation(-this.angleBeta);
-            return m.multiplyVector(Vector3.unitY());
-        }
+    private updatePointerStyle() {
+        // if (isShiftDown && !isControlDown) {
+        //     state.setCursorStyle('move');
+        // } else if (!isShiftDown && isControlDown) {
+        //     if (delta.y > 0) {
+        //         state.setCursorStyle('zoom-out');
+        //     } else {
+        //         state.setCursorStyle('zoom-in');
+        //     }
+        // } else if (state.mouseRightDown) {
+        //     state.setCursorStyle('crosshair');
+        // } else {
+        //     state.setCursorStyle('default');
+        // }
+    }
 
-        let relativeUnitX = () => {
-            let m = Matrix4.newZRotation(-this.angleBeta);
-            return m.multiplyVector(Vector3.unitX());
-        }
+    private updateKeyboardControlsOld(state: InputState) {
+        
+        let hasChanged = false;
 
+        if (state.IsKeyPressed("r")) {
+            this.speed *= 2;
+        }
+        if (state.IsKeyPressed("f")) {
+            this.speed = Math.max(this.speed * 0.5, 0.1);
+        }
         if (!this.canMove) {
             return hasChanged;
         }
-
         if (state.IsKeyDown("s")) {
             hasChanged = true;
-            this.pos.add(relativeUnitY().scale(0.01 * this.speed));
+            this.pos.add(this.getRelativeUnitY().scale(0.01 * this.speed));
         }
         if (state.IsKeyDown("w")) {
             hasChanged = true;
-            this.pos.add(relativeUnitY().scale(-0.01 * this.speed));
+            this.pos.add(this.getRelativeUnitY().scale(-0.01 * this.speed));
         }
         if (state.IsKeyDown("a")) {
             hasChanged = true;
-            this.pos.add(relativeUnitX().scale(0.01 * this.speed));
+            this.pos.add(this.getRelativeUnitX().scale(0.01 * this.speed));
         }
         if (state.IsKeyDown("d")) {
             hasChanged = true;
-            this.pos.add(relativeUnitX().scale(-0.01 * this.speed));
+            this.pos.add(this.getRelativeUnitX().scale(-0.01 * this.speed));
         }
         if (state.IsKeyDown("q")) {
             hasChanged = true;
@@ -271,33 +405,10 @@ export class Camera {
             hasChanged = true;
             this.pos.z -= 0.01 * this.speed;
         }
-
-        // panning
-        if (state.mouseRightDown && !isControlDown && isShiftDown) {
-            
-            hasChanged = true;
-            this.pos.add(relativeUnitX().scale(0.0005 * this.zoom * delta.x));
-            this.pos.add(relativeTrueUnitY().scale(0.0005 * this.zoom * -delta.y));
-        }
-
-        if (isShiftDown && !isControlDown) {
-            state.setCursorStyle('move');
-        } else if (!isShiftDown && isControlDown) {
-            if (delta.y > 0) {
-                state.setCursorStyle('zoom-out');
-            } else {
-                state.setCursorStyle('zoom-in');
-            }
-        } else if (state.mouseRightDown) {
-            state.setCursorStyle('crosshair');
-        } else {
-            state.setCursorStyle('default');
-        }
-
         return hasChanged;
     }
 
-    
+    ///////////////////////////////////////////////////////////////////////////
 
     getCameraPoint(): Vector3 {
         return this.inverseWorldMatrix.multiplyVector(new Vector3(0, 0, 0));
@@ -347,9 +458,9 @@ export class Camera {
         return Ray.fromPoints(origin, screenPoint);
     }
 
-    getProjectionMatrix(canvas: HTMLCanvasElement): Matrix4 {
+    getProjectionMatrix(width: number, height: number): Matrix4 {
         // aspects
-        let aspect = canvas.width / canvas.height; // note: this should be constant
+        let aspect = width / height; // note: this should be constant
 
         // let z_plane = -1. / Math.tan(pi / 8.);
 
@@ -357,5 +468,28 @@ export class Camera {
         // let projection = Matrix4.newOrthographic(-1, 1, -1, 1, 0.1, 0.1);
         let projection = Matrix4.newPerspective(this.fov, aspect, this.zNear, this.zFar);
         return projection;
+    }
+
+    getRelativeUnitZ = () => {
+        let m = this.rotateXRev;
+        let m2 = this.rotateZRev;
+        return m2.multiplyVector(m.multiplyVector(Vector3.unitZ()));
+    }
+
+    getRelativeTrueUnitY = () => {
+        let m = this.rotateXRev;
+        let m2 = this.rotateZRev;
+        return m2.multiplyVector(m.multiplyVector(Vector3.unitY()));
+    }
+
+    getRelativeUnitY = () => {
+        // let m = Matrix4.newXRotation(-this.angleAlpha);
+        // let m = Matrix4.newZRotation(-this.angleBeta);
+        return this.rotateZRev.multiplyVector(Vector3.unitY());
+    }
+
+    getRelativeUnitX = () => {
+        // let m = Matrix4.newZRotation(-this.angleBeta);
+        return this.rotateZRev.multiplyVector(Vector3.unitX());
     }
 }

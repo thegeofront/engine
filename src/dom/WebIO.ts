@@ -22,7 +22,7 @@ export namespace WebIO {
 
     /**
      * Shorthand
-     * Fetch a url, and parse the response as json. will return empty string on encountering negative network responses 
+     * Fetch a url, and parse the response as text. will return empty string on encountering negative network responses 
      */
     export async function getText(url: string): Promise<string> {
         let res = await fetch(url);
@@ -35,7 +35,7 @@ export namespace WebIO {
 
     /**
      * Shorthand
-     * Fetch a url, and parse the response as json. will return empty blob on encountering negative network responses 
+     * Fetch a url, and parse the response as blobl. will return empty blob on encountering negative network responses 
      */
     export async function getBlob(url: string): Promise<Blob> {
         let res = await fetch(url);
@@ -48,12 +48,17 @@ export namespace WebIO {
 
     /**
      * Fetch a url as a blob, then process it to ImageData
+     * DOES NOT HANDLE ERRORS
+     * 
      * @param url 
      * @returns 
      */
     export async function getImage(url: string) : Promise<ImageData> {
         let blob = await getBlob(url);
-        return await loadImageFromBlob(blob);
+        let res = loadImageFromBlob(blob).catch((e) => {
+            return new ImageData(0,0);
+        });
+        return res;
     }
 
     /////////////////////////////////////////////////////////////////////////// Private

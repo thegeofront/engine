@@ -1,12 +1,12 @@
 import { Vector2 } from "../lib";
 import { Context } from "./Context";
 
-export type MouseAction = (e: MouseEvent) => void;
+export type MouseAction = (e?: MouseEvent) => void;
 
 export class MouseHandler {
 
-    pos: Vector2 = Vector2.zero();
-    delta: Vector2 = Vector2.zero();
+    private pos: Vector2 = Vector2.zero();
+    private delta: Vector2 = Vector2.zero();
     private posBefore: Vector2 = Vector2.zero();
 
     leftDown = false;
@@ -52,10 +52,6 @@ export class MouseHandler {
             e.stopPropagation();
         });
         document.addEventListener("wheel", (e) => this.onDomEventWheel(e));
-
-        document.addEventListener("touchmove", (e) => this.onDomEventTouchMove(e));
-        document.addEventListener("touchstart", (e) => this.onDomEventTouchStart(e));
-        document.addEventListener("touchend", (e) => this.onDomEventTouchEnd(e));
 
         c.addEventListener("blur", () => this.onDomEventBlur());
         c.addEventListener("focus", () => this.onDomEventFocus());
@@ -153,18 +149,6 @@ export class MouseHandler {
 
     private onDomEventWheel(e: Event) {
         // 
-    }
-
-    private onDomEventTouchMove(e: TouchEvent) {
-        e.preventDefault();
-    }
-
-    private onDomEventTouchStart(e: TouchEvent) {
-
-    }
-
-    private onDomEventTouchEnd(e: TouchEvent) {
-
     }
 
     private onDomEventBlur() {

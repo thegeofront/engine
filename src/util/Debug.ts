@@ -16,6 +16,15 @@ export namespace Debug {
 	export let Times = 0;
 	let TimesCount = 0;
 
+	/////////////////////////////////////////////////////////////////////////// Event based 
+
+	export function dispatch(message: string, type="my-log-event") {
+		let event = new CustomEvent(type, {
+			detail: {message},
+		});    
+		document.dispatchEvent(event);
+	}
+
 	/////////////////////////////////////////////////////////////////////////// Additions
 
 	export function logOnce(message?: any, ...optionalParams: any[]): void {

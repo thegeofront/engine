@@ -7,10 +7,11 @@ export class KeyboardHandler {
 
     constructor(
         public context: Context,
-        
+    
         private keysDown: Set<Key> = new Set(), // only keeps track of keys down who have a KeyDown action attached
+        private keysPressed: Set<Key> = new Set(), // only keeps track of keys down who have a KeyDown action attached
         private keysDownWithAction: Set<Key> = new Set(), // only keeps track of keys down who have a KeyDown action attached
-        
+
         private keyPressedActions: Map<Key, KeyAction> = new Map(),
         private keyDownActions: Map<Key, KeyAction> = new Map(),
         private keyUpActions: Map<Key, KeyAction> = new Map(),
@@ -28,6 +29,8 @@ export class KeyboardHandler {
         for (let key of this.keysDownWithAction) {
             this.keyDownActions.get(key)!();
         }
+
+
     }    
 
     ///////////////////////////////////////////////////////////////////////////
@@ -36,6 +39,9 @@ export class KeyboardHandler {
         return this.keysDown.has(key);
     }
         
+    isPressed(key: Key) {
+        return this.keysPressed.has(key);
+    }
 
     onDown(key: Key, action: KeyAction) {
         this.keyDownActions.set(key, action);
@@ -49,7 +55,7 @@ export class KeyboardHandler {
         this.keyUpActions.set(key, action);
     }
 
-    removeDowm(key: Key) {
+    removeDown(key: Key) {
         this.keyDownActions.delete(key);
     }
 
