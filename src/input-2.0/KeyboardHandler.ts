@@ -8,8 +8,11 @@ export class KeyboardHandler {
     constructor(
         public context: Context,
     
+        private keysDownPrev: Set<Key> = new Set(), // only keeps track of keys down who have a KeyDown action attached
         private keysDown: Set<Key> = new Set(), // only keeps track of keys down who have a KeyDown action attached
-        private keysPressed: Set<Key> = new Set(), // only keeps track of keys down who have a KeyDown action attached
+        private keysDownNew = new Array<Key>(),
+        
+        // private keysPressed: Set<Key> = new Set(), // only keeps track of keys down who have a KeyDown action attached
         private keysDownWithAction: Set<Key> = new Set(), // only keeps track of keys down who have a KeyDown action attached
 
         private keyPressedActions: Map<Key, KeyAction> = new Map(),
@@ -26,11 +29,24 @@ export class KeyboardHandler {
     }
 
     update() {
+        
+        // set current keydowns to the previous state
+        this.keysDownPrev.clear();
+        for (let key of this.keysDown) {
+            this.keysDownPrev.add(key);
+        }
+        
+        // update the downList with changes
+        for (let key of this.keysDownNew) {
+            this.keysDown.add(key);
+        }
+        this.keysDownNew = [];
+        // this.keyUpActions()
+
         for (let key of this.keysDownWithAction) {
             this.keyDownActions.get(key)!();
         }
-
-
+        
     }    
 
     ///////////////////////////////////////////////////////////////////////////
@@ -40,7 +56,8 @@ export class KeyboardHandler {
     }
         
     isPressed(key: Key) {
-        return this.keysPressed.has(key);
+        return this.keysDown.has(key) && !this.keysDownPrev.has(key);
+        // return this.keysPressed.has(key);
     }
 
     onDown(key: Key, action: KeyAction) {
@@ -54,6 +71,8 @@ export class KeyboardHandler {
     onUp(key: Key, action: KeyAction) {
         this.keyUpActions.set(key, action);
     }
+
+    ///////////////////////////////////////////////////////////////////////////
 
     removeDown(key: Key) {
         this.keyDownActions.delete(key);
@@ -81,6 +100,8 @@ export class KeyboardHandler {
 
     private onDomEventKeyDown(res: any) {
         let code = res.keyCode;
+        this.keysDownNew.push(code);
+        // this.keysDown.add(code);
         if (this.keysDownWithAction.has(code)) return; 
         
         // the key is freshly pressed
@@ -93,7 +114,6 @@ export class KeyboardHandler {
         if (this.keyDownActions.has(code)) {
             this.keysDownWithAction.add(code);
         }
-        this.keysDown.add(code);
     }
 
     private onDomEventKeyUp(res: any) {

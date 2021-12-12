@@ -1,6 +1,7 @@
 // author : Jos Feenstra
 // purpose : contain all logic regarding
 
+import { KeyboardHandler } from "../../input-2.0/KeyboardHandler";
 import { TouchHandler } from "../../input-2.0/TouchHandler";
 import { Vector3, Vector2, Plane, Matrix4, InputState, GeonMath, Ray, Matrix3, InputHandler, Debug, Key, Pointertype } from "../../lib";
 
@@ -13,6 +14,7 @@ enum MoveMode {
 
 
 export class Camera {
+
     pos: Vector3;
     offset: Vector3; // offset from rotation center
     angleAlpha = 0; // rotation x
@@ -26,6 +28,8 @@ export class Camera {
 
     // other consts
     speed = 10;
+    rotateSmoothener = 0.9; // 0: no smooth | 0.99: suuuuper smooth
+    scrollSmoothener = 0.9; // 0: no smooth | 0.99: suuuuper smooth
 
     worldPlane = Plane.WorldXY();
 
@@ -247,8 +251,8 @@ export class Camera {
 
             if (mode == MoveMode.Zoom) {
                 delta.x = 0;
-                delta.y = input.touch.zoomDelta;
-
+                delta.y = 0; // input.touch.zoomDelta
+                scrollDelta = input.touch.zoomDelta * 0.05;
             }
         } 
 
@@ -257,7 +261,7 @@ export class Camera {
         } 
 
         if (input.keys) {
-            
+            hasChanged2 = this.updateKeyboardControls(input.keys);
         }
 
         // [ rmb ] rotate the camera. we use a dropoff to make it smooth
@@ -320,16 +324,18 @@ export class Camera {
         // rotate the camera : we use a dropoff to make it smooth
         if (!this.rotateDropoffDelta.roughlyEquals(Vector2._zero, 0.1)) {
             hasChanged = true;
-            this.angleAlpha = GeonMath.clamp(this.angleAlpha + this.rotateDropoffDelta.y * 0.003, 0, Math.PI);
-            this.angleBeta += this.rotateDropoffDelta.x * -0.003;
-            this.rotateDropoffDelta.scale(0.9)
+            let rd = 0.003; // rotate dampner
+            this.angleAlpha = GeonMath.clamp(this.angleAlpha + this.rotateDropoffDelta.y * rd, 0, Math.PI);
+            this.angleBeta += this.rotateDropoffDelta.x * -rd;
+            this.rotateDropoffDelta.scale(this.rotateSmoothener)
         }
         
         // zoom the camera : apply scroll
         if (scrollDelta != 0) {
-            this.zoomDelta += scrollDelta * 0.08;
-            
+            let sd = 0.03; // scroll dampner
+            this.zoomDelta += scrollDelta * sd; 
         }
+
         // zoom the camera : apply mouse move
         if (mode == MoveMode.Zoom) {
             this.zoomDelta -= delta.y * 0.0005;
@@ -339,7 +345,7 @@ export class Camera {
         if (!GeonMath.isRougly(this.zoomDelta, 0, 0.001)) {
             hasChanged = true;
             this.zoom = Math.min(-0.001, this.zoom * (1 + this.zoomDelta));
-            this.zoomDelta *= 0.9;
+            this.zoomDelta *= this.scrollSmoothener;
         }
 
         // pan the camera : no dropoff
@@ -402,6 +408,46 @@ export class Camera {
             this.pos.z += 0.01 * this.speed;
         }
         if (state.IsKeyDown("e")) {
+            hasChanged = true;
+            this.pos.z -= 0.01 * this.speed;
+        }
+        return hasChanged;
+    }
+
+    private updateKeyboardControls(state: KeyboardHandler) {
+        
+        let hasChanged = false;
+
+        if (state.isPressed(Key.R)) {
+            this.speed *= 2;
+        }
+        if (state.isPressed(Key.F)) {
+            this.speed = Math.max(this.speed * 0.5, 0.1);
+        }
+        if (!this.canMove) {
+            return hasChanged;
+        }
+        if (state.isDown(Key.S)) {
+            hasChanged = true;
+            this.pos.add(this.getRelativeUnitY().scale(0.01 * this.speed));
+        }
+        if (state.isDown(Key.W)) {
+            hasChanged = true;
+            this.pos.add(this.getRelativeUnitY().scale(-0.01 * this.speed));
+        }
+        if (state.isDown(Key.A)) {
+            hasChanged = true;
+            this.pos.add(this.getRelativeUnitX().scale(0.01 * this.speed));
+        }
+        if (state.isDown(Key.D)) {
+            hasChanged = true;
+            this.pos.add(this.getRelativeUnitX().scale(-0.01 * this.speed));
+        }
+        if (state.isDown(Key.Q)) {
+            hasChanged = true;
+            this.pos.z += 0.01 * this.speed;
+        }
+        if (state.isDown(Key.E)) {
             hasChanged = true;
             this.pos.z -= 0.01 * this.speed;
         }

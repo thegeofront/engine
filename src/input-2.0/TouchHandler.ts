@@ -15,7 +15,8 @@ export class TouchHandler {
 
     zoomScore = 0;
     private distance = 0;
-    zoomDelta= 0;
+    zoomDelta = 0;
+    newDistance = 0;
 
     constructor(
         private context: Context,
@@ -74,25 +75,11 @@ export class TouchHandler {
         }
     }
 
-    private disId1 = 0;
-    private disId2 = 0;
-    private updateZoom(resetDelta = false) {
-        if (this.down < 2) return
-        var newDistance = this.fingers[0].pos.disTo(this.fingers[1].pos);
-
-        // if (resetDelta) {
-        //     Debug.dispatch(`resetDelta: ${resetDelta} delta: ${this.zoomDelta} distance: ${this.distance}`)
-        //     this.distance = newDistance;
-        //     this.zoomDelta = 0;
-        //     return;
-        // }
-
-        this.zoomDelta = this.distance - newDistance;
-        this.distance = newDistance;
-
-
+    private updateZoom() {
+        if (this.down < 2) return;
+        this.zoomDelta = this.distance - this.newDistance;
+        this.distance = this.newDistance;
         this.zoomScore += this.zoomDelta;
-
     }
 
     /////////////////////////////////////////////////////////////////////////// Finger updates
@@ -125,6 +112,12 @@ export class TouchHandler {
                 resetDelta = finger._updatePos(event);
                 break;
             }
+        }
+
+        // update pinch zoom stuff
+        this.newDistance = this.fingers[0].pos.disTo(this.fingers[1].pos)
+        if (resetDelta) {
+            this.distance = this.newDistance;
         }
     }
 
