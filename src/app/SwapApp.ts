@@ -5,7 +5,7 @@
 //          - making sure core deletes old apps
 
 import { Core } from "./Core";
-import { InputState } from "../input/InputState";
+import { InputState } from "../inputOld/InputState";
 import { UI } from "../dom/UI";
 import { App } from "./App";
 import { EnumParameter } from "../parametric/EnumParameter";

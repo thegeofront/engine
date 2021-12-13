@@ -1,4 +1,4 @@
-import { InputState } from "../input/InputState";
+import { InputState } from "../inputOld/InputState";
 import { UI } from "../dom/UI";
 import { InputHandler } from "../lib";
 

@@ -62,10 +62,16 @@ export * from "./image/Bitmap";
 export * from "./image/Kernels";
 export * from "./image/ImageProcessing";
 
-export * from "./input/InputState";
+export * from "./inputOld/InputState";
 
-export * from "./input-2.0/InputHandler";
-export * from "./input-2.0/Keys";
+export * from "./input/InputHandler";
+export * from "./input/KeyboardHandler";
+export * from "./input/Keys";
+export * from "./input/MouseHandler";
+export * from "./input/TouchHandler";
+export * from "./input/TimeHandler";
+export * from "./input/TouchHandler";
+export * from "./input/TouchFinger";
 
 export * from "./math/Domain";
 export * from "./math/Math";

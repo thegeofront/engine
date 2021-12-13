@@ -1,5 +1,5 @@
-import { TimeHandler } from "../input-2.0/TimeHandler";
-import { InputState } from "../input/InputState";
+import { TimeHandler } from "../input/TimeHandler";
+import { InputState } from "../inputOld/InputState";
 
 export class FpsCounter {
     fps = 0;
