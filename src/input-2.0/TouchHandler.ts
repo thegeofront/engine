@@ -50,6 +50,16 @@ export class TouchHandler {
         this.updateZoom();
     }
 
+    postUpdate() {
+
+    }
+
+    /////////////////////////////////////////////////////////////////////////// 
+
+    get tab() {
+        return this.down == 5 && this.fingers[4].pressed;
+    }
+
     /////////////////////////////////////////////////////////////////////////// Updates
 
     private updateFingers() {

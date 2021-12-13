@@ -1,5 +1,6 @@
 import { InputState } from "../input/InputState";
 import { UI } from "../dom/UI";
+import { InputHandler } from "../lib";
 
 export class App {
     gl: WebGLRenderingContext;
@@ -21,11 +22,11 @@ export class App {
         // additional setup of state
     }
 
-    update(state: InputState) {
+    update(input: InputHandler) {
         // updating state
     }
 
-    draw(gl: WebGLRenderingContext) {
+    draw() {
         // drawing state
     }
 }

@@ -5,8 +5,8 @@ export type MouseAction = (e?: MouseEvent) => void;
 
 export class MouseHandler {
 
-    private pos: Vector2 = Vector2.zero();
-    private delta: Vector2 = Vector2.zero();
+    pos: Vector2 = Vector2.zero();
+    delta: Vector2 = Vector2.zero();
     private posBefore: Vector2 = Vector2.zero();
 
     leftDown = false;
@@ -28,6 +28,13 @@ export class MouseHandler {
     onLeftUp?: MouseAction;
     onMiddleUp?: MouseAction;
     onRightUp?: MouseAction;
+
+    private scrollNew: number = 0;
+    scrollDelta: number = 0;
+
+    middleDownBefore = false;
+    rightDownBefore = false;
+    leftDownBefore = false;
 
     private constructor(
         public context: Context,
@@ -61,44 +68,42 @@ export class MouseHandler {
      * Call this before general game update calls
      */
     update() {
-        // // update mouse pos
-        if (!this.posBefore.equals(this.pos)) {
-            // mouse has moved during previous frame | try to not create new vectors every frame
 
-            this.delta.set(this.pos.x - this.posBefore.x, this.pos.y - this.posBefore.y);
-            this.posBefore.copy(this.pos);
-
-            // this.mousePos = this.mousePosBuffered.clone();
-            // this.mouseDelta = this.mousePos.subbed(this.mousePosPrev);
-            // this.mousePosPrev = this.mousePos.clone();
+        // normalize all scrolling behaviour
+        if (this.scrollNew != 0) {
+            // we are scrolling
+            let value = 0.1;
+            if (this.scrollNew < 0) value = -0.1;
+            this.scrollDelta = value;
+            this.scrollNew = 0;
         } else {
-            this.delta.x = 0;
-            this.delta.y = 0;
+            this.scrollDelta = 0;
         }
-
-        // // normalize all scrolling behaviour
-        // if (this.mouseScrollBuffered != 0) {
-        //     // we are scrolling
-        //     let value = 0.1;
-        //     if (this.mouseScrollBuffered < 0) value = -0.1;
-        //     this.scrollValue = Math.max(0, this.scrollValue + value);
-        //     this.mouseScrollDelta = value;
-        //     this.mouseScrollBuffered = 0;
-        // } else {
-        //     // this.mouseScrollBuffered = 0;
-        //     this.mouseScrollDelta = 0;
-        // }
     }
 
     /**
      * Has to be called after game update
     //  */
-    // postUpdate() {
+    postUpdate() {
+        this.leftDownBefore = this.leftDown;
+        this.rightDownBefore = this.rightDown;
+        this.middleDownBefore = this.middleDown;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+
+    get leftPressed() {
+        return this.leftDown && !this.leftDownBefore
+    }
     
-    //     this.leftDownBefore = this.leftDown;
-    //     this.rightDownBefore = this.rightDown;
-    //     this.middleDownBefore = this.MiddleDown;
-    // }
+    get rightPressed() {
+        return this.rightDown && !this.rightDownBefore
+    }
+
+    get middlePressed() {
+        return this.middleDown && !this.middleDownBefore
+    }
+
     ///////////////////////////////////////////////////////////////////////////
 
     private onDomEventMouseDown(e: MouseEvent) {
@@ -142,13 +147,12 @@ export class MouseHandler {
     }
 
     private onDomEventMouseMove(e: MouseEvent) {
-        // 
         this.pos.x = e.clientX;
         this.pos.y = e.clientY;
     }
 
-    private onDomEventWheel(e: Event) {
-        // 
+    private onDomEventWheel(e: WheelEvent) {
+        this.scrollNew = e.deltaY;
     }
 
     private onDomEventBlur() {

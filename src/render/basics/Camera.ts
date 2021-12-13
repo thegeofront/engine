@@ -2,6 +2,7 @@
 // purpose : contain all logic regarding
 
 import { KeyboardHandler } from "../../input-2.0/KeyboardHandler";
+import { MouseHandler } from "../../input-2.0/MouseHandler";
 import { TouchHandler } from "../../input-2.0/TouchHandler";
 import { Vector3, Vector2, Plane, Matrix4, InputState, GeonMath, Ray, Matrix3, InputHandler, Debug, Key, Pointertype } from "../../lib";
 
@@ -84,7 +85,7 @@ export class Camera {
     /**
      * New way of updating. Has touch support
      */
-    updateNew(state: InputHandler, forceUpdate = true) : boolean {
+    update(state: InputHandler, forceUpdate = true) : boolean {
         let hasChanged = this.updateControlsNew(state);
         if (hasChanged || forceUpdate) {
             this.updateMatrices(state.width, state.height); // TODO only move if we have changed
@@ -94,7 +95,7 @@ export class Camera {
         return hasChanged;
     }
 
-    update(state: InputState, forceUpdate = true) : boolean {
+    updateOld(state: InputState, forceUpdate = true) : boolean {
         let hasChanged = this.updateControlsOld(state);
         if (hasChanged || forceUpdate) {
             this.updateMatrices(state.canvas.width, state.canvas.height); // TODO only move if we have changed
@@ -245,6 +246,7 @@ export class Camera {
             mode = this.getMoveModeFromTouch(input.touch);
             if (input.touch.down > 0) {
                 delta = input.touch.fingers[0].delta;
+                this.mousePos.copy(input.touch.fingers[0].pos); 
             } else {
                 delta = Vector2.zero();
             }
@@ -257,20 +259,18 @@ export class Camera {
         } 
 
         if (input.mouse) {
-            
+            mode = this.getMoveModeFromKeyboardNew(input.keys!, input.mouse);
+            let prevPos = this.mousePos.clone();
+            let pos = input.mouse.pos.clone();
+            this.mousePos = pos;
+            delta = prevPos.clone().sub(this.mousePos);
+            this.scrollSmoothener = 0.90;
+            scrollDelta = input.mouse.scrollDelta * 3;
         } 
 
         if (input.keys) {
             hasChanged2 = this.updateKeyboardControls(input.keys);
         }
-
-        // [ rmb ] rotate the camera. we use a dropoff to make it smooth
-        // let isControlDown = state.IsKeyDown('control');
-        // let isShiftDown = state.IsKeyDown('shift');
-        // if (state.mouseRightDown && !isControlDown && !isShiftDown) {
-        //     hasChanged = delta.y != 0 || delta.x != 0;
-        //     this.rotateDropoffDelta.copy(delta);
-        // }
 
         hasChanged1 = this.updatePointerControls(mode, delta, scrollDelta);
         this.updatePointerStyle();
@@ -307,6 +307,24 @@ export class Camera {
             return MoveMode.None;
         }
     }
+
+    private getMoveModeFromKeyboardNew(keys: KeyboardHandler, mouse: MouseHandler) : MoveMode {
+        
+        let isMouseRightDown = mouse.rightDown; 
+        let isControlDown = keys.isDown(Key.Ctrl);
+        let isShiftDown = keys.isDown(Key.Shift);
+        
+        if (isMouseRightDown && !isControlDown && !isShiftDown) {
+            return MoveMode.Rotate;
+        } else if (isMouseRightDown && isControlDown && !isShiftDown) {
+            return MoveMode.Zoom;
+        } else if (isMouseRightDown && !isControlDown && isShiftDown) {
+            return MoveMode.Pan;
+        } else {
+            return MoveMode.None;
+        }
+    }
+
 
     private updatePointerControls(mode: MoveMode, delta: Vector2, scrollDelta: number) : boolean {
 

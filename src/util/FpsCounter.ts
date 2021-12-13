@@ -24,8 +24,8 @@ export class FpsCounter {
         }
     }
 
-    update(state: InputState | TimeHandler) {
-        this._update(state.tick);
+    update(dt: number) {
+        this._update(dt);
     }
 
     setFps() {

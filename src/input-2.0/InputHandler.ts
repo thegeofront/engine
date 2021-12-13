@@ -80,4 +80,9 @@ export class InputHandler {
         this.keys?.update();
         this.pointer.update(this.time.tick);
     }  
+
+    postUpdate() {
+        this.keys?.postUpdate();
+        this.pointer.postUpdate();
+    }
 }

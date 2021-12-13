@@ -2,16 +2,15 @@
 // Purpose: The Core app. This can hold multiple other apps with their own Update and Draw calls.
 // Use this to switch between Apps, or run multiple Apps.
 
-import { InputState } from "../input/InputState";
 import { App } from "./App";
 import { FpsCounter } from "../util/FpsCounter";
 import { UI } from "../dom/UI";
-import { HelpGl } from "../lib";
+import { HelpGl, InputHandler } from "../lib";
 
 export class Core {
     canvas: HTMLCanvasElement;
     gl: WebGLRenderingContext;
-    state: InputState;
+    input: InputHandler;
     ui: UI;
     fpsCounter: FpsCounter;
 
@@ -23,7 +22,7 @@ export class Core {
     constructor(canvas: HTMLCanvasElement, gl: WebGLRenderingContext, uiFrame: HTMLDivElement) {
         this.canvas = canvas;
         this.gl = gl;
-        this.state = new InputState(canvas);
+        this.input = InputHandler.fromCanvas(canvas);
         this.fpsCounter = new FpsCounter();
         this.ui = new UI(uiFrame);
         this.apps = new Map();
@@ -49,12 +48,12 @@ export class Core {
     }
 
     update(time: number) {
-        this.state.preUpdate(time);
-        this.fpsCounter.update(this.state);
+        this.input.update();
+        this.fpsCounter.update(this.input.time.tick);
         this.apps.forEach((app) => {
-            app.update(this.state);
+            app.update(this.input);
         });
-        this.state.postUpdate();
+        this.input.postUpdate();
     }
 
     draw(clear=true) {
@@ -83,7 +82,7 @@ export class Core {
         // render all apps
         // TODO : reverse order
         this.apps.forEach((app) => {
-            app.draw(this.gl);
+            app.draw();
         });
     }
 }

@@ -9,6 +9,7 @@ import { InputState } from "../input/InputState";
 import { UI } from "../dom/UI";
 import { App } from "./App";
 import { EnumParameter } from "../parametric/EnumParameter";
+import { InputHandler, Key } from "../lib";
 
 export class SwapApp extends App {
     possibleApps: any[];
@@ -76,8 +77,8 @@ export class SwapApp extends App {
         this.core.addApp(app);
     }
 
-    update(state: InputState) {
-        if (state.IsKeyPressed("m")) {
+    update(state: InputHandler) {
+        if (state.keys?.isPressed(Key.M)) {
             // simple toggle
             this.core.ui.toggleVisibility();
         }

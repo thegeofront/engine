@@ -49,6 +49,10 @@ export class KeyboardHandler {
         
     }    
 
+    postUpdate() {
+        
+    }
+
     ///////////////////////////////////////////////////////////////////////////
 
     isDown(key: Key) {
