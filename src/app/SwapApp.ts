@@ -80,7 +80,7 @@ export class SwapApp extends App {
     update(state: InputHandler) {
         if (state.keys?.isPressed(Key.M)) {
             // simple toggle
-            this.core.ui.toggleVisibility();
+            // this.core.ui.toggleVisibility();
         }
     }
 }

@@ -11,7 +11,7 @@ export class Core {
     canvas: HTMLCanvasElement;
     gl: WebGLRenderingContext;
     input: InputHandler;
-    ui: UI;
+    // ui: UI;
     fpsCounter: FpsCounter;
 
     fullscreen = true;
@@ -19,12 +19,12 @@ export class Core {
 
     private apps: Map<string, App>;
 
-    constructor(canvas: HTMLCanvasElement, gl: WebGLRenderingContext, uiFrame: HTMLDivElement) {
+    constructor(canvas: HTMLCanvasElement, gl: WebGLRenderingContext) {
         this.canvas = canvas;
         this.gl = gl;
         this.input = InputHandler.fromCanvas(canvas);
         this.fpsCounter = new FpsCounter();
-        this.ui = new UI(uiFrame);
+        // this.ui = new UI(uiFrame);
         this.apps = new Map();
         this.gl.clearColor(0, 0, 0, 0);
     }
@@ -36,14 +36,14 @@ export class Core {
     }
 
     removeApp(appName: string) {
-        this.ui.removeContext(appName);
+        // this.ui.removeContext(appName);
         this.apps.delete(appName);
     }
 
     activateApp(app: App) {
-        this.ui.addContext(app.name);
-        this.ui.addText(app.description);
-        app.ui(this.ui);
+        // this.ui.addContext(app.name);
+        // this.ui.addText(app.description);
+        // app.ui(this.ui);
         app.start();
     }
 

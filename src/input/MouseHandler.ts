@@ -1,4 +1,4 @@
-import { Vector2 } from "../lib";
+import { Debug, Vector2 } from "../lib";
 import { Context } from "./Context";
 
 export type MouseAction = (e?: MouseEvent) => void;
@@ -107,10 +107,10 @@ export class MouseHandler {
     ///////////////////////////////////////////////////////////////////////////
 
     private onDomEventMouseDown(e: MouseEvent) {
-        e.preventDefault();
-        e.stopPropagation();
+        // e.preventDefault();
+        // e.stopPropagation();
 
-        this.context.focus();
+        // this.context.focus();
         let code = e.buttons;
         if (code >= 4) {
             code -= 4;
@@ -127,7 +127,6 @@ export class MouseHandler {
             if (!this.leftDown && this.onLeftPressed) this.onLeftPressed(e);
             this.leftDown = true;
         }
-        return false;
     }
 
     private onDomEventMouseUp(e: MouseEvent) {
@@ -156,10 +155,10 @@ export class MouseHandler {
     }
 
     private onDomEventBlur() {
-
+        Debug.log("focus!");
     }
 
     private onDomEventFocus() {
-
+        Debug.log("blur!");
     }
 }

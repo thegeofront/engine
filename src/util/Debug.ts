@@ -16,6 +16,54 @@ export namespace Debug {
 	export let Times = 0;
 	let TimesCount = 0;
 
+	/////////////////////////////////////////////////////////////////////////// Create a hook
+	
+	let _onLogListener: (message: string, log: string) => void | undefined;
+
+	let _onErrorListener: (message: string) => void | undefined;
+
+	/**
+	 * Highjack Debug.log, Debug.error, Debug.info and Debug.warn. This highjack ignores the active status of regular logging
+	 */
+	export function setLogListener(listener: (message: string, log: string) => void) {
+		_onLogListener = listener;
+	}
+
+	export function setErrorListener(listener: (message: string) => void) {
+		_onErrorListener = listener;
+	}
+
+	/**
+	 * DANGEROUS.
+	 * Does not work if no log listener has been defined 
+	 */
+	export function forceLogListenerUponConsole() {
+		if (!hasLogListener()) return;
+
+		console.log = (m, p) => onLog("log", m, p);
+		console.info = (m, p) => onLog("info", m, p);
+		console.warn = (m, p) => onLog("warn", m, p);
+		console.error = (m, p) => onLog("error", m, p);
+	}	
+
+	function hasLogListener() : Boolean {
+		return (_onLogListener != undefined);
+	}
+
+	function hasErrorListener() : Boolean {
+		return (_onErrorListener != undefined);
+	}
+
+	function onLog(tag: string, message?: any, ...optionalParams: any[]) {
+		if (!_onLogListener) return;
+		_onLogListener(`${String([message, ...optionalParams])}`, tag)
+	}
+
+	function onError(tag: string, message?: any, ...optionalParams: any[]) {
+		if (!_onErrorListener) return;
+		_onErrorListener(`${String([message, ...optionalParams])}`)
+	}
+
 	/////////////////////////////////////////////////////////////////////////// Event based 
 
 	export function dispatch(message: string, type="my-log-event") {
@@ -81,6 +129,8 @@ export namespace Debug {
 	}
 
 	export function error(message?: any, ...optionalParams: any[]): void {
+		if (hasLogListener()) onLog("error", message, optionalParams);
+		if (hasErrorListener()) onError("error", message, optionalParams);
 		if (!Active) return;
 		console.error(message, ...optionalParams)
 	}
@@ -101,11 +151,13 @@ export namespace Debug {
 	}
 
 	export function info(message?: any, ...optionalParams: any[]): void {
+		if (hasLogListener()) onLog("error", message, optionalParams);
 		if (!Active) return;
 		console.info(message, ...optionalParams);
 	}
 
 	export function log(message?: any, ...optionalParams: any[]): void {
+		if (hasLogListener()) onLog("error", message, optionalParams);
 		if (!Active) return;
 		console.log(message, ...optionalParams);
 	}
@@ -141,6 +193,7 @@ export namespace Debug {
 	}
 
 	export function warn(message?: any, ...optionalParams: any[]): void {
+		if (hasLogListener()) onLog("error", message, optionalParams);
 		if (!Active) return;
 		console.warn(message, ...optionalParams);
 	}

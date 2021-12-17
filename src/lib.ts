@@ -25,6 +25,7 @@ export * from "./data/Pool";
 
 export * from "./dom/IO";
 export * from "./dom/UI";
+export * from "./dom/WebIO";
 
 export * from "./geometry/Geometry";
 export * from "./geometry/Intersect";
@@ -53,6 +54,8 @@ export * from "./geometry/mesh/MultiLine";
 export * from "./geometry/mesh/Mesh";
 export * from "./geometry/mesh/ShaderMesh";
 export * from "./geometry/mesh/TopoMesh";
+
+export * from "./geometry/mesh/ObjProcessing";
 
 // export * from "./geometry/solid";
 
@@ -106,6 +109,8 @@ export * from "./render/shaders/PhongShader";
 export * from "./render/shaders/TemplateShader";
 export * from "./render/shaders/ZebraShader";
 export * from "./render/shaders/SkyBoxShader";
+
+
 
 export * from "./render/webgl/DrawTarget";
 export * from "./render/webgl/Attribute";

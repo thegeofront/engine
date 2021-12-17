@@ -1,9 +1,9 @@
 // author : Jos Feenstra
 // purpose : contain all logic regarding
 
-import { KeyboardHandler } from "../../input-2.0/KeyboardHandler";
-import { MouseHandler } from "../../input-2.0/MouseHandler";
-import { TouchHandler } from "../../input-2.0/TouchHandler";
+import { KeyboardHandler } from "../../input/KeyboardHandler";
+import { MouseHandler } from "../../input/MouseHandler";
+import { TouchHandler } from "../../input/TouchHandler";
 import { Vector3, Vector2, Plane, Matrix4, InputState, GeonMath, Ray, Matrix3, InputHandler, Debug, Key, Pointertype } from "../../lib";
 
 enum MoveMode {

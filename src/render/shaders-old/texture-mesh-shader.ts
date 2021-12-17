@@ -25,7 +25,7 @@ export class TextureMeshShader extends OldShader<ShaderMesh> {
     texture: WebGLTexture | null;
     u_texture_size: WebGLUniformLocation;
 
-    constructor(gl: WebGLRenderingContext) {
+    constructor(gl: WebGLRenderingContext, pixelPerfect = true) {
         const vs = `
         // precision mediump int;
         // precision mediump float;
@@ -44,8 +44,7 @@ export class TextureMeshShader extends OldShader<ShaderMesh> {
         `;
 
         let fs;
-        let pixelPerfext = true;
-        if (pixelPerfext) {
+        if (pixelPerfect) {
             fs = `
             precision mediump float;
     
@@ -108,8 +107,8 @@ export class TextureMeshShader extends OldShader<ShaderMesh> {
         this.texture = gl.createTexture();
     }
 
-    static new(gl: WebGLRenderingContext): TextureMeshShader {
-        return new TextureMeshShader(gl);
+    static new(gl: WebGLRenderingContext, pixelPerfect = true): TextureMeshShader {
+        return new TextureMeshShader(gl, pixelPerfect);
     }
 
     set(r: ShaderMesh, speed: DrawSpeed) {
