@@ -155,10 +155,10 @@ export class MouseHandler {
     }
 
     private onDomEventBlur() {
-        Debug.log("focus!");
+        Debug.log("blur!");
     }
 
     private onDomEventFocus() {
-        Debug.log("blur!");
+        Debug.log("focus!");
     }
 }

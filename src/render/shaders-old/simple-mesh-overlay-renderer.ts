@@ -20,7 +20,7 @@ export class SimpleMeshOverlayRenderer extends OldShader<ShaderMesh> {
     count: number;
     size: number;
 
-    constructor(gl: WebGLRenderingContext, color = [1, 0, 0, 0.25]) {
+    constructor(gl: WebGLRenderingContext, color = [1, 0, 0, 0.25], forcedZ=0.0001) {
         const vs = `
         precision mediump int;
         precision mediump float;
@@ -31,7 +31,7 @@ export class SimpleMeshOverlayRenderer extends OldShader<ShaderMesh> {
 
         void main() {
             gl_Position = u_transform * a_position;
-            gl_Position.z = 0.0001;
+            gl_Position.z = ${forcedZ};
         }
         `;
 
