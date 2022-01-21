@@ -1,6 +1,5 @@
-// purpose: wrapper around Camera, Lights, and Combo's
-// Purpose: Experiment: a collection of renderers, things to render, and Camera's, as common as many 3d engines
-// NOTE:    for now, just the camera lives in here
+// purpose: wrapper around Camera, Lights, and the Sun
+//          This is all the data a typical shader requires at render time
 
 import { Color } from "../../image/Color";
 import { Vector3 } from "../../lib";
