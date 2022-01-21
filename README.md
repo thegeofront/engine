@@ -1,7 +1,5 @@
 # Geon Engine
-A no-dependency 3D engine for delivering interactive 3d experiences on the web. 
-Think barebones three.js, but with a focus on parametric design / procedural generation.
-
+A no-dependency 3D engine for delivering interactive 3d experiences on the web. Can be used for procedural generation, Scientific calculations, modelling, and as a game engine.
 
 ## Demo
 [online](http://josfeenstra.nl/project/geon/)
