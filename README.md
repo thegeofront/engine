@@ -23,16 +23,14 @@ However, this makes it hard to make changes on the fly. This is why this uncommo
 
 --------------------------------------------------------------------
 
-## TODO
+## Roadmap
 
-- [✔️] Refactor entire codebase to make it look more like `three.js`
-- [ ] Image Processing
+- [✔️] Refactor the render codebase
+- [✔️] Image Processing
 - [ ] Build a blender-style glossy mesh shader with filleted edges
 - [ ] Create a maze using marching cubes
-- [ ] 
-- [ ]
 
-
+<!--
 ## Notes
 
 - We need things like a `Entity`, which has a `Model`, which has a `Material` + `Mesh`, which should include all needed info for a `Shader`.
@@ -42,7 +40,7 @@ However, this makes it hard to make changes on the fly. This is why this uncommo
   - can be done by decoupled loaders, like: `shader.loadCamera` / `shader.loadModel` / `shader.loadMaterial`. 
 - TODO: create an `InstanceRenderer()`, which accepts 1 model and a whole bunch of position matrices.
   - Try to render a whole forest with them
-
+ -->
 _____________________________________________________________
 ⚙️ = Busy | ✔️= DONE 
 
