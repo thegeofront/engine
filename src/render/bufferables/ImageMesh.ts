@@ -1,4 +1,4 @@
-import { Bitmap, Vector3, ShaderMesh, Plane, Domain2, Rectangle3, Mesh } from "../../lib";
+import { Bitmap, Vector3, ShaderMesh, Plane, Domain2, Rectangle3, Mesh, WebIO, IO } from "../../lib";
 import { Bufferable } from "../basics/Bufferable";
 
 /**

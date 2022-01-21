@@ -11,7 +11,7 @@ import { DotShader } from "../shaders-old/dot-shader";
 import { LineShader } from "../shaders-old/line-shader";
 import { MeshDebugShader } from "../shaders-old/mesh-debug-shader";
 import { ShadedMeshShader } from "../shaders-old/shaded-mesh-shader";
-import { Circle3, Scene } from "../../lib";
+import { Circle3, IO, Scene } from "../../lib";
 import { OldShader } from "../OldShader";
 import { DrawSpeed, WebGl } from "../webgl/HelpGl";
 import { Billboard, BillboardPayload, BillboardShader } from "../shaders/BillboardShader";
@@ -172,6 +172,10 @@ export class DebugRenderer {
             //@ts-ignore
             shader.set(unit);
         } else if (unit instanceof ImageMesh) {
+
+            // FOR DEBUGGING
+            IO.promptDownloadImage(key + ".png", unit.image.toImageData());
+
             //@ts-ignore
             shader.set(unit.buffer(), DrawSpeed.StaticDraw);
         } else if (unit instanceof Entity) {

@@ -72,6 +72,19 @@ export class IO {
     }
 
     /**
+     * A dumb hack to trigger a file download
+     */
+    static async promptDownloadImage(file: string, imageData: ImageData) {
+        let element = document.createElement("a");
+        let image = await imageDataToImage(imageData);
+        element.setAttribute("href", image.src);
+        element.setAttribute("download", file);
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+    }
+
+    /**
      * A procedure specific to scans
      * TODO : fix this
      * @deprecated
@@ -102,7 +115,7 @@ export class IO {
             let img = document.createElement("img") as HTMLImageElement;
             img.src = src;
     
-            img.onload = () => resolve(loadImageHelper2(img));
+            img.onload = () => resolve(imageToImageData(img));
             img.onerror = () => reject(new Error(`Script load error for ${img}`));
         });
     }
@@ -230,7 +243,7 @@ export function loadImageFromSrc(src: string): Promise<ImageData> {
         img.crossOrigin = "Anonymous";
         img.src = src;
 
-        img.onload = () => resolve(loadImageHelper2(img));
+        img.onload = () => resolve(imageToImageData(img));
         img.onerror = () => reject(new Error(`Script load error for ${img}`));
     });
 }
@@ -241,12 +254,12 @@ function loadImageHelper1(fileReader: FileReader): Promise<ImageData> {
         img.src = fileReader.result as string;
         img.crossOrigin = "Anonymous";
 
-        img.onload = () => resolve(loadImageHelper2(img));
+        img.onload = () => resolve(imageToImageData(img));
         img.onerror = () => reject(new Error(`Script load error for ${img}`));
     });
 }
 
-function loadImageHelper2(image: HTMLImageElement): ImageData {
+function imageToImageData(image: HTMLImageElement): ImageData {
     // turn it into image data by building a complete canvas and sampling it
     let canvas = document.createElement("canvas")!;
     canvas.width = image.width;
@@ -256,4 +269,21 @@ function loadImageHelper2(image: HTMLImageElement): ImageData {
     let data = ctx.getImageData(0, 0, image.width, image.height);
     canvas.parentNode?.removeChild(canvas);
     return data;
+}
+
+
+async function imageDataToImage(imagedata: ImageData) : Promise<HTMLImageElement> {
+    var canvas = document.createElement('canvas')!;
+    var ctx = canvas.getContext('2d')!;
+    canvas.width = imagedata.width;
+    canvas.height = imagedata.height;
+    ctx.putImageData(imagedata, 0, 0);
+
+    var image = new Image();
+    image.src = canvas.toDataURL("image/png");
+   
+    return new Promise(function (resolve, reject) {
+        image.onload = () => resolve(image);
+        image.onerror = () => reject(new Error(`could not convert image data to image`));
+    });
 }
