@@ -14,7 +14,6 @@
 //   - aka, twins are implicit: 0 -> 1 & 1 -> 0 OR 21 -> 20 & 20 -> 21
 
 import { HashTable } from "../../data/HashTable";
-import { IntMatrix } from "../../data/IntMatrix";
 import { Plane } from "../primitives/Plane";
 import { Const } from "../../math/Const";
 import { Matrix4 } from "../../math/Matrix4";
@@ -221,9 +220,9 @@ export class Graph {
         return data;
     }
 
-    allVertLoops(): IntMatrix {
-        throw "TODO";
-    }
+    // allVertLoops(): IntMatrix {
+    //     throw "TODO";
+    // }
 
     allVertLoopsAsInts(): VertIndex[][] {
         // TODO speed this up
@@ -729,6 +728,33 @@ export class Graph {
             let b = this.getVert(edges[i * 2 + 1]);
             callback(a.pos, b.pos);
         }
+    }
+
+    meshify(): Mesh {
+        // init result
+        let meshes: Mesh[] = [];
+    
+        // per quad
+        let loops = this.allVertLoopsAsInts();
+        for (let i = 0; i < loops.length; i++) {
+            const loop = loops[i];
+            if (loop.length < 3) {
+                console.log("invalids");
+                continue;
+            }
+            let m: Mesh;
+            if (loop.length == 3) {
+                let vecs = loop.map((j) => this.getVertexPos(j));
+                m = Mesh.newTriangle([vecs[0], vecs[1], vecs[2]]);
+            } else {
+                let vecs = loop.map((j) => this.getVertexPos(j));
+                m = Mesh.newQuad([vecs[0], vecs[3], vecs[1], vecs[2]]);
+            }
+            meshes.push(m);
+        }
+    
+        let rend = Mesh.fromJoin(meshes);
+        return rend;
     }
 }
 

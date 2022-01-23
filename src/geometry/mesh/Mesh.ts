@@ -242,6 +242,10 @@ export class Mesh extends Geometry {
         return mesh;
     }
 
+    static newTriangle(corners: Vector3[]) {
+        return this.fromLists(corners, [0,1,2]);
+    }
+
     static newQuad(corners: Vector3[]) {
         let faces = [...quadToTri(cubeFaces[0])];
         return this.fromLists(corners, faces);
@@ -961,6 +965,7 @@ const cubeUVS = [
     [0.0, 1.0],
     [1.0, 1.0],
 ]
+
 
 export function quadToTri(abcd: number[]): number[] {
     return [abcd[0], abcd[2], abcd[1], abcd[0], abcd[3], abcd[2]];

@@ -174,7 +174,7 @@ export class DebugRenderer {
         } else if (unit instanceof ImageMesh) {
 
             // FOR DEBUGGING
-            IO.promptDownloadImage(key + ".png", unit.image.toImageData());
+            // IO.promptDownloadImage(key + ".png", unit.image.toImageData());
 
             //@ts-ignore
             shader.set(unit.buffer(), DrawSpeed.StaticDraw);
