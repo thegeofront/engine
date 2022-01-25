@@ -83,22 +83,28 @@ export class Perlin {
     private inc(num: number): number {
         num++;
         if (this.repeat > 0) num %= this.repeat;
-
         return num;
     }
 
-    public octaveNoise(x: number, y: number, z: number, octaves: number, persistence: number) {
+    public leveledNoise() {
+
+        // input 0.2, 0.5, 0.8,
+        // bouw plateaus op deze hoogtes
+        // 
+    }
+
+    public octaveNoise(x: number, y: number, z: number, offset=1, frequency=1, amplitude=1, octaves=1, octaveBlend=0.5) {
         let total = 0;
-        let frequency = 1;
-        let amplitude = 1;
-        let maxValue = 0;  // Used for normalizing result to 0.0 - 1.0
-        for (let i=0 ; i<octaves ; i++) {
-            total += this.noise(x * frequency, y * frequency, z * frequency) * amplitude;
+        let maxValue = 0;  
+        for (let i = 0 ; i < octaves ; i++) {
+            total += this.noise(
+                x * frequency + offset, 
+                y * frequency + offset, 
+                z * frequency + offset) * amplitude;
             maxValue += amplitude;
-            amplitude *= persistence;
+            amplitude *= octaveBlend;
             frequency *= 2;
         }
-        
         return total/maxValue;
     }
 
