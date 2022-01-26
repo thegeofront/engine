@@ -4,7 +4,6 @@
 import { Matrix4 } from "../../lib";
 import { Model } from "./Model";
 
-
 export class Entity {
     
     constructor(

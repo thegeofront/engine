@@ -621,8 +621,9 @@ export class Matrix4 extends FloatMatrix {
         return matrix;
     }
 
-    toXform(xform=Transform.new()) : Transform {
-        return xform
+    toTransform(xform=Transform.new()) : Transform {
+        xform.setWithMatrix(this);
+        return xform;
     }
 
     determinant(): number {
@@ -687,7 +688,7 @@ export class Matrix4 extends FloatMatrix {
         var m31 = m[3 * 4 + 1];
         var m32 = m[3 * 4 + 2];
         var m33 = m[3 * 4 + 3];
-        
+
         var tmp_0 = m22 * m33;
         var tmp_1 = m32 * m23;
         var tmp_2 = m12 * m33;
