@@ -36,6 +36,10 @@ export class Transform {
         return tf;
     }
 
+    buffer() {
+        
+    }
+
     setWithMatrix(mat: Matrix4) {
         this._m = mat;
         

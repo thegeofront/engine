@@ -1,5 +1,6 @@
 import { Color } from "../../image/Color";
 import { Bitmap, Entity, Matrix3, Matrix4, Mesh, meshFromObj, ShaderMesh, Vector3 } from "../../lib";
+import { Transform } from "../../math/Transform";
 import { Material } from "../basics/Material";
 import { Model } from "../basics/Model";
 import { Scene } from "../basics/Scene";
@@ -142,7 +143,7 @@ export class PhongShader extends ShaderProgram<Entity> {
     }
 
     protected onLoad(e: Entity, speed: DrawSpeed): number {
-        this.loadPosition(e.position);
+        this.loadTransform(e.xform);
         this.loadMesh(e.model.mesh, speed);
         this.loadMaterial(e.model.material);
         return e.model.mesh.maxSize;
@@ -153,11 +154,11 @@ export class PhongShader extends ShaderProgram<Entity> {
         this.attributes.load("occlusion", data, speed);
     }
 
-    public loadPosition(position: Matrix4) {
+    public loadTransform(xform: Transform | Matrix4) {
         this.useProgram();
         // let euler = position.decompose()[1];
         // let rotation = Matrix3.newRotation(euler);
-        this.uniforms.loadMatrix4("modelMatrix", position);
+        this.uniforms.loadMatrix4("modelMatrix", xform instanceof Transform ? xform.toMatrix() : xform);
     }
 
     public loadMesh(mesh: Mesh, speed: DrawSpeed) {

@@ -23,6 +23,6 @@ export class Model {
      * Spawns an entity equiped with this model
      */
     spawn() {
-        return Entity.new(Matrix4.newIdentity(), this);
+        return Entity.new(undefined, this);
     }
 }

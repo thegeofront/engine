@@ -8,6 +8,7 @@ export class Quaternion {
     z: number;
     w: number;
 
+
     constructor(x: number, y: number, z: number, w: number) {
         this.x = x;
         this.y = y;
@@ -15,11 +16,18 @@ export class Quaternion {
         this.w = w;
     }
 
+
     static new() {
         return new Quaternion(0, 0, 0, 1);
     }
 
-    setWithIndex(i: number, value: number) {
+
+    static fromEuler(yaw: number, pitch: number, roll: number) {
+        return new Quaternion(0,0,0,1).setEuler(yaw, pitch, roll);      
+    }
+
+
+    private setIndex(i: number, value: number) {
         switch(i) {
             case 0:
                 this.x = value;
@@ -36,6 +44,39 @@ export class Quaternion {
             default: 
                 return;
         } 
+    }
+
+    add(other: Quaternion) {
+        this.x += other.x;
+        this.y += other.y;
+        this.z += other.z;
+        this.w += other.w;
+        return this;
+    }
+
+    addN(x=0.0, y=0.0, z=0.0, w=0.0) {
+        this.x += x;
+        this.y += y;
+        this.z += z;
+        this.w += w;
+        return this;
+    }
+
+    setEuler(yaw: number, pitch: number, roll: number) {
+        const halfYaw = yaw * 0.5;
+        const halfPitch = pitch * 0.5;
+        const halfRoll = roll * 0.5;
+        const cosYaw   = Math.cos(halfYaw);
+        const sinYaw   = Math.sin(halfYaw);
+        const cosPitch = Math.cos(halfPitch);
+        const sinPitch = Math.sin(halfPitch);
+        const cosRoll  = Math.cos(halfRoll);
+        const sinRoll  = Math.sin(halfRoll);
+        this.x = cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw;
+        this.y = cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw;
+        this.z = sinRoll * cosPitch * cosYaw - cosRoll * sinPitch * sinYaw;
+        this.w = cosRoll * cosPitch * cosYaw + sinRoll * sinPitch * sinYaw;
+        return this;
     }
 
     /**
@@ -83,11 +124,12 @@ export class Quaternion {
             const k = (i + 2) % 3;
             
             let s = Math.sqrt(r[index(i, i)] - r[index(j, j)] - r[index(k, k)] + 1.0);
-            this.setWithIndex(i, s * 0.5);
+            this.setIndex(i, s * 0.5);
             s = 0.5 / s;
-            this.setWithIndex(j, (r[index(j, i)] + r[index(i, j)]) * s);
-            this.setWithIndex(k, (r[index(k, i)] + r[index(i, k)]) * s);
+            this.setIndex(j, (r[index(j, i)] + r[index(i, j)]) * s);
+            this.setIndex(k, (r[index(k, i)] + r[index(i, k)]) * s);
             this.w = (r[index(k, j)] - r[index(j, k)]) * s;
         }
+        return this;
     }
 }

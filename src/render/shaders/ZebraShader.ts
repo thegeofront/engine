@@ -105,7 +105,7 @@ export class ZebraShader extends ShaderProgram<Entity> {
     }
 
     protected onLoad(e: Entity, speed: DrawSpeed): number {
-        this.loadPosition(e.position);
+        this.loadPosition(e.xform.toMatrix());
         this.loadMesh(e.model.mesh, speed);
         return e.model.mesh.maxSize;
     }
