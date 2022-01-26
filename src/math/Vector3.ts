@@ -16,6 +16,10 @@ export class Vector3 {
         return new Vector3(x, y, z);
     }
 
+    static ones() {
+        return new Vector3(1,1,1);
+    }
+    
     get data() {
         return [this.x,this.y,this.z]; 
     }
@@ -412,3 +416,7 @@ export class Vector3 {
 }
 
 const _vector = new Vector3(0, 0, 0);
+
+export function calcLength(x: number,y: number,z: number) {
+    return Math.sqrt(x * x + y * y + z * z)
+}

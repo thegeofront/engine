@@ -112,7 +112,7 @@ export class ZebraShader extends ShaderProgram<Entity> {
 
     public loadPosition(position: Matrix4) {
         this.useProgram();
-        let euler = position.decompose()[1];
+        // let euler = position.toXform();
         // let rotation = Matrix3.newRotation(euler);
         this.uniforms.loadMatrix4("modelMatrix", position);
         this.uniforms.loadMatrix3("normalMatrix", Matrix3.newIdentity());

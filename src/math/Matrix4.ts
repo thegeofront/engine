@@ -6,6 +6,7 @@
 import { FloatMatrix } from "../data/FloatMatrix";
 import { Matrix3 } from "./Matrix3";
 import { Quaternion } from "./Quaternion";
+import { Transform } from "./Transform";
 import { Vector2 } from "./Vector2";
 import { Vector3 } from "./Vector3";
 
@@ -566,131 +567,101 @@ export class Matrix4 extends FloatMatrix {
         return matrix;
     }
 
+    static fromXform(xform: Transform, matrix = new Matrix4()) {
+        return Matrix4.fromPosRotScale(xform.pos, xform.rot, xform.scale, matrix);
+    }
+
     /**
      * creates a matrix from translation, quaternion, scale
      */
-    newCompose(translation: Vector3, quaternion: Quaternion, scale: Vector3, matrix = new Matrix4()): Matrix4 {
-        
-        let d = matrix.data;
+    static fromPosRotScale(pos: Vector3, rot: Quaternion, scale: Vector3, matrix = new Matrix4()): Matrix4 {
 
-        const x = quaternion.x;
-        const y = quaternion.y;
-        const z = quaternion.z;
-        const w = quaternion.w;
-
-        const x2 = x + x;
-        const y2 = y + y;
-        const z2 = z + z;
-
-        const xx = x * x2;
-        const xy = x * y2;
-        const xz = x * z2;
-
-        const yy = y * y2;
-        const yz = y * z2;
-        const zz = z * z2;
-
-        const wx = w * x2;
-        const wy = w * y2;
-        const wz = w * z2;
+        const rx = rot.x;
+        const ry = rot.y;
+        const rz = rot.z;
+        const rw = rot.w;
 
         const sx = scale.x;
         const sy = scale.y;
         const sz = scale.z;
 
-        d[0] = (1 - (yy + zz)) * sx;
-        d[1] = (xy + wz) * sx;
-        d[2] = (xz - wy) * sx;
-        d[3] = 0;
+        const x2 = rx + rx;
+        const y2 = ry + ry;
+        const z2 = rz + rz;
 
-        d[4] = (xy - wz) * sy;
-        d[5] = (1 - (xx + zz)) * sy;
-        d[6] = (yz + wx) * sy;
-        d[7] = 0;
+        const xx = rx * x2;
+        const xy = rx * y2;
+        const xz = rx * z2;
 
-        d[8] = (xz + wy) * sz;
-        d[9] = (yz - wx) * sz;
-        d[10] = (1 - (xx + yy)) * sz;
-        d[11] = 0;
+        const yy = ry * y2;
+        const yz = ry * z2;
+        const zz = rz * z2;
 
-        d[12] = translation.x;
-        d[13] = translation.y;
-        d[14] = translation.z;
-        d[15] = 1;
+        const wx = rw * x2;
+        const wy = rw * y2;
+        const wz = rw * z2;
+
+        matrix.data[0] = (1 - (yy + zz)) * sx;
+        matrix.data[1] = (xy + wz) * sx;
+        matrix.data[2] = (xz - wy) * sx;
+        matrix.data[3] = 0;
+        matrix.data[4] = (xy - wz) * sy;
+        matrix.data[5] = (1 - (xx + zz)) * sy;
+        matrix.data[6] = (yz + wx) * sy;
+        matrix.data[7] = 0;
+        matrix.data[8] = (xz + wy) * sz;
+        matrix.data[9] = (yz - wx) * sz;
+        matrix.data[10] = (1 - (xx + yy)) * sz;
+        matrix.data[11] = 0;
+        matrix.data[12] = pos.x;
+        matrix.data[13] = pos.y;
+        matrix.data[14] = pos.z;
+        matrix.data[15] = 1;
 
         return matrix;
     }
 
-    decompose() : [Vector3, Vector3, Vector3] {
-        const d = this.data;
-
-        // get position
-        let position = Vector3.new();
-        position.x = d[12];
-        position.y = d[13];
-        position.z = d[14];
-
-        // get scale
-        let sx = Vector3.new(d[0], d[1], d[2]).length();
-        let sy = Vector3.new(d[4], d[5], d[6]).length();
-        let sz = Vector3.new(d[8], d[9], d[10]).length();
-
-        // if determine is negative, we need to invert one scale
-        const det = this.determinate();
-        if (det < 0) sx = -sx;
-
-        let scale = Vector3.new();
-        scale.x = sx;
-        scale.y = sy;
-        scale.z = sz;
-
-        // get rotation
-        let rotation = Vector3.new(1 / sx, 1 / sy, 1 / sz);
-
-
-        return [position, rotation, scale];
+    toXform(xform=Transform.new()) : Transform {
+        return xform
     }
 
-    determinate(): number {
-        let m = this.data;
+    determinant(): number {
+        const m = this.data;
 
-        var m00 = m[0 * 4 + 0];
-        var m01 = m[0 * 4 + 1];
-        var m02 = m[0 * 4 + 2];
-        var m03 = m[0 * 4 + 3];
-        var m10 = m[1 * 4 + 0];
-        var m11 = m[1 * 4 + 1];
-        var m12 = m[1 * 4 + 2];
-        var m13 = m[1 * 4 + 3];
-        var m20 = m[2 * 4 + 0];
-        var m21 = m[2 * 4 + 1];
-        var m22 = m[2 * 4 + 2];
-        var m23 = m[2 * 4 + 3];
-        var m30 = m[3 * 4 + 0];
-        var m31 = m[3 * 4 + 1];
-        var m32 = m[3 * 4 + 2];
-        var m33 = m[3 * 4 + 3];
-        var tmp_0 = m22 * m33;
-        var tmp_1 = m32 * m23;
-        var tmp_2 = m12 * m33;
-        var tmp_3 = m32 * m13;
-        var tmp_4 = m12 * m23;
-        var tmp_5 = m22 * m13;
-        var tmp_6 = m02 * m33;
-        var tmp_7 = m32 * m03;
-        var tmp_8 = m02 * m23;
-        var tmp_9 = m22 * m03;
-        var tmp_10 = m02 * m13;
-        var tmp_11 = m12 * m03;
+        const m00 = m[0];
+        const m01 = m[1];
+        const m02 = m[2];
+        const m03 = m[3];
+        const m10 = m[4];
+        const m11 = m[5];
+        const m12 = m[6];
+        const m13 = m[7];
+        const m20 = m[8];
+        const m21 = m[9];
+        const m22 = m[10];
+        const m23 = m[11];
+        const m30 = m[12];
+        const m31 = m[13];
+        const m32 = m[14];
+        const m33 = m[15];
 
-        var t0 =
-            tmp_0 * m11 + tmp_3 * m21 + tmp_4 * m31 - (tmp_1 * m11 + tmp_2 * m21 + tmp_5 * m31);
-        var t1 =
-            tmp_1 * m01 + tmp_6 * m21 + tmp_9 * m31 - (tmp_0 * m01 + tmp_7 * m21 + tmp_8 * m31);
-        var t2 =
-            tmp_2 * m01 + tmp_7 * m11 + tmp_10 * m31 - (tmp_3 * m01 + tmp_6 * m11 + tmp_11 * m31);
-        var t3 =
-            tmp_5 * m01 + tmp_8 * m11 + tmp_11 * m21 - (tmp_4 * m01 + tmp_9 * m11 + tmp_10 * m21);
+        const tmp_0 = m22 * m33;
+        const tmp_1 = m32 * m23;
+        const tmp_2 = m12 * m33;
+        const tmp_3 = m32 * m13;
+        const tmp_4 = m12 * m23;
+        const tmp_5 = m22 * m13;
+        const tmp_6 = m02 * m33;
+        const tmp_7 = m32 * m03;
+        const tmp_8 = m02 * m23;
+        const tmp_9 = m22 * m03;
+        const tmp_10 = m02 * m13;
+        const tmp_11 = m12 * m03;
+
+        const t0 = tmp_0 * m11 + tmp_3 * m21 + tmp_4  * m31 - (tmp_1 * m11 + tmp_2 * m21 + tmp_5  * m31);
+        const t1 = tmp_1 * m01 + tmp_6 * m21 + tmp_9  * m31 - (tmp_0 * m01 + tmp_7 * m21 + tmp_8  * m31);
+        const t2 = tmp_2 * m01 + tmp_7 * m11 + tmp_10 * m31 - (tmp_3 * m01 + tmp_6 * m11 + tmp_11 * m31);
+        const t3 = tmp_5 * m01 + tmp_8 * m11 + tmp_11 * m21 - (tmp_4 * m01 + tmp_9 * m11 + tmp_10 * m21);
 
         return 1.0 / (m00 * t0 + m10 * t1 + m20 * t2 + m30 * t3);
     }
@@ -716,6 +687,7 @@ export class Matrix4 extends FloatMatrix {
         var m31 = m[3 * 4 + 1];
         var m32 = m[3 * 4 + 2];
         var m33 = m[3 * 4 + 3];
+        
         var tmp_0 = m22 * m33;
         var tmp_1 = m32 * m23;
         var tmp_2 = m12 * m33;

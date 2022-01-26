@@ -174,7 +174,7 @@ export class Plane extends Geometry {
         return this;
     }
 
-    // NOTE: pulling is inefficient since i do not cache the inverse.
+    // NOTE: pulling is inefficient since we do not cache the inverse.
     pullToPlane(p: Vector3): Vector3 {
         return this.inverse.multiplyVector(p);
     }
