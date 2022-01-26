@@ -40,6 +40,7 @@ export class KeyboardHandler {
         for (let key of this.keysDownNew) {
             this.keysDown.add(key);
         }
+        console.log(this.keysDown);
         this.keysDownNew = [];
         // this.keyUpActions()
 
@@ -126,6 +127,9 @@ export class KeyboardHandler {
         
         this.keysDownWithAction.delete(code);
         this.keysDown.delete(code);
+        if (this.keysDownNew.indexOf(code) != -1) {
+            this.keysDownNew.splice(this.keysDownNew.indexOf(code), 1);
+        };
 
         // try to do a key up action
         let upAction = this.keyUpActions.get(code); 
@@ -139,6 +143,7 @@ export class KeyboardHandler {
         
         this.keysDownWithAction.clear();
         this.keysDown.clear();
+        this.keysDownNew = [];
     }
 
     private onDomEventFocus() {

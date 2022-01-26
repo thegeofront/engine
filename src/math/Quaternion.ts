@@ -1,6 +1,12 @@
 // author: Jos Feenstra
 // purpose: Quaternion to be used for rotation
+// Inspired by:
 // https://api.flutter.dev/flutter/vector_math/Quaternion-class.html
+
+
+import { TileSolver } from "../algorithms/TileSolver";
+import { Random } from "./Random";
+import { Vector3 } from "./Vector3";
 
 export class Quaternion {
     x: number;
@@ -46,21 +52,63 @@ export class Quaternion {
         } 
     }
 
+
+    lengthSquared() {
+        return (this.x * this.x) + (this.y * this.y) + (this.z * this.z) + (this.w * this.w);
+    }
+
+    length() {
+        return Math.sqrt(this.lengthSquared());
+    }
+
+    set(x=0.0, y=0.0, z=0.0, w=0.0) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.w = w;
+
+        return this;
+    }
+
+
+    copy(q: Quaternion) {
+        this.x = q.x;
+        this.y = q.y;
+        this.z = q.z;
+        this.w = q.w;
+
+        return this;
+    } 
+
+
+    inverse() {
+        const scalar = 1.0 / this.lengthSquared();
+        this.w = this.w * scalar;
+        this.z = -this.z * scalar;
+        this.y = -this.y * scalar;
+        this.x = -this.x * scalar;
+    }
+
+
     add(other: Quaternion) {
         this.x += other.x;
         this.y += other.y;
         this.z += other.z;
         this.w += other.w;
+
         return this;
     }
+
 
     addN(x=0.0, y=0.0, z=0.0, w=0.0) {
         this.x += x;
         this.y += y;
         this.z += z;
         this.w += w;
+
         return this;
     }
+
 
     setEuler(yaw: number, pitch: number, roll: number) {
         const halfYaw = yaw * 0.5;
@@ -77,6 +125,120 @@ export class Quaternion {
         this.z = sinRoll * cosPitch * cosYaw - cosRoll * sinPitch * sinYaw;
         this.w = cosRoll * cosPitch * cosYaw + sinRoll * sinPitch * sinYaw;
         return this;
+    }
+
+
+    setAxisAngle(axis: Vector3, radians: number) {
+        const length = axis.length();
+        if (length == 0.0) {
+            return;
+        }
+        const halfSin = Math.sin(radians * 0.5) / length;
+
+        this.x = axis.x * halfSin;
+        this.y = axis.y * halfSin;
+        this.z = axis.z * halfSin;
+        this.w = Math.cos(radians * 0.5);
+
+        return this;
+    }
+
+    /**
+     * Same as 'setTwoVectors', but skips out on normalization for efficiencie's sake
+     * This makes YOU responsible for giving me two normalized vectors :)
+     */
+    setTwoNormalizedVectors(a: Vector3, b: Vector3) {
+
+        const c = a.dot(b);
+        let angle = Math.acos(c);
+        let axis = a.cross(b);
+
+        if (Math.abs(1.0 + c) < 0.0005) {
+            // c \approx -1 indicates 180 degree rotation
+            angle = Math.PI;
+            // [JF]: This is a common problem, 
+            // a and b are parallel in opposite directions. We need any
+            // vector as our rotation axis that is perpendicular.
+            // Find one by taking the cross product of v1 with an appropriate unit axis
+            if (a.x > a.y && a.x > a.z) {
+                // v1 points in a dominantly x direction, so don't cross with that axis
+                axis = a.cross(Vector3.unitY());
+            } else {
+                // Predominantly points in some other direction, so x-axis should be safe
+                axis = a.cross(Vector3.unitX());
+            }
+        } else if (Math.abs(1.0 - c) < 0.0005) {
+            // c \approx 1 is 0-degree rotation, axis is arbitrary
+            angle = 0.0;
+            axis = Vector3.unitX();
+        }
+
+        return this.setAxisAngle(axis.normalize(), angle);
+    }
+
+    /**
+     * This is like plane.fromCVV, but just the vv part
+     * NOTE: the plane class should probably be deleted eventually, it wont be needed anymore :)
+     * TODO: Replace Plane with a Pose class, aka Transform without Scale
+     */
+    setTwoVectors(a: Vector3, b: Vector3) {
+        return this.setTwoNormalizedVectors(a.normalized(), b.normalized());
+    }
+
+
+    setPose(a: Vector3, b: Vector3) {
+        let i = a.normalized();
+        let k = a.cross(b).normalized();
+        let j = k.cross(a).normalized();
+
+        return this.setFromMatrix(
+            i.x, i.y, i.z, 
+            j.x, j.y, j.z, 
+            k.x, k.y, k.z
+        );
+    }
+
+
+    /**
+     * http://www.euclideanspace.com/maths/algebra/realNormedAlgebra/quaternions/code/index.html
+     */
+    multiply(q2: Quaternion) {
+        const q1 = this;
+        const x =  q1.x * q2.w + q1.y * q2.z - q1.z * q2.y + q1.w * q2.x;
+        const y = -q1.x * q2.z + q1.y * q2.w + q1.z * q2.x + q1.w * q2.y;
+        const z =  q1.x * q2.y - q1.y * q2.x + q1.z * q2.w + q1.w * q2.z;
+        const w = -q1.x * q2.x - q1.y * q2.y - q1.z * q2.z + q1.w * q2.w;
+        this.set(x,y,z,w);
+    }
+
+    /**
+     * I dont know what this means yet ...
+     */
+    setStrangeNumbers(a: number, b: number, c: number) {
+        const x0 = a;
+
+        const r1 = Math.sqrt(1.0 - x0);
+        const r2 = Math.sqrt(x0);
+
+        const t1 = Math.PI * 2.0 * b;
+        const t2 = Math.PI * 2.0 * c;
+        const c1 = Math.cos(t1);
+        const s1 = Math.sin(t1);
+        const c2 = Math.cos(t2);
+        const s2 = Math.sin(t2);
+
+        this.x = s1 * r1;
+        this.y = c1 * r1;
+        this.z = s2 * r2;
+        this.w = c2 * r2;
+        
+        return this;
+    }
+
+    setRandom(random: Random) {
+        // From: "Uniform Random Rotations", Ken Shoemake, Graphics Gems III,
+        // pg. 124-132.
+        return this.setStrangeNumbers(random.get(), random.get(), random.get());
     }
 
     /**
@@ -131,5 +293,38 @@ export class Quaternion {
             this.w = (r[index(k, j)] - r[index(j, k)]) * s;
         }
         return this;
+    }
+
+
+    rotate(v: Vector3) {
+
+        const x = this.x;
+        const y = this.y;
+        const z = this.z;
+        const w = this.w;
+        
+        const tiw = w;
+        const tiz = -z;
+        const tiy = -y;
+        const tix = -x;
+        
+        const tx = tiw * v.x + tix * 0.0 + tiy * v.z - tiz * v.y;
+        const ty = tiw * v.y + tiy * 0.0 + tiz * v.x - tix * v.z;
+        const tz = tiw * v.z + tiz * 0.0 + tix * v.y - tiy * v.x;
+        const tw = tiw * 0.0 - tix * v.x - tiy * v.y - tiz * v.z;
+        
+        const result_x = tw * x + tx * w + ty * z - tz * y;
+        const result_y = tw * y + ty * w + tz * x - tx * z;
+        const result_z = tw * z + tz * w + tx * y - ty * x;
+        
+        v.x = result_x;
+        v.y = result_y;
+        v.z = result_z;
+        
+        return v;
+    }
+
+    rotated(v: Vector3) {
+        return this.rotate(v.clone());
     }
 }

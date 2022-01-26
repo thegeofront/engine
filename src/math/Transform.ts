@@ -82,10 +82,11 @@ export class Transform {
     }
 
     toMatrix() : Matrix4 {
+
         return this.compose();
     }
 
-    private compose() : Matrix4 {        
+    private compose() : Matrix4 {       
         return Matrix4.fromPosRotScale(this.pos, this.rot, this.scale, this._m);
     }
 }

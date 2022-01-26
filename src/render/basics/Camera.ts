@@ -5,6 +5,7 @@ import { KeyboardHandler } from "../../input/KeyboardHandler";
 import { MouseHandler } from "../../input/MouseHandler";
 import { TouchHandler } from "../../input/TouchHandler";
 import { Vector3, Vector2, Plane, Matrix4, InputState, GeonMath, Ray, Matrix3, InputHandler, Debug, Key, Pointertype } from "../../lib";
+import { Transform } from "../../math/Transform";
 
 enum MoveMode {
     None,
@@ -34,9 +35,9 @@ export class Camera {
 
     worldPlane = Plane.WorldXY();
 
+    xform?: Transform;
+
     positionM = Matrix4.new();
-
-
     rotateXRev = Matrix4.new();
     rotateZRev = Matrix4.new();
     rotateX = Matrix4.new();
@@ -163,18 +164,24 @@ export class Camera {
         // let yzFlip = new Matrix4([1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1]);
 
         // translated to fit screen
-        let position = Matrix4.newTranslation(this.pos.x, this.pos.y, this.pos.z);
         let mOffset = Matrix4.newTranslation(offset.x, offset.y, offset.z);
+        let camMatrix : Matrix4;
+        if (!this.xform) {
+            let position = Matrix4.newTranslation(this.pos.x, this.pos.y, this.pos.z);
+            
+            // rotated by user
+            this.rotateX = Matrix4.newXRotation(this.angleAlpha, this.rotateX);
+            this.rotateXRev = Matrix4.newXRotation(-this.angleAlpha, this.rotateXRev);
+            this.rotateZ = Matrix4.newZRotation(this.angleBeta, this.rotateZ);
+            this.rotateZRev = Matrix4.newZRotation(-this.angleBeta, this.rotateZRev);
+            this.rotate.copy(this.rotateZ).multiply(this.rotateX);
+            camMatrix = position.multiply(this.rotate);
+        } else {
+            camMatrix = this.xform.toMatrix().inverse();
+        }
 
-        // rotated by user
-        this.rotateX = Matrix4.newXRotation(this.angleAlpha, this.rotateX);
-        this.rotateXRev = Matrix4.newXRotation(-this.angleAlpha, this.rotateXRev);
-        this.rotateZ = Matrix4.newZRotation(this.angleBeta, this.rotateZ);
-        this.rotateZRev = Matrix4.newZRotation(-this.angleBeta, this.rotateZRev);
-        this.rotate.copy(this.rotateZ).multiply(this.rotateX);
- 
         // let transform = mOffset.multiply(rotation).multiply(position);
-        let worldMatrix = position.multiply(this.rotate).multiply(mOffset);
+        let worldMatrix = camMatrix.multiply(mOffset);
 
         // 2 : project & total
         let projectMatrix = this.getProjectionMatrix(width, height); // THIS IS MORE OR LESS STATIC, CACHE IT!
