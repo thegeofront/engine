@@ -40,7 +40,6 @@ export class KeyboardHandler {
         for (let key of this.keysDownNew) {
             this.keysDown.add(key);
         }
-        console.log(this.keysDown);
         this.keysDownNew = [];
         // this.keyUpActions()
 

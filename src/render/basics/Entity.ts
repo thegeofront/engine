@@ -1,5 +1,6 @@
 // purpose: highest level shadable 'object'.
 //     like: a tree, a rock, a spawner, an enemy.
+// TODO: the idea of ActiveEntity (a spider) vs PassiveEntity (a tree)
 
 import { Transform } from "../../math/Transform";
 import { Model } from "./Model";
