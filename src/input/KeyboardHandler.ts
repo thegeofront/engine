@@ -120,6 +120,7 @@ export class KeyboardHandler {
         }
     }
 
+
     private onDomEventKeyUp(res: any) {
         let code = res.keyCode;
         // console.log(code, "up");
@@ -137,6 +138,7 @@ export class KeyboardHandler {
         }
     }
 
+
     private onDomEventBlur() {
         // console.log("on blur");
         
@@ -145,6 +147,7 @@ export class KeyboardHandler {
         this.keysDownNew = [];
     }
 
+    
     private onDomEventFocus() {
         // console.log("on focus");
     }
