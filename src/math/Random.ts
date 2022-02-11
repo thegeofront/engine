@@ -1,9 +1,6 @@
-//
-// note: thank you, stackoverflow!
-// https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript
-
 /**
  * Pseudo random number generator. based on simple fast counter (sfc32)
+ * https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript
  */
 export class Random {
     private constructor(
