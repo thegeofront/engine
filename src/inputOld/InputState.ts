@@ -131,8 +131,8 @@ export class InputState {
         this.minimumTick = 1000 / 144;
 
         // mouse
-        canvas.addEventListener("mousedown", this.setMouseDown.bind(this));
-        canvas.addEventListener("mouseup", this.setMouseUp.bind(this));
+        window.addEventListener("mousedown", this.setMouseDown.bind(this));
+        window.addEventListener("mouseup", this.setMouseUp.bind(this));
         canvas.addEventListener("contextmenu", (e) => {
             e.preventDefault();
             e.stopPropagation();
