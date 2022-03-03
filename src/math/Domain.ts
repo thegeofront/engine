@@ -36,7 +36,6 @@ export class Domain {
         // create a new domain which bounds all parsed values
         let min = Infinity;
         let max = -Infinity;
-        console.log(data);
         for (let i = 0; i < data.length; i++) {
             if (data[i] < min) min = data[i];
             if (data[i] > max) max = data[i];

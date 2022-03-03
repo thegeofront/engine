@@ -12,12 +12,15 @@ export class UI {
     readonly globalContext: HTMLDivElement;
     currentContext!: HTMLDivElement;
 
-    constructor(frame: HTMLDivElement) {
+    constructor(frame?: HTMLDivElement) {
+        if (!frame) {
+            frame = document.body.appendChild(document.createElement('div'));
+        }
         this.globalContext = frame;
         this.currentContext = frame;
     }
 
-    static new(frame: HTMLDivElement) {
+    static new(frame?: HTMLDivElement) {
         return new UI(frame);
     }
 

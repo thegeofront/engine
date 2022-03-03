@@ -19,7 +19,7 @@ export class Core {
 
     private apps: Map<string, App>;
 
-    constructor(canvas: HTMLCanvasElement, gl: WebGLRenderingContext, uiFrame: HTMLDivElement) {
+    constructor(canvas: HTMLCanvasElement, gl: WebGLRenderingContext, uiFrame?: HTMLDivElement) {
         this.canvas = canvas;
         this.gl = gl;
         this.input = InputHandler.fromCanvas(canvas);
