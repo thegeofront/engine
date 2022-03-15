@@ -1,3 +1,6 @@
+/**
+ * TODO rewrite this so that it uses KeyboardEvent.code instead of keycode, which is apparantly deprecated
+ */
 export enum Key {
     Backspace = 8,
     Tab = 9,
@@ -112,3 +115,40 @@ export enum Key {
     ClosedBracket = 221,
     Quote = 222,
   }
+
+export function codeToKeyCode(code: string) {
+    if (mapping.has(code)) {
+        return mapping.get(code);
+    }
+}
+
+const mapping = new Map<string, Key>(Object.entries({
+    "KeyA": Key.A,
+    "KeyB": Key.B,
+    "KeyC": Key.C,
+    "KeyD": Key.D,
+    "KeyE": Key.E,
+    "KeyF": Key.F,
+    "KeyG": Key.G,
+    "KeyH": Key.H,
+    "KeyI": Key.I,
+    "KeyJ": Key.J,
+    "KeyK": Key.K,
+    "KeyL": Key.L,
+    "KeyM": Key.M,
+    "KeyN": Key.N,
+    "KeyO": Key.O,
+    "KeyP": Key.P,
+    "KeyQ": Key.Q,
+    "KeyR": Key.R,
+    "KeyS": Key.S,
+    "KeyT": Key.T,
+    "KeyU": Key.U,
+    "KeyV": Key.V,
+    "KeyW": Key.W,
+    "KeyX": Key.X,
+    "KeyY": Key.Y,
+    "KeyZ": Key.Z,
+}));
+
+

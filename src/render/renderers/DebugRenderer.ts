@@ -126,6 +126,11 @@ export class DebugRenderer {
         }
     }
 
+    delete(key: string) {
+        this.shaders.delete(key);
+        this.activeShaders.delete(key);
+    } 
+
     render(c: Scene) {
         for (let key of this.activeShaders) {
             this.shaders.get(key)!.render(c);

@@ -26,6 +26,10 @@ export class Vector2 {
 
     // --- factories & other statics
 
+    
+    // use this to skip object creation
+    static dummy = Vector2.zero();
+
     static _zero: Vector2 = Vector2.zero();
 
     static new(x = 0, y = 0) {
@@ -327,3 +331,5 @@ export class Vector2 {
         return this.copy(other).scale(scalar);
     }
 }
+
+const _vector = new Vector2(0, 0);

@@ -25,7 +25,7 @@ export class KeyboardHandler {
 
     static new(context: Context) {
         // NOTE: it seems that svg's do not handle button press events. For now, use global window.
-        return new KeyboardHandler(window);
+        return new KeyboardHandler(context);
     }
 
     update() {
@@ -140,7 +140,7 @@ export class KeyboardHandler {
 
 
     private onDomEventBlur() {
-        // console.log("on blur");
+        console.log("on blur");
         
         this.keysDownWithAction.clear();
         this.keysDown.clear();
@@ -149,6 +149,6 @@ export class KeyboardHandler {
 
     
     private onDomEventFocus() {
-        // console.log("on focus");
+        console.log("on focus");
     }
 }

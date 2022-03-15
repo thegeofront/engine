@@ -132,7 +132,7 @@ export class InputState {
 
         // mouse
         canvas.addEventListener("mousedown", this.setMouseDown.bind(this));
-        canvas.addEventListener("mouseup", this.setMouseUp.bind(this));
+        document.addEventListener("mouseup", this.setMouseUp.bind(this));
         canvas.addEventListener("contextmenu", (e) => {
             e.preventDefault();
             e.stopPropagation();

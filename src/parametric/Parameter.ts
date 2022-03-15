@@ -34,14 +34,14 @@ export class Parameter {
         return Domain.new(this.min, this.max);
     }
 
-    set(state: number, activateOnSet = true) {
+    set(state: number, doOnSet = true) {
         // something is still wrong here...
         let clamped = GeonMath.clamp(state, this.min, this.max);
         let rest = state - this.min;
         let times = Math.round(rest / this.step);
         let stepped = this.min + this.step * times;
         this.state = GeonMath.clamp(stepped, this.min, this.max);
-        if (activateOnSet) this.onset();
+        if (doOnSet) this.onset();
     }
 
     getNPermutations() {
