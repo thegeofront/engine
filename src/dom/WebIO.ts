@@ -61,6 +61,17 @@ export namespace WebIO {
         return res;
     }
 
+    export async function readFileAsText(file: File): Promise<string | ArrayBuffer | null> {
+        return new Promise((resolve, reject) => {
+          var fr = new FileReader();  
+            fr.onload = () => {
+                resolve(fr.result)
+            };
+            fr.onerror = reject;
+            fr.readAsText(file);
+        });
+    }
+
     /////////////////////////////////////////////////////////////////////////// Private
 
     function loadImageFromBlob(blob: Blob): Promise<ImageData> {
@@ -98,3 +109,24 @@ export namespace WebIO {
         return data;
     }    
 }
+
+
+/**
+ * For ways of putting data into the browser
+ */
+export namespace WebInput {
+
+    export function askForFile(file: string, callback: (files: FileList) => void) {
+        var e = document.createElement("input");
+        e.setAttribute("type", "file");
+        e.setAttribute("multiple", "");
+        e.onchange = () => {
+            callback(e.files);
+        }
+        document.body.appendChild(e);
+        e.click();
+        document.body.removeChild(e);
+        e.remove();
+    }
+
+} 
