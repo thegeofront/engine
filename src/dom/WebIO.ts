@@ -116,7 +116,7 @@ export namespace WebIO {
  */
 export namespace WebInput {
 
-    export function askForFile(file: string, callback: (files: FileList) => void) {
+    export function askForFile(file: string, callback: (files: FileList | null) => void) {
         var e = document.createElement("input");
         e.setAttribute("type", "file");
         e.setAttribute("multiple", "");
