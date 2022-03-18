@@ -38,6 +38,10 @@ export class MultiLine {
         }
     }
 
+    static new(vertData: Float32Array, idData?: Uint16Array) {
+        return new MultiLine(MultiVector3.fromData(vertData), idData);
+    }
+
     // this assumes even vectices are 'from' points, and odd vertices are 'to' points
     static fromLines(verts: Vector2[] | Vector3[] | MultiVector2 | MultiVector3) {
         let data = ToFloatMatrix(verts);

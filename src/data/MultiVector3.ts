@@ -16,6 +16,20 @@ export class MultiVector3 extends Geometry {
         return new MultiVector3(new FloatMatrix(3, count));
     }
 
+    static fromJoin(list: MultiVector3[]) {
+        let lengths = list.map(mv => mv.matrix.data.length);
+        let sum = lengths.reduce((partial, length) => partial + length, 0);
+        let mv =  MultiVector3.new(sum / 3);
+        
+        let acc = 0;
+        for (let [i, length] of lengths.entries()) {
+            mv.matrix.data.set(list[i].matrix.data, acc);
+            acc += length;
+        }
+
+        return mv;
+    }
+
     static fromList(vecs: Vector3[]): MultiVector3 {
         let length = vecs.length;
         let multi = MultiVector3.new(length);

@@ -132,16 +132,6 @@ export namespace ObjProcessing {
                         verts.push(parseFloat(part));
                     }
                     break;
-                case "v":
-                    for (const part of parts) {
-                        verts.push(parseFloat(part));
-                    }
-                    break;
-                case "v":
-                    for (const part of parts) {
-                        verts.push(parseFloat(part));
-                    }
-                    break;
                 case "vn":
                     for (const part of parts) {
                         norms.push(parseFloat(part));
