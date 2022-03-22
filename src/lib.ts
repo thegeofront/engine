@@ -8,6 +8,7 @@ export * from "./render/OldMultiShader";
 
 export * from "./algorithms/MarchingCubes";
 export * from "./algorithms/Perlin";
+export * from "./algorithms/Triangulator";
 
 export * from "./app/App";
 export * from "./app/Core";

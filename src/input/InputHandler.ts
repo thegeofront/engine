@@ -42,8 +42,7 @@ export class InputHandler {
     static new(context: Context, width: number, height: number) {
         let timeHandler = TimeHandler.new()
         let isMobile =  Util.isUserMobile();
-        console.log({isMobile});
-
+      
         if (isMobile) {
             let touchHandler = TouchHandler.new(context, width, height);
             return new InputHandler(
