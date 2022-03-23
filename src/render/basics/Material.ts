@@ -36,6 +36,17 @@ export class Material {
         );
     }
 
+    static fromFlatColor(color: Color) {
+        return new Material(
+            color,
+            Color.fromHex("#000000")!,
+            Color.fromHex("#000000")!,
+            Color.fromHex("#000000")!,
+            3.195,
+            1,
+        );
+    }
+
     static grey() {
         return new Material(
             Color.fromHex("#1d1d1d")!,

@@ -87,7 +87,7 @@ export class Camera {
      * New way of updating. Has touch support
      */
     update(state: InputHandler, forceUpdate = true) : boolean {
-        let hasChanged = this.updateControlsNew(state);
+        let hasChanged = this.updateControls(state);
         if (hasChanged || forceUpdate) {
             this.updateMatrices(state.width, state.height); // TODO only move if we have changed
         }
@@ -237,7 +237,7 @@ export class Camera {
         return hasChanged1 || hasChanged2;
     }
 
-    private updateControlsNew(input: InputHandler) {
+    private updateControls(input: InputHandler) {
         
         if (!this.canControl) {
             return false;

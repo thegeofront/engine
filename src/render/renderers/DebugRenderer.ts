@@ -24,6 +24,7 @@ import { Bufferable } from "../basics/Bufferable";
 import { AnyShader, createNewShaderForShadable, Shadable } from "../basics/Shadable";
 import { Entity } from "../basics/Entity";
 import { PhongShader } from "../shaders/PhongShader";
+import { Model } from "../basics/Model";
 
 // NOTE: I think this type of polymorphism is better than regular polymorphism
 export type RenderableUnit =

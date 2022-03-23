@@ -23,26 +23,6 @@ THIS SOFTWARE.
  */
 export namespace Triangulator {
 
-    export function polygonToMesh() {
-        
-    }
-
-    export function multiPolygonToMesh(arrayTree: any) {
-        let res = Triangulator.flatten(arrayTree);
-        let vertices = res.vertices;
-
-        let triangles = Triangulator.triangulate(
-            res.vertices, 
-            res.holes, 
-            res.dimensions);
-
-        return {
-            type: `mesh-${res.dimensions}`,
-            vertices,
-            triangles,
-        }
-    }
-
     /**
      * 
      * ...

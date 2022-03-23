@@ -95,10 +95,10 @@ export class KeyboardHandler {
     private start() {
         let c = this.context;
         
-        c.addEventListener("keydown", (res) => this.onDomEventKeyDown(res));
-        c.addEventListener("keyup", (res) => this.onDomEventKeyUp(res));
-        c.addEventListener("blur", (res) => this.onDomEventBlur());
-        c.addEventListener("focus", (res) => this.onDomEventFocus());
+        window.addEventListener("keydown", (res) => this.onDomEventKeyDown(res));
+        window.addEventListener("keyup", (res) => this.onDomEventKeyUp(res));
+        window.addEventListener("blur", (res) => this.onDomEventBlur());
+        window.addEventListener("focus", (res) => this.onDomEventFocus());
     }
 
 
