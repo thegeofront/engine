@@ -24,6 +24,7 @@ export class Color {
     }
         
     static fromHex(str: string) {
+        if (!str) return;
         str = str.replace('#', '');
         let parts = str.match(/.{1,2}/g);
         if (!parts) {
