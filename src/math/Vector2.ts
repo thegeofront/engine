@@ -11,7 +11,10 @@ import { Matrix4 } from "./Matrix4";
 import { Random } from "./Random";
 import { Util } from "./Util";
 
+const trait = "vector-2";
+
 export class Vector2 {
+    trait = trait;
     x: number;
     y: number;
 
@@ -26,7 +29,6 @@ export class Vector2 {
 
     // --- factories & other statics
 
-    
     // use this to skip object creation
     static dummy = Vector2.zero();
 

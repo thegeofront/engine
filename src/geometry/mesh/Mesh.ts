@@ -45,13 +45,14 @@ export enum NormalKind {
 }
 
 export class Mesh extends Geometry {
-    
+    trait = "mesh-3";
+
     constructor(
         public verts: MultiVector3,
         public links: IntMatrix, // relationships, can be 3 (triangles) | 4 (quads)
         private _uvs?: MultiVector2,
-        private _normals?: MultiVector3, 
-        private _normalKind = NormalKind.None
+        private _normals?: MultiVector3,
+        private _normalKind = NormalKind.None,
     ) {
         super();
     }
@@ -88,7 +89,13 @@ export class Mesh extends Geometry {
     /////////////////////////////////////////////////////////////////////////// Geometry Trait
 
     clone(): Mesh {
-        return new Mesh(this.verts.clone(), this.links.clone(), this._uvs?.clone(), this._normals?.clone(), this._normalKind);
+        return new Mesh(
+            this.verts.clone(),
+            this.links.clone(),
+            this._uvs?.clone(),
+            this._normals?.clone(),
+            this._normalKind,
+        );
     }
 
     transform(m: Matrix4): Mesh {
@@ -109,14 +116,36 @@ export class Mesh extends Geometry {
         return new Mesh(verts, links, uvs, normals);
     }
 
-    static fromLists(verts: Vector3[], faces: number[], uvs=[], normals=[], normalKind = NormalKind.None): Mesh {
-        return new Mesh(MultiVector3.fromList(verts), IntMatrix.fromList(faces, 3), MultiVector2.fromList(uvs), MultiVector3.fromList(normals), normalKind);
+    static fromLists(
+        verts: Vector3[],
+        faces: number[],
+        uvs = [],
+        normals = [],
+        normalKind = NormalKind.None,
+    ): Mesh {
+        return new Mesh(
+            MultiVector3.fromList(verts),
+            IntMatrix.fromList(faces, 3),
+            MultiVector2.fromList(uvs),
+            MultiVector3.fromList(normals),
+            normalKind,
+        );
     }
 
-    static fromRawLists(verts: number[], faces: number[], uvs: number[], normals: number[], normalKind=NormalKind.None): Mesh {
-        
-        return new Mesh(MultiVector3.fromData(verts), IntMatrix.fromList(faces, 3), MultiVector2.fromData(uvs), MultiVector3.fromData(normals), normalKind);
-
+    static fromRawLists(
+        verts: number[],
+        faces: number[],
+        uvs: number[],
+        normals: number[],
+        normalKind = NormalKind.None,
+    ): Mesh {
+        return new Mesh(
+            MultiVector3.fromData(verts),
+            IntMatrix.fromList(faces, 3),
+            MultiVector2.fromData(uvs),
+            MultiVector3.fromData(normals),
+            normalKind,
+        );
     }
 
     static newEmpty(vertCount: number, linkCount: number, perLinkCount: number): Mesh {
@@ -234,16 +263,18 @@ export class Mesh extends Geometry {
 
     static fromRectDoubleSided(rect: Rectangle3, texture?: ImageData) {
         let verts = rect.getCorners();
-        let uvs = MultiVector2.fromData(new Float32Array([
-            0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0,
-        ]),);
+        let uvs = MultiVector2.fromData(
+            new Float32Array([
+                0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0,
+            ]),
+        );
         let faces = IntMatrix.fromList([0, 1, 3, 0, 3, 2, 0, 3, 1, 0, 2, 3], 3);
         let mesh = Mesh.new(MultiVector3.fromList(verts), faces, uvs);
         return mesh;
     }
 
     static newTriangle(corners: Vector3[]) {
-        return this.fromLists(corners, [0,1,2]);
+        return this.fromLists(corners, [0, 1, 2]);
     }
 
     static newQuad(corners: Vector3[]) {
@@ -601,8 +632,8 @@ export class Mesh extends Geometry {
 
     toLines(): Mesh {
         // i think we can replace this with this.getLineIds(), I just cant be bothered to test side effects for now...
-        const getLines = (num: number) => { 
-            let count = this.links.count() * num; 
+        const getLines = (num: number) => {
+            let count = this.links.count() * num;
             let lines = new IntMatrix(count, 2);
             for (let i = 0; i < this.links.count(); i++) {
                 for (let j = 0; j < num; j++) {
@@ -839,23 +870,22 @@ export class Mesh extends Geometry {
 
     /**
      * 1. For every edge, intersect with plane. if hit: store
-     * 2. Use triangle IDS to stitch the points together to form lines. 
-     * (2. for now, just figure out continuous line segments some other way) 
-     * @returns 
+     * 2. Use triangle IDS to stitch the points together to form lines.
+     * (2. for now, just figure out continuous line segments some other way)
+     * @returns
      */
-    xPlane(plane: Plane) : MultiLine {
-
+    xPlane(plane: Plane): MultiLine {
         if (this.links._width != 3) {
             Debug.error("intersection on quad based mesh not implemented...");
             return MultiLine.fromLines([]);
         }
 
-        let width = 3
+        let width = 3;
         let height = this.links.count();
 
-        // we can never have more than 2 vertices per face. We will make this array shorter at the end 
-        let linePoints = MultiVector3.new(height * 2); 
-        
+        // we can never have more than 2 vertices per face. We will make this array shorter at the end
+        let linePoints = MultiVector3.new(height * 2);
+
         let points: Vector3[] = [];
         let nCuts = 0;
 
@@ -863,15 +893,15 @@ export class Mesh extends Geometry {
         let a = Vector3.zero();
         let b = Vector3.zero();
         let c = Vector3.zero();
-        
-        // in between products 
+
+        // in between products
         let ba = Vector3.zero();
         let ac = Vector3.zero();
         let intersectionsPerTriangle;
         let pNormal = plane.khat;
         let pCenter = plane.center;
         let stored: Vector3 | undefined;
-        let twice = false; 
+        let twice = false;
 
         // per triangle
         for (let i = 0; i < height; i++) {
@@ -882,9 +912,9 @@ export class Mesh extends Geometry {
             for (let j = 0; j < width; j++) {
                 if (twice) continue;
                 let jnext = (j + 1) % width;
-                
+
                 let ia = this.links.get(i, j);
-                let ib = this.links.get(i, jnext)
+                let ib = this.links.get(i, jnext);
 
                 // get the verts of the edge
                 this.verts.getCopy(a, ia);
@@ -904,10 +934,10 @@ export class Mesh extends Geometry {
                     continue;
                 }
 
-                // if we arrive here: valid intersection!               
+                // if we arrive here: valid intersection!
                 if (stored) {
                     linePoints.set(nCuts, stored);
-                    linePoints.set(nCuts+1, c.copy(a).lerp(b, t));
+                    linePoints.set(nCuts + 1, c.copy(a).lerp(b, t));
                     nCuts += 2;
                     twice = true;
                 } else {
@@ -964,8 +994,7 @@ const cubeUVS = [
     [1.0, 0.0],
     [0.0, 1.0],
     [1.0, 1.0],
-]
-
+];
 
 export function quadToTri(abcd: number[]): number[] {
     return [abcd[0], abcd[2], abcd[1], abcd[0], abcd[3], abcd[2]];

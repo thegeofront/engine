@@ -63,6 +63,9 @@ export class DebugRenderer {
     }
 
     clear() {
+        for (let shader of this.shaders.values()) {
+            shader
+        }
         this.shaders.clear();
         this.activeShaders.clear();
     }

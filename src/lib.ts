@@ -39,6 +39,7 @@ export * from "./geometry/primitives/Plane";
 export * from "./geometry/primitives/Rectangle";
 export * from "./geometry/primitives/Triangle2";
 export * from "./geometry/primitives/Triangle3";
+export * from "./geometry/primitives/Polygon2";
 
 export * from "./geometry/curve/Curve";
 export * from "./geometry/curve/Bezier";
@@ -110,8 +111,6 @@ export * from "./render/shaders/PhongShader";
 export * from "./render/shaders/TemplateShader";
 export * from "./render/shaders/ZebraShader";
 export * from "./render/shaders/SkyBoxShader";
-
-
 
 export * from "./render/webgl/DrawTarget";
 export * from "./render/webgl/Attribute";
