@@ -43,6 +43,19 @@ export class Domain {
         return new Domain(min, max);
     }
 
+    static normalize(a: number, start: number, end: number) {
+        return (a - start) / (end - start);
+    }
+
+    static elevate(a: number, start: number, end: number) {
+        return a * (end - start) + start;
+    }
+
+    static remap(a: number, aStart: number, aEnd: number, bStart: number, bEnd: number) {
+        let norm = Domain.normalize(a, aStart, aEnd);
+        return Domain.elevate(norm, bStart, bEnd);
+    }
+
     offset(t0Offset: number, t1Offset: number) {
         this.t0 += t0Offset;
         this.t1 += t1Offset;

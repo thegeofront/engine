@@ -22,7 +22,7 @@ export class Color {
     static new() {
         return new Color([1, 1, 1, 1]);
     }
-        
+
     static fromHex(str: string) {
         if (!str) return;
         str = str.replace('#', '');
@@ -48,7 +48,7 @@ export class Color {
     }
 
     static fromList(list: number[]) {
-        if (list.length != 3) {
+        if (list.length != 3 && list.length != 4) {
             return undefined;
         }
         return new Color(list);

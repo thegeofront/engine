@@ -4,6 +4,10 @@ import { Const } from "./Const";
 
 export class GeonMath {
 
+    static round(value: number, decimals: number) {
+        return Number(Math.round(Number(value + 'e' + decimals))+'e-'+decimals);
+    }
+
     static isRougly(value: number, check: number, tolerance: number) {
         return Math.abs(value - check) < tolerance;
     }
