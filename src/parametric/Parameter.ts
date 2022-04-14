@@ -30,7 +30,12 @@ export class Parameter {
         return this.state;
     }
 
-    getDomain() : Domain {
+    // FORGOT TO COMMIT REMOVE THIS
+    getNorm() {
+        return (this.state - this.min) / (this.max - this.min);
+    }
+
+    getDomain(): Domain {
         return Domain.new(this.min, this.max);
     }
 
@@ -42,6 +47,11 @@ export class Parameter {
         let stepped = this.min + this.step * times;
         this.state = GeonMath.clamp(stepped, this.min, this.max);
         if (doOnSet) this.onset();
+    }
+
+    // FORGOT TO COMMIT REMOVE THIS
+    setNorm(n: number) {
+        return this.set(n * (this.max - this.min) + this.min);
     }
 
     getNPermutations() {
@@ -63,10 +73,7 @@ export class Parameter {
     }
 
     private onset() {
-        if (this.slider)
-            this.slider.valueAsNumber = this.state;
-        if (this.text)
-            this.text.innerText = this.state.toString();
+        if (this.slider) this.slider.valueAsNumber = this.state;
+        if (this.text) this.text.innerText = this.state.toString();
     }
 }
-
