@@ -45,8 +45,7 @@ export enum NormalKind {
 }
 
 export class Mesh extends Geometry {
-    trait = "mesh-3";
-
+ 
     constructor(
         public verts: MultiVector3,
         public links: IntMatrix, // relationships, can be 3 (triangles) | 4 (quads)

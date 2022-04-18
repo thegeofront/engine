@@ -38,7 +38,8 @@ export type RenderableUnit =
     | MultiLine
     | ImageMesh
     | Circle3
-    | Entity;
+    | Entity
+    | Array<RenderableUnit>;
 type AcceptableShader =
     | AnyShader
     | DotShader
@@ -78,6 +79,8 @@ export class DebugRenderer {
             key = createRandomGUID().slice(0, 8);
         }
 
+        // TODO what if the key is present, but the renderable unit is something different? 
+
         let shader = this.shaders.get(key);
         if (!shader) {
             return this.add(key, unit, ...options);
@@ -110,6 +113,10 @@ export class DebugRenderer {
         shader.set(shadable, DrawSpeed.StaticDraw);
 
         return shader;
+    }
+
+    getShaders() {
+        return this.shaders;
     }
 
     addUi(ui: UI) {
@@ -239,7 +246,6 @@ export class DebugRenderer {
             shader = new TextureMeshShader(gl);
             shader.set(unit.buffer(), DrawSpeed.StaticDraw);
         } else if (unit instanceof Entity) {
-
             if (unit.model.material.texture) {
                 // TODO WE NEED A NEW TEXTUREDMESHSHADER!!!!!
                 shader = new TextureMeshShader(gl);

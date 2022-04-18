@@ -6,6 +6,7 @@ export * from "./math/Util";
 export * from "./image/Kernels";
 export * from "./render/OldMultiShader";
 
+export * from "./algorithms/Delaunay";
 export * from "./algorithms/MarchingCubes";
 export * from "./algorithms/Perlin";
 export * from "./algorithms/Triangulator";

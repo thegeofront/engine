@@ -2,9 +2,10 @@
 // TODO: extend from a generic triangulation? might be nice to have
 // TODO: make sure triangles are always counter clockwise, this is unelegant
 
+import { IntMatrix, Mesh, MultiVector2 } from "../lib";
 import { Vector2 } from "../math/Vector2";
 
-const MAX_TRIANGLE_RANGE = 10000000; // experiement with Math.Infinite
+const MAX_TRIANGLE_RANGE = 10000000; // TODO: experiment with Math.Infinite
 
 export class Delaunay {
     private pts: Vector2[];
@@ -23,6 +24,28 @@ export class Delaunay {
         this.pts.push(new Vector2(MAX_TRIANGLE_RANGE, -MAX_TRIANGLE_RANGE));
         this.pts.push(new Vector2(0, MAX_TRIANGLE_RANGE));
         this.trs.push([0, 1, 2, -1, -1, -1]);
+    }
+
+    static new() {
+        return new Delaunay()
+    }
+
+    static fromPoints(points: MultiVector2) {
+        let d = new Delaunay();
+        points.forEach(p => d.insert(p));
+        return d;
+    }
+
+    toMesh() : Mesh {
+
+        // filter out the big base triangle 
+        let nobigtri: number[][] = [];
+        this.trs.forEach(list => {
+            if (list[0] < 3 || list[1] < 3 || list[2] < 3) return;
+            nobigtri.push([list[0]-3, list[1]-3, list[2]-3]);
+        });
+
+        return Mesh.new(MultiVector2.fromList(this.pts.slice(3)).to3D(), IntMatrix.from2dList(nobigtri, 3));
     }
 
     public getVertices() {
@@ -53,6 +76,17 @@ export class Delaunay {
         }
 
         return edges;
+    }
+
+    /**
+     * @param levels A property per vertex
+     * @param level a level of which we wish to extract the isocurves
+     */
+    public getIsoCurves(levels: number, level: number) {
+        let visisted = new Set<number>();
+
+        // make sure we visit every triangle
+        for (let i = 0; i < this.trs.length; i++) {}
     }
 
     public getCircumcirclesWithRadii() {

@@ -26,13 +26,15 @@ export class Parameter {
         return new Parameter(name, state ? 1 : 0, 0, 1, 1);
     }
 
-    get(): number {
-        return this.state;
-    }
-
-    // FORGOT TO COMMIT REMOVE THIS
+    /**
+     * get the current state, normalized
+     */
     getNorm() {
         return (this.state - this.min) / (this.max - this.min);
+    }
+
+    get(): number {
+        return this.state;
     }
 
     getDomain(): Domain {
@@ -49,9 +51,8 @@ export class Parameter {
         if (doOnSet) this.onset();
     }
 
-    // FORGOT TO COMMIT REMOVE THIS
-    setNorm(n: number) {
-        return this.set(n * (this.max - this.min) + this.min);
+    setNorm(state: number) {
+        return this.set(state * (this.max - this.min) + this.min);
     }
 
     getNPermutations() {

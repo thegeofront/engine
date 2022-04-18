@@ -15,6 +15,11 @@ export namespace ObjProcessing {
 
     }
 
+    export function write(mesh: Mesh) : string {
+        // TODO TODO TODO
+        return "";
+    }
+
     /**
      * Useful for when you just want one mesh from an OBJ.
      * Not useful if you want explicit material info

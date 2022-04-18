@@ -25,6 +25,18 @@ export class IntMatrix {
         return array;
     }
 
+    static from2dList(list: number[][], width?: number): IntMatrix {
+        width = width || list[0].length; 
+        let height = list.length;
+        let array = new IntMatrix(height, width);
+        for (let i = 0; i < height; i++) {
+            for (let j = 0 ; j < width; j++) {
+                array.data[i * width + j] = list[i][j];
+            }
+        }
+        return array;
+    }
+
     print() {
         let strings: string[] = [];
         const WIDTH = 8;
