@@ -19,7 +19,7 @@ export class HashTable<V> {
         return this.data.has(this.stringify(key));
     }
 
-    get(key: any) {
+    get(key: any): undefined | V {
         return this.data.get(this.stringify(key));
     }
 }

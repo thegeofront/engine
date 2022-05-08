@@ -2,7 +2,7 @@
 // TODO: extend from a generic triangulation? might be nice to have
 // TODO: make sure triangles are always counter clockwise, this is unelegant
 
-import { IntMatrix, Mesh, MultiVector2 } from "../lib";
+import { Domain, HashTable, IntMatrix, Mesh, MultiVector2 } from "../lib";
 import { Vector2 } from "../math/Vector2";
 
 const MAX_TRIANGLE_RANGE = 10000000; // TODO: experiment with Math.Infinite
@@ -27,25 +27,27 @@ export class Delaunay {
     }
 
     static new() {
-        return new Delaunay()
+        return new Delaunay();
     }
 
     static fromPoints(points: MultiVector2) {
         let d = new Delaunay();
-        points.forEach(p => d.insert(p));
+        points.forEach((p) => d.insert(p));
         return d;
     }
 
-    toMesh() : Mesh {
-
-        // filter out the big base triangle 
+    toMesh(): Mesh {
+        // filter out the big base triangle
         let nobigtri: number[][] = [];
-        this.trs.forEach(list => {
+        this.trs.forEach((list) => {
             if (list[0] < 3 || list[1] < 3 || list[2] < 3) return;
-            nobigtri.push([list[0]-3, list[1]-3, list[2]-3]);
+            nobigtri.push([list[0] - 3, list[1] - 3, list[2] - 3]);
         });
 
-        return Mesh.new(MultiVector2.fromList(this.pts.slice(3)).to3D(), IntMatrix.from2dList(nobigtri, 3));
+        return Mesh.new(
+            MultiVector2.fromList(this.pts.slice(3)).to3D(),
+            IntMatrix.from2dList(nobigtri, 3),
+        );
     }
 
     public getVertices() {
@@ -82,11 +84,73 @@ export class Delaunay {
      * @param levels A property per vertex
      * @param level a level of which we wish to extract the isocurves
      */
-    public getIsoCurves(levels: number, level: number) {
-        let visisted = new Set<number>();
+    public getIsoCurves(levels: number[], level: number, norm: false): Vector2[][] {
+        if (levels.length != this.pts.length)
+            throw new Error("Need same number of levels as vertices");
 
-        // make sure we visit every triangle
-        for (let i = 0; i < this.trs.length; i++) {}
+        let isoCurves: Vector2[][] = [];
+        // todo if level is below or above ALL levels, return
+        if (!isInBetween(level, levels)) return isoCurves;
+
+        // do some setup
+        let isoPointData = new HashTable<Vector2>();
+
+        let getIsoPoint = (triInner: number, triOuter: number): Vector2 | undefined => {
+            // if (triA > triB) {
+            //     let tmp = triB;
+            //     triB = triA;
+            //     triA = tmp;
+            // }
+            return isoPointData.get([triInner, triOuter]);
+        };
+
+        let setIsoPoint = (point: Vector2, triInner: number, triOuter: number) => {
+            // if (triA > triB) {
+            //     let tmp = triB;
+            //     triB = triA;
+            //     triA = tmp;
+            // }
+            isoPointData.set([triInner, triOuter], point);
+        };
+
+        let isoPoints = [];
+
+        // find all relevant edges
+        for (let [i, tr] of this.trs.entries()) {
+            for (let [j, k, nb] of [
+                [0, 1, 5],
+                [1, 2, 3],
+                [2, 0, 4],
+            ]) {
+                let levelA = levels[tr[j]];
+                let levelB = levels[tr[k]];
+
+                if (levelA > levelB) {
+                    let tmp = levelB;
+                    levelB = levelA;
+                    levelA = tmp;
+                }
+
+                if (levelA < level && level < levelB) {
+                    // we have an isoPoint!
+                    let param = norm ? 0.5 : Domain.normalize(level, levelA, levelB);
+
+                    let from = this.pts[tr[j]];
+                    let to = this.pts[tr[k]];
+
+                    let innerTri = i;
+                    let outerTri = tr[nb];
+
+                    let isoPoint = Vector2.fromLerp(from, to, param);
+                    setIsoPoint(isoPoint, innerTri, outerTri);
+                    isoPoints.push(isoPoint);
+                }
+            }
+        }
+
+        // now stitch all isopoints together to isocurves
+
+        return [];
     }
 
     public getCircumcirclesWithRadii() {
@@ -280,4 +344,22 @@ export class Delaunay {
         if (this.trs[triangleID][5] == neighborID) index = 2;
         return this.trs[triangleID][index];
     }
+}
+
+function isInBetween(value: number, values: number[]): boolean {
+    let isLowest = true;
+    let isHighest = true;
+
+    for (let i of values) {
+        if (i > value) {
+            isHighest = false;
+        }
+
+        if (i < value) {
+            isLowest = false;
+        }
+    }
+
+    // the value is in-between values if `value` is neither highest nor lowest
+    return !isLowest && !isHighest;
 }
